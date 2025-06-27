@@ -50,7 +50,7 @@ export default function LandingPage() {
             
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
               Built for everyday people who want to eat smart, feel better, and stay on track. 
-              Get AI-powered meal plans tailored to your goals—whether you're building muscle, 
+              Get AI-powered meal plans tailored to your goals—whether you&apos;re building muscle, 
               losing weight, or maintaining your ideal lifestyle.
             </p>
 
@@ -84,7 +84,7 @@ export default function LandingPage() {
               Everything You Need to Reach Your Goals
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              From calculating your daily needs to generating personalized meal plans—we've got you covered.
+              From calculating your daily needs to generating personalized meal plans—we&apos;ve got you covered.
             </p>
           </div>
 
@@ -132,7 +132,7 @@ export default function LandingPage() {
             Ready to Transform Your Nutrition?
           </h2>
           <p className="text-xl text-gray-600 mb-8">
-            Join thousands of people who've made nutrition simple and effective with NutriGoal.
+            Join thousands of people who&apos;ve made nutrition simple and effective with NutriGoal.
           </p>
           
           <Link 

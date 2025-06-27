@@ -12,7 +12,7 @@ export default function TestSupabase() {
     async function testConnection() {
       try {
         // Test basic connection
-        const { data, error } = await supabase.from('user_profiles').select('count').limit(1)
+        const { error } = await supabase.from('user_profiles').select('count').limit(1)
         
         if (error) {
           if (error.message.includes('relation "user_profiles" does not exist')) {

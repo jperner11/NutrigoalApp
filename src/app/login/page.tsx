@@ -45,7 +45,7 @@ export default function LoginPage() {
         // Redirect to onboarding
         window.location.href = '/onboarding'
       }
-    } catch (error) {
+    } catch {
       toast.error('Something went wrong. Please try again.')
     } finally {
       setIsLoading(false)
