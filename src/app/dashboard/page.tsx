@@ -116,7 +116,7 @@ export default function DashboardPage() {
             Welcome back, {mockUserData.name.split(' ')[0]}! &#128075;
           </h1>
           <p className="text-gray-600">
-            Let's continue your nutrition journey. Here's your plan for today.
+            Let&apos;s continue your nutrition journey. Here&apos;s your plan for today.
           </p>
         </div>
 
@@ -216,7 +216,7 @@ export default function DashboardPage() {
             {/* Meal Plan */}
             <div>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">Today's Meal Plan</h2>
+                <h2 className="text-2xl font-bold text-gray-900">Today&apos;s Meal Plan</h2>
                 {!mockUserData.isPremium && (
                   <Link
                     href="/premium"

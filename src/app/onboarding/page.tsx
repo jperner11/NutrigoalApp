@@ -12,16 +12,6 @@ interface FormData extends UserMetrics {
   allergies: string[]
 }
 
-const DIETARY_OPTIONS = [
-  'Vegetarian', 'Vegan', 'Keto', 'Paleo', 'Mediterranean', 
-  'Low Carb', 'High Protein', 'Gluten Free', 'No Restrictions'
-]
-
-const COMMON_ALLERGIES = [
-  'Dairy', 'Eggs', 'Fish', 'Shellfish', 'Tree Nuts', 
-  'Peanuts', 'Wheat', 'Soy', 'None'
-]
-
 export default function OnboardingPage() {
   const [step, setStep] = useState(1)
   const [formData, setFormData] = useState<FormData>({
@@ -49,16 +39,6 @@ export default function OnboardingPage() {
   }
 
   const handleBack = () => setStep(step - 1)
-
-  const handleArrayToggle = (field: 'dietaryPreferences' | 'allergies', value: string) => {
-    setFormData(prev => {
-      const current = prev[field]
-      const updated = current.includes(value)
-        ? current.filter(item => item !== value)
-        : [...current, value]
-      return { ...prev, [field]: updated }
-    })
-  }
 
   const renderStepContent = () => {
     switch (step) {
