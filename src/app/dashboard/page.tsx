@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Target, User, Utensils, Droplets, TrendingUp, Calendar, Settings, LogOut, Zap } from 'lucide-react'
+import { Target, User, Droplets, TrendingUp, Calendar, Settings, LogOut, Zap, Utensils } from 'lucide-react'
 import Link from 'next/link'
 
 // Mock data - in real app this would come from the database
@@ -37,13 +37,13 @@ const mockMealPlan = {
 
 export default function DashboardPage() {
   const [currentTab, setCurrentTab] = useState('today')
-  const [consumedCalories, setConsumedCalories] = useState(1450)
-  const [consumedWater, setConsumedWater] = useState(1800)
+  const [consumedCalories] = useState(1450)
+  const [consumedWater] = useState(1800)
 
   const calorieProgress = (consumedCalories / mockUserData.dailyCalories) * 100
   const waterProgress = (consumedWater / mockUserData.dailyWater) * 100
 
-  const renderMealSection = (title: string, meals: any[], icon: React.ReactNode) => (
+  const renderMealSection = (title: string, meals: string[], icon: React.ReactNode) => (
     <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
       <div className="flex items-center space-x-3 mb-4">
         {icon}
@@ -53,8 +53,7 @@ export default function DashboardPage() {
         {meals.map((meal, index) => (
           <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
             <div>
-              <h4 className="font-medium text-gray-900">{meal.name}</h4>
-              <p className="text-sm text-gray-600">{meal.calories} cal • {meal.protein}g protein</p>
+              <h4 className="font-medium text-gray-900">{meal}</h4>
             </div>
             <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
               Track
@@ -114,7 +113,7 @@ export default function DashboardPage() {
         {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome back, {mockUserData.name.split(' ')[0]}! 👋
+            Welcome back, {mockUserData.name.split(' ')[0]}! &#128075;
           </h1>
           <p className="text-gray-600">
             Let's continue your nutrition journey. Here's your plan for today.
@@ -229,22 +228,22 @@ export default function DashboardPage() {
               </div>
 
               <div className="grid lg:grid-cols-2 gap-6">
-                {renderMealSection('Breakfast', mockMealPlan.breakfast, 
+                {renderMealSection('Breakfast', mockMealPlan.breakfast.map(meal => meal.name), 
                   <div className="bg-yellow-100 rounded-full p-2">
                     <Utensils className="h-4 w-4 text-yellow-600" />
                   </div>
                 )}
-                {renderMealSection('Lunch', mockMealPlan.lunch,
+                {renderMealSection('Lunch', mockMealPlan.lunch.map(meal => meal.name),
                   <div className="bg-orange-100 rounded-full p-2">
                     <Utensils className="h-4 w-4 text-orange-600" />
                   </div>
                 )}
-                {renderMealSection('Dinner', mockMealPlan.dinner,
+                {renderMealSection('Dinner', mockMealPlan.dinner.map(meal => meal.name),
                   <div className="bg-red-100 rounded-full p-2">
                     <Utensils className="h-4 w-4 text-red-600" />
                   </div>
                 )}
-                {renderMealSection('Snacks', mockMealPlan.snacks,
+                {renderMealSection('Snacks', mockMealPlan.snacks.map(meal => meal.name),
                   <div className="bg-green-100 rounded-full p-2">
                     <Utensils className="h-4 w-4 text-green-600" />
                   </div>

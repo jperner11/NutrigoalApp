@@ -29,10 +29,10 @@ export interface MealPlan {
   user_id: string
   date: string
   meals: {
-    breakfast: any[]
-    lunch: any[]
-    dinner: any[]
-    snacks: any[]
+    breakfast: string[]
+    lunch: string[]
+    dinner: string[]
+    snacks: string[]
   }
   total_calories: number
   total_protein: number

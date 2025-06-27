@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { Target, Check, Zap, Calendar, Brain, Utensils, ShoppingCart, TrendingUp, Crown } from 'lucide-react'
+import { Target, Check, Zap, Calendar, Brain, ShoppingCart, TrendingUp, Crown } from 'lucide-react'
 
 const features = {
   free: [
@@ -210,8 +210,8 @@ export default function PremiumPage() {
                 <span className="text-xl font-bold text-gray-600">SM</span>
               </div>
               <p className="text-gray-600 italic mb-4">
-                "The 7-day meal plans have completely transformed how I approach nutrition. 
-                I save so much time planning and shopping!"
+                &quot;The 7-day meal plans have completely transformed how I approach nutrition. 
+                I save so much time planning and shopping!&quot;
               </p>
               <p className="font-semibold text-gray-900">Sarah M.</p>
               <p className="text-sm text-gray-500">Lost 15lbs in 3 months</p>
@@ -222,8 +222,8 @@ export default function PremiumPage() {
                 <span className="text-xl font-bold text-gray-600">DJ</span>
               </div>
               <p className="text-gray-600 italic mb-4">
-                "The AI assistant is like having a personal nutritionist. It answers all my 
-                questions and helps me make better food choices."
+                &quot;The AI assistant is like having a personal nutritionist. It answers all my 
+                questions and helps me make better food choices.&quot;
               </p>
               <p className="font-semibold text-gray-900">David J.</p>
               <p className="text-sm text-gray-500">Gained 8lbs of muscle</p>
@@ -234,8 +234,8 @@ export default function PremiumPage() {
                 <span className="text-xl font-bold text-gray-600">LK</span>
               </div>
               <p className="text-gray-600 italic mb-4">
-                "The progress analytics keep me motivated. Seeing my improvements over time 
-                makes it so much easier to stay consistent."
+                &quot;The progress analytics keep me motivated. Seeing my improvements over time 
+                makes it so much easier to stay consistent.&quot;
               </p>
               <p className="font-semibold text-gray-900">Lisa K.</p>
               <p className="text-sm text-gray-500">Maintaining for 6 months</p>

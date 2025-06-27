@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import Link from 'next/link'
 
 export default function TestSupabase() {
   const [status, setStatus] = useState('Testing connection...')
@@ -54,12 +55,9 @@ export default function TestSupabase() {
             <p><strong>Key:</strong> {process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.substring(0, 20)}...</p>
           </div>
           
-          <a 
-            href="/" 
-            className="block w-full bg-gradient-to-r from-green-500 to-blue-500 text-white text-center py-2 px-4 rounded-lg hover:from-green-600 hover:to-blue-600 transition-all"
-          >
+          <Link href="/" className="block w-full bg-gradient-to-r from-green-500 to-blue-500 text-white text-center py-2 px-4 rounded-lg hover:from-green-600 hover:to-blue-600 transition-all">
             Back to Home
-          </a>
+          </Link>
         </div>
       </div>
     </div>

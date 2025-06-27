@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { ArrowRight, ArrowLeft, Target, User, Activity, Utensils, Calculator } from 'lucide-react'
+import { ArrowRight, ArrowLeft, Target, User, Activity, Calculator } from 'lucide-react'
 import { calculateNutritionTargets, getActivityLevelName, getGoalName } from '@/lib/nutrition'
 import type { UserMetrics } from '@/lib/nutrition'
 import Link from 'next/link'
@@ -35,7 +35,7 @@ export default function OnboardingPage() {
     dietaryPreferences: [],
     allergies: []
   })
-  const [nutritionTargets, setNutritionTargets] = useState<any>(null)
+  const [nutritionTargets, setNutritionTargets] = useState<{calories: number, protein: number, fat: number, carbs: number, water: number} | null>(null)
 
   const totalSteps = 5
 
@@ -67,8 +67,8 @@ export default function OnboardingPage() {
           <div className="space-y-6">
             <div className="text-center mb-8">
               <User className="h-16 w-16 text-blue-500 mx-auto mb-4" />
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Let's Get to Know You</h2>
-              <p className="text-gray-600">We'll use this information to calculate your personalized nutrition goals</p>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">Let&apos;s Get to Know You</h2>
+              <p className="text-gray-600">We&apos;ll use this information to calculate your personalized nutrition goals</p>
             </div>
 
             <div className="space-y-4">
@@ -154,7 +154,7 @@ export default function OnboardingPage() {
               ].map((option) => (
                 <div
                   key={option.value}
-                  onClick={() => setFormData(prev => ({ ...prev, activityLevel: option.value as any }))}
+                  onClick={() => setFormData(prev => ({ ...prev, activityLevel: option.value as 'sedentary' | 'lightly_active' | 'moderately_active' | 'very_active' | 'extremely_active' }))}
                   className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
                     formData.activityLevel === option.value
                       ? 'border-blue-500 bg-blue-50'
@@ -195,7 +195,7 @@ export default function OnboardingPage() {
               ].map((option) => (
                 <div
                   key={option.value}
-                  onClick={() => setFormData(prev => ({ ...prev, goal: option.value as any }))}
+                  onClick={() => setFormData(prev => ({ ...prev, goal: option.value as 'bulking' | 'cutting' | 'maintenance' }))}
                   className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
                     formData.goal === option.value
                       ? `border-${option.color}-500 bg-${option.color}-50`
@@ -220,55 +220,6 @@ export default function OnboardingPage() {
         )
 
       case 4:
-        return (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <Utensils className="h-16 w-16 text-orange-500 mx-auto mb-4" />
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Dietary Preferences</h2>
-              <p className="text-gray-600">Help us personalize your meal recommendations</p>
-            </div>
-
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-3">Dietary Preferences (select all that apply)</h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {DIETARY_OPTIONS.map((option) => (
-                  <button
-                    key={option}
-                    onClick={() => handleArrayToggle('dietaryPreferences', option)}
-                    className={`p-3 text-sm border-2 rounded-lg transition-all ${
-                      formData.dietaryPreferences.includes(option)
-                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-3">Allergies & Intolerances (select all that apply)</h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {COMMON_ALLERGIES.map((option) => (
-                  <button
-                    key={option}
-                    onClick={() => handleArrayToggle('allergies', option)}
-                    className={`p-3 text-sm border-2 rounded-lg transition-all ${
-                      formData.allergies.includes(option)
-                        ? 'border-red-500 bg-red-50 text-red-700'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )
-
-      case 5:
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
