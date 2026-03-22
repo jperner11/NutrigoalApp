@@ -34,6 +34,13 @@ export default function NewDietPlanPage() {
   const [selectedMealIndex, setSelectedMealIndex] = useState<number | null>(null)
   const [loadingNutrition, setLoadingNutrition] = useState(false)
   const [foodAmount, setFoodAmount] = useState(100)
+  const [includeSnack, setIncludeSnack] = useState(false)
+  const [mealPrefs, setMealPrefs] = useState({
+    breakfast: '',
+    lunch: '',
+    dinner: '',
+    snack: '',
+  })
 
   if (!profile) return null
 
@@ -122,72 +129,76 @@ export default function NewDietPlanPage() {
   async function generatePlan() {
     setGenerating(true)
     try {
-      // Generate a basic plan structure based on user's calorie targets
-      const mealSplit = [
-        { type: 'breakfast' as MealType, name: 'Breakfast', calPct: 0.25 },
-        { type: 'snack' as MealType, name: 'Morning Snack', calPct: 0.10 },
-        { type: 'lunch' as MealType, name: 'Lunch', calPct: 0.30 },
-        { type: 'snack' as MealType, name: 'Afternoon Snack', calPct: 0.10 },
-        { type: 'dinner' as MealType, name: 'Dinner', calPct: 0.25 },
+      const mealSlots = [
+        { key: 'breakfast', label: 'Breakfast', type: 'breakfast' as MealType },
+        { key: 'lunch', label: 'Lunch', type: 'lunch' as MealType },
+        { key: 'dinner', label: 'Dinner', type: 'dinner' as MealType },
+        ...(includeSnack ? [{ key: 'snack', label: 'Afternoon Snack', type: 'snack' as MealType }] : []),
       ]
 
-      // Search for foods for each meal
-      const searchTerms: Record<string, string[]> = {
-        breakfast: ['eggs', 'oatmeal', 'banana', 'yogurt'],
-        lunch: ['chicken breast', 'rice', 'broccoli', 'sweet potato'],
-        dinner: ['salmon', 'quinoa', 'spinach', 'avocado'],
-        snack: ['almonds', 'apple', 'protein bar', 'cottage cheese'],
-      }
+      const params = new URLSearchParams({
+        targetCalories: String(targetCalories),
+        targetProtein: String(targetProtein),
+        targetCarbs: String(targetCarbs),
+        targetFat: String(targetFat),
+        mealCount: String(mealSlots.length),
+      })
 
-      const generatedMeals: MealEntry[] = []
-
-      for (const meal of mealSplit) {
-        const terms = searchTerms[meal.type] || searchTerms.snack
-        const randomTerm = terms[Math.floor(Math.random() * terms.length)]
-
-        // Search for a food
-        const searchRes = await fetch(`/api/food/search?query=${encodeURIComponent(randomTerm)}&number=1`)
-        const searchData = await searchRes.json()
-        const results = searchData.results ?? []
-
-        const foods: FoodItem[] = []
-
-        if (results.length > 0) {
-          const targetCals = targetCalories * meal.calPct
-          // Estimate amount to hit target calories (rough: 1-2 cal per gram for most foods)
-          const estimatedAmount = Math.round(Math.max(50, Math.min(300, targetCals / 1.5)))
-
-          const nutRes = await fetch(`/api/food/nutrition?id=${results[0].id}&amount=${estimatedAmount}&unit=g`)
-          const nutData = await nutRes.json()
-
-          foods.push({
-            spoonacular_id: results[0].id,
-            name: nutData.name || results[0].name,
-            amount: estimatedAmount,
-            unit: 'g',
-            calories: nutData.calories,
-            protein: nutData.protein,
-            carbs: nutData.carbs,
-            fat: nutData.fat,
-          })
+      // Add ingredient preferences per meal
+      mealSlots.forEach(slot => {
+        const ingredients = mealPrefs[slot.key as keyof typeof mealPrefs]?.trim()
+        if (ingredients) {
+          params.append(`ingredients_${slot.key}`, ingredients)
         }
+      })
 
-        generatedMeals.push({
-          meal_type: meal.type,
-          meal_name: meal.name,
-          foods,
-          total_calories: foods.reduce((s, f) => s + f.calories, 0),
-          total_protein: foods.reduce((s, f) => s + f.protein, 0),
-          total_carbs: foods.reduce((s, f) => s + f.carbs, 0),
-          total_fat: foods.reduce((s, f) => s + f.fat, 0),
-        })
+      const res = await fetch(`/api/food/mealplan?${params.toString()}`)
+      if (!res.ok) {
+        const err = await res.json().catch(() => null)
+        throw new Error(err?.message || 'Failed to generate')
       }
+
+      const data = await res.json()
+
+      const generatedMeals: MealEntry[] = data.meals.map(
+        (meal: {
+          id: number
+          title: string
+          calories: number
+          protein: number
+          carbs: number
+          fat: number
+          servings: number
+        }, index: number) => {
+          const slot = mealSlots[index]
+          const foods: FoodItem[] = [{
+            spoonacular_id: meal.id,
+            name: meal.title,
+            amount: meal.servings || 1,
+            unit: meal.servings === 1 ? 'serving' : 'servings',
+            calories: Math.round(meal.calories),
+            protein: Math.round(meal.protein * 10) / 10,
+            carbs: Math.round(meal.carbs * 10) / 10,
+            fat: Math.round(meal.fat * 10) / 10,
+          }]
+
+          return {
+            meal_type: slot?.type || 'snack',
+            meal_name: slot?.label || meal.title,
+            foods,
+            total_calories: Math.round(meal.calories),
+            total_protein: Math.round(meal.protein),
+            total_carbs: Math.round(meal.carbs),
+            total_fat: Math.round(meal.fat),
+          }
+        }
+      )
 
       setMeals(generatedMeals)
       setPlanName(`${profile?.full_name?.split(' ')[0] || 'My'}'s Meal Plan`)
       toast.success('Meal plan generated! You can customize the foods.')
-    } catch {
-      toast.error('Failed to generate plan')
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to generate meal plan. Try again.')
     }
     setGenerating(false)
   }
@@ -280,28 +291,76 @@ export default function NewDietPlanPage() {
         </div>
       </div>
 
-      {/* Quick Generate */}
+      {/* Auto-Generate with Preferences */}
       <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-6 border border-purple-200 mb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-1">Auto-Generate Plan</h3>
-            <p className="text-sm text-gray-800">
-              Generate a {targetCalories} cal plan with {targetProtein}g protein, {targetCarbs}g carbs, {targetFat}g fat using Spoonacular.
-            </p>
-          </div>
-          <button
-            onClick={generatePlan}
-            disabled={generating}
-            className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-5 py-2.5 rounded-lg font-medium hover:shadow-lg transition-all disabled:opacity-50 flex-shrink-0"
-          >
-            {generating ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Sparkles className="h-4 w-4" />
-            )}
-            <span>{generating ? 'Generating...' : 'Generate'}</span>
-          </button>
+        <div className="flex items-center gap-2 mb-4">
+          <Sparkles className="h-5 w-5 text-purple-600" />
+          <h3 className="font-semibold text-gray-900">Auto-Generate Plan</h3>
         </div>
+        <p className="text-sm text-gray-800 mb-4">
+          Target: {targetCalories} cal · {targetProtein}g protein · {targetCarbs}g carbs · {targetFat}g fat. Tell us what ingredients you like for each meal.
+        </p>
+
+        <div className="space-y-3 mb-4">
+          {[
+            { key: 'breakfast', label: 'Breakfast', placeholder: 'e.g. eggs, oats, banana, yogurt' },
+            { key: 'lunch', label: 'Lunch', placeholder: 'e.g. chicken, rice, broccoli, avocado' },
+            { key: 'dinner', label: 'Dinner', placeholder: 'e.g. salmon, sweet potato, asparagus' },
+          ].map(slot => (
+            <div key={slot.key}>
+              <label className="block text-sm font-medium text-gray-900 mb-1">{slot.label} ingredients</label>
+              <input
+                type="text"
+                value={mealPrefs[slot.key as keyof typeof mealPrefs]}
+                onChange={(e) => setMealPrefs(prev => ({ ...prev, [slot.key]: e.target.value }))}
+                className="w-full px-3 py-2 border border-purple-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                placeholder={slot.placeholder}
+              />
+            </div>
+          ))}
+
+          {/* Optional snack */}
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setIncludeSnack(!includeSnack)}
+              className={`flex items-center gap-2 text-sm font-medium px-3 py-1.5 rounded-lg transition-colors ${
+                includeSnack
+                  ? 'bg-purple-100 text-purple-700'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              <Plus className="h-3 w-3" />
+              Afternoon Snack
+            </button>
+          </div>
+
+          {includeSnack && (
+            <div>
+              <label className="block text-sm font-medium text-gray-900 mb-1">Snack ingredients</label>
+              <input
+                type="text"
+                value={mealPrefs.snack}
+                onChange={(e) => setMealPrefs(prev => ({ ...prev, snack: e.target.value }))}
+                className="w-full px-3 py-2 border border-purple-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                placeholder="e.g. nuts, protein bar, fruit, cheese"
+              />
+            </div>
+          )}
+        </div>
+
+        <button
+          onClick={generatePlan}
+          disabled={generating}
+          className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-5 py-2.5 rounded-lg font-medium hover:shadow-lg transition-all disabled:opacity-50"
+        >
+          {generating ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Sparkles className="h-4 w-4" />
+          )}
+          <span>{generating ? 'Generating meals...' : 'Generate Meal Plan'}</span>
+        </button>
       </div>
 
       {/* Plan Name & Notes */}
