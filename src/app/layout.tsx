@@ -6,11 +6,10 @@ import { Toaster } from "react-hot-toast";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "NutriGoal - Your Personalized Diet & Hydration Planner",
-  description: "Built for everyday people who want to eat smart, feel better, and stay on track. Get AI-powered meal plans tailored to your goals.",
-  keywords: "nutrition, diet, meal planning, calories, hydration, fitness, health",
+  title: "NutriGoal - Nutrition, Training & Wellness Platform",
+  description: "All-in-one platform for individuals and nutritionists. AI-powered meal planning, workout builder, cardio tracking, and water intake monitoring.",
+  keywords: "nutrition, diet, meal planning, workout, training, cardio, hydration, nutritionist, fitness",
   authors: [{ name: "NutriGoal Team" }],
-  viewport: "width=device-width, initial-scale=1",
 };
 
 export default function RootLayout({
