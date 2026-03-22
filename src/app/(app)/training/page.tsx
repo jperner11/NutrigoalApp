@@ -39,12 +39,12 @@ export default function TrainingPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Training Plans</h1>
-          <p className="text-gray-600 mt-1">Build and manage your workout routines.</p>
+          <p className="text-gray-900 mt-1">Build and manage your workout routines.</p>
         </div>
         {canCreatePlans ? (
           <Link
             href="/training/new"
-            className="flex items-center space-x-2 bg-gradient-to-r from-green-500 to-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all"
+            className="flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all"
           >
             <Plus className="h-4 w-4" />
             <span>New Plan</span>
@@ -60,7 +60,7 @@ export default function TrainingPage() {
       {!canCreatePlans && (
         <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-xl p-6 mb-8">
           <h3 className="font-semibold text-gray-900 mb-2">Upgrade to create custom training plans</h3>
-          <p className="text-gray-600 text-sm mb-4">
+          <p className="text-gray-800 text-sm mb-4">
             Pro users can build custom workout plans with exercises, sets, and reps.
           </p>
           <Link
@@ -84,7 +84,7 @@ export default function TrainingPage() {
           {canCreatePlans && (
             <Link
               href="/training/new"
-              className="inline-flex items-center space-x-2 bg-gradient-to-r from-green-500 to-blue-500 text-white px-6 py-3 rounded-lg font-medium hover:shadow-lg transition-all"
+              className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:shadow-lg transition-all"
             >
               <Plus className="h-5 w-5" />
               <span>Create Training Plan</span>
@@ -100,17 +100,17 @@ export default function TrainingPage() {
               className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
             >
               <div className="flex items-center space-x-3 mb-3">
-                <div className="bg-green-100 rounded-lg p-2">
-                  <Dumbbell className="h-5 w-5 text-green-600" />
+                <div className="bg-purple-100 rounded-lg p-2">
+                  <Dumbbell className="h-5 w-5 text-purple-600" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900">{plan.name}</h3>
                   {plan.is_active && (
-                    <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Active</span>
+                    <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">Active</span>
                   )}
                 </div>
               </div>
-              <p className="text-sm text-gray-600">{plan.days_per_week} days/week</p>
+              <p className="text-sm text-gray-900">{plan.days_per_week} days/week</p>
               {plan.description && (
                 <p className="text-sm text-gray-500 mt-2 line-clamp-2">{plan.description}</p>
               )}

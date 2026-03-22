@@ -80,19 +80,19 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-slate-50 flex items-center justify-center px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center space-x-2 mb-6">
-            <div className="bg-gradient-to-r from-green-500 to-blue-500 rounded-lg p-2">
+            <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg p-2">
               <Target className="h-6 w-6 text-white" />
             </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+            <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
               NutriGoal
             </span>
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h1>
-          <p className="text-gray-600">Start your nutrition journey today</p>
+          <p className="text-gray-800">Start your nutrition journey today</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-lg p-8">
@@ -106,12 +106,12 @@ export default function SignupPage() {
                   onClick={() => setFormData(prev => ({ ...prev, role: 'free' }))}
                   className={`p-4 border-2 rounded-xl text-center transition-all ${
                     formData.role === 'free'
-                      ? 'border-green-500 bg-green-50'
+                      ? 'border-purple-500 bg-purple-50'
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
-                  <User className={`h-8 w-8 mx-auto mb-2 ${formData.role === 'free' ? 'text-green-600' : 'text-gray-400'}`} />
-                  <span className={`font-medium ${formData.role === 'free' ? 'text-green-700' : 'text-gray-700'}`}>Individual</span>
+                  <User className={`h-8 w-8 mx-auto mb-2 ${formData.role === 'free' ? 'text-purple-600' : 'text-gray-400'}`} />
+                  <span className={`font-medium ${formData.role === 'free' ? 'text-purple-700' : 'text-gray-700'}`}>Individual</span>
                   <p className="text-xs text-gray-500 mt-1">Personal use</p>
                 </button>
                 <button
@@ -141,7 +141,7 @@ export default function SignupPage() {
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   placeholder="your.email@example.com"
                   required
                 />
@@ -159,7 +159,7 @@ export default function SignupPage() {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                  className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   placeholder="Min. 6 characters"
                   required
                   minLength={6}
@@ -181,7 +181,7 @@ export default function SignupPage() {
                   type="password"
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   placeholder="Confirm your password"
                   required
                 />
@@ -191,7 +191,7 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50 flex items-center justify-center space-x-2"
+              className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50 flex items-center justify-center space-x-2"
             >
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -205,9 +205,9 @@ export default function SignupPage() {
           </form>
 
           <div className="mt-6 pt-6 border-t border-gray-200 text-center">
-            <p className="text-gray-600">
+            <p className="text-gray-900">
               Already have an account?{' '}
-              <Link href="/login" className="text-blue-600 hover:text-blue-800 font-semibold">
+              <Link href="/login" className="text-purple-600 hover:text-purple-800 font-semibold">
                 Sign In
               </Link>
             </p>
@@ -217,8 +217,8 @@ export default function SignupPage() {
         <div className="text-center mt-6">
           <p className="text-sm text-gray-500">
             By creating an account, you agree to our{' '}
-            <span className="text-blue-600">Terms of Service</span> and{' '}
-            <span className="text-blue-600">Privacy Policy</span>
+            <span className="text-purple-600">Terms of Service</span> and{' '}
+            <span className="text-purple-600">Privacy Policy</span>
           </p>
         </div>
       </div>

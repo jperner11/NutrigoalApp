@@ -37,11 +37,11 @@ export default function DietPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Diet Plans</h1>
-          <p className="text-gray-600 mt-1">Manage your meal plans and track your nutrition.</p>
+          <p className="text-gray-900 mt-1">Manage your meal plans and track your nutrition.</p>
         </div>
         <Link
           href="/diet/new"
-          className="flex items-center space-x-2 bg-gradient-to-r from-green-500 to-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all"
+          className="flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all"
         >
           <Plus className="h-4 w-4" />
           <span>New Plan</span>
@@ -55,7 +55,7 @@ export default function DietPage() {
           <p className="text-gray-500 mb-6">Create your first diet plan to start tracking your nutrition.</p>
           <Link
             href="/diet/new"
-            className="inline-flex items-center space-x-2 bg-gradient-to-r from-green-500 to-blue-500 text-white px-6 py-3 rounded-lg font-medium hover:shadow-lg transition-all"
+            className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:shadow-lg transition-all"
           >
             <Plus className="h-5 w-5" />
             <span>Create Diet Plan</span>
@@ -76,12 +76,12 @@ export default function DietPage() {
                 <div>
                   <h3 className="font-semibold text-gray-900">{plan.name}</h3>
                   {plan.is_active && (
-                    <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Active</span>
+                    <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">Active</span>
                   )}
                 </div>
               </div>
               {plan.target_calories && (
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-900">
                   {plan.target_calories} cal · {plan.target_protein}g P · {plan.target_carbs}g C · {plan.target_fat}g F
                 </p>
               )}

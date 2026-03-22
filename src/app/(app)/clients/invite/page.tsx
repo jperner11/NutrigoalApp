@@ -81,13 +81,13 @@ export default function InviteClientPage() {
 
   return (
     <div className="max-w-lg mx-auto">
-      <Link href="/clients" className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 mb-6">
+      <Link href="/clients" className="flex items-center space-x-2 text-gray-900 hover:text-gray-900 mb-6">
         <ArrowLeft className="h-4 w-4" />
         <span>Back to Clients</span>
       </Link>
 
       <h1 className="text-3xl font-bold text-gray-900 mb-2">Invite Client</h1>
-      <p className="text-gray-600 mb-8">
+      <p className="text-gray-800 mb-8">
         Send an invitation to a client&apos;s email. If they already have an account, they&apos;ll be linked automatically.
       </p>
 
@@ -102,7 +102,7 @@ export default function InviteClientPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               placeholder="client@example.com"
               required
             />
@@ -112,7 +112,7 @@ export default function InviteClientPage() {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white py-3 rounded-lg font-medium hover:shadow-lg transition-all disabled:opacity-50"
+          className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-lg font-medium hover:shadow-lg transition-all disabled:opacity-50"
         >
           {isLoading ? 'Sending...' : 'Send Invitation'}
         </button>

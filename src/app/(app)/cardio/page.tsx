@@ -113,7 +113,7 @@ export default function CardioPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Cardio</h1>
-          <p className="text-gray-600 mt-1">Track your cardiovascular sessions.</p>
+          <p className="text-gray-900 mt-1">Track your cardiovascular sessions.</p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
@@ -181,7 +181,7 @@ export default function CardioPage() {
             <button
               type="button"
               onClick={() => setShowForm(false)}
-              className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg text-sm"
+              className="px-4 py-2 text-gray-900 hover:bg-gray-100 rounded-lg text-sm"
             >
               Cancel
             </button>
@@ -216,12 +216,12 @@ export default function CardioPage() {
                 </div>
               </div>
               <div className="flex items-center space-x-6 text-sm">
-                <div className="flex items-center space-x-1 text-gray-600">
+                <div className="flex items-center space-x-1 text-gray-900">
                   <Clock className="h-4 w-4" />
                   <span>{session.duration_minutes} min</span>
                 </div>
                 {session.avg_bpm && (
-                  <div className="flex items-center space-x-1 text-gray-600">
+                  <div className="flex items-center space-x-1 text-gray-900">
                     <HeartPulse className="h-4 w-4" />
                     <span>{session.avg_bpm} bpm</span>
                   </div>

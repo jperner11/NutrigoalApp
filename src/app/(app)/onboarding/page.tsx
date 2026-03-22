@@ -118,22 +118,22 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
-              <User className="h-16 w-16 text-blue-500 mx-auto mb-4" />
+              <User className="h-16 w-16 text-purple-600 mx-auto mb-4" />
               <h2 className="text-3xl font-bold text-gray-900 mb-2">Let&apos;s Get to Know You</h2>
-              <p className="text-gray-600">We&apos;ll use this to calculate your personalized nutrition goals</p>
+              <p className="text-gray-800">We&apos;ll use this to calculate your personalized nutrition goals</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
-              <input type="text" value={formData.full_name} onChange={(e) => setFormData(prev => ({ ...prev, full_name: e.target.value }))} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="John Doe" />
+              <input type="text" value={formData.full_name} onChange={(e) => setFormData(prev => ({ ...prev, full_name: e.target.value }))} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="John Doe" />
             </div>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Age</label>
-                <input type="number" value={formData.age || ''} onChange={(e) => setFormData(prev => ({ ...prev, age: parseInt(e.target.value) || 0 }))} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="25" />
+                <input type="number" value={formData.age || ''} onChange={(e) => setFormData(prev => ({ ...prev, age: parseInt(e.target.value) || 0 }))} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="25" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Gender</label>
-                <select value={formData.gender} onChange={(e) => setFormData(prev => ({ ...prev, gender: e.target.value as 'male' | 'female' }))} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <select value={formData.gender} onChange={(e) => setFormData(prev => ({ ...prev, gender: e.target.value as 'male' | 'female' }))} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
                   <option value="male">Male</option>
                   <option value="female">Female</option>
                 </select>
@@ -142,11 +142,11 @@ export default function OnboardingPage() {
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Height (cm)</label>
-                <input type="number" value={formData.height || ''} onChange={(e) => setFormData(prev => ({ ...prev, height: parseInt(e.target.value) || 0 }))} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="175" />
+                <input type="number" value={formData.height || ''} onChange={(e) => setFormData(prev => ({ ...prev, height: parseInt(e.target.value) || 0 }))} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="175" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Weight (kg)</label>
-                <input type="number" value={formData.weight || ''} onChange={(e) => setFormData(prev => ({ ...prev, weight: parseInt(e.target.value) || 0 }))} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="70" />
+                <input type="number" value={formData.weight || ''} onChange={(e) => setFormData(prev => ({ ...prev, weight: parseInt(e.target.value) || 0 }))} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="70" />
               </div>
             </div>
           </div>
@@ -156,15 +156,15 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
-              <Activity className="h-16 w-16 text-green-500 mx-auto mb-4" />
+              <Activity className="h-16 w-16 text-purple-600 mx-auto mb-4" />
               <h2 className="text-3xl font-bold text-gray-900 mb-2">Your Activity Level</h2>
-              <p className="text-gray-600">How active are you in a typical week?</p>
+              <p className="text-gray-800">How active are you in a typical week?</p>
             </div>
             <div className="space-y-3">
               {ACTIVITY_LEVELS.map((option) => (
-                <div key={option.value} onClick={() => setFormData(prev => ({ ...prev, activityLevel: option.value as UserMetrics['activityLevel'] }))} className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${formData.activityLevel === option.value ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'}`}>
+                <div key={option.value} onClick={() => setFormData(prev => ({ ...prev, activityLevel: option.value as UserMetrics['activityLevel'] }))} className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${formData.activityLevel === option.value ? 'border-purple-500 bg-purple-50' : 'border-gray-200 hover:border-gray-300'}`}>
                   <h3 className="font-semibold text-gray-900">{option.label}</h3>
-                  <p className="text-sm text-gray-600">{option.description}</p>
+                  <p className="text-sm text-gray-800">{option.description}</p>
                 </div>
               ))}
             </div>
@@ -177,13 +177,13 @@ export default function OnboardingPage() {
             <div className="text-center mb-8">
               <Target className="h-16 w-16 text-purple-500 mx-auto mb-4" />
               <h2 className="text-3xl font-bold text-gray-900 mb-2">Your Fitness Goal</h2>
-              <p className="text-gray-600">What do you want to achieve?</p>
+              <p className="text-gray-800">What do you want to achieve?</p>
             </div>
             <div className="space-y-3">
               {FITNESS_GOALS.map((option) => (
-                <div key={option.value} onClick={() => setFormData(prev => ({ ...prev, goal: option.value as UserMetrics['goal'] }))} className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${formData.goal === option.value ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'}`}>
+                <div key={option.value} onClick={() => setFormData(prev => ({ ...prev, goal: option.value as UserMetrics['goal'] }))} className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${formData.goal === option.value ? 'border-purple-500 bg-purple-50' : 'border-gray-200 hover:border-gray-300'}`}>
                   <h3 className="font-semibold text-gray-900">{option.label}</h3>
-                  <p className="text-sm text-gray-600">{option.description}</p>
+                  <p className="text-sm text-gray-800">{option.description}</p>
                 </div>
               ))}
             </div>
@@ -196,13 +196,13 @@ export default function OnboardingPage() {
             <div className="text-center mb-8">
               <Utensils className="h-16 w-16 text-orange-500 mx-auto mb-4" />
               <h2 className="text-3xl font-bold text-gray-900 mb-2">Dietary Preferences</h2>
-              <p className="text-gray-600">Select any that apply (optional)</p>
+              <p className="text-gray-800">Select any that apply (optional)</p>
             </div>
             <div>
               <h3 className="font-medium text-gray-700 mb-3">Dietary Preferences</h3>
               <div className="flex flex-wrap gap-2">
                 {dietaryOptions.map((pref) => (
-                  <button key={pref} type="button" onClick={() => togglePreference(pref)} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${formData.dietaryPreferences.includes(pref) ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+                  <button key={pref} type="button" onClick={() => togglePreference(pref)} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${formData.dietaryPreferences.includes(pref) ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
                     {pref}
                   </button>
                 ))}
@@ -225,17 +225,17 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
-              <Calculator className="h-16 w-16 text-green-500 mx-auto mb-4" />
+              <Calculator className="h-16 w-16 text-purple-600 mx-auto mb-4" />
               <h2 className="text-3xl font-bold text-gray-900 mb-2">Your Personalized Plan</h2>
-              <p className="text-gray-600">Here are your daily nutrition targets</p>
+              <p className="text-gray-800">Here are your daily nutrition targets</p>
             </div>
             {nutritionTargets && (
               <>
                 <div className="grid md:grid-cols-2 gap-6">
-                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl">
-                    <h3 className="text-lg font-semibold text-blue-900 mb-2">Daily Calories</h3>
-                    <div className="text-3xl font-bold text-blue-700">{nutritionTargets.calories}</div>
-                    <p className="text-sm text-blue-600">calories per day</p>
+                  <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl">
+                    <h3 className="text-lg font-semibold text-purple-900 mb-2">Daily Calories</h3>
+                    <div className="text-3xl font-bold text-purple-700">{nutritionTargets.calories}</div>
+                    <p className="text-sm text-purple-600">calories per day</p>
                   </div>
                   <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl">
                     <h3 className="text-lg font-semibold text-purple-900 mb-2">Daily Water</h3>
@@ -246,14 +246,14 @@ export default function OnboardingPage() {
                 <div className="bg-white border border-gray-200 rounded-xl p-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Macronutrient Breakdown</h3>
                   <div className="grid grid-cols-3 gap-4 text-center">
-                    <div><div className="text-2xl font-bold text-red-600">{nutritionTargets.protein}g</div><div className="text-sm text-gray-600">Protein</div></div>
-                    <div><div className="text-2xl font-bold text-yellow-600">{nutritionTargets.carbs}g</div><div className="text-sm text-gray-600">Carbs</div></div>
-                    <div><div className="text-2xl font-bold text-green-600">{nutritionTargets.fat}g</div><div className="text-sm text-gray-600">Fat</div></div>
+                    <div><div className="text-2xl font-bold text-red-600">{nutritionTargets.protein}g</div><div className="text-sm text-gray-900">Protein</div></div>
+                    <div><div className="text-2xl font-bold text-yellow-600">{nutritionTargets.carbs}g</div><div className="text-sm text-gray-900">Carbs</div></div>
+                    <div><div className="text-2xl font-bold text-green-600">{nutritionTargets.fat}g</div><div className="text-sm text-gray-900">Fat</div></div>
                   </div>
                 </div>
-                <div className="bg-gray-50 p-6 rounded-xl">
+                <div className="bg-slate-50 p-6 rounded-xl">
                   <h3 className="font-semibold text-gray-900 mb-3">Profile Summary</h3>
-                  <div className="space-y-2 text-sm text-gray-600">
+                  <div className="space-y-2 text-sm text-gray-900">
                     <p><strong>Goal:</strong> {getGoalName(formData.goal)}</p>
                     <p><strong>Activity Level:</strong> {getActivityLevelName(formData.activityLevel)}</p>
                     {formData.dietaryPreferences.length > 0 && <p><strong>Dietary:</strong> {formData.dietaryPreferences.join(', ')}</p>}
@@ -261,7 +261,7 @@ export default function OnboardingPage() {
                   </div>
                 </div>
                 <div className="text-center">
-                  <button onClick={handleSave} disabled={saving} className="inline-flex items-center space-x-2 bg-gradient-to-r from-green-500 to-blue-500 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:shadow-xl transition-all disabled:opacity-50">
+                  <button onClick={handleSave} disabled={saving} className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:shadow-xl transition-all disabled:opacity-50">
                     <span>{saving ? 'Saving...' : 'Complete Setup'}</span>
                     <ArrowRight className="h-5 w-5" />
                   </button>
@@ -278,11 +278,11 @@ export default function OnboardingPage() {
       {/* Progress Bar */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm text-gray-600">Step {step} of {totalSteps}</span>
-          <span className="text-sm text-gray-600">{Math.round((step / totalSteps) * 100)}%</span>
+          <span className="text-sm text-gray-900">Step {step} of {totalSteps}</span>
+          <span className="text-sm text-gray-900">{Math.round((step / totalSteps) * 100)}%</span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2">
-          <div className="bg-gradient-to-r from-green-500 to-blue-500 h-2 rounded-full transition-all duration-300" style={{ width: `${(step / totalSteps) * 100}%` }} />
+          <div className="bg-gradient-to-r from-purple-600 to-indigo-600 h-2 rounded-full transition-all duration-300" style={{ width: `${(step / totalSteps) * 100}%` }} />
         </div>
       </div>
 
@@ -291,10 +291,10 @@ export default function OnboardingPage() {
 
         {step < 5 && (
           <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
-            <button onClick={() => setStep(step - 1)} disabled={step === 1} className={`flex items-center space-x-2 px-6 py-3 rounded-lg transition-all ${step === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-gray-600 hover:bg-gray-100'}`}>
+            <button onClick={() => setStep(step - 1)} disabled={step === 1} className={`flex items-center space-x-2 px-6 py-3 rounded-lg transition-all ${step === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-gray-900 hover:bg-gray-100'}`}>
               <ArrowLeft className="h-4 w-4" /><span>Back</span>
             </button>
-            <button onClick={handleNext} disabled={!canProceed()} className={`flex items-center space-x-2 px-6 py-3 rounded-lg transition-all ${canProceed() ? 'bg-gradient-to-r from-green-500 to-blue-500 text-white hover:shadow-lg' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}>
+            <button onClick={handleNext} disabled={!canProceed()} className={`flex items-center space-x-2 px-6 py-3 rounded-lg transition-all ${canProceed() ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:shadow-lg' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}>
               <span>Next</span><ArrowRight className="h-4 w-4" />
             </button>
           </div>

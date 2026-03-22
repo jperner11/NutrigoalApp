@@ -8,9 +8,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="flex flex-col items-center space-y-4">
-          <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin" />
           <p className="text-gray-500 text-sm">Loading...</p>
         </div>
       </div>
@@ -18,7 +18,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       <Sidebar
         userRole={profile?.role ?? 'free'}
         userName={profile?.full_name ?? profile?.email ?? 'User'}

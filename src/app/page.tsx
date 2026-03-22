@@ -9,23 +9,23 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
-              <div className="bg-gradient-to-r from-green-500 to-blue-500 rounded-lg p-2">
+              <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg p-2">
                 <Target className="h-6 w-6 text-white" />
               </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+              <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
                 NutriGoal
               </span>
             </div>
             <div className="flex items-center space-x-4">
-              <Link href="/pricing" className="text-gray-600 hover:text-gray-900 transition-colors">
+              <Link href="/pricing" className="text-gray-900 hover:text-gray-900 transition-colors">
                 Pricing
               </Link>
-              <Link href="/login" className="text-gray-600 hover:text-gray-900 transition-colors">
+              <Link href="/login" className="text-gray-900 hover:text-gray-900 transition-colors">
                 Sign In
               </Link>
               <Link
                 href="/signup"
-                className="bg-gradient-to-r from-green-500 to-blue-500 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all duration-200 flex items-center space-x-2"
+                className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all duration-200 flex items-center space-x-2"
               >
                 <span>Get Started</span>
                 <ArrowRight className="h-4 w-4" />
@@ -41,14 +41,14 @@ export default function LandingPage() {
           <div className="text-center">
             <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6">
               Your Complete{' '}
-              <span className="bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
                 Wellness
               </span>
               <br />
               Platform
             </h1>
 
-            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl text-gray-800 mb-8 max-w-3xl mx-auto leading-relaxed">
               Diet planning, workout building, cardio tracking, and hydration monitoring&mdash;all in one place.
               For individuals pursuing their goals and nutritionists managing their clients.
             </p>
@@ -56,7 +56,7 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
               <Link
                 href="/signup"
-                className="bg-gradient-to-r from-green-500 to-blue-500 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:shadow-xl transition-all duration-300 flex items-center space-x-2 group"
+                className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:shadow-xl transition-all duration-300 flex items-center space-x-2 group"
               >
                 <span>Start Free</span>
                 <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
@@ -83,7 +83,7 @@ export default function LandingPage() {
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
               Everything You Need in One Platform
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-800 max-w-2xl mx-auto">
               From nutrition to training, cardio to hydration&mdash;track every aspect of your wellness journey.
             </p>
           </div>
@@ -94,17 +94,17 @@ export default function LandingPage() {
                 <Target className="h-7 w-7 text-orange-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Diet Planning</h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-800 text-sm">
                 Create meal plans with real food data from Spoonacular. Track macros automatically.
               </p>
             </div>
 
             <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow border border-gray-100">
-              <div className="bg-green-100 rounded-full p-3 w-fit mb-4">
-                <Dumbbell className="h-7 w-7 text-green-600" />
+              <div className="bg-purple-100 rounded-full p-3 w-fit mb-4">
+                <Dumbbell className="h-7 w-7 text-purple-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Workout Builder</h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-800 text-sm">
                 Choose from a library of exercises. Build custom training plans with sets, reps, and rest.
               </p>
             </div>
@@ -114,7 +114,7 @@ export default function LandingPage() {
                 <HeartPulse className="h-7 w-7 text-red-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Cardio Tracking</h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-800 text-sm">
                 Log cardio sessions with heart rate. Calories burned calculated using proven formulas.
               </p>
             </div>
@@ -124,7 +124,7 @@ export default function LandingPage() {
                 <Droplets className="h-7 w-7 text-cyan-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Water Tracking</h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-800 text-sm">
                 Monitor daily hydration with quick-add buttons and progress tracking.
               </p>
             </div>
@@ -144,7 +144,7 @@ export default function LandingPage() {
               <h2 className="text-4xl font-bold text-gray-900 mb-6">
                 Manage Your Clients with Ease
               </h2>
-              <p className="text-lg text-gray-600 mb-8">
+              <p className="text-lg text-gray-800 mb-8">
                 Create personalized diet plans, training programs, and cardio prescriptions for your clients.
                 Monitor their progress and keep them on track&mdash;all from one dashboard.
               </p>
@@ -157,7 +157,7 @@ export default function LandingPage() {
                   'Client self-service logging',
                 ].map((item, i) => (
                   <li key={i} className="flex items-center space-x-3">
-                    <div className="bg-green-500 rounded-full p-0.5">
+                    <div className="bg-purple-600 rounded-full p-0.5">
                       <svg className="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                       </svg>
@@ -180,14 +180,14 @@ export default function LandingPage() {
                   <div key={i} className="bg-white rounded-xl p-4 shadow-sm flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <div className="bg-gray-200 rounded-full w-10 h-10 flex items-center justify-center">
-                        <span className="text-sm font-bold text-gray-600">{name.split(' ').map(n => n[0]).join('')}</span>
+                        <span className="text-sm font-bold text-gray-900">{name.split(' ').map(n => n[0]).join('')}</span>
                       </div>
                       <div>
                         <p className="font-medium text-gray-900">{name}</p>
                         <p className="text-xs text-gray-500">{['Cutting', 'Bulking', 'Maintenance'][i]}</p>
                       </div>
                     </div>
-                    <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Active</span>
+                    <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">Active</span>
                   </div>
                 ))}
               </div>
@@ -205,7 +205,7 @@ export default function LandingPage() {
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
             AI-Powered Meal Suggestions
           </h2>
-          <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-800 mb-8 max-w-2xl mx-auto">
             Get personalized meal ideas based on your macros, dietary preferences, and allergies.
             Powered by AI, tailored to your goals.
           </p>
@@ -215,7 +215,7 @@ export default function LandingPage() {
               <div>Free suggestion</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">5/mo</div>
+              <div className="text-2xl font-bold text-purple-600">5/mo</div>
               <div>Pro plan</div>
             </div>
             <div className="text-center">
@@ -232,13 +232,13 @@ export default function LandingPage() {
           <h2 className="text-4xl font-bold text-gray-900 mb-6">
             Ready to Transform Your Wellness?
           </h2>
-          <p className="text-xl text-gray-600 mb-8">
+          <p className="text-xl text-gray-800 mb-8">
             Join NutriGoal today&mdash;whether you&apos;re training solo or managing a roster of clients.
           </p>
 
           <Link
             href="/signup"
-            className="inline-flex items-center space-x-3 bg-gradient-to-r from-green-500 to-blue-500 text-white px-10 py-5 rounded-xl text-xl font-semibold hover:shadow-xl transition-all duration-300 group"
+            className="inline-flex items-center space-x-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-10 py-5 rounded-xl text-xl font-semibold hover:shadow-xl transition-all duration-300 group"
           >
             <Zap className="h-6 w-6" />
             <span>Get Started Free</span>
@@ -256,7 +256,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="flex items-center justify-center space-x-2 mb-4">
-              <div className="bg-gradient-to-r from-green-500 to-blue-500 rounded-lg p-2">
+              <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg p-2">
                 <Target className="h-6 w-6 text-white" />
               </div>
               <span className="text-2xl font-bold">NutriGoal</span>

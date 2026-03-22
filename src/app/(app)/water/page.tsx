@@ -59,7 +59,7 @@ export default function WaterPage() {
     <div>
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Water Intake</h1>
-        <p className="text-gray-600 mt-1">Stay hydrated throughout the day.</p>
+        <p className="text-gray-900 mt-1">Stay hydrated throughout the day.</p>
       </div>
 
       {/* Progress Circle */}
@@ -119,13 +119,13 @@ export default function WaterPage() {
 
         {/* Custom Amount */}
         <div className="flex items-center space-x-3">
-          <span className="text-sm text-gray-600">Custom:</span>
+          <span className="text-sm text-gray-900">Custom:</span>
           <div className="flex items-center space-x-2">
             <button
               onClick={() => setCustomAmount(prev => Math.max(50, prev - 50))}
               className="p-1 rounded-lg hover:bg-gray-100"
             >
-              <Minus className="h-4 w-4 text-gray-600" />
+              <Minus className="h-4 w-4 text-gray-900" />
             </button>
             <input
               type="number"
@@ -140,7 +140,7 @@ export default function WaterPage() {
               onClick={() => setCustomAmount(prev => prev + 50)}
               className="p-1 rounded-lg hover:bg-gray-100"
             >
-              <Plus className="h-4 w-4 text-gray-600" />
+              <Plus className="h-4 w-4 text-gray-900" />
             </button>
           </div>
           <button

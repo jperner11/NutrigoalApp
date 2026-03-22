@@ -6,24 +6,24 @@ import { PRICING } from '@/lib/constants'
 
 export default function PricingPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-slate-50">
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-md border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center space-x-2">
-              <div className="bg-gradient-to-r from-green-500 to-blue-500 rounded-lg p-2">
+              <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg p-2">
                 <Target className="h-6 w-6 text-white" />
               </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+              <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
                 NutriGoal
               </span>
             </Link>
             <div className="flex items-center space-x-4">
-              <Link href="/login" className="text-gray-600 hover:text-gray-900 transition-colors">
+              <Link href="/login" className="text-gray-900 hover:text-gray-900 transition-colors">
                 Sign In
               </Link>
-              <Link href="/signup" className="bg-gradient-to-r from-green-500 to-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all">
+              <Link href="/signup" className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all">
                 Get Started
               </Link>
             </div>
@@ -36,11 +36,11 @@ export default function PricingPage() {
         <div className="text-center mb-16">
           <h1 className="text-5xl font-bold text-gray-900 mb-6">
             Simple, Transparent{' '}
-            <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
               Pricing
             </span>
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-800 max-w-2xl mx-auto">
             Choose the plan that fits your needs. Upgrade or downgrade anytime.
           </p>
         </div>
@@ -52,12 +52,12 @@ export default function PricingPage() {
             <div className="text-center mb-6">
               <h3 className="text-2xl font-bold text-gray-900 mb-2">{PRICING.free.name}</h3>
               <div className="text-4xl font-bold text-gray-900 mb-2">$0</div>
-              <p className="text-gray-600">Forever free</p>
+              <p className="text-gray-800">Forever free</p>
             </div>
             <ul className="space-y-4 mb-8">
               {PRICING.free.features.map((feature, i) => (
                 <li key={i} className="flex items-center space-x-3">
-                  <div className="bg-gray-100 rounded-full p-1"><Check className="h-4 w-4 text-gray-600" /></div>
+                  <div className="bg-gray-100 rounded-full p-1"><Check className="h-4 w-4 text-gray-900" /></div>
                   <span className="text-gray-700 text-sm">{feature}</span>
                 </li>
               ))}
@@ -68,31 +68,31 @@ export default function PricingPage() {
           </div>
 
           {/* Pro */}
-          <div className="bg-gradient-to-br from-blue-50 to-green-50 rounded-2xl p-8 shadow-lg border-2 border-blue-200 relative">
+          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-8 shadow-lg border-2 border-indigo-200 relative">
             <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-              <div className="bg-gradient-to-r from-green-500 to-blue-500 text-white px-6 py-2 rounded-full text-sm font-semibold">
+              <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-2 rounded-full text-sm font-semibold">
                 Most Popular
               </div>
             </div>
             <div className="text-center mb-6">
               <h3 className="text-2xl font-bold text-gray-900 mb-2">{PRICING.pro.name}</h3>
               <div className="flex items-center justify-center space-x-1 mb-2">
-                <div className="text-4xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+                <div className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
                   ${PRICING.pro.price}
                 </div>
-                <span className="text-gray-600">/month</span>
+                <span className="text-gray-800">/month</span>
               </div>
-              <p className="text-gray-600">Full features for individuals</p>
+              <p className="text-gray-800">Full features for individuals</p>
             </div>
             <ul className="space-y-4 mb-8">
               {PRICING.pro.features.map((feature, i) => (
                 <li key={i} className="flex items-center space-x-3">
-                  <div className="bg-gradient-to-r from-green-500 to-blue-500 rounded-full p-1"><Check className="h-4 w-4 text-white" /></div>
+                  <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full p-1"><Check className="h-4 w-4 text-white" /></div>
                   <span className="text-gray-700 text-sm">{feature}</span>
                 </li>
               ))}
             </ul>
-            <Link href="/signup" className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white py-3 rounded-lg font-semibold hover:shadow-xl transition-all flex items-center justify-center space-x-2">
+            <Link href="/signup" className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-lg font-semibold hover:shadow-xl transition-all flex items-center justify-center space-x-2">
               <Zap className="h-5 w-5" />
               <span>Start Pro</span>
             </Link>
@@ -112,9 +112,9 @@ export default function PricingPage() {
                 <div className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                   ${PRICING.nutritionist.price}
                 </div>
-                <span className="text-gray-600">/month</span>
+                <span className="text-gray-800">/month</span>
               </div>
-              <p className="text-gray-600">10 clients included</p>
+              <p className="text-gray-800">10 clients included</p>
             </div>
             <ul className="space-y-4 mb-8">
               {PRICING.nutritionist.features.map((feature, i) => (
@@ -143,7 +143,7 @@ export default function PricingPage() {
             ].map((item, i) => (
               <div key={i} className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
                 <h3 className="font-semibold text-gray-900 mb-2">{item.q}</h3>
-                <p className="text-gray-600 text-sm">{item.a}</p>
+                <p className="text-gray-800 text-sm">{item.a}</p>
               </div>
             ))}
           </div>

@@ -59,13 +59,13 @@ export default function ClientsPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">My Clients</h1>
-          <p className="text-gray-600 mt-1">
+          <p className="text-gray-900 mt-1">
             {activeClients.length} active · {pendingClients.length} pending
           </p>
         </div>
         <Link
           href="/clients/invite"
-          className="flex items-center space-x-2 bg-gradient-to-r from-green-500 to-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all"
+          className="flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all"
         >
           <Plus className="h-4 w-4" />
           <span>Invite Client</span>
@@ -79,7 +79,7 @@ export default function ClientsPage() {
           <p className="text-gray-500 mb-6">Invite your first client to start managing their nutrition and training.</p>
           <Link
             href="/clients/invite"
-            className="inline-flex items-center space-x-2 bg-gradient-to-r from-green-500 to-blue-500 text-white px-6 py-3 rounded-lg font-medium hover:shadow-lg transition-all"
+            className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:shadow-lg transition-all"
           >
             <Mail className="h-5 w-5" />
             <span>Invite Client</span>
@@ -94,9 +94,9 @@ export default function ClientsPage() {
               className="bg-white rounded-xl p-5 shadow-sm border border-gray-200 flex items-center justify-between hover:shadow-md transition-shadow block"
             >
               <div className="flex items-center space-x-4">
-                <div className={`rounded-full p-2 ${row.status === 'active' ? 'bg-green-100' : 'bg-yellow-100'}`}>
+                <div className={`rounded-full p-2 ${row.status === 'active' ? 'bg-purple-100' : 'bg-yellow-100'}`}>
                   {row.status === 'active' ? (
-                    <UserCheck className="h-5 w-5 text-green-600" />
+                    <UserCheck className="h-5 w-5 text-purple-600" />
                   ) : (
                     <Clock className="h-5 w-5 text-yellow-600" />
                   )}
@@ -112,7 +112,7 @@ export default function ClientsPage() {
               </div>
               <span className={`text-xs font-medium px-3 py-1 rounded-full ${
                 row.status === 'active'
-                  ? 'bg-green-100 text-green-700'
+                  ? 'bg-purple-100 text-purple-700'
                   : 'bg-yellow-100 text-yellow-700'
               }`}>
                 {row.status}

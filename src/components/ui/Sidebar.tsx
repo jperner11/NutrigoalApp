@@ -51,11 +51,11 @@ export default function Sidebar({ userRole, userName, onSignOut }: SidebarProps)
       {/* Logo */}
       <div className="flex items-center h-16 px-4 border-b border-gray-200">
         <Link href="/dashboard" className="flex items-center space-x-2 min-w-0">
-          <div className="bg-gradient-to-r from-green-500 to-blue-500 rounded-lg p-1.5 flex-shrink-0">
+          <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg p-1.5 flex-shrink-0">
             <Target className="h-5 w-5 text-white" />
           </div>
           {!collapsed && (
-            <span className="text-xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent truncate">
+            <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent truncate">
               NutriGoal
             </span>
           )}
@@ -74,12 +74,12 @@ export default function Sidebar({ userRole, userName, onSignOut }: SidebarProps)
               href={item.href}
               className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 isActive
-                  ? 'bg-gradient-to-r from-green-50 to-blue-50 text-green-700'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  ? 'bg-gradient-to-r from-purple-50 to-indigo-50 text-purple-700'
+                  : 'text-gray-900 hover:bg-gray-50 hover:text-gray-900'
               }`}
               title={collapsed ? item.label : undefined}
             >
-              <Icon className={`h-5 w-5 flex-shrink-0 ${isActive ? 'text-green-600' : ''}`} />
+              <Icon className={`h-5 w-5 flex-shrink-0 ${isActive ? 'text-purple-600' : ''}`} />
               {!collapsed && <span>{item.label}</span>}
             </Link>
           )
@@ -97,7 +97,7 @@ export default function Sidebar({ userRole, userName, onSignOut }: SidebarProps)
 
         <button
           onClick={onSignOut}
-          className="flex items-center space-x-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors w-full"
+          className="flex items-center space-x-3 px-3 py-2 rounded-lg text-sm text-gray-900 hover:bg-red-50 hover:text-red-600 transition-colors w-full"
           title={collapsed ? 'Sign Out' : undefined}
         >
           <LogOut className="h-5 w-5 flex-shrink-0" />
@@ -106,7 +106,7 @@ export default function Sidebar({ userRole, userName, onSignOut }: SidebarProps)
 
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="flex items-center justify-center p-2 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors w-full"
+          className="flex items-center justify-center p-2 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-900 transition-colors w-full"
         >
           {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
         </button>

@@ -190,7 +190,7 @@ export default function MealPlanTracker({ userId, onMacrosUpdate }: MealPlanTrac
           <p className="text-gray-500 mb-4">No active diet plan. Create one to start tracking meals.</p>
           <Link
             href="/diet"
-            className="inline-flex items-center space-x-2 bg-gradient-to-r from-green-500 to-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all"
+            className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all"
           >
             <span>Create Diet Plan</span>
           </Link>
@@ -208,7 +208,7 @@ export default function MealPlanTracker({ userId, onMacrosUpdate }: MealPlanTrac
           <h2 className="text-lg font-semibold text-gray-900">Today&apos;s Meals</h2>
           <p className="text-sm text-gray-500">{activePlan.name} &middot; {mealsEaten}/{meals.length} completed</p>
         </div>
-        <Link href="/diet" className="text-sm text-blue-600 hover:text-blue-800 font-medium">
+        <Link href="/diet" className="text-sm text-purple-600 hover:text-purple-800 font-medium">
           View Plan
         </Link>
       </div>
@@ -226,7 +226,7 @@ export default function MealPlanTracker({ userId, onMacrosUpdate }: MealPlanTrac
               <div
                 key={meal.id}
                 className={`border rounded-lg overflow-hidden transition-colors ${
-                  isEaten ? 'border-green-200 bg-green-50/50' : 'border-gray-200'
+                  isEaten ? 'border-purple-200 bg-purple-50/50' : 'border-gray-200'
                 }`}
               >
                 <div className="flex items-center p-4">
@@ -234,11 +234,11 @@ export default function MealPlanTracker({ userId, onMacrosUpdate }: MealPlanTrac
                     onClick={() => setExpandedMeal(isExpanded ? null : meal.id)}
                     className="flex-1 flex items-center gap-3 text-left"
                   >
-                    <div className={`rounded-lg p-2 ${isEaten ? 'bg-green-100' : 'bg-gray-100'}`}>
-                      <Utensils className={`h-4 w-4 ${isEaten ? 'text-green-600' : 'text-gray-500'}`} />
+                    <div className={`rounded-lg p-2 ${isEaten ? 'bg-purple-100' : 'bg-gray-100'}`}>
+                      <Utensils className={`h-4 w-4 ${isEaten ? 'text-purple-600' : 'text-gray-500'}`} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className={`font-medium ${isEaten ? 'text-green-800' : 'text-gray-900'}`}>
+                      <p className={`font-medium ${isEaten ? 'text-purple-800' : 'text-gray-900'}`}>
                         {meal.meal_name}
                       </p>
                       <p className="text-xs text-gray-500">
@@ -256,8 +256,8 @@ export default function MealPlanTracker({ userId, onMacrosUpdate }: MealPlanTrac
                     onClick={() => toggleMeal(meal)}
                     className={`ml-3 flex-shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center transition-colors ${
                       isEaten
-                        ? 'bg-green-500 border-green-500 text-white'
-                        : 'border-gray-300 hover:border-green-400'
+                        ? 'bg-purple-600 border-purple-600 text-white'
+                        : 'border-gray-300 hover:border-purple-400'
                     }`}
                   >
                     {isEaten && <Check className="h-4 w-4" />}

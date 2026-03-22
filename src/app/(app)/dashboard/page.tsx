@@ -140,7 +140,7 @@ export default function DashboardPage() {
           <h1 className="text-3xl font-bold text-gray-900">
             Welcome back, {profile.full_name?.split(' ')[0] || 'there'}!
           </h1>
-          <p className="text-gray-600 mt-1">
+          <p className="text-gray-900 mt-1">
             Here&apos;s your overview for today.
           </p>
         </div>
@@ -157,14 +157,14 @@ export default function DashboardPage() {
 
       {/* Onboarding prompt */}
       {!profile.onboarding_completed && (
-        <div className="mb-6 bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-xl p-6">
+        <div className="mb-6 bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-xl p-6">
           <h3 className="font-semibold text-gray-900 mb-2">Complete your profile</h3>
-          <p className="text-gray-600 text-sm mb-4">
+          <p className="text-gray-800 text-sm mb-4">
             Set up your metrics and goals to get personalized nutrition targets.
           </p>
           <Link
             href="/onboarding"
-            className="inline-flex items-center space-x-2 bg-gradient-to-r from-green-500 to-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all"
+            className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all"
           >
             <span>Complete Setup</span>
           </Link>
@@ -177,21 +177,21 @@ export default function DashboardPage() {
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="bg-blue-100 rounded-full p-3">
-                <Target className="h-6 w-6 text-blue-600" />
+              <div className="bg-purple-100 rounded-full p-3">
+                <Target className="h-6 w-6 text-purple-600" />
               </div>
               <div>
                 <span className="text-2xl font-bold text-gray-900">{todayStats.caloriesConsumed}</span>
                 <span className="text-sm text-gray-500 ml-1">/ {profile.daily_calories ?? '—'} cal</span>
               </div>
             </div>
-            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">
+            <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-medium">
               {Math.round(calorieProgress)}%
             </span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
             <div
-              className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+              className="bg-purple-500 h-2 rounded-full transition-all duration-300"
               style={{ width: `${calorieProgress}%` }}
             />
           </div>
@@ -271,14 +271,14 @@ export default function DashboardPage() {
         {/* Workouts */}
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
           <div className="flex items-center justify-between mb-4">
-            <div className="bg-green-100 rounded-full p-3">
-              <Dumbbell className="h-6 w-6 text-green-600" />
+            <div className="bg-purple-100 rounded-full p-3">
+              <Dumbbell className="h-6 w-6 text-purple-600" />
             </div>
             <span className="text-sm text-gray-500">Today</span>
           </div>
           <div className="space-y-2">
             <span className="text-2xl font-bold text-gray-900">{todayStats.workoutsCompleted}</span>
-            <p className="text-sm text-gray-600">Workouts completed</p>
+            <p className="text-sm text-gray-900">Workouts completed</p>
           </div>
         </div>
 
@@ -292,7 +292,7 @@ export default function DashboardPage() {
           </div>
           <div className="space-y-2">
             <span className="text-2xl font-bold text-gray-900">{todayStats.cardioMinutes} min</span>
-            <p className="text-sm text-gray-600">Cardio completed</p>
+            <p className="text-sm text-gray-900">Cardio completed</p>
           </div>
         </div>
       </div>
@@ -337,8 +337,8 @@ export default function DashboardPage() {
         </Link>
 
         <Link href="/training" className="bg-white rounded-xl p-5 shadow-sm border border-gray-200 hover:shadow-md transition-shadow flex items-center space-x-4">
-          <div className="bg-green-100 rounded-lg p-3">
-            <Dumbbell className="h-6 w-6 text-green-600" />
+          <div className="bg-purple-100 rounded-lg p-3">
+            <Dumbbell className="h-6 w-6 text-purple-600" />
           </div>
           <div>
             <h3 className="font-semibold text-gray-900">Start Workout</h3>
@@ -384,7 +384,7 @@ export default function DashboardPage() {
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-gray-900">Client Overview</h2>
-            <Link href="/clients" className="text-sm text-blue-600 hover:text-blue-800 font-medium">
+            <Link href="/clients" className="text-sm text-purple-600 hover:text-purple-800 font-medium">
               View All
             </Link>
           </div>
@@ -394,13 +394,13 @@ export default function DashboardPage() {
               <p className="text-gray-500 mb-4">No clients yet. Start by inviting your first client.</p>
               <Link
                 href="/clients/invite"
-                className="inline-flex items-center space-x-2 bg-gradient-to-r from-green-500 to-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all"
+                className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all"
               >
                 <span>Invite Client</span>
               </Link>
             </div>
           ) : (
-            <p className="text-gray-600">
+            <p className="text-gray-900">
               You have <span className="font-semibold">{clientCount}</span> active client{clientCount !== 1 ? 's' : ''}.
             </p>
           )}
@@ -412,19 +412,19 @@ export default function DashboardPage() {
         <div className="mt-8 bg-white rounded-xl p-6 shadow-sm border border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Weekly Progress</h2>
           <div className="grid md:grid-cols-3 gap-4">
-            <div className="text-center p-4 bg-blue-50 rounded-lg">
-              <TrendingUp className="h-6 w-6 text-blue-600 mx-auto mb-2" />
-              <div className="text-sm text-gray-600">Avg. daily goal</div>
-              <div className="text-lg font-bold text-blue-600">—</div>
+            <div className="text-center p-4 bg-purple-50 rounded-lg">
+              <TrendingUp className="h-6 w-6 text-purple-600 mx-auto mb-2" />
+              <div className="text-sm text-gray-900">Avg. daily goal</div>
+              <div className="text-lg font-bold text-purple-600">—</div>
             </div>
-            <div className="text-center p-4 bg-green-50 rounded-lg">
-              <Dumbbell className="h-6 w-6 text-green-600 mx-auto mb-2" />
-              <div className="text-sm text-gray-600">Workouts this week</div>
-              <div className="text-lg font-bold text-green-600">—</div>
+            <div className="text-center p-4 bg-purple-50 rounded-lg">
+              <Dumbbell className="h-6 w-6 text-purple-600 mx-auto mb-2" />
+              <div className="text-sm text-gray-900">Workouts this week</div>
+              <div className="text-lg font-bold text-purple-600">—</div>
             </div>
             <div className="text-center p-4 bg-cyan-50 rounded-lg">
               <Droplets className="h-6 w-6 text-cyan-600 mx-auto mb-2" />
-              <div className="text-sm text-gray-600">Avg. water intake</div>
+              <div className="text-sm text-gray-900">Avg. water intake</div>
               <div className="text-lg font-bold text-cyan-600">—</div>
             </div>
           </div>
