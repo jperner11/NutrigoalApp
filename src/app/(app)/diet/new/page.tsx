@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
-import { Utensils, Sparkles, Plus, Trash2, ArrowLeft, Loader2 } from 'lucide-react'
+import { Utensils, Sparkles, Plus, Trash2, ArrowLeft, Loader2, RefreshCw } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import Link from 'next/link'
 import { MEAL_TYPES } from '@/lib/constants'
@@ -19,6 +19,8 @@ interface MealEntry {
   total_carbs: number
   total_fat: number
 }
+
+const MAX_REROLLS = 3
 
 export default function NewDietPlanPage() {
   const router = useRouter()
@@ -35,6 +37,8 @@ export default function NewDietPlanPage() {
   const [loadingNutrition, setLoadingNutrition] = useState(false)
   const [foodAmount, setFoodAmount] = useState(100)
   const [includeSnack, setIncludeSnack] = useState(false)
+  const [rerollsUsed, setRerollsUsed] = useState(0)
+  const [rerollingMeal, setRerollingMeal] = useState<number | null>(null)
   const [mealPrefs, setMealPrefs] = useState({
     breakfast: '',
     lunch: '',
@@ -48,6 +52,13 @@ export default function NewDietPlanPage() {
   const targetProtein = profile.daily_protein ?? 150
   const targetCarbs = profile.daily_carbs ?? 250
   const targetFat = profile.daily_fat ?? 65
+
+  const mealSlots = [
+    { key: 'breakfast', label: 'Breakfast', type: 'breakfast' as MealType, share: includeSnack ? 0.25 : 0.25 },
+    { key: 'lunch', label: 'Lunch', type: 'lunch' as MealType, share: includeSnack ? 0.35 : 0.40 },
+    { key: 'dinner', label: 'Dinner', type: 'dinner' as MealType, share: includeSnack ? 0.30 : 0.35 },
+    ...(includeSnack ? [{ key: 'snack', label: 'Afternoon Snack', type: 'snack' as MealType, share: 0.10 }] : []),
+  ]
 
   async function searchFood(query: string) {
     if (!query.trim()) return
@@ -126,16 +137,51 @@ export default function NewDietPlanPage() {
     ])
   }
 
+  interface APIIngredient {
+    name: string
+    amount: number
+    unit: string
+    calories: number
+    protein: number
+    carbs: number
+    fat: number
+  }
+
+  interface APIMeal {
+    title: string
+    ingredients: APIIngredient[]
+    calories: number
+    protein: number
+    carbs: number
+    fat: number
+  }
+
+  function apiMealToEntry(meal: APIMeal, slot: { type: MealType; label: string }): MealEntry {
+    const foods: FoodItem[] = meal.ingredients.map((ing: APIIngredient) => ({
+      spoonacular_id: 0,
+      name: ing.name,
+      amount: ing.amount,
+      unit: ing.unit || 'g',
+      calories: ing.calories,
+      protein: ing.protein,
+      carbs: ing.carbs,
+      fat: ing.fat,
+    }))
+
+    return {
+      meal_type: slot.type,
+      meal_name: `${slot.label}: ${meal.title}`,
+      foods,
+      total_calories: meal.calories,
+      total_protein: meal.protein,
+      total_carbs: meal.carbs,
+      total_fat: meal.fat,
+    }
+  }
+
   async function generatePlan() {
     setGenerating(true)
     try {
-      const mealSlots = [
-        { key: 'breakfast', label: 'Breakfast', type: 'breakfast' as MealType },
-        { key: 'lunch', label: 'Lunch', type: 'lunch' as MealType },
-        { key: 'dinner', label: 'Dinner', type: 'dinner' as MealType },
-        ...(includeSnack ? [{ key: 'snack', label: 'Afternoon Snack', type: 'snack' as MealType }] : []),
-      ]
-
       const params = new URLSearchParams({
         targetCalories: String(targetCalories),
         targetProtein: String(targetProtein),
@@ -144,7 +190,6 @@ export default function NewDietPlanPage() {
         mealCount: String(mealSlots.length),
       })
 
-      // Add ingredient preferences per meal
       mealSlots.forEach(slot => {
         const ingredients = mealPrefs[slot.key as keyof typeof mealPrefs]?.trim()
         if (ingredients) {
@@ -161,46 +206,70 @@ export default function NewDietPlanPage() {
       const data = await res.json()
 
       const generatedMeals: MealEntry[] = data.meals.map(
-        (meal: {
-          id: number
-          title: string
-          calories: number
-          protein: number
-          carbs: number
-          fat: number
-          servings: number
-        }, index: number) => {
+        (meal: APIMeal, index: number) => {
           const slot = mealSlots[index]
-          const foods: FoodItem[] = [{
-            spoonacular_id: meal.id,
-            name: meal.title,
-            amount: meal.servings || 1,
-            unit: meal.servings === 1 ? 'serving' : 'servings',
-            calories: Math.round(meal.calories),
-            protein: Math.round(meal.protein * 10) / 10,
-            carbs: Math.round(meal.carbs * 10) / 10,
-            fat: Math.round(meal.fat * 10) / 10,
-          }]
-
-          return {
-            meal_type: slot?.type || 'snack',
-            meal_name: slot?.label || meal.title,
-            foods,
-            total_calories: Math.round(meal.calories),
-            total_protein: Math.round(meal.protein),
-            total_carbs: Math.round(meal.carbs),
-            total_fat: Math.round(meal.fat),
-          }
+          return apiMealToEntry(meal, slot)
         }
       )
 
       setMeals(generatedMeals)
+      setRerollsUsed(0)
       setPlanName(`${profile?.full_name?.split(' ')[0] || 'My'}'s Meal Plan`)
-      toast.success('Meal plan generated! You can customize the foods.')
+      toast.success('Meal plan generated with ingredient breakdowns!')
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Failed to generate meal plan. Try again.')
     }
     setGenerating(false)
+  }
+
+  async function rerollMeal(mealIndex: number) {
+    if (rerollsUsed >= MAX_REROLLS) {
+      toast.error(`You've used all ${MAX_REROLLS} surprise re-rolls for this plan.`)
+      return
+    }
+
+    const slot = mealSlots[mealIndex]
+    if (!slot) return
+
+    setRerollingMeal(mealIndex)
+    try {
+      const mealCalories = Math.round(targetCalories * slot.share)
+      const mealProtein = Math.round(targetProtein * slot.share)
+      const mealCarbs = Math.round(targetCarbs * slot.share)
+      const mealFat = Math.round(targetFat * slot.share)
+
+      const res = await fetch('/api/food/mealplan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mealType: slot.key,
+          targetCalories: mealCalories,
+          targetProtein: mealProtein,
+          targetCarbs: mealCarbs,
+          targetFat: mealFat,
+          ingredients: mealPrefs[slot.key as keyof typeof mealPrefs] || '',
+        }),
+      })
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => null)
+        throw new Error(err?.message || 'Failed to regenerate')
+      }
+
+      const meal: APIMeal = await res.json()
+
+      setMeals(prev => {
+        const updated = [...prev]
+        updated[mealIndex] = apiMealToEntry(meal, slot)
+        return updated
+      })
+
+      setRerollsUsed(prev => prev + 1)
+      toast.success(`New ${slot.label.toLowerCase()} generated!`)
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to regenerate meal.')
+    }
+    setRerollingMeal(null)
   }
 
   async function savePlan() {
@@ -217,14 +286,12 @@ export default function NewDietPlanPage() {
     setSaving(true)
     const supabase = createClient()
 
-    // Deactivate other plans
     await supabase
       .from('diet_plans')
       .update({ is_active: false })
       .eq('user_id', profile.id)
       .eq('is_active', true)
 
-    // Create the plan
     const { data: plan, error: planError } = await supabase
       .from('diet_plans')
       .insert({
@@ -247,10 +314,9 @@ export default function NewDietPlanPage() {
       return
     }
 
-    // Insert meals
     const mealInserts = meals.map(meal => ({
       diet_plan_id: plan.id,
-      day_of_week: null, // null = every day
+      day_of_week: null,
       meal_type: meal.meal_type,
       meal_name: meal.meal_name,
       foods: meal.foods,
@@ -291,6 +357,32 @@ export default function NewDietPlanPage() {
         </div>
       </div>
 
+      {/* Plan Name & Notes — FIRST */}
+      <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-900 mb-1">Plan Name</label>
+            <input
+              type="text"
+              value={planName}
+              onChange={(e) => setPlanName(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              placeholder="e.g. My Cutting Plan"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-900 mb-1">Notes (optional)</label>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              rows={2}
+              placeholder="Any notes about this plan..."
+            />
+          </div>
+        </div>
+      </div>
+
       {/* Auto-Generate with Preferences */}
       <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-6 border border-purple-200 mb-8">
         <div className="flex items-center gap-2 mb-4">
@@ -319,7 +411,6 @@ export default function NewDietPlanPage() {
             </div>
           ))}
 
-          {/* Optional snack */}
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -363,201 +454,229 @@ export default function NewDietPlanPage() {
         </button>
       </div>
 
-      {/* Plan Name & Notes */}
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-900 mb-1">Plan Name</label>
-            <input
-              type="text"
-              value={planName}
-              onChange={(e) => setPlanName(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              placeholder="e.g. My Cutting Plan"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-900 mb-1">Notes (optional)</label>
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              rows={2}
-              placeholder="Any notes about this plan..."
-            />
-          </div>
-        </div>
-      </div>
-
       {/* Macro Summary */}
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
-        <h3 className="font-semibold text-gray-900 mb-3">Daily Totals</h3>
-        <div className="grid grid-cols-4 gap-3">
-          <div className="bg-purple-50 rounded-lg p-3 text-center">
-            <p className="text-xs text-gray-800 mb-1">Calories</p>
-            <p className="text-lg font-bold text-purple-700">{Math.round(totalCalories)}</p>
-            <p className="text-xs text-gray-500">/ {targetCalories}</p>
-          </div>
-          <div className="bg-green-50 rounded-lg p-3 text-center">
-            <p className="text-xs text-gray-800 mb-1">Protein</p>
-            <p className="text-lg font-bold text-green-700">{Math.round(totalProtein)}g</p>
-            <p className="text-xs text-gray-500">/ {targetProtein}g</p>
-          </div>
-          <div className="bg-amber-50 rounded-lg p-3 text-center">
-            <p className="text-xs text-gray-800 mb-1">Carbs</p>
-            <p className="text-lg font-bold text-amber-700">{Math.round(totalCarbs)}g</p>
-            <p className="text-xs text-gray-500">/ {targetCarbs}g</p>
-          </div>
-          <div className="bg-rose-50 rounded-lg p-3 text-center">
-            <p className="text-xs text-gray-800 mb-1">Fat</p>
-            <p className="text-lg font-bold text-rose-700">{Math.round(totalFat)}g</p>
-            <p className="text-xs text-gray-500">/ {targetFat}g</p>
+      {meals.length > 0 && (
+        <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
+          <h3 className="font-semibold text-gray-900 mb-3">Daily Totals</h3>
+          <div className="grid grid-cols-4 gap-3">
+            <div className="bg-purple-50 rounded-lg p-3 text-center">
+              <p className="text-xs text-gray-800 mb-1">Calories</p>
+              <p className={`text-lg font-bold ${Math.abs(totalCalories - targetCalories) < targetCalories * 0.1 ? 'text-purple-700' : 'text-red-600'}`}>
+                {Math.round(totalCalories)}
+              </p>
+              <p className="text-xs text-gray-500">/ {targetCalories}</p>
+            </div>
+            <div className="bg-green-50 rounded-lg p-3 text-center">
+              <p className="text-xs text-gray-800 mb-1">Protein</p>
+              <p className={`text-lg font-bold ${Math.abs(totalProtein - targetProtein) < targetProtein * 0.15 ? 'text-green-700' : 'text-red-600'}`}>
+                {Math.round(totalProtein)}g
+              </p>
+              <p className="text-xs text-gray-500">/ {targetProtein}g</p>
+            </div>
+            <div className="bg-amber-50 rounded-lg p-3 text-center">
+              <p className="text-xs text-gray-800 mb-1">Carbs</p>
+              <p className={`text-lg font-bold ${Math.abs(totalCarbs - targetCarbs) < targetCarbs * 0.15 ? 'text-amber-700' : 'text-red-600'}`}>
+                {Math.round(totalCarbs)}g
+              </p>
+              <p className="text-xs text-gray-500">/ {targetCarbs}g</p>
+            </div>
+            <div className="bg-rose-50 rounded-lg p-3 text-center">
+              <p className="text-xs text-gray-800 mb-1">Fat</p>
+              <p className={`text-lg font-bold ${Math.abs(totalFat - targetFat) < targetFat * 0.15 ? 'text-rose-700' : 'text-red-600'}`}>
+                {Math.round(totalFat)}g
+              </p>
+              <p className="text-xs text-gray-500">/ {targetFat}g</p>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Meals */}
       <div className="space-y-4 mb-6">
         {meals.map((meal, mealIndex) => (
-          <div key={mealIndex} className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="bg-purple-100 rounded-lg p-2">
-                  <Utensils className="h-4 w-4 text-purple-600" />
-                </div>
-                <div>
-                  <input
-                    type="text"
-                    value={meal.meal_name}
-                    onChange={(e) => {
-                      setMeals(prev => {
-                        const updated = [...prev]
-                        updated[mealIndex].meal_name = e.target.value
-                        return updated
-                      })
-                    }}
-                    className="font-semibold text-gray-900 bg-transparent border-none focus:outline-none focus:ring-0 p-0"
-                  />
-                  <div className="flex gap-2 mt-0.5">
-                    <select
-                      value={meal.meal_type}
+          <div key={mealIndex} className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            {/* Meal Header */}
+            <div className="bg-gradient-to-r from-purple-50 to-indigo-50 px-6 py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="bg-purple-100 rounded-lg p-2">
+                    <Utensils className="h-4 w-4 text-purple-600" />
+                  </div>
+                  <div>
+                    <input
+                      type="text"
+                      value={meal.meal_name}
                       onChange={(e) => {
                         setMeals(prev => {
                           const updated = [...prev]
-                          updated[mealIndex].meal_type = e.target.value as MealType
+                          updated[mealIndex].meal_name = e.target.value
                           return updated
                         })
                       }}
-                      className="text-xs text-gray-500 bg-transparent border-none focus:outline-none p-0"
-                    >
-                      {MEAL_TYPES.map(mt => (
-                        <option key={mt.value} value={mt.value}>{mt.label}</option>
-                      ))}
-                    </select>
+                      className="font-semibold text-gray-900 bg-transparent border-none focus:outline-none focus:ring-0 p-0 text-lg"
+                    />
+                    <div className="flex gap-2 mt-0.5">
+                      <select
+                        value={meal.meal_type}
+                        onChange={(e) => {
+                          setMeals(prev => {
+                            const updated = [...prev]
+                            updated[mealIndex].meal_type = e.target.value as MealType
+                            return updated
+                          })
+                        }}
+                        className="text-xs text-gray-500 bg-transparent border-none focus:outline-none p-0"
+                      >
+                        {MEAL_TYPES.map(mt => (
+                          <option key={mt.value} value={mt.value}>{mt.label}</option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="text-right">
-                <p className="text-sm font-medium text-gray-900">{Math.round(meal.total_calories)} cal</p>
-                <p className="text-xs text-gray-500">
-                  {Math.round(meal.total_protein)}P · {Math.round(meal.total_carbs)}C · {Math.round(meal.total_fat)}F
-                </p>
+                <div className="flex items-center gap-3">
+                  {/* Surprise Me button */}
+                  {mealIndex < mealSlots.length && (
+                    <button
+                      onClick={() => rerollMeal(mealIndex)}
+                      disabled={rerollingMeal !== null || rerollsUsed >= MAX_REROLLS}
+                      className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg bg-white border border-purple-200 text-purple-600 hover:bg-purple-50 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                      title={rerollsUsed >= MAX_REROLLS ? 'No re-rolls left' : `${MAX_REROLLS - rerollsUsed} re-rolls remaining`}
+                    >
+                      {rerollingMeal === mealIndex ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : (
+                        <RefreshCw className="h-3 w-3" />
+                      )}
+                      Surprise me
+                    </button>
+                  )}
+                  <div className="text-right">
+                    <p className="text-sm font-bold text-gray-900">{Math.round(meal.total_calories)} cal</p>
+                    <p className="text-xs text-gray-600">
+                      {Math.round(meal.total_protein)}P · {Math.round(meal.total_carbs)}C · {Math.round(meal.total_fat)}F
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Food items */}
-            {meal.foods.length > 0 && (
-              <div className="space-y-2 mb-4">
-                {meal.foods.map((food, foodIndex) => (
-                  <div key={foodIndex} className="flex items-center justify-between py-2 px-3 bg-gray-50 rounded-lg">
-                    <div>
-                      <p className="text-sm text-gray-900">{food.amount}{food.unit} {food.name}</p>
-                      <p className="text-xs text-gray-500">{food.calories} cal · {food.protein}g P · {food.carbs}g C · {food.fat}g F</p>
+            {/* Ingredient List */}
+            <div className="px-6 py-4">
+              {meal.foods.length > 0 && (
+                <div className="space-y-2 mb-4">
+                  {/* Header row */}
+                  <div className="grid grid-cols-12 gap-2 text-xs text-gray-500 font-medium px-2 pb-1 border-b border-gray-100">
+                    <div className="col-span-5">Ingredient</div>
+                    <div className="col-span-2 text-right">Cal</div>
+                    <div className="col-span-1 text-right">P</div>
+                    <div className="col-span-1 text-right">C</div>
+                    <div className="col-span-1 text-right">F</div>
+                    <div className="col-span-2"></div>
+                  </div>
+                  {meal.foods.map((food, foodIndex) => (
+                    <div key={foodIndex} className="grid grid-cols-12 gap-2 items-center py-2 px-2 rounded-lg hover:bg-gray-50 transition-colors group">
+                      <div className="col-span-5">
+                        <p className="text-sm font-medium text-gray-900">{food.amount} {food.unit} {food.name}</p>
+                      </div>
+                      <div className="col-span-2 text-right text-sm text-gray-700">{food.calories}</div>
+                      <div className="col-span-1 text-right text-sm text-green-700">{food.protein}g</div>
+                      <div className="col-span-1 text-right text-sm text-amber-700">{food.carbs}g</div>
+                      <div className="col-span-1 text-right text-sm text-rose-700">{food.fat}g</div>
+                      <div className="col-span-2 text-right">
+                        <button
+                          onClick={() => removeFoodFromMeal(mealIndex, foodIndex)}
+                          className="p-1 text-gray-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
                     </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Add food search */}
+              {selectedMealIndex === mealIndex ? (
+                <div className="border-t border-gray-100 pt-4">
+                  <div className="flex gap-2 mb-2">
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && searchFood(searchQuery)}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      placeholder="Search foods (e.g. chicken breast, rice)..."
+                      autoFocus
+                    />
+                    <input
+                      type="number"
+                      value={foodAmount}
+                      onChange={(e) => setFoodAmount(parseInt(e.target.value) || 100)}
+                      className="w-20 px-2 py-2 border border-gray-300 rounded-lg text-sm text-center focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      min={1}
+                    />
+                    <span className="flex items-center text-sm text-gray-500">g</span>
                     <button
-                      onClick={() => removeFoodFromMeal(mealIndex, foodIndex)}
-                      className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                      onClick={() => searchFood(searchQuery)}
+                      disabled={searching}
+                      className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 disabled:opacity-50"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      {searching ? '...' : 'Search'}
                     </button>
                   </div>
-                ))}
-              </div>
-            )}
 
-            {/* Add food search */}
-            {selectedMealIndex === mealIndex ? (
-              <div className="border-t border-gray-100 pt-4">
-                <div className="flex gap-2 mb-2">
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && searchFood(searchQuery)}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    placeholder="Search foods (e.g. chicken breast, rice)..."
-                    autoFocus
-                  />
-                  <input
-                    type="number"
-                    value={foodAmount}
-                    onChange={(e) => setFoodAmount(parseInt(e.target.value) || 100)}
-                    className="w-20 px-2 py-2 border border-gray-300 rounded-lg text-sm text-center focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    min={1}
-                  />
-                  <span className="flex items-center text-sm text-gray-500">g</span>
+                  {searchResults.length > 0 && (
+                    <div className="space-y-1 max-h-48 overflow-y-auto">
+                      {searchResults.map(result => (
+                        <button
+                          key={result.id}
+                          onClick={() => addFoodToMeal(mealIndex, result)}
+                          disabled={loadingNutrition}
+                          className="w-full text-left px-3 py-2 text-sm text-gray-900 hover:bg-purple-50 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
+                        >
+                          {loadingNutrition ? (
+                            <Loader2 className="h-3 w-3 animate-spin text-purple-600" />
+                          ) : (
+                            <Plus className="h-3 w-3 text-purple-600" />
+                          )}
+                          {result.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
                   <button
-                    onClick={() => searchFood(searchQuery)}
-                    disabled={searching}
-                    className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 disabled:opacity-50"
+                    onClick={() => {
+                      setSelectedMealIndex(null)
+                      setSearchQuery('')
+                      setSearchResults([])
+                    }}
+                    className="text-xs text-gray-500 hover:text-gray-700 mt-2"
                   >
-                    {searching ? '...' : 'Search'}
+                    Cancel
                   </button>
                 </div>
-
-                {searchResults.length > 0 && (
-                  <div className="space-y-1 max-h-48 overflow-y-auto">
-                    {searchResults.map(result => (
-                      <button
-                        key={result.id}
-                        onClick={() => addFoodToMeal(mealIndex, result)}
-                        disabled={loadingNutrition}
-                        className="w-full text-left px-3 py-2 text-sm text-gray-900 hover:bg-purple-50 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
-                      >
-                        {loadingNutrition ? (
-                          <Loader2 className="h-3 w-3 animate-spin text-purple-600" />
-                        ) : (
-                          <Plus className="h-3 w-3 text-purple-600" />
-                        )}
-                        {result.name}
-                      </button>
-                    ))}
-                  </div>
-                )}
-
+              ) : (
                 <button
-                  onClick={() => {
-                    setSelectedMealIndex(null)
-                    setSearchQuery('')
-                    setSearchResults([])
-                  }}
-                  className="text-xs text-gray-500 hover:text-gray-700 mt-2"
+                  onClick={() => setSelectedMealIndex(mealIndex)}
+                  className="flex items-center gap-1 text-sm text-purple-600 hover:text-purple-800 font-medium"
                 >
-                  Cancel
+                  <Plus className="h-3 w-3" />
+                  Add Food
                 </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => setSelectedMealIndex(mealIndex)}
-                className="flex items-center gap-1 text-sm text-purple-600 hover:text-purple-800 font-medium"
-              >
-                <Plus className="h-3 w-3" />
-                Add Food
-              </button>
-            )}
+              )}
+            </div>
           </div>
         ))}
       </div>
+
+      {/* Re-roll counter */}
+      {meals.length > 0 && (
+        <p className="text-center text-xs text-gray-500 mb-4">
+          {MAX_REROLLS - rerollsUsed} surprise re-roll{MAX_REROLLS - rerollsUsed !== 1 ? 's' : ''} remaining for this plan
+        </p>
+      )}
 
       {/* Add Meal Button */}
       <button

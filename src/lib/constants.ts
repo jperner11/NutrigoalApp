@@ -117,6 +117,14 @@ export const MEAL_TYPES = [
   { value: 'snack', label: 'Snack' },
 ] as const
 
+// ─── Training Constants ────────────────────────────────
+
+export const WEIGHT_INCREMENT_COMPOUND = 2.5 // kg
+export const WEIGHT_INCREMENT_ISOLATION = 1.25 // kg
+export const DEFAULT_REST_SECONDS = 90
+export const DEFAULT_SETS = 3
+export const DEFAULT_REPS = '8-12'
+
 // ─── Water Quick-Add Options (ml) ───────────────────────
 
 export const WATER_QUICK_ADD = [

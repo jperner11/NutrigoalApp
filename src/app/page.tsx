@@ -25,7 +25,7 @@ export default function LandingPage() {
               </Link>
               <Link
                 href="/signup"
-                className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all duration-200 flex items-center space-x-2"
+                className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-5 py-2.5 rounded-lg hover:shadow-lg hover:shadow-[0_0_20px_rgba(139,92,246,0.3)] transition-all duration-300 flex items-center space-x-2"
               >
                 <span>Get Started</span>
                 <ArrowRight className="h-4 w-4" />
@@ -36,40 +36,70 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
+      <section className="relative overflow-hidden bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,80,255,0.3),rgba(255,255,255,0))]">
+        {/* Secondary gradient layer */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_80%_60%,rgba(139,92,246,0.1),rgba(255,255,255,0))]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_40%_40%_at_20%_80%,rgba(99,102,241,0.08),rgba(255,255,255,0))]" />
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-20">
           <div className="text-center">
             <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6">
               Your Complete{' '}
-              <span className="bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent bg-[length:200%] animate-[gradient_3s_linear_infinite]">
                 Wellness
               </span>
               <br />
               Platform
             </h1>
 
-            <p className="text-xl text-gray-800 mb-8 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl text-gray-800 mb-10 max-w-3xl mx-auto leading-relaxed">
               Diet planning, workout building, cardio tracking, and hydration monitoring&mdash;all in one place.
               For individuals pursuing their goals and nutritionists managing their clients.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
               <Link
                 href="/signup"
-                className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:shadow-xl transition-all duration-300 flex items-center space-x-2 group"
+                className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-10 py-5 rounded-xl text-lg font-semibold hover:shadow-xl hover:shadow-[0_0_30px_rgba(139,92,246,0.3)] transition-all duration-300 flex items-center space-x-2 group"
               >
                 <span>Start Free</span>
                 <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
                 href="/pricing"
-                className="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-xl text-lg font-semibold hover:border-gray-400 hover:shadow-md transition-all duration-200"
+                className="border-2 border-gray-300 text-gray-700 px-10 py-5 rounded-xl text-lg font-semibold hover:border-purple-300 hover:shadow-md hover:shadow-purple-100 transition-all duration-300"
               >
                 View Plans
               </Link>
             </div>
 
-            <div className="text-sm text-gray-500 mb-16">
+            {/* Social Proof */}
+            <div className="flex flex-col items-center gap-4 mb-12">
+              <div className="flex -space-x-3">
+                {[
+                  { initials: 'JR', bg: 'bg-purple-500' },
+                  { initials: 'AM', bg: 'bg-indigo-500' },
+                  { initials: 'KT', bg: 'bg-violet-500' },
+                  { initials: 'LS', bg: 'bg-fuchsia-500' },
+                  { initials: 'DP', bg: 'bg-purple-600' },
+                ].map((avatar, i) => (
+                  <div
+                    key={i}
+                    className={`${avatar.bg} w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold border-2 border-white shadow-sm`}
+                  >
+                    {avatar.initials}
+                  </div>
+                ))}
+                <div className="bg-gray-100 w-10 h-10 rounded-full flex items-center justify-center text-gray-500 text-xs font-bold border-2 border-white shadow-sm">
+                  +
+                </div>
+              </div>
+              <p className="text-sm text-gray-500 font-medium">
+                Join <span className="text-purple-600 font-semibold">1,000+</span> users tracking their fitness journey
+              </p>
+            </div>
+
+            <div className="text-sm text-gray-500">
               <p>For individuals &amp; nutritionists &bull; AI-powered suggestions &bull; Science-based calculations</p>
             </div>
           </div>
@@ -89,7 +119,7 @@ export default function LandingPage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow border border-gray-100">
+            <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100">
               <div className="bg-orange-100 rounded-full p-3 w-fit mb-4">
                 <Target className="h-7 w-7 text-orange-600" />
               </div>
@@ -99,7 +129,7 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow border border-gray-100">
+            <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100">
               <div className="bg-purple-100 rounded-full p-3 w-fit mb-4">
                 <Dumbbell className="h-7 w-7 text-purple-600" />
               </div>
@@ -109,7 +139,7 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow border border-gray-100">
+            <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100">
               <div className="bg-red-100 rounded-full p-3 w-fit mb-4">
                 <HeartPulse className="h-7 w-7 text-red-600" />
               </div>
@@ -119,7 +149,7 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow border border-gray-100">
+            <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100">
               <div className="bg-cyan-100 rounded-full p-3 w-fit mb-4">
                 <Droplets className="h-7 w-7 text-cyan-600" />
               </div>
@@ -168,7 +198,7 @@ export default function LandingPage() {
               </ul>
               <Link
                 href="/signup"
-                className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-xl transition-all duration-300"
+                className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-xl hover:shadow-[0_0_30px_rgba(139,92,246,0.3)] transition-all duration-300"
               >
                 <span>Start as Nutritionist</span>
                 <ArrowRight className="h-5 w-5" />
@@ -177,7 +207,7 @@ export default function LandingPage() {
             <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-8 border border-purple-100">
               <div className="space-y-4">
                 {['Sarah M.', 'David J.', 'Lisa K.'].map((name, i) => (
-                  <div key={i} className="bg-white rounded-xl p-4 shadow-sm flex items-center justify-between">
+                  <div key={i} className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <div className="bg-gray-200 rounded-full w-10 h-10 flex items-center justify-center">
                         <span className="text-sm font-bold text-gray-900">{name.split(' ').map(n => n[0]).join('')}</span>
@@ -227,25 +257,25 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20">
-        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+      <section className="py-24 relative overflow-hidden bg-[radial-gradient(ellipse_80%_60%_at_50%_120%,rgba(120,80,255,0.15),rgba(255,255,255,0))]">
+        <div className="relative max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-4xl font-bold text-gray-900 mb-6">
             Ready to Transform Your Wellness?
           </h2>
-          <p className="text-xl text-gray-800 mb-8">
+          <p className="text-xl text-gray-800 mb-10">
             Join NutriGoal today&mdash;whether you&apos;re training solo or managing a roster of clients.
           </p>
 
           <Link
             href="/signup"
-            className="inline-flex items-center space-x-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-10 py-5 rounded-xl text-xl font-semibold hover:shadow-xl transition-all duration-300 group"
+            className="inline-flex items-center space-x-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-12 py-6 rounded-xl text-xl font-semibold hover:shadow-xl hover:shadow-[0_0_30px_rgba(139,92,246,0.3)] transition-all duration-300 group"
           >
             <Zap className="h-6 w-6" />
             <span>Get Started Free</span>
             <ArrowRight className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
           </Link>
 
-          <p className="text-sm text-gray-500 mt-4">
+          <p className="text-sm text-gray-500 mt-6">
             No credit card required &bull; Free plan available forever
           </p>
         </div>
@@ -261,17 +291,19 @@ export default function LandingPage() {
               </div>
               <span className="text-2xl font-bold">NutriGoal</span>
             </div>
-            <p className="text-gray-400 mb-4">
+            <p className="text-gray-400 mb-6">
               Your complete nutrition, training &amp; wellness platform
             </p>
-            <div className="flex justify-center space-x-6 text-sm text-gray-500 mb-4">
-              <Link href="/pricing" className="hover:text-gray-300">Pricing</Link>
-              <Link href="/login" className="hover:text-gray-300">Sign In</Link>
-              <Link href="/signup" className="hover:text-gray-300">Sign Up</Link>
+            <div className="flex justify-center space-x-6 text-sm text-gray-500 mb-6">
+              <Link href="/pricing" className="hover:text-gray-300 transition-colors">Pricing</Link>
+              <Link href="/login" className="hover:text-gray-300 transition-colors">Sign In</Link>
+              <Link href="/signup" className="hover:text-gray-300 transition-colors">Sign Up</Link>
             </div>
-            <p className="text-sm text-gray-500">
-              &copy; 2024 NutriGoal. Built for better wellness.
-            </p>
+            <div className="border-t border-gray-800 pt-6">
+              <p className="text-sm text-gray-500">
+                &copy; 2025 NutriGoal. Built for better wellness.
+              </p>
+            </div>
           </div>
         </div>
       </footer>

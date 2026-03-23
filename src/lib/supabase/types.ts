@@ -163,12 +163,15 @@ export interface TrainingPlanExercise {
 }
 
 export interface WorkoutSetLog {
+  set_number: number
   reps: number
   weight_kg: number
+  completed: boolean
 }
 
 export interface WorkoutExerciseLog {
   exercise_id: string
+  exercise_name: string
   sets: WorkoutSetLog[]
 }
 
