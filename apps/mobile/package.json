@@ -9,8 +9,9 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "@nutrigoal/shared": "*",
+    "@expo/ngrok": "^4.1.3",
     "@expo/vector-icons": "^15.0.2",
+    "@nutrigoal/shared": "*",
     "@react-navigation/native": "^7.1.33",
     "@supabase/supabase-js": "^2.100.0",
     "expo": "~55.0.8",
