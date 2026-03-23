@@ -1,5 +1,5 @@
 import { WEIGHT_INCREMENT_COMPOUND, WEIGHT_INCREMENT_ISOLATION } from './constants'
-import type { WorkoutSetLog } from './supabase/types'
+import type { WorkoutSetLog } from './types'
 
 export function parseRepRange(reps: string): { min: number; max: number } {
   const parts = reps.split('-').map(s => parseInt(s.trim()))
