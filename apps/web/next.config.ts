@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Vercel SSR deployment - no static export needed
+  transpilePackages: ['@nutrigoal/shared'],
 };
 
 export default nextConfig;

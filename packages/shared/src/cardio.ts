@@ -1,7 +1,7 @@
 // Cardio calorie calculation using heart-rate-based formula (Keytel et al.)
 // Falls back to MET-based calculation when BPM is not available
 
-import type { Gender } from '@/lib/supabase/types'
+import type { Gender } from './types'
 
 interface CardioCalorieParams {
   durationMinutes: number
