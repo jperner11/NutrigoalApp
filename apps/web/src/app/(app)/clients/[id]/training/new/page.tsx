@@ -4,11 +4,11 @@ import { useState, useEffect, useMemo } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
-import { ArrowLeft, Plus, Trash2, Search, Loader2, Dumbbell } from 'lucide-react'
+import { ArrowLeft, Plus, Trash2, Loader2 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import Link from 'next/link'
 import type { Exercise, UserProfile } from '@/lib/supabase/types'
-import { BODY_PARTS, EQUIPMENT_TYPES, DEFAULT_REST_SECONDS, DEFAULT_SETS, DEFAULT_REPS } from '@/lib/constants'
+import { BODY_PARTS, DEFAULT_REST_SECONDS, DEFAULT_SETS, DEFAULT_REPS } from '@/lib/constants'
 
 interface DayExercise {
   tempId: string

@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import { ArrowLeft, Plus, Trash2, Send, CheckCircle, Clock } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import Link from 'next/link'
-import type { FeedbackRequest, FeedbackQuestion, UserProfile } from '@/lib/supabase/types'
+import type { FeedbackRequest, FeedbackQuestion, FeedbackResponse, UserProfile } from '@/lib/supabase/types'
 
 export default function ClientFeedbackPage() {
   const { id } = useParams<{ id: string }>()
@@ -181,7 +181,7 @@ export default function ClientFeedbackPage() {
               {fb.status === 'completed' && fb.responses && (
                 <div className="border-t border-gray-100 pt-3 space-y-3">
                   {fb.questions.map((q: FeedbackQuestion, i: number) => {
-                    const resp = (fb.responses as any)?.[i]
+                    const resp = (fb.responses as FeedbackResponse[])?.[i]
                     return (
                       <div key={q.id}>
                         <p className="text-xs font-medium text-gray-500">{q.question}</p>
