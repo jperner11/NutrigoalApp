@@ -21,7 +21,7 @@ const TABS: TabConfig[] = [
 ]
 
 // Hidden tabs accessible via navigation but not in tab bar
-const HIDDEN_TABS = ['onboarding', 'water', 'ai', 'clients', 'settings']
+const HIDDEN_TABS = ['onboarding', 'water', 'ai', 'ai-generate', 'clients', 'my-pt', 'settings']
 
 export default function TabLayout() {
   const { profile } = useAuth()

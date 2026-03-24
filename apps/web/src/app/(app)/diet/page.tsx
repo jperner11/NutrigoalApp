@@ -75,9 +75,14 @@ export default function DietPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900">{plan.name}</h3>
-                  {plan.is_active && (
-                    <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">Active</span>
-                  )}
+                  <div className="flex gap-1">
+                    {plan.created_by !== profile?.id && (
+                      <span className="text-xs bg-violet-100 text-violet-700 px-2 py-0.5 rounded-full">From PT</span>
+                    )}
+                    {plan.is_active && (
+                      <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">Active</span>
+                    )}
+                  </div>
                 </div>
               </div>
               {plan.target_calories && (
