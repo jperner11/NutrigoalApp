@@ -54,14 +54,14 @@ export async function POST(request: Request) {
       basic: 'User has BASIC cooking skills. Keep recipes simple: max 3-4 steps, common pantry ingredients.',
       intermediate: 'User is comfortable cooking. Standard recipes are fine.',
       advanced: 'User is an advanced cook. Can suggest complex recipes.',
-    }[cookingSkill]
+    }[cookingSkill as string] ?? 'User is comfortable cooking. Standard recipes are fine.'
 
     const prepContext = {
       daily: 'User cooks fresh daily.',
       batch_prep: 'User prefers BATCH PREP (meal prep on weekends). Suggest meals that store well and can be portioned.',
       quick_only: 'User needs QUICK meals only (max 15 min prep). Prioritize speed.',
       eat_out: 'User eats out often. Suggest meals that are easy to order or replicate at restaurants.',
-    }[mealPrepPreference]
+    }[mealPrepPreference as string] ?? 'User cooks fresh daily.'
 
     const systemPrompt = `You are a sports nutritionist creating a daily meal plan optimized around a workout schedule.
 
