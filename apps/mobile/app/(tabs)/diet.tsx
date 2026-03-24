@@ -7,8 +7,12 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
-import { MEAL_TYPES } from '@nutrigoal/shared'
-import type { DietPlan, FoodItem, MealType } from '@nutrigoal/shared'
+import {
+  MEAL_TYPES, COMMON_SUPPLEMENTS, SUPPLEMENT_FREQUENCIES, SUPPLEMENT_TIMES,
+} from '@nutrigoal/shared'
+import type {
+  DietPlan, FoodItem, MealType, UserSupplement, SupplementFrequency, SupplementTime,
+} from '@nutrigoal/shared'
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || ''
 
@@ -18,13 +22,17 @@ interface MealEntry {
   foods: FoodItem[]
 }
 
-type Screen = 'list' | 'create' | 'log'
+type Screen = 'list' | 'create' | 'log' | 'supplements'
 
 export default function DietScreen() {
   const { user, profile } = useAuth()
   const [screen, setScreen] = useState<Screen>('list')
   const [plans, setPlans] = useState<DietPlan[]>([])
+  const [supplements, setSupplements] = useState<UserSupplement[]>([])
+  const [todayLogs, setTodayLogs] = useState<string[]>([]) // supplement_ids taken today
   const [refreshing, setRefreshing] = useState(false)
+
+  const today = new Date().toISOString().split('T')[0]
 
   const fetchPlans = async () => {
     if (!user) return
@@ -32,11 +40,33 @@ export default function DietScreen() {
     if (data) setPlans(data as DietPlan[])
   }
 
-  useEffect(() => { fetchPlans() }, [user])
-  const onRefresh = async () => { setRefreshing(true); await fetchPlans(); setRefreshing(false) }
+  const fetchSupplements = async () => {
+    if (!user) return
+    const [supRes, logRes] = await Promise.all([
+      supabase.from('user_supplements').select('*').eq('user_id', user.id).eq('is_active', true).order('created_at'),
+      supabase.from('supplement_logs').select('supplement_id').eq('user_id', user.id).eq('date', today),
+    ])
+    if (supRes.data) setSupplements(supRes.data as UserSupplement[])
+    if (logRes.data) setTodayLogs(logRes.data.map((l: any) => l.supplement_id))
+  }
+
+  const toggleSupplementTaken = async (supplementId: string) => {
+    if (!user) return
+    if (todayLogs.includes(supplementId)) {
+      await supabase.from('supplement_logs').delete().eq('supplement_id', supplementId).eq('date', today)
+      setTodayLogs(todayLogs.filter(id => id !== supplementId))
+    } else {
+      await supabase.from('supplement_logs').insert({ user_id: user.id, supplement_id: supplementId, date: today })
+      setTodayLogs([...todayLogs, supplementId])
+    }
+  }
+
+  useEffect(() => { fetchPlans(); fetchSupplements() }, [user])
+  const onRefresh = async () => { setRefreshing(true); await Promise.all([fetchPlans(), fetchSupplements()]); setRefreshing(false) }
 
   if (screen === 'create') return <CreateDietPlan user={user} profile={profile} onDone={() => { setScreen('list'); fetchPlans() }} onCancel={() => setScreen('list')} />
   if (screen === 'log') return <LogMeal user={user} onDone={() => { setScreen('list') }} onCancel={() => setScreen('list')} />
+  if (screen === 'supplements') return <ManageSupplements user={user} onDone={() => { setScreen('list'); fetchSupplements() }} onCancel={() => setScreen('list')} />
 
   return (
     <SafeAreaView style={s.container}>
@@ -66,10 +96,182 @@ export default function DietScreen() {
                 <Text style={s.cardTitle}>{plan.name}</Text>
                 {plan.target_calories && <Text style={s.cardSub}>{plan.target_calories} kcal/day · P{plan.target_protein}g C{plan.target_carbs}g F{plan.target_fat}g</Text>}
               </View>
+              {plan.created_by !== user?.id && <View style={s.ptBadge}><Text style={s.ptBadgeText}>From PT</Text></View>}
               {plan.is_active && <View style={s.activeBadge}><Text style={s.badgeText}>Active</Text></View>}
             </View>
           </View>
         ))}
+
+        {/* ─── Supplements Section ─── */}
+        <View style={s.supHeader}>
+          <Text style={s.supTitle}>Supplements & Pharma</Text>
+          <TouchableOpacity onPress={() => setScreen('supplements')}>
+            <Text style={s.supManage}>{supplements.length > 0 ? 'Manage' : '+ Add'}</Text>
+          </TouchableOpacity>
+        </View>
+
+        {supplements.length === 0 ? (
+          <TouchableOpacity style={s.supEmptyCard} onPress={() => setScreen('supplements')}>
+            <Ionicons name="medical-outline" size={24} color="#d1d5db" />
+            <Text style={s.supEmptyText}>Track your vitamins & supplements</Text>
+          </TouchableOpacity>
+        ) : (
+          supplements.map((sup) => {
+            const taken = todayLogs.includes(sup.id)
+            return (
+              <TouchableOpacity key={sup.id} style={s.supCard} onPress={() => toggleSupplementTaken(sup.id)}>
+                <View style={[s.supCheck, taken && s.supCheckDone]}>
+                  {taken && <Ionicons name="checkmark" size={16} color="#fff" />}
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={[s.supName, taken && s.supNameDone]}>{sup.name}</Text>
+                  <Text style={s.supDosage}>
+                    {sup.dosage ? `${sup.dosage} · ` : ''}{SUPPLEMENT_FREQUENCIES.find(f => f.value === sup.frequency)?.label ?? sup.frequency}
+                    {' · '}{SUPPLEMENT_TIMES.find(t => t.value === sup.time_of_day)?.label ?? sup.time_of_day}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            )
+          })
+        )}
+      </ScrollView>
+    </SafeAreaView>
+  )
+}
+
+// ─── Manage Supplements ─────────────────────────────────
+function ManageSupplements({ user, onDone, onCancel }: any) {
+  const [supplements, setSupplements] = useState<UserSupplement[]>([])
+  const [showAdd, setShowAdd] = useState(false)
+  const [name, setName] = useState('')
+  const [dosage, setDosage] = useState('')
+  const [frequency, setFrequency] = useState<SupplementFrequency>('daily')
+  const [timeOfDay, setTimeOfDay] = useState<SupplementTime>('morning')
+  const [notes, setNotes] = useState('')
+  const [saving, setSaving] = useState(false)
+
+  const fetchSupplements = async () => {
+    if (!user) return
+    const { data } = await supabase.from('user_supplements').select('*').eq('user_id', user.id).order('created_at')
+    if (data) setSupplements(data as UserSupplement[])
+  }
+
+  useEffect(() => { fetchSupplements() }, [])
+
+  const handleSave = async () => {
+    if (!name.trim()) { Alert.alert('Error', 'Enter a supplement name'); return }
+    setSaving(true)
+    const { error } = await supabase.from('user_supplements').insert({
+      user_id: user.id,
+      name: name.trim(),
+      dosage: dosage.trim() || null,
+      frequency,
+      time_of_day: timeOfDay,
+      notes: notes.trim() || null,
+    })
+    setSaving(false)
+    if (error) { Alert.alert('Error', error.message); return }
+    setName(''); setDosage(''); setNotes('')
+    setShowAdd(false)
+    await fetchSupplements()
+  }
+
+  const handleDelete = (sup: UserSupplement) => {
+    Alert.alert('Remove Supplement', `Remove ${sup.name}?`, [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Remove', style: 'destructive', onPress: async () => {
+        await supabase.from('user_supplements').delete().eq('id', sup.id)
+        await fetchSupplements()
+      }},
+    ])
+  }
+
+  return (
+    <SafeAreaView style={s.container}>
+      <View style={s.modalHeader}>
+        <TouchableOpacity onPress={() => { onCancel(); onDone() }}><Text style={s.cancelText}>Done</Text></TouchableOpacity>
+        <Text style={s.modalTitle}>Supplements</Text>
+        <TouchableOpacity onPress={() => setShowAdd(true)}>
+          <Ionicons name="add-circle" size={28} color="#16a34a" />
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView contentContainerStyle={s.modalContent}>
+        {supplements.length === 0 && !showAdd && (
+          <View style={s.empty}>
+            <Ionicons name="medical-outline" size={48} color="#d1d5db" />
+            <Text style={s.emptyText}>No supplements added</Text>
+            <TouchableOpacity onPress={() => setShowAdd(true)}>
+              <Text style={s.emptyLink}>Add your first supplement</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {supplements.map((sup) => (
+          <View key={sup.id} style={s.supMgmtCard}>
+            <View style={{ flex: 1 }}>
+              <Text style={s.supMgmtName}>{sup.name}</Text>
+              <Text style={s.supMgmtInfo}>
+                {sup.dosage ? `${sup.dosage} · ` : ''}
+                {SUPPLEMENT_FREQUENCIES.find(f => f.value === sup.frequency)?.label}
+                {' · '}{SUPPLEMENT_TIMES.find(t => t.value === sup.time_of_day)?.label}
+              </Text>
+              {sup.notes && <Text style={s.supMgmtNotes}>{sup.notes}</Text>}
+            </View>
+            <TouchableOpacity onPress={() => handleDelete(sup)}>
+              <Ionicons name="trash-outline" size={20} color="#ef4444" />
+            </TouchableOpacity>
+          </View>
+        ))}
+
+        {showAdd && (
+          <View style={s.addSupCard}>
+            <Text style={s.addSupTitle}>Add Supplement</Text>
+
+            <Text style={s.label}>Name</Text>
+            <View style={s.chipGrid}>
+              {COMMON_SUPPLEMENTS.map((cs) => (
+                <TouchableOpacity key={cs} style={[s.supChip, name === cs && s.supChipActive]} onPress={() => setName(cs)}>
+                  <Text style={[s.supChipText, name === cs && s.supChipTextActive]}>{cs}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            <TextInput style={[s.input, { marginTop: 8 }]} value={name} onChangeText={setName} placeholder="Or type custom name" placeholderTextColor="#9ca3af" />
+
+            <Text style={s.label}>Dosage (optional)</Text>
+            <TextInput style={s.input} value={dosage} onChangeText={setDosage} placeholder="e.g. 1000mg, 2 capsules" placeholderTextColor="#9ca3af" />
+
+            <Text style={s.label}>Frequency</Text>
+            <View style={s.chipGrid}>
+              {SUPPLEMENT_FREQUENCIES.map((f) => (
+                <TouchableOpacity key={f.value} style={[s.supChip, frequency === f.value && s.supChipActive]} onPress={() => setFrequency(f.value as SupplementFrequency)}>
+                  <Text style={[s.supChipText, frequency === f.value && s.supChipTextActive]}>{f.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <Text style={s.label}>Time of day</Text>
+            <View style={s.chipGrid}>
+              {SUPPLEMENT_TIMES.map((t) => (
+                <TouchableOpacity key={t.value} style={[s.supChip, timeOfDay === t.value && s.supChipActive]} onPress={() => setTimeOfDay(t.value as SupplementTime)}>
+                  <Text style={[s.supChipText, timeOfDay === t.value && s.supChipTextActive]}>{t.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <Text style={s.label}>Notes (optional)</Text>
+            <TextInput style={s.input} value={notes} onChangeText={setNotes} placeholder="e.g. Take with food" placeholderTextColor="#9ca3af" />
+
+            <View style={{ flexDirection: 'row', gap: 12, marginTop: 16 }}>
+              <TouchableOpacity style={s.supCancelBtn} onPress={() => setShowAdd(false)}>
+                <Text style={s.supCancelText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[s.saveBtn, saving && s.saveBtnDisabled]} onPress={handleSave} disabled={saving}>
+                {saving ? <ActivityIndicator color="#fff" /> : <Text style={s.saveBtnText}>Add</Text>}
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   )
@@ -266,6 +468,31 @@ function LogMeal({ user, onDone, onCancel }: any) {
   const [searchResults, setSearchResults] = useState<any[]>([])
   const [searching, setSearching] = useState(false)
   const [loadingNutrition, setLoadingNutrition] = useState<number | null>(null)
+  const [freeformText, setFreeformText] = useState('')
+  const [parsing, setParsing] = useState(false)
+
+  const parseFreeform = async () => {
+    if (!freeformText.trim()) return
+    setParsing(true)
+    try {
+      const res = await fetch(`${API_URL}/api/ai/parse-meal`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: freeformText, mealType }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.message || 'Failed to parse')
+      const parsed: FoodItem[] = data.foods.map((f: any) => ({
+        spoonacular_id: 0, name: f.name, amount: f.amount, unit: f.unit,
+        calories: f.calories, protein: f.protein, carbs: f.carbs, fat: f.fat,
+      }))
+      setFoods([...foods, ...parsed])
+      setFreeformText('')
+    } catch (err) {
+      Alert.alert('Error', err instanceof Error ? err.message : 'Failed to parse meal')
+    }
+    setParsing(false)
+  }
 
   const searchFood = async () => {
     if (!searchQuery.trim()) return
@@ -325,19 +552,42 @@ function LogMeal({ user, onDone, onCancel }: any) {
           ))}
         </View>
 
+        {/* Freeform AI Input */}
+        <View style={s.freeformCard}>
+          <View style={s.freeformHeader}>
+            <Ionicons name="sparkles" size={16} color="#16a34a" />
+            <Text style={s.freeformTitle}>Quick Log with AI</Text>
+          </View>
+          <Text style={s.freeformHint}>Describe what you ate naturally</Text>
+          <View style={s.searchRow}>
+            <TextInput
+              style={[s.input, { flex: 1 }]}
+              value={freeformText}
+              onChangeText={setFreeformText}
+              placeholder='e.g. "chicken breast with rice and salad"'
+              placeholderTextColor="#9ca3af"
+              returnKeyType="send"
+              onSubmitEditing={parseFreeform}
+            />
+            <TouchableOpacity style={s.searchBtn} onPress={parseFreeform} disabled={parsing}>
+              {parsing ? <ActivityIndicator color="#fff" size="small" /> : <Ionicons name="sparkles" size={20} color="#fff" />}
+            </TouchableOpacity>
+          </View>
+        </View>
+
         {foods.map((f, i) => (
           <View key={i} style={s.foodRow}>
             <View style={{ flex: 1 }}>
               <Text style={s.foodName}>{f.name}</Text>
-              <Text style={s.foodMacros}>{f.calories}kcal · P{f.protein} C{f.carbs} F{f.fat}</Text>
+              <Text style={s.foodMacros}>{f.amount}{f.unit} · {f.calories}kcal · P{f.protein} C{f.carbs} F{f.fat}</Text>
             </View>
             <TouchableOpacity onPress={() => setFoods(foods.filter((_, idx) => idx !== i))}><Ionicons name="close-circle" size={20} color="#d1d5db" /></TouchableOpacity>
           </View>
         ))}
 
         <TouchableOpacity style={s.addFoodBtn} onPress={() => { setShowSearch(true); setSearchQuery(''); setSearchResults([]) }}>
-          <Ionicons name="search" size={18} color="#16a34a" />
-          <Text style={s.addFoodText}>Search & Add Food</Text>
+          <Ionicons name="search" size={18} color="#6b7280" />
+          <Text style={[s.addFoodText, { color: '#6b7280' }]}>Or search database</Text>
         </TouchableOpacity>
 
         {foods.length > 0 && (
@@ -409,6 +659,8 @@ const s = StyleSheet.create({
   cardSub: { fontSize: 13, color: '#6b7280', marginTop: 4 },
   activeBadge: { backgroundColor: '#dcfce7', borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 },
   badgeText: { fontSize: 12, fontWeight: '600', color: '#16a34a' },
+  ptBadge: { backgroundColor: '#ede9fe', borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4, marginRight: 6 },
+  ptBadgeText: { fontSize: 11, fontWeight: '600', color: '#7c3aed' },
   // Modal
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
   cancelText: { fontSize: 16, color: '#6b7280' },
@@ -448,4 +700,35 @@ const s = StyleSheet.create({
   saveBtn: { backgroundColor: '#16a34a', borderRadius: 12, paddingVertical: 16, alignItems: 'center', marginTop: 24 },
   saveBtnDisabled: { opacity: 0.6 },
   saveBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  // Freeform AI
+  freeformCard: { backgroundColor: '#dcfce7', borderRadius: 14, padding: 16, marginTop: 12, marginBottom: 8 },
+  freeformHeader: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 },
+  freeformTitle: { fontSize: 14, fontWeight: '700', color: '#166534' },
+  freeformHint: { fontSize: 12, color: '#166534', marginBottom: 10 },
+  // Supplements - list view
+  supHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 24, marginBottom: 10 },
+  supTitle: { fontSize: 18, fontWeight: '700', color: '#111827' },
+  supManage: { fontSize: 14, fontWeight: '600', color: '#16a34a' },
+  supEmptyCard: { backgroundColor: '#fff', borderRadius: 12, padding: 20, alignItems: 'center', gap: 8, borderWidth: 2, borderColor: '#e5e7eb', borderStyle: 'dashed' },
+  supEmptyText: { fontSize: 14, color: '#9ca3af' },
+  supCard: { flexDirection: 'row', backgroundColor: '#fff', borderRadius: 12, padding: 14, marginBottom: 8, alignItems: 'center', gap: 12, shadowColor: '#000', shadowOpacity: 0.03, shadowRadius: 4, elevation: 1 },
+  supCheck: { width: 28, height: 28, borderRadius: 14, borderWidth: 2, borderColor: '#d1d5db', alignItems: 'center', justifyContent: 'center' },
+  supCheckDone: { backgroundColor: '#16a34a', borderColor: '#16a34a' },
+  supName: { fontSize: 15, fontWeight: '600', color: '#374151' },
+  supNameDone: { textDecorationLine: 'line-through', color: '#9ca3af' },
+  supDosage: { fontSize: 12, color: '#9ca3af', marginTop: 2 },
+  // Supplements - manage screen
+  supMgmtCard: { flexDirection: 'row', backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 8, alignItems: 'center', gap: 12, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 6, elevation: 1 },
+  supMgmtName: { fontSize: 16, fontWeight: '700', color: '#374151' },
+  supMgmtInfo: { fontSize: 13, color: '#6b7280', marginTop: 2 },
+  supMgmtNotes: { fontSize: 12, color: '#9ca3af', fontStyle: 'italic', marginTop: 2 },
+  addSupCard: { backgroundColor: '#fff', borderRadius: 14, padding: 18, marginTop: 8, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 6, elevation: 1 },
+  addSupTitle: { fontSize: 17, fontWeight: '700', color: '#111827', marginBottom: 4 },
+  chipGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  supChip: { backgroundColor: '#f3f4f6', borderWidth: 2, borderColor: '#e5e7eb', borderRadius: 10, paddingVertical: 8, paddingHorizontal: 12 },
+  supChipActive: { borderColor: '#16a34a', backgroundColor: '#f0fdf4' },
+  supChipText: { fontSize: 13, fontWeight: '600', color: '#6b7280' },
+  supChipTextActive: { color: '#16a34a' },
+  supCancelBtn: { flex: 1, borderWidth: 2, borderColor: '#e5e7eb', borderRadius: 12, paddingVertical: 14, alignItems: 'center' },
+  supCancelText: { fontSize: 15, fontWeight: '600', color: '#6b7280' },
 })

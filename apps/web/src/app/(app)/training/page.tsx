@@ -142,9 +142,14 @@ export default function TrainingPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900">{plan.name}</h3>
-                  {plan.is_active && (
-                    <span className="text-xs bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-700 px-2 py-0.5 rounded-full font-medium">Active</span>
-                  )}
+                  <div className="flex gap-1">
+                    {plan.created_by !== profile?.id && (
+                      <span className="text-xs bg-violet-100 text-violet-700 px-2 py-0.5 rounded-full font-medium">From PT</span>
+                    )}
+                    {plan.is_active && (
+                      <span className="text-xs bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-700 px-2 py-0.5 rounded-full font-medium">Active</span>
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="flex items-center gap-4 text-sm text-gray-600">

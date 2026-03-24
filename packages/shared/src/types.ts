@@ -10,6 +10,18 @@ export type Equipment = 'barbell' | 'dumbbell' | 'machine' | 'cable' | 'bodyweig
 export type ClientStatus = 'active' | 'inactive' | 'pending'
 export type SubscriptionStatus = 'active' | 'canceled' | 'past_due' | 'trialing'
 export type AIUsageType = 'meal_suggestion' | 'workout_suggestion'
+export type FeedbackStatus = 'pending' | 'completed' | 'dismissed'
+export type TrainingExperience = 'never' | 'beginner' | 'intermediate' | 'advanced'
+export type EquipmentAccess = 'full_gym' | 'home_basic' | 'home_full' | 'bodyweight_only' | 'outdoor'
+export type TrainingStyle = 'strength' | 'hypertrophy' | 'functional' | 'endurance' | 'mixed'
+export type CookingSkill = 'none' | 'basic' | 'intermediate' | 'advanced'
+export type MealPrepPreference = 'daily' | 'batch_prep' | 'quick_only' | 'eat_out'
+export type WorkType = 'desk' | 'active' | 'hybrid' | 'remote'
+export type SleepQuality = 'poor' | 'average' | 'good'
+export type StressLevel = 'low' | 'moderate' | 'high'
+export type GoalTimeline = 'steady' | '4_weeks' | '8_weeks' | '12_weeks' | '6_months'
+export type SupplementFrequency = 'daily' | 'twice_daily' | 'three_times' | 'weekly' | 'as_needed'
+export type SupplementTime = 'morning' | 'afternoon' | 'evening' | 'with_meals' | 'pre_workout' | 'post_workout' | 'bedtime'
 
 // ─── Core Tables ────────────────────────────────────────
 
@@ -33,6 +45,33 @@ export interface UserProfile {
   daily_water_ml: number | null
   avatar_url: string | null
   onboarding_completed: boolean
+  // Schedule
+  wake_time: string | null
+  sleep_time: string | null
+  workout_time: string | null
+  workout_days_per_week: number | null
+  meals_per_day: number | null
+  // Health & medical
+  injuries: string[]
+  medical_conditions: string[]
+  medications: string[]
+  // Fitness background
+  training_experience: TrainingExperience | null
+  equipment_access: EquipmentAccess | null
+  training_style: TrainingStyle[]
+  // Nutrition background
+  dietary_restrictions: string[]
+  food_dislikes: string[]
+  cooking_skill: CookingSkill | null
+  meal_prep_preference: MealPrepPreference | null
+  // Lifestyle
+  work_type: WorkType | null
+  sleep_quality: SleepQuality | null
+  stress_level: StressLevel | null
+  // Enhanced goals
+  target_weight_kg: number | null
+  goal_timeline: GoalTimeline | null
+  motivation: string[]
   created_at: string
   updated_at: string
 }
@@ -230,4 +269,68 @@ export interface Subscription {
   current_period_end: string | null
   created_at: string
   updated_at: string
+}
+
+// ─── Supplements & Pharma ──────────────────────────────
+
+export interface UserSupplement {
+  id: string
+  user_id: string
+  name: string
+  dosage: string | null
+  frequency: SupplementFrequency
+  time_of_day: SupplementTime
+  notes: string | null
+  is_active: boolean
+  created_at: string
+}
+
+export interface SupplementLog {
+  id: string
+  user_id: string
+  supplement_id: string
+  date: string
+  taken_at: string
+}
+
+// ─── Messaging & Feedback ──────────────────────────────
+
+export interface Conversation {
+  id: string
+  nutritionist_id: string
+  client_id: string
+  last_message_at: string
+  created_at: string
+}
+
+export interface Message {
+  id: string
+  conversation_id: string
+  sender_id: string
+  content: string
+  read_at: string | null
+  created_at: string
+}
+
+export interface FeedbackQuestion {
+  id: string
+  question: string
+  type: 'text' | 'rating' | 'yes_no'
+}
+
+export interface FeedbackResponse {
+  question_id: string
+  answer: string | number | boolean
+}
+
+export interface FeedbackRequest {
+  id: string
+  nutritionist_id: string
+  client_id: string
+  title: string
+  questions: FeedbackQuestion[]
+  responses: FeedbackResponse[] | null
+  status: FeedbackStatus
+  created_at: string
+  responded_at: string | null
 }

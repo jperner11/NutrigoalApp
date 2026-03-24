@@ -78,6 +78,7 @@ export default function TrainingScreen() {
                 <Text style={s.cardTitle}>{p.name}</Text>
                 <Text style={s.cardSub}>{p.days_per_week} days/week</Text>
               </View>
+              {p.created_by !== user?.id && <View style={s.ptBadge}><Text style={s.ptBadgeText}>From PT</Text></View>}
               {p.is_active && <View style={s.activeBadge}><Text style={s.badgeText}>Active</Text></View>}
               <Ionicons name="chevron-forward" size={20} color="#d1d5db" />
             </View>
@@ -493,6 +494,8 @@ const s = StyleSheet.create({
   cardSub: { fontSize: 13, color: '#6b7280', marginTop: 2 },
   activeBadge: { backgroundColor: '#dcfce7', borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 },
   badgeText: { fontSize: 12, fontWeight: '600', color: '#16a34a' },
+  ptBadge: { backgroundColor: '#ede9fe', borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4, marginRight: 6 },
+  ptBadgeText: { fontSize: 11, fontWeight: '600', color: '#7c3aed' },
   // Modal/Form shared
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
   cancelText: { fontSize: 16, color: '#6b7280' },

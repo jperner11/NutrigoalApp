@@ -129,7 +129,7 @@ export default function DashboardScreen() {
           <QuickAction icon="restaurant" label="Log Meal" onPress={() => router.push('/(tabs)/diet')} />
           <QuickAction icon="barbell" label="Workout" onPress={() => router.push('/(tabs)/training')} />
           <QuickAction icon="heart" label="Cardio" onPress={() => router.push('/(tabs)/cardio')} />
-          <QuickAction icon="sparkles" label="AI Suggest" onPress={() => router.push('/(tabs)/ai')} />
+          <QuickAction icon="sparkles" label="AI Plans" onPress={() => router.push('/(tabs)/ai-generate')} />
         </View>
       </ScrollView>
     </SafeAreaView>
