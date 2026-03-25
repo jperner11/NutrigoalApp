@@ -177,7 +177,7 @@ export default function OnboardingPage() {
     }
 
     toast.success('Profile setup complete!')
-    window.location.href = navigateTo === 'ai-generate' ? '/ai-generate' : '/dashboard'
+    window.location.href = navigateTo === 'ai-generate' ? '/ai/suggest' : '/dashboard'
   }
 
   const renderStep = () => {
