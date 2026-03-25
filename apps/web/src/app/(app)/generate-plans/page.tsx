@@ -210,18 +210,45 @@ export default function GeneratePlansPage() {
 
       if (dayError || !planDay) continue
 
-      // exercise_id is resolved server-side by the API route
-      const exerciseInserts = day.exercises
-        .filter(ex => ex.exercise_id)
-        .map((ex, idx) => ({
-          plan_day_id: planDay.id,
-          exercise_id: ex.exercise_id!,
-          order_index: idx,
-          sets: ex.sets || 3,
-          reps: ex.reps || '8-12',
-          rest_seconds: ex.rest_seconds || 90,
-          notes: ex.notes || null,
-        }))
+      // Resolve exercise IDs — use server-provided ID or create client-side
+      const validBodyParts = new Set(['chest', 'back', 'shoulders', 'biceps', 'triceps', 'legs', 'core', 'full_body'])
+      const validEquipment = new Set(['barbell', 'dumbbell', 'machine', 'cable', 'bodyweight', 'band'])
+
+      const exerciseInserts = []
+      for (let idx = 0; idx < day.exercises.length; idx++) {
+        const ex = day.exercises[idx]
+        let exerciseId = ex.exercise_id
+
+        if (!exerciseId) {
+          // Fallback: create exercise client-side
+          const bodyPart = validBodyParts.has(ex.body_part) ? ex.body_part : 'full_body'
+          const equip = validEquipment.has(ex.equipment) ? ex.equipment : 'bodyweight'
+          const { data: newEx } = await supabase
+            .from('exercises')
+            .insert({
+              name: ex.name,
+              body_part: bodyPart,
+              equipment: equip,
+              is_compound: idx < 3,
+            })
+            .select('id')
+            .single()
+
+          if (newEx) exerciseId = newEx.id
+        }
+
+        if (exerciseId) {
+          exerciseInserts.push({
+            plan_day_id: planDay.id,
+            exercise_id: exerciseId,
+            order_index: idx,
+            sets: ex.sets || 3,
+            reps: ex.reps || '8-12',
+            rest_seconds: ex.rest_seconds || 90,
+            notes: ex.notes || null,
+          })
+        }
+      }
 
       if (exerciseInserts.length > 0) {
         await supabase.from('training_plan_exercises').insert(exerciseInserts)
