@@ -38,7 +38,7 @@ export default function LoginPage() {
     }
 
     toast.success('Welcome back!')
-    router.push('/dashboard')
+    window.location.href = '/dashboard'
   }
 
   return (

@@ -75,7 +75,7 @@ export default function SignupPage() {
       }
 
       toast.success('Account created! Please check your email to confirm.')
-      router.push('/onboarding')
+      window.location.href = '/onboarding'
     }, 1000)
   }
 
