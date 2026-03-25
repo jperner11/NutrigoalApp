@@ -161,6 +161,7 @@ export default function GeneratePlansPage() {
       day_number: number
       name: string
       exercises: {
+        exercise_id?: string
         name: string
         body_part: string
         equipment: string
@@ -196,10 +197,6 @@ export default function GeneratePlansPage() {
 
     if (planError || !plan) throw new Error('Failed to save training plan')
 
-    // Load exercises from DB to match by name
-    const { data: dbExercises } = await supabase.from('exercises').select('*')
-    const exerciseMap = new Map((dbExercises ?? []).map(e => [e.name.toLowerCase(), e]))
-
     for (const day of (data.days ?? [])) {
       const { data: planDay, error: dayError } = await supabase
         .from('training_plan_days')
@@ -213,46 +210,18 @@ export default function GeneratePlansPage() {
 
       if (dayError || !planDay) continue
 
-      // For each exercise, try to find it in DB or create it
-      const exerciseInserts = []
-      for (let idx = 0; idx < day.exercises.length; idx++) {
-        const ex = day.exercises[idx]
-        let exerciseId: string | null = null
-
-        const existing = exerciseMap.get(ex.name.toLowerCase())
-        if (existing) {
-          exerciseId = existing.id
-        } else {
-          // Create the exercise
-          const { data: newEx } = await supabase
-            .from('exercises')
-            .insert({
-              name: ex.name,
-              body_part: ex.body_part || 'full_body',
-              equipment: ex.equipment || 'bodyweight',
-              is_compound: idx < 3, // first few are usually compounds
-            })
-            .select()
-            .single()
-
-          if (newEx) {
-            exerciseId = newEx.id
-            exerciseMap.set(newEx.name.toLowerCase(), newEx)
-          }
-        }
-
-        if (exerciseId) {
-          exerciseInserts.push({
-            plan_day_id: planDay.id,
-            exercise_id: exerciseId,
-            order_index: idx,
-            sets: ex.sets || 3,
-            reps: ex.reps || '8-12',
-            rest_seconds: ex.rest_seconds || 90,
-            notes: ex.notes || null,
-          })
-        }
-      }
+      // exercise_id is resolved server-side by the API route
+      const exerciseInserts = day.exercises
+        .filter(ex => ex.exercise_id)
+        .map((ex, idx) => ({
+          plan_day_id: planDay.id,
+          exercise_id: ex.exercise_id!,
+          order_index: idx,
+          sets: ex.sets || 3,
+          reps: ex.reps || '8-12',
+          rest_seconds: ex.rest_seconds || 90,
+          notes: ex.notes || null,
+        }))
 
       if (exerciseInserts.length > 0) {
         await supabase.from('training_plan_exercises').insert(exerciseInserts)

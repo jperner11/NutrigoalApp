@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
 
 export async function POST(request: Request) {
   const apiKey = process.env.OPENAI_API_KEY
@@ -140,7 +141,9 @@ Rules:
 - Include warm-up note for first compound
 - Balance push/pull across the week
 - Each muscle group trained 2x/week minimum
-- NEVER include exercises that conflict with listed injuries`
+- NEVER include exercises that conflict with listed injuries
+- The ${daysPerWeek} days MUST include any conditioning/cardio days — do NOT exceed ${daysPerWeek} total training days
+- Use specific exercise names (e.g. "Barbell Bench Press" not just "Bench Press")`
 
     const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -172,6 +175,50 @@ Rules:
       parsed = JSON.parse(jsonStr)
     } catch {
       return NextResponse.json({ message: 'Failed to parse AI response' }, { status: 502 })
+    }
+
+    // Resolve exercise IDs server-side (bypass RLS with service role)
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    if (!supabaseUrl || !serviceRoleKey) {
+      return NextResponse.json(parsed) // fallback: return without IDs
+    }
+
+    const supabase = createClient(supabaseUrl, serviceRoleKey)
+
+    // Load existing exercises
+    const { data: dbExercises } = await supabase.from('exercises').select('id, name')
+    const exerciseMap = new Map((dbExercises ?? []).map(e => [e.name.toLowerCase(), e.id]))
+
+    const validBodyParts = new Set(['chest', 'back', 'shoulders', 'biceps', 'triceps', 'legs', 'core', 'full_body'])
+    const validEquipment = new Set(['barbell', 'dumbbell', 'machine', 'cable', 'bodyweight', 'band'])
+
+    for (const day of (parsed.days ?? [])) {
+      for (const ex of (day.exercises ?? [])) {
+        const key = ex.name.toLowerCase()
+        if (exerciseMap.has(key)) {
+          ex.exercise_id = exerciseMap.get(key)
+        } else {
+          // Create the exercise
+          const bodyPart = validBodyParts.has(ex.body_part) ? ex.body_part : 'full_body'
+          const equip = validEquipment.has(ex.equipment) ? ex.equipment : 'bodyweight'
+          const { data: newEx } = await supabase
+            .from('exercises')
+            .insert({
+              name: ex.name,
+              body_part: bodyPart,
+              equipment: equip,
+              is_compound: ['chest', 'back', 'legs', 'full_body'].includes(bodyPart) && (day.exercises.indexOf(ex) < 3),
+            })
+            .select('id')
+            .single()
+
+          if (newEx) {
+            ex.exercise_id = newEx.id
+            exerciseMap.set(key, newEx.id)
+          }
+        }
+      }
     }
 
     return NextResponse.json(parsed)

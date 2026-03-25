@@ -18,14 +18,11 @@ import { createClient } from '@/lib/supabase/client'
 import { toast } from 'react-hot-toast'
 
 const STEPS = ['Basics', 'Health', 'Fitness', 'Nutrition', 'Lifestyle', 'Goals', 'Schedule', 'Review']
-const TIME_OPTIONS = [
-  '05:00', '05:30', '06:00', '06:30', '07:00', '07:30',
-  '08:00', '08:30', '09:00', '09:30', '10:00', '10:30',
-  '11:00', '11:30', '12:00', '12:30', '13:00', '13:30',
-  '14:00', '14:30', '15:00', '15:30', '16:00', '16:30',
-  '17:00', '17:30', '18:00', '18:30', '19:00', '19:30',
-  '20:00', '20:30', '21:00', '21:30', '22:00', '22:30', '23:00',
-]
+const TIME_OPTIONS = Array.from({ length: 48 }, (_, i) => {
+  const h = Math.floor(i / 2).toString().padStart(2, '0')
+  const m = i % 2 === 0 ? '00' : '30'
+  return `${h}:${m}`
+})
 
 function fmt12(t: string) {
   const [h, m] = t.split(':').map(Number)
@@ -571,46 +568,32 @@ export default function OnboardingPage() {
             />
             <div>
               <Label>What time do you wake up?</Label>
-              <div className="flex overflow-x-auto gap-2 pb-2 scrollbar-hide">
-                {TIME_OPTIONS.filter(t => t >= '05:00' && t <= '10:00').map((t) => (
-                  <button
-                    key={t}
-                    type="button"
-                    onClick={() => setWakeTime(t)}
-                    className={`whitespace-nowrap py-2.5 px-4 rounded-xl border-2 font-semibold text-sm transition-all ${
-                      wakeTime === t
-                        ? 'border-purple-500 bg-purple-50 text-purple-700'
-                        : 'border-gray-200 text-gray-500 hover:border-gray-300'
-                    }`}
-                  >
-                    {fmt12(t)}
-                  </button>
+              <select
+                value={wakeTime}
+                onChange={(e) => setWakeTime(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 font-semibold text-sm text-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all bg-white"
+              >
+                {TIME_OPTIONS.map((t) => (
+                  <option key={t} value={t}>{fmt12(t)}</option>
                 ))}
-              </div>
+              </select>
             </div>
             <div>
               <Label>Preferred workout time</Label>
-              <div className="flex overflow-x-auto gap-2 pb-2 scrollbar-hide">
+              <select
+                value={workoutTime}
+                onChange={(e) => setWorkoutTime(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 font-semibold text-sm text-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all bg-white"
+              >
                 {TIME_OPTIONS.map((t) => (
-                  <button
-                    key={t}
-                    type="button"
-                    onClick={() => setWorkoutTime(t)}
-                    className={`whitespace-nowrap py-2.5 px-4 rounded-xl border-2 font-semibold text-sm transition-all ${
-                      workoutTime === t
-                        ? 'border-purple-500 bg-purple-50 text-purple-700'
-                        : 'border-gray-200 text-gray-500 hover:border-gray-300'
-                    }`}
-                  >
-                    {fmt12(t)}
-                  </button>
+                  <option key={t} value={t}>{fmt12(t)}</option>
                 ))}
-              </div>
+              </select>
             </div>
             <div>
               <Label>Training days per week</Label>
               <div className="flex gap-3">
-                {[2, 3, 4, 5, 6, 7].map((d) => (
+                {[3, 4, 5, 6, 7].map((d) => (
                   <button
                     key={d}
                     type="button"
@@ -629,7 +612,7 @@ export default function OnboardingPage() {
             <div>
               <Label>Meals per day</Label>
               <div className="flex gap-3">
-                {[2, 3, 4, 5].map((m) => (
+                {[3, 4, 5, 6, 7].map((m) => (
                   <button
                     key={m}
                     type="button"
