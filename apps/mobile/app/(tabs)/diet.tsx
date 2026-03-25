@@ -74,7 +74,7 @@ export default function DietScreen() {
         <Text style={s.title}>Diet Plans</Text>
         <View style={{ flexDirection: 'row', gap: 8 }}>
           <TouchableOpacity style={s.logBtn} onPress={() => setScreen('log')}>
-            <Ionicons name="add-circle-outline" size={18} color="#16a34a" />
+            <Ionicons name="add-circle-outline" size={18} color="#7c3aed" />
             <Text style={s.logBtnText}>Log Meal</Text>
           </TouchableOpacity>
           <TouchableOpacity style={s.addBtn} onPress={() => setScreen('create')}>
@@ -192,7 +192,7 @@ function ManageSupplements({ user, onDone, onCancel }: any) {
         <TouchableOpacity onPress={() => { onCancel(); onDone() }}><Text style={s.cancelText}>Done</Text></TouchableOpacity>
         <Text style={s.modalTitle}>Supplements</Text>
         <TouchableOpacity onPress={() => setShowAdd(true)}>
-          <Ionicons name="add-circle" size={28} color="#16a34a" />
+          <Ionicons name="add-circle" size={28} color="#7c3aed" />
         </TouchableOpacity>
       </View>
 
@@ -386,7 +386,7 @@ function CreateDietPlan({ user, profile, onDone, onCancel }: any) {
 
         {/* Macro Summary */}
         <View style={s.macroSummary}>
-          <MacroBox label="Cals" value={totalCals} unit="" color="#16a34a" />
+          <MacroBox label="Cals" value={totalCals} unit="" color="#7c3aed" />
           <MacroBox label="Protein" value={totalProtein} unit="g" color="#3b82f6" />
           <MacroBox label="Carbs" value={totalCarbs} unit="g" color="#f59e0b" />
           <MacroBox label="Fat" value={totalFat} unit="g" color="#ef4444" />
@@ -408,14 +408,14 @@ function CreateDietPlan({ user, profile, onDone, onCancel }: any) {
               </View>
             ))}
             <TouchableOpacity style={s.addFoodBtn} onPress={() => { setSearchMealIdx(mi); setShowFoodSearch(true); setSearchQuery(''); setSearchResults([]) }}>
-              <Ionicons name="search" size={18} color="#16a34a" />
+              <Ionicons name="search" size={18} color="#7c3aed" />
               <Text style={s.addFoodText}>Search & Add Food</Text>
             </TouchableOpacity>
           </View>
         ))}
 
         <TouchableOpacity style={s.addMealBtn} onPress={addMeal}>
-          <Ionicons name="add" size={18} color="#16a34a" />
+          <Ionicons name="add" size={18} color="#7c3aed" />
           <Text style={s.addMealText}>Add Snack</Text>
         </TouchableOpacity>
 
@@ -447,7 +447,7 @@ function CreateDietPlan({ user, profile, onDone, onCancel }: any) {
             renderItem={({ item }) => (
               <TouchableOpacity style={s.foodSearchItem} onPress={() => addFood(item)} disabled={loadingNutrition === item.id}>
                 <Text style={s.foodSearchName}>{item.name}</Text>
-                {loadingNutrition === item.id ? <ActivityIndicator size="small" color="#16a34a" /> : <Ionicons name="add-circle" size={24} color="#16a34a" />}
+                {loadingNutrition === item.id ? <ActivityIndicator size="small" color="#7c3aed" /> : <Ionicons name="add-circle" size={24} color="#7c3aed" />}
               </TouchableOpacity>
             )}
             ListEmptyComponent={!searching ? <Text style={s.emptySearch}>Search for ingredients to add to your meal</Text> : null}
@@ -555,7 +555,7 @@ function LogMeal({ user, onDone, onCancel }: any) {
         {/* Freeform AI Input */}
         <View style={s.freeformCard}>
           <View style={s.freeformHeader}>
-            <Ionicons name="sparkles" size={16} color="#16a34a" />
+            <Ionicons name="sparkles" size={16} color="#7c3aed" />
             <Text style={s.freeformTitle}>Quick Log with AI</Text>
           </View>
           <Text style={s.freeformHint}>Describe what you ate naturally</Text>
@@ -592,7 +592,7 @@ function LogMeal({ user, onDone, onCancel }: any) {
 
         {foods.length > 0 && (
           <View style={s.macroSummary}>
-            <MacroBox label="Cals" value={foods.reduce((s, f) => s + f.calories, 0)} unit="" color="#16a34a" />
+            <MacroBox label="Cals" value={foods.reduce((s, f) => s + f.calories, 0)} unit="" color="#7c3aed" />
             <MacroBox label="P" value={foods.reduce((s, f) => s + f.protein, 0)} unit="g" color="#3b82f6" />
             <MacroBox label="C" value={foods.reduce((s, f) => s + f.carbs, 0)} unit="g" color="#f59e0b" />
             <MacroBox label="F" value={foods.reduce((s, f) => s + f.fat, 0)} unit="g" color="#ef4444" />
@@ -623,7 +623,7 @@ function LogMeal({ user, onDone, onCancel }: any) {
             renderItem={({ item }) => (
               <TouchableOpacity style={s.foodSearchItem} onPress={() => addFood(item)} disabled={loadingNutrition === item.id}>
                 <Text style={s.foodSearchName}>{item.name}</Text>
-                {loadingNutrition === item.id ? <ActivityIndicator size="small" color="#16a34a" /> : <Ionicons name="add-circle" size={24} color="#16a34a" />}
+                {loadingNutrition === item.id ? <ActivityIndicator size="small" color="#7c3aed" /> : <Ionicons name="add-circle" size={24} color="#7c3aed" />}
               </TouchableOpacity>
             )}
           />
@@ -643,22 +643,22 @@ function MacroBox({ label, value, unit, color }: { label: string; value: number;
 }
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f0fdf4' },
+  container: { flex: 1, backgroundColor: '#f8fafc' },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 },
   title: { fontSize: 24, fontWeight: '800', color: '#111827' },
-  addBtn: { backgroundColor: '#16a34a', borderRadius: 20, width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
-  logBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, borderWidth: 2, borderColor: '#16a34a', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 8 },
-  logBtnText: { fontSize: 13, fontWeight: '600', color: '#16a34a' },
+  addBtn: { backgroundColor: '#7c3aed', borderRadius: 20, width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
+  logBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, borderWidth: 2, borderColor: '#7c3aed', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 8 },
+  logBtnText: { fontSize: 13, fontWeight: '600', color: '#7c3aed' },
   content: { padding: 20, paddingTop: 0 },
   empty: { alignItems: 'center', paddingTop: 80, gap: 8 },
   emptyText: { fontSize: 18, fontWeight: '600', color: '#6b7280' },
-  emptyLink: { fontSize: 15, fontWeight: '600', color: '#16a34a', marginTop: 4 },
+  emptyLink: { fontSize: 15, fontWeight: '600', color: '#7c3aed', marginTop: 4 },
   card: { backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 10, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 6, elevation: 1 },
   cardRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   cardTitle: { fontSize: 16, fontWeight: '700', color: '#374151' },
   cardSub: { fontSize: 13, color: '#6b7280', marginTop: 4 },
-  activeBadge: { backgroundColor: '#dcfce7', borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 },
-  badgeText: { fontSize: 12, fontWeight: '600', color: '#16a34a' },
+  activeBadge: { backgroundColor: '#ede9fe', borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 },
+  badgeText: { fontSize: 12, fontWeight: '600', color: '#7c3aed' },
   ptBadge: { backgroundColor: '#ede9fe', borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4, marginRight: 6 },
   ptBadgeText: { fontSize: 11, fontWeight: '600', color: '#7c3aed' },
   // Modal
@@ -677,43 +677,43 @@ const s = StyleSheet.create({
   mealCard: { backgroundColor: '#fff', borderRadius: 14, padding: 16, marginTop: 16, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 6, elevation: 1 },
   mealHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
   mealName: { fontSize: 16, fontWeight: '700', color: '#374151' },
-  mealCals: { fontSize: 13, fontWeight: '600', color: '#16a34a' },
+  mealCals: { fontSize: 13, fontWeight: '600', color: '#7c3aed' },
   foodRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
   foodName: { fontSize: 14, fontWeight: '600', color: '#374151' },
   foodMacros: { fontSize: 12, color: '#9ca3af', marginTop: 2 },
   addFoodBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingTop: 12 },
-  addFoodText: { fontSize: 14, fontWeight: '600', color: '#16a34a' },
+  addFoodText: { fontSize: 14, fontWeight: '600', color: '#7c3aed' },
   addMealBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 14 },
-  addMealText: { fontSize: 15, fontWeight: '600', color: '#16a34a' },
+  addMealText: { fontSize: 15, fontWeight: '600', color: '#7c3aed' },
   // Type chips
   typeRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
   typeChip: { borderWidth: 2, borderColor: '#e5e7eb', borderRadius: 10, paddingVertical: 8, paddingHorizontal: 14 },
-  typeChipActive: { borderColor: '#16a34a', backgroundColor: '#f0fdf4' },
+  typeChipActive: { borderColor: '#7c3aed', backgroundColor: '#f8fafc' },
   typeChipText: { fontSize: 14, fontWeight: '600', color: '#6b7280' },
-  typeChipTextActive: { color: '#16a34a' },
+  typeChipTextActive: { color: '#7c3aed' },
   // Search
   searchRow: { flexDirection: 'row', gap: 8 },
-  searchBtn: { backgroundColor: '#16a34a', borderRadius: 12, width: 50, alignItems: 'center', justifyContent: 'center' },
+  searchBtn: { backgroundColor: '#7c3aed', borderRadius: 12, width: 50, alignItems: 'center', justifyContent: 'center' },
   foodSearchItem: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
   foodSearchName: { fontSize: 15, fontWeight: '600', color: '#374151', textTransform: 'capitalize' },
   emptySearch: { textAlign: 'center', color: '#9ca3af', marginTop: 40 },
-  saveBtn: { backgroundColor: '#16a34a', borderRadius: 12, paddingVertical: 16, alignItems: 'center', marginTop: 24 },
+  saveBtn: { backgroundColor: '#7c3aed', borderRadius: 12, paddingVertical: 16, alignItems: 'center', marginTop: 24 },
   saveBtnDisabled: { opacity: 0.6 },
   saveBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
   // Freeform AI
-  freeformCard: { backgroundColor: '#dcfce7', borderRadius: 14, padding: 16, marginTop: 12, marginBottom: 8 },
+  freeformCard: { backgroundColor: '#ede9fe', borderRadius: 14, padding: 16, marginTop: 12, marginBottom: 8 },
   freeformHeader: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 },
-  freeformTitle: { fontSize: 14, fontWeight: '700', color: '#166534' },
-  freeformHint: { fontSize: 12, color: '#166534', marginBottom: 10 },
+  freeformTitle: { fontSize: 14, fontWeight: '700', color: '#5b21b6' },
+  freeformHint: { fontSize: 12, color: '#5b21b6', marginBottom: 10 },
   // Supplements - list view
   supHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 24, marginBottom: 10 },
   supTitle: { fontSize: 18, fontWeight: '700', color: '#111827' },
-  supManage: { fontSize: 14, fontWeight: '600', color: '#16a34a' },
+  supManage: { fontSize: 14, fontWeight: '600', color: '#7c3aed' },
   supEmptyCard: { backgroundColor: '#fff', borderRadius: 12, padding: 20, alignItems: 'center', gap: 8, borderWidth: 2, borderColor: '#e5e7eb', borderStyle: 'dashed' },
   supEmptyText: { fontSize: 14, color: '#9ca3af' },
   supCard: { flexDirection: 'row', backgroundColor: '#fff', borderRadius: 12, padding: 14, marginBottom: 8, alignItems: 'center', gap: 12, shadowColor: '#000', shadowOpacity: 0.03, shadowRadius: 4, elevation: 1 },
   supCheck: { width: 28, height: 28, borderRadius: 14, borderWidth: 2, borderColor: '#d1d5db', alignItems: 'center', justifyContent: 'center' },
-  supCheckDone: { backgroundColor: '#16a34a', borderColor: '#16a34a' },
+  supCheckDone: { backgroundColor: '#7c3aed', borderColor: '#7c3aed' },
   supName: { fontSize: 15, fontWeight: '600', color: '#374151' },
   supNameDone: { textDecorationLine: 'line-through', color: '#9ca3af' },
   supDosage: { fontSize: 12, color: '#9ca3af', marginTop: 2 },
@@ -726,9 +726,9 @@ const s = StyleSheet.create({
   addSupTitle: { fontSize: 17, fontWeight: '700', color: '#111827', marginBottom: 4 },
   chipGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   supChip: { backgroundColor: '#f3f4f6', borderWidth: 2, borderColor: '#e5e7eb', borderRadius: 10, paddingVertical: 8, paddingHorizontal: 12 },
-  supChipActive: { borderColor: '#16a34a', backgroundColor: '#f0fdf4' },
+  supChipActive: { borderColor: '#7c3aed', backgroundColor: '#f8fafc' },
   supChipText: { fontSize: 13, fontWeight: '600', color: '#6b7280' },
-  supChipTextActive: { color: '#16a34a' },
+  supChipTextActive: { color: '#7c3aed' },
   supCancelBtn: { flex: 1, borderWidth: 2, borderColor: '#e5e7eb', borderRadius: 12, paddingVertical: 14, alignItems: 'center' },
   supCancelText: { fontSize: 15, fontWeight: '600', color: '#6b7280' },
 })

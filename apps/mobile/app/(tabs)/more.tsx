@@ -14,7 +14,7 @@ interface MenuItem {
 
 const MENU_ITEMS: MenuItem[] = [
   { icon: 'water', label: 'Water Tracking', route: '/(tabs)/water', color: '#3b82f6' },
-  { icon: 'sparkles', label: 'AI Generate Plans', route: '/(tabs)/ai-generate', color: '#16a34a' },
+  { icon: 'sparkles', label: 'AI Generate Plans', route: '/(tabs)/ai-generate', color: '#7c3aed' },
   { icon: 'sparkles', label: 'AI Suggestions', route: '/(tabs)/ai', color: '#8b5cf6' },
   { icon: 'chatbubbles', label: 'My PT / Messages', route: '/(tabs)/my-pt', color: '#3b82f6', roles: ['free', 'pro'] },
   { icon: 'people', label: 'Clients', route: '/(tabs)/clients', color: '#f59e0b', roles: ['nutritionist'] },
@@ -60,7 +60,7 @@ export default function MoreScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f0fdf4' },
+  container: { flex: 1, backgroundColor: '#f8fafc' },
   header: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 },
   title: { fontSize: 24, fontWeight: '800', color: '#111827' },
   content: { padding: 20, paddingTop: 0, gap: 4 },

@@ -253,11 +253,11 @@ export default function AIGenerateScreen() {
       {/* Tab Switcher */}
       <View style={st.tabRow}>
         <TouchableOpacity style={[st.tab, tab === 'meal' && st.tabActive]} onPress={() => setTab('meal')}>
-          <Ionicons name="restaurant" size={18} color={tab === 'meal' ? '#16a34a' : '#9ca3af'} />
+          <Ionicons name="restaurant" size={18} color={tab === 'meal' ? '#7c3aed' : '#9ca3af'} />
           <Text style={[st.tabText, tab === 'meal' && st.tabTextActive]}>Meal Plan</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[st.tab, tab === 'training' && st.tabActive]} onPress={() => setTab('training')}>
-          <Ionicons name="barbell" size={18} color={tab === 'training' ? '#16a34a' : '#9ca3af'} />
+          <Ionicons name="barbell" size={18} color={tab === 'training' ? '#7c3aed' : '#9ca3af'} />
           <Text style={[st.tabText, tab === 'training' && st.tabTextActive]}>Training Plan</Text>
         </TouchableOpacity>
       </View>
@@ -267,7 +267,7 @@ export default function AIGenerateScreen() {
           <>
             {/* Info card */}
             <View style={st.infoCard}>
-              <Ionicons name="sparkles" size={20} color="#16a34a" />
+              <Ionicons name="sparkles" size={20} color="#7c3aed" />
               <View style={{ flex: 1 }}>
                 <Text style={st.infoTitle}>Smart Meal Planning</Text>
                 <Text style={st.infoDesc}>
@@ -286,7 +286,7 @@ export default function AIGenerateScreen() {
 
             {loading && (
               <View style={st.loadingBox}>
-                <ActivityIndicator size="large" color="#16a34a" />
+                <ActivityIndicator size="large" color="#7c3aed" />
                 <Text style={st.loadingText}>Creating your personalized meal plan...</Text>
               </View>
             )}
@@ -297,7 +297,7 @@ export default function AIGenerateScreen() {
                   <View key={i} style={st.mealCard}>
                     <View style={st.mealHeader}>
                       <View style={st.mealTimeBox}>
-                        <Ionicons name="time-outline" size={14} color="#16a34a" />
+                        <Ionicons name="time-outline" size={14} color="#7c3aed" />
                         <Text style={st.mealTime}>{formatTime12(meal.time)}</Text>
                       </View>
                       <Text style={st.mealType}>{meal.meal_type}</Text>
@@ -334,7 +334,7 @@ export default function AIGenerateScreen() {
 
                 <View style={st.actionRow}>
                   <TouchableOpacity style={st.regenBtn} onPress={generateMealPlan}>
-                    <Ionicons name="refresh" size={18} color="#16a34a" />
+                    <Ionicons name="refresh" size={18} color="#7c3aed" />
                     <Text style={st.regenText}>Regenerate</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={[st.saveBtn, saving && { opacity: 0.6 }]} onPress={saveMealPlan} disabled={saving}>
@@ -354,7 +354,7 @@ export default function AIGenerateScreen() {
         {tab === 'training' && (
           <>
             <View style={st.infoCard}>
-              <Ionicons name="sparkles" size={20} color="#16a34a" />
+              <Ionicons name="sparkles" size={20} color="#7c3aed" />
               <View style={{ flex: 1 }}>
                 <Text style={st.infoTitle}>AI Training Program</Text>
                 <Text style={st.infoDesc}>
@@ -372,7 +372,7 @@ export default function AIGenerateScreen() {
 
             {loading && (
               <View style={st.loadingBox}>
-                <ActivityIndicator size="large" color="#16a34a" />
+                <ActivityIndicator size="large" color="#7c3aed" />
                 <Text style={st.loadingText}>Designing your training program...</Text>
               </View>
             )}
@@ -405,7 +405,7 @@ export default function AIGenerateScreen() {
 
                 <View style={st.actionRow}>
                   <TouchableOpacity style={st.regenBtn} onPress={generateTrainingPlan}>
-                    <Ionicons name="refresh" size={18} color="#16a34a" />
+                    <Ionicons name="refresh" size={18} color="#7c3aed" />
                     <Text style={st.regenText}>Regenerate</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={[st.saveBtn, saving && { opacity: 0.6 }]} onPress={saveTrainingPlan} disabled={saving}>
@@ -437,19 +437,19 @@ function TotalItem({ label, value, target, unit }: { label: string; value: numbe
 }
 
 const st = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f0fdf4' },
+  container: { flex: 1, backgroundColor: '#f8fafc' },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 },
   title: { fontSize: 20, fontWeight: '800', color: '#111827' },
   tabRow: { flexDirection: 'row', marginHorizontal: 20, backgroundColor: '#fff', borderRadius: 12, padding: 4, marginBottom: 8 },
   tab: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 10, borderRadius: 10 },
-  tabActive: { backgroundColor: '#f0fdf4' },
+  tabActive: { backgroundColor: '#f5f3ff' },
   tabText: { fontSize: 14, fontWeight: '600', color: '#9ca3af' },
-  tabTextActive: { color: '#16a34a' },
+  tabTextActive: { color: '#7c3aed' },
   content: { padding: 20, paddingTop: 8, paddingBottom: 40 },
-  infoCard: { flexDirection: 'row', backgroundColor: '#dcfce7', borderRadius: 12, padding: 16, gap: 12, marginBottom: 16, alignItems: 'flex-start' },
-  infoTitle: { fontSize: 15, fontWeight: '700', color: '#166534' },
-  infoDesc: { fontSize: 13, color: '#166534', marginTop: 2, lineHeight: 18 },
-  generateBtn: { flexDirection: 'row', backgroundColor: '#16a34a', borderRadius: 12, paddingVertical: 16, alignItems: 'center', justifyContent: 'center', gap: 8 },
+  infoCard: { flexDirection: 'row', backgroundColor: '#ede9fe', borderRadius: 12, padding: 16, gap: 12, marginBottom: 16, alignItems: 'flex-start' },
+  infoTitle: { fontSize: 15, fontWeight: '700', color: '#5b21b6' },
+  infoDesc: { fontSize: 13, color: '#5b21b6', marginTop: 2, lineHeight: 18 },
+  generateBtn: { flexDirection: 'row', backgroundColor: '#7c3aed', borderRadius: 12, paddingVertical: 16, alignItems: 'center', justifyContent: 'center', gap: 8 },
   generateBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
   loadingBox: { alignItems: 'center', paddingVertical: 40, gap: 16 },
   loadingText: { fontSize: 15, color: '#6b7280', fontWeight: '500' },
@@ -457,33 +457,33 @@ const st = StyleSheet.create({
   mealCard: { backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 12, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 6, elevation: 1 },
   mealHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
   mealTimeBox: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  mealTime: { fontSize: 13, fontWeight: '600', color: '#16a34a' },
+  mealTime: { fontSize: 13, fontWeight: '600', color: '#7c3aed' },
   mealType: { fontSize: 12, fontWeight: '600', color: '#6b7280', textTransform: 'uppercase', letterSpacing: 0.5 },
   mealTitle: { fontSize: 17, fontWeight: '700', color: '#111827', marginBottom: 4 },
-  timingNote: { fontSize: 12, color: '#16a34a', fontStyle: 'italic', marginBottom: 8 },
+  timingNote: { fontSize: 12, color: '#7c3aed', fontStyle: 'italic', marginBottom: 8 },
   macroRow: { flexDirection: 'row', gap: 6, marginBottom: 10 },
   macroPill: { fontSize: 11, fontWeight: '600', color: '#374151', backgroundColor: '#f3f4f6', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3 },
   ingRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4, borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
   ingName: { fontSize: 14, color: '#374151' },
   ingAmount: { fontSize: 14, color: '#6b7280' },
-  totalsCard: { backgroundColor: '#dcfce7', borderRadius: 12, padding: 16, marginBottom: 12 },
-  totalsTitle: { fontSize: 15, fontWeight: '700', color: '#166534', marginBottom: 8 },
+  totalsCard: { backgroundColor: '#ede9fe', borderRadius: 12, padding: 16, marginBottom: 12 },
+  totalsTitle: { fontSize: 15, fontWeight: '700', color: '#5b21b6', marginBottom: 8 },
   totalsRow: { flexDirection: 'row', justifyContent: 'space-between' },
   totalItem: { alignItems: 'center' },
-  totalLabel: { fontSize: 11, color: '#166534' },
-  totalValue: { fontSize: 16, fontWeight: '800', color: '#166534', marginTop: 2 },
-  totalTarget: { fontSize: 10, color: '#16a34a', marginTop: 1 },
+  totalLabel: { fontSize: 11, color: '#5b21b6' },
+  totalValue: { fontSize: 16, fontWeight: '800', color: '#5b21b6', marginTop: 2 },
+  totalTarget: { fontSize: 10, color: '#7c3aed', marginTop: 1 },
   actionRow: { flexDirection: 'row', gap: 12, marginTop: 8 },
-  regenBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, borderWidth: 2, borderColor: '#16a34a', borderRadius: 12, paddingVertical: 14 },
-  regenText: { fontSize: 15, fontWeight: '600', color: '#16a34a' },
-  saveBtn: { flex: 2, flexDirection: 'row', backgroundColor: '#16a34a', borderRadius: 12, paddingVertical: 14, alignItems: 'center', justifyContent: 'center', gap: 6 },
+  regenBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, borderWidth: 2, borderColor: '#7c3aed', borderRadius: 12, paddingVertical: 14 },
+  regenText: { fontSize: 15, fontWeight: '600', color: '#7c3aed' },
+  saveBtn: { flex: 2, flexDirection: 'row', backgroundColor: '#7c3aed', borderRadius: 12, paddingVertical: 14, alignItems: 'center', justifyContent: 'center', gap: 6 },
   saveBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
   // Training plan styles
   planHeader: { marginBottom: 16 },
   planName: { fontSize: 20, fontWeight: '800', color: '#111827' },
   planDesc: { fontSize: 14, color: '#6b7280', marginTop: 4 },
   dayCard: { backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 12, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 6, elevation: 1 },
-  dayTitle: { fontSize: 16, fontWeight: '700', color: '#16a34a', marginBottom: 10 },
+  dayTitle: { fontSize: 16, fontWeight: '700', color: '#7c3aed', marginBottom: 10 },
   exRow: { flexDirection: 'row', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
   exName: { fontSize: 14, fontWeight: '600', color: '#374151' },
   exMeta: { fontSize: 12, color: '#9ca3af', marginTop: 2 },

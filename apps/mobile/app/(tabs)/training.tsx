@@ -184,14 +184,14 @@ function CreatePlan({ user, profile, onDone, onCancel }: any) {
               </View>
             ))}
             <TouchableOpacity style={s.addExBtn} onPress={() => { setPickerDayIdx(di); setShowPicker(true); setSearch(''); setFilterBody('') }}>
-              <Ionicons name="add-circle-outline" size={20} color="#16a34a" />
+              <Ionicons name="add-circle-outline" size={20} color="#7c3aed" />
               <Text style={s.addExText}>Add Exercise</Text>
             </TouchableOpacity>
           </View>
         ))}
 
         <TouchableOpacity style={s.addDayBtn} onPress={addDay}>
-          <Ionicons name="add" size={20} color="#16a34a" />
+          <Ionicons name="add" size={20} color="#7c3aed" />
           <Text style={s.addDayText}>Add Day</Text>
         </TouchableOpacity>
 
@@ -229,7 +229,7 @@ function CreatePlan({ user, profile, onDone, onCancel }: any) {
                   <Text style={s.pickName}>{item.name}</Text>
                   <Text style={s.pickMeta}>{item.body_part} · {item.equipment}{item.is_compound ? ' · compound' : ''}</Text>
                 </View>
-                <Ionicons name="add-circle" size={24} color="#16a34a" />
+                <Ionicons name="add-circle" size={24} color="#7c3aed" />
               </TouchableOpacity>
             )}
           />
@@ -412,7 +412,7 @@ function WorkoutSession({ dayId, user, profile, onDone }: any) {
 
         {suggestion && (
           <View style={s.suggestionCard}>
-            <Ionicons name="trending-up" size={18} color="#16a34a" />
+            <Ionicons name="trending-up" size={18} color="#7c3aed" />
             <Text style={s.suggestionText}>{suggestion.reason}</Text>
           </View>
         )}
@@ -444,7 +444,7 @@ function WorkoutSession({ dayId, user, profile, onDone }: any) {
               placeholderTextColor="#c4b5fd"
             />
             <TouchableOpacity style={[s.checkBtn, set.completed && s.checkBtnDone]} onPress={() => toggleComplete(si)}>
-              <Ionicons name={set.completed ? 'checkmark-circle' : 'ellipse-outline'} size={28} color={set.completed ? '#16a34a' : '#d1d5db'} />
+              <Ionicons name={set.completed ? 'checkmark-circle' : 'ellipse-outline'} size={28} color={set.completed ? '#7c3aed' : '#d1d5db'} />
             </TouchableOpacity>
           </View>
         ))}
@@ -480,20 +480,20 @@ function WorkoutSession({ dayId, user, profile, onDone }: any) {
 
 // ─── Styles ─────────────────────────────────────────────
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f0fdf4' },
+  container: { flex: 1, backgroundColor: '#f8fafc' },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 },
   title: { fontSize: 24, fontWeight: '800', color: '#111827' },
-  addBtn: { backgroundColor: '#16a34a', borderRadius: 20, width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
+  addBtn: { backgroundColor: '#7c3aed', borderRadius: 20, width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
   content: { padding: 20, paddingTop: 0 },
   empty: { alignItems: 'center', paddingTop: 80, gap: 8 },
   emptyText: { fontSize: 18, fontWeight: '600', color: '#6b7280' },
-  emptyLink: { fontSize: 15, fontWeight: '600', color: '#16a34a', marginTop: 4 },
+  emptyLink: { fontSize: 15, fontWeight: '600', color: '#7c3aed', marginTop: 4 },
   card: { backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 10, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 6, elevation: 1 },
   cardRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   cardTitle: { fontSize: 16, fontWeight: '700', color: '#374151' },
   cardSub: { fontSize: 13, color: '#6b7280', marginTop: 2 },
-  activeBadge: { backgroundColor: '#dcfce7', borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 },
-  badgeText: { fontSize: 12, fontWeight: '600', color: '#16a34a' },
+  activeBadge: { backgroundColor: '#ede9fe', borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 },
+  badgeText: { fontSize: 12, fontWeight: '600', color: '#7c3aed' },
   ptBadge: { backgroundColor: '#ede9fe', borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4, marginRight: 6 },
   ptBadgeText: { fontSize: 11, fontWeight: '600', color: '#7c3aed' },
   // Modal/Form shared
@@ -513,17 +513,17 @@ const s = StyleSheet.create({
   exerciseName: { fontSize: 15, fontWeight: '600', color: '#374151' },
   exerciseMeta: { fontSize: 12, color: '#9ca3af', marginTop: 2 },
   addExBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingTop: 12 },
-  addExText: { fontSize: 14, fontWeight: '600', color: '#16a34a' },
+  addExText: { fontSize: 14, fontWeight: '600', color: '#7c3aed' },
   addDayBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 16, marginTop: 8 },
-  addDayText: { fontSize: 15, fontWeight: '600', color: '#16a34a' },
-  startBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, backgroundColor: '#16a34a', borderRadius: 10, paddingVertical: 12, marginTop: 12 },
+  addDayText: { fontSize: 15, fontWeight: '600', color: '#7c3aed' },
+  startBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, backgroundColor: '#7c3aed', borderRadius: 10, paddingVertical: 12, marginTop: 12 },
   startBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
-  saveBtn: { backgroundColor: '#16a34a', borderRadius: 12, paddingVertical: 16, alignItems: 'center', marginTop: 24 },
+  saveBtn: { backgroundColor: '#7c3aed', borderRadius: 12, paddingVertical: 16, alignItems: 'center', marginTop: 24 },
   saveBtnDisabled: { opacity: 0.6 },
   saveBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
   // Picker
   filterChip: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6 },
-  filterChipActive: { backgroundColor: '#16a34a', borderColor: '#16a34a' },
+  filterChipActive: { backgroundColor: '#7c3aed', borderColor: '#7c3aed' },
   filterChipText: { fontSize: 13, fontWeight: '600', color: '#6b7280' },
   filterChipTextActive: { color: '#fff' },
   pickItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
@@ -532,12 +532,12 @@ const s = StyleSheet.create({
   // Session
   sessionExName: { fontSize: 22, fontWeight: '800', color: '#111827', textAlign: 'center' },
   sessionExMeta: { fontSize: 14, color: '#6b7280', textAlign: 'center', marginTop: 4, marginBottom: 16 },
-  suggestionCard: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#dcfce7', borderRadius: 10, padding: 12, marginBottom: 16 },
-  suggestionText: { fontSize: 13, color: '#166534', flex: 1 },
+  suggestionCard: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#ede9fe', borderRadius: 10, padding: 12, marginBottom: 16 },
+  suggestionText: { fontSize: 13, color: '#5b21b6', flex: 1 },
   setsHeader: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8, borderBottomWidth: 2, borderBottomColor: '#e5e7eb' },
   setCol: { flex: 1, fontSize: 12, fontWeight: '700', color: '#6b7280', textAlign: 'center' },
   setRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 6 },
-  setRowDone: { backgroundColor: '#f0fdf4', borderRadius: 8 },
+  setRowDone: { backgroundColor: '#f8fafc', borderRadius: 8 },
   setInput: { flex: 1, backgroundColor: '#f9fafb', borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 8, paddingVertical: 10, paddingHorizontal: 12, fontSize: 16, textAlign: 'center', color: '#111827', marginHorizontal: 4 },
   checkBtn: { flex: 0.5, alignItems: 'center' },
   checkBtnDone: {},

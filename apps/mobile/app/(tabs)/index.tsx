@@ -96,10 +96,10 @@ export default function DashboardScreen() {
             <Text style={styles.cardValue}>{mealCalories} / {calTarget}</Text>
           </View>
           <View style={styles.progressBg}>
-            <View style={[styles.progressFill, { width: `${calPercent}%`, backgroundColor: '#16a34a' }]} />
+            <View style={[styles.progressFill, { width: `${calPercent}%`, backgroundColor: '#7c3aed' }]} />
           </View>
           <View style={styles.macroRow}>
-            <MacroPill label="Protein" value={mealProtein} target={profile?.daily_protein ?? 150} color="#3b82f6" unit="g" />
+            <MacroPill label="Protein" value={mealProtein} target={profile?.daily_protein ?? 150} color="#22c55e" unit="g" />
             <MacroPill label="Carbs" value={mealCarbs} target={profile?.daily_carbs ?? 250} color="#f59e0b" unit="g" />
             <MacroPill label="Fat" value={mealFat} target={profile?.daily_fat ?? 65} color="#ef4444" unit="g" />
           </View>
@@ -149,14 +149,14 @@ function MacroPill({ label, value, target, color, unit }: { label: string; value
 function QuickAction({ icon, label, onPress }: { icon: string; label: string; onPress: () => void }) {
   return (
     <TouchableOpacity style={styles.actionCard} onPress={onPress}>
-      <Ionicons name={icon as any} size={24} color="#16a34a" />
+      <Ionicons name={icon as any} size={24} color={label === 'Cardio' ? '#ef4444' : '#7c3aed'} />
       <Text style={styles.actionLabel}>{label}</Text>
     </TouchableOpacity>
   )
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f0fdf4' },
+  container: { flex: 1, backgroundColor: '#f8fafc' },
   content: { padding: 20 },
   greeting: { fontSize: 28, fontWeight: '800', color: '#111827' },
   date: { fontSize: 14, color: '#6b7280', marginTop: 4, marginBottom: 20 },

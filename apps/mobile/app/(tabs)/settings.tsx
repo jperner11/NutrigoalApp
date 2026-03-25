@@ -18,7 +18,7 @@ export default function SettingsScreen() {
         {/* Profile Card */}
         <View style={styles.profileCard}>
           <View style={styles.avatar}>
-            <Ionicons name="person" size={32} color="#16a34a" />
+            <Ionicons name="person" size={32} color="#7c3aed" />
           </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.name}>{profile?.full_name || 'User'}</Text>
@@ -60,21 +60,21 @@ function StatItem({ label, value }: { label: string; value: string }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f0fdf4' },
+  container: { flex: 1, backgroundColor: '#f8fafc' },
   header: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 },
   title: { fontSize: 24, fontWeight: '800', color: '#111827' },
   content: { padding: 20, paddingTop: 0 },
   profileCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#fff', borderRadius: 16, padding: 16, marginBottom: 16, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 },
-  avatar: { width: 56, height: 56, borderRadius: 28, backgroundColor: '#dcfce7', alignItems: 'center', justifyContent: 'center' },
+  avatar: { width: 56, height: 56, borderRadius: 28, backgroundColor: '#ede9fe', alignItems: 'center', justifyContent: 'center' },
   name: { fontSize: 18, fontWeight: '700', color: '#111827' },
   email: { fontSize: 13, color: '#6b7280', marginTop: 2 },
-  tierBadge: { backgroundColor: '#dcfce7', borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 },
-  tierText: { fontSize: 12, fontWeight: '700', color: '#16a34a' },
+  tierBadge: { backgroundColor: '#ede9fe', borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 },
+  tierText: { fontSize: 12, fontWeight: '700', color: '#7c3aed' },
   card: { backgroundColor: '#fff', borderRadius: 16, padding: 16, marginBottom: 16, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 },
   cardTitle: { fontSize: 16, fontWeight: '700', color: '#374151', marginBottom: 12 },
   statRow: { flexDirection: 'row', justifyContent: 'space-around' },
   statItem: { alignItems: 'center' },
-  statValue: { fontSize: 20, fontWeight: '800', color: '#16a34a' },
+  statValue: { fontSize: 20, fontWeight: '800', color: '#7c3aed' },
   statLabel: { fontSize: 12, color: '#6b7280', marginTop: 2 },
   signOutBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 24, paddingVertical: 16 },
   signOutText: { fontSize: 16, fontWeight: '600', color: '#ef4444' },

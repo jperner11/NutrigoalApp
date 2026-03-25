@@ -75,7 +75,7 @@ export default function WaterScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f0fdf4' },
+  container: { flex: 1, backgroundColor: '#f8fafc' },
   header: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 },
   title: { fontSize: 24, fontWeight: '800', color: '#111827' },
   content: { padding: 20, paddingTop: 0 },
