@@ -7,6 +7,8 @@ import {
   Target,
   Droplets,
   TrendingUp,
+  TrendingDown,
+  Minus,
   Dumbbell,
   HeartPulse,
   Utensils,
@@ -14,6 +16,7 @@ import {
   Sparkles,
   Crown,
   Plus,
+  Scale,
 } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'react-hot-toast'
@@ -38,6 +41,16 @@ export default function DashboardPage() {
     cardioMinutes: 0,
   })
   const [clientCount, setClientCount] = useState(0)
+  const [weeklyStats, setWeeklyStats] = useState({
+    avgGoalPct: null as number | null,
+    workoutsThisWeek: 0,
+    avgWaterMl: null as number | null,
+  })
+  const [weightData, setWeightData] = useState({
+    current: null as number | null,
+    previous: null as number | null,
+    trend: 'stable' as 'up' | 'down' | 'stable',
+  })
 
   const greeting = useMemo(() => getGreeting(), [])
 
@@ -115,6 +128,78 @@ export default function DashboardPage() {
         workoutsCompleted: workoutCount ?? 0,
         cardioMinutes,
       })
+
+      // Weekly progress stats
+      const weekStart = new Date()
+      weekStart.setDate(weekStart.getDate() - weekStart.getDay()) // Sunday
+      const weekStartStr = weekStart.toISOString().split('T')[0]
+
+      // Avg daily calorie goal % over past 7 days
+      const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0]
+      const { data: weekMealLogs } = await supabase
+        .from('meal_logs')
+        .select('date, total_calories')
+        .eq('user_id', profile!.id)
+        .gte('date', sevenDaysAgo)
+
+      let avgGoalPct: number | null = null
+      if (weekMealLogs && weekMealLogs.length > 0 && profile!.daily_calories) {
+        const dailyTotals = new Map<string, number>()
+        weekMealLogs.forEach(l => {
+          dailyTotals.set(l.date, (dailyTotals.get(l.date) ?? 0) + l.total_calories)
+        })
+        const pcts = Array.from(dailyTotals.values()).map(c => (c / profile!.daily_calories!) * 100)
+        avgGoalPct = Math.round(pcts.reduce((a, b) => a + b, 0) / pcts.length)
+      }
+
+      // Workouts this week
+      const { count: weekWorkoutCount } = await supabase
+        .from('workout_logs')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', profile!.id)
+        .gte('date', weekStartStr)
+
+      // Avg water this week
+      const { data: weekWaterLogs } = await supabase
+        .from('water_logs')
+        .select('date, amount_ml')
+        .eq('user_id', profile!.id)
+        .gte('date', sevenDaysAgo)
+
+      let avgWaterMl: number | null = null
+      if (weekWaterLogs && weekWaterLogs.length > 0) {
+        const dailyWater = new Map<string, number>()
+        weekWaterLogs.forEach(l => {
+          dailyWater.set(l.date, (dailyWater.get(l.date) ?? 0) + l.amount_ml)
+        })
+        const totals = Array.from(dailyWater.values())
+        avgWaterMl = Math.round(totals.reduce((a, b) => a + b, 0) / totals.length)
+      }
+
+      setWeeklyStats({
+        avgGoalPct,
+        workoutsThisWeek: weekWorkoutCount ?? 0,
+        avgWaterMl,
+      })
+
+      // Latest weight data
+      const { data: recentWeights } = await supabase
+        .from('weight_logs')
+        .select('weight_kg, date')
+        .eq('user_id', profile!.id)
+        .order('date', { ascending: false })
+        .limit(2)
+
+      if (recentWeights && recentWeights.length > 0) {
+        const current = recentWeights[0].weight_kg
+        const previous = recentWeights.length > 1 ? recentWeights[1].weight_kg : null
+        const diff = previous ? current - previous : 0
+        setWeightData({
+          current,
+          previous,
+          trend: diff > 0.3 ? 'up' : diff < -0.3 ? 'down' : 'stable',
+        })
+      }
 
       // If nutritionist, count clients
       if (profile!.role === 'nutritionist') {
@@ -434,28 +519,74 @@ export default function DashboardPage() {
       {/* Progress Section */}
       {profile.onboarding_completed && (
         <div className="mt-8 bg-gradient-to-br from-white to-purple-50/40 rounded-xl p-6 shadow-sm border border-purple-100/60 hover:shadow-md transition-all duration-200">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Weekly Progress</h2>
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-gray-900">Weekly Progress</h2>
+            <Link href="/progress" className="text-sm text-purple-600 hover:text-purple-800 font-medium transition-colors">
+              View All
+            </Link>
+          </div>
+          <div className="grid md:grid-cols-4 gap-4">
+            {/* Weight Widget */}
+            <Link href="/progress" className="text-center p-4 bg-gradient-to-br from-indigo-50 to-purple-50/80 rounded-xl border border-indigo-100/40 hover:shadow-md transition-all group">
+              <div className="inline-flex items-center justify-center w-10 h-10 bg-indigo-100 rounded-full mb-2 group-hover:scale-110 transition-transform">
+                <Scale className="h-5 w-5 text-indigo-600" />
+              </div>
+              <div className="text-sm text-gray-500">Weight</div>
+              <div className="text-lg font-bold text-indigo-600">
+                {weightData.current ? `${weightData.current}kg` : '\u2014'}
+              </div>
+              {weightData.current && weightData.previous && (
+                <div className={`flex items-center justify-center gap-1 text-xs font-medium mt-0.5 ${
+                  weightData.trend === 'up' ? 'text-amber-600' : weightData.trend === 'down' ? 'text-green-600' : 'text-gray-400'
+                }`}>
+                  {weightData.trend === 'up' ? <TrendingUp className="h-3 w-3" /> : weightData.trend === 'down' ? <TrendingDown className="h-3 w-3" /> : <Minus className="h-3 w-3" />}
+                  <span>{(weightData.current - weightData.previous) > 0 ? '+' : ''}{(weightData.current - weightData.previous).toFixed(1)}kg</span>
+                </div>
+              )}
+            </Link>
+
+            {/* Avg Daily Goal */}
             <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-indigo-50/80 rounded-xl border border-purple-100/40">
               <div className="inline-flex items-center justify-center w-10 h-10 bg-purple-100 rounded-full mb-2">
                 <TrendingUp className="h-5 w-5 text-purple-600" />
               </div>
               <div className="text-sm text-gray-500">Avg. daily goal</div>
-              <div className="text-lg font-bold text-purple-600">&mdash;</div>
+              <div className="text-lg font-bold text-purple-600">
+                {weeklyStats.avgGoalPct !== null ? `${weeklyStats.avgGoalPct}%` : '\u2014'}
+              </div>
             </div>
+
+            {/* Workouts This Week */}
             <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-violet-50/80 rounded-xl border border-purple-100/40">
               <div className="inline-flex items-center justify-center w-10 h-10 bg-purple-100 rounded-full mb-2">
                 <Dumbbell className="h-5 w-5 text-purple-600" />
               </div>
               <div className="text-sm text-gray-500">Workouts this week</div>
-              <div className="text-lg font-bold text-purple-600">&mdash;</div>
+              <div className="text-lg font-bold text-purple-600">
+                {weeklyStats.workoutsThisWeek}
+                {profile.workout_days_per_week && (
+                  <span className="text-sm text-gray-400 font-normal"> / {profile.workout_days_per_week}</span>
+                )}
+              </div>
             </div>
+
+            {/* Avg Water */}
             <div className="text-center p-4 bg-gradient-to-br from-cyan-50 to-blue-50/80 rounded-xl border border-cyan-100/40">
               <div className="inline-flex items-center justify-center w-10 h-10 bg-cyan-100 rounded-full mb-2">
                 <Droplets className="h-5 w-5 text-cyan-600" />
               </div>
               <div className="text-sm text-gray-500">Avg. water intake</div>
-              <div className="text-lg font-bold text-cyan-600">&mdash;</div>
+              <div className="text-lg font-bold text-cyan-600">
+                {weeklyStats.avgWaterMl !== null
+                  ? `${(weeklyStats.avgWaterMl / 1000).toFixed(1)}L`
+                  : '\u2014'
+                }
+              </div>
+              {weeklyStats.avgWaterMl !== null && profile.daily_water_ml && (
+                <div className="text-xs text-gray-400 mt-0.5">
+                  / {(profile.daily_water_ml / 1000).toFixed(1)}L goal
+                </div>
+              )}
             </div>
           </div>
         </div>

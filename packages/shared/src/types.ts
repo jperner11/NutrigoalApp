@@ -225,6 +225,18 @@ export interface WorkoutLog {
   logged_at: string
 }
 
+// ─── Progress Tracking ─────────────────────────────────
+
+export interface WeightLog {
+  id: string
+  user_id: string
+  date: string
+  weight_kg: number
+  body_fat_pct: number | null
+  notes: string | null
+  created_at: string
+}
+
 // ─── Cardio & Water Tables ──────────────────────────────
 
 export interface CardioType {

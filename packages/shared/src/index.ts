@@ -39,6 +39,7 @@ export type {
   CardioType,
   CardioSession,
   WaterLog,
+  WeightLog,
   Subscription,
   UserSupplement,
   SupplementLog,
