@@ -66,7 +66,6 @@ export default function DietPlanDetailPage() {
       .from('diet_plan_meals')
       .select('*')
       .eq('diet_plan_id', params.id)
-      .order('created_at')
 
     setMeals(mealsData ?? [])
     // Expand all meals by default

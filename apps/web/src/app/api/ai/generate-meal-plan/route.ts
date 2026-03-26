@@ -109,8 +109,9 @@ Rules:
 - Each meal MUST have "time" (HH:MM) and "timing_note"
 - meal_type: breakfast, lunch, dinner, or snack
 - 2-6 ingredients per meal with realistic portions and accurate macros
+- ALWAYS measure solid foods in grams (g) and liquids in milliliters (ml). Examples: "banana" = 120g, "whole milk" = 200ml, "chicken breast" = 150g, "olive oil" = 15ml, "rice" = 80g (dry). Never use cups, tablespoons, or "1 medium".
 - SUM across ALL meals must match daily targets within 5%
-- Protein accuracy is critical: chicken breast 100g = 31g protein, eggs 1 large = 6g protein
+- Protein accuracy is critical: chicken breast 100g = 31g protein, eggs 1 large (50g) = 6g protein
 - Pre-workout = lighter, carb-focused. Post-workout = protein-heavy + fast carbs`
 
     const userPrompt = `Generate a ${mealsPerDay}-meal plan hitting these DAILY targets:
