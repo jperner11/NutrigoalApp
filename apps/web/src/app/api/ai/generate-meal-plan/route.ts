@@ -19,6 +19,7 @@ export async function POST(request: Request) {
       allergies = [],
       dietaryRestrictions = [],
       foodDislikes = [],
+      favouriteFoods = [],
       cookingSkill = 'intermediate',
       mealPrepPreference = 'daily',
       medicalConditions = [],
@@ -38,8 +39,9 @@ export async function POST(request: Request) {
     const constraints: string[] = []
     if (dietaryRestrictions.length > 0) constraints.push(`STRICT dietary restrictions: ${dietaryRestrictions.join(', ')}. NEVER include foods that violate these.`)
     if (allergies.length > 0) constraints.push(`ALLERGIES (MUST AVOID): ${allergies.join(', ')}. These are dangerous — never include.`)
-    if (foodDislikes.length > 0) constraints.push(`User DISLIKES these foods (avoid): ${foodDislikes.join(', ')}`)
+    if (foodDislikes.length > 0) constraints.push(`User DISLIKES these foods (NEVER use): ${foodDislikes.join(', ')}`)
     if (dietaryPreferences.length > 0) constraints.push(`Dietary preferences: ${dietaryPreferences.join(', ')}`)
+    if (favouriteFoods.length > 0) constraints.push(`User's FAVOURITE foods (prioritize these): ${favouriteFoods.join(', ')}. Build meals around these where possible.`)
 
     // Build health context
     const healthNotes: string[] = []
@@ -108,7 +110,7 @@ Rules:
 - Return exactly ${mealsPerDay} meals
 - Each meal MUST have "time" (HH:MM) and "timing_note"
 - meal_type: breakfast, lunch, dinner, or snack
-- 2-6 ingredients per meal with realistic portions and accurate macros
+- Keep meals SIMPLE and practical: each main meal should have 1 protein source, 1 carb source, and 1 fat source (e.g. olive oil, avocado). Snacks can be simpler (1-2 items). Aim for 3-4 ingredients per meal, max 5.
 - ALWAYS measure solid foods in grams (g) and liquids in milliliters (ml). Examples: "banana" = 120g, "whole milk" = 200ml, "chicken breast" = 150g, "olive oil" = 15ml, "rice" = 80g (dry). Never use cups, tablespoons, or "1 medium".
 - SUM across ALL meals must match daily targets within 5%
 - Protein accuracy is critical: chicken breast 100g = 31g protein, eggs 1 large (50g) = 6g protein

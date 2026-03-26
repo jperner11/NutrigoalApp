@@ -59,7 +59,8 @@ export default function OnboardingPage() {
   )
   const [dietaryRestrictions, setDietaryRestrictions] = useState<string[]>([])
   const [allergies, setAllergies] = useState('')
-  const [foodDislikes, setFoodDislikes] = useState<string[]>([])
+  const [foodDislikes, setFoodDislikes] = useState('')
+  const [favouriteFoods, setFavouriteFoods] = useState('')
   const [cookingSkill, setCookingSkill] = useState('intermediate')
   const [mealPrepPref, setMealPrepPref] = useState('daily')
 
@@ -147,7 +148,8 @@ export default function OnboardingPage() {
         // Nutrition
         dietary_restrictions: dietaryRestrictions,
         allergies: allergies.split(',').map(a => a.trim()).filter(Boolean),
-        food_dislikes: foodDislikes,
+        food_dislikes: foodDislikes.split(',').map(s => s.trim()).filter(Boolean),
+        favourite_foods: favouriteFoods.split(',').map(s => s.trim()).filter(Boolean),
         cooking_skill: cookingSkill,
         meal_prep_preference: mealPrepPref,
         // Lifestyle
@@ -391,11 +393,40 @@ export default function OnboardingPage() {
             </div>
             <div>
               <Label>Foods you dislike</Label>
-              <p className="text-sm text-gray-500 mb-3">We&apos;ll avoid these in your meal plans</p>
-              <ChipGrid
-                items={COMMON_FOOD_DISLIKES.map(f => ({ value: f, label: f }))}
-                selected={foodDislikes}
-                onToggle={(val) => toggleArray(foodDislikes, setFoodDislikes, val)}
+              <p className="text-sm text-gray-500 mb-2">List any foods you don&apos;t want in your meal plans</p>
+              <textarea
+                value={foodDislikes}
+                onChange={(e) => setFoodDislikes(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
+                rows={2}
+                placeholder="e.g. tofu, liver, sardines, coconut, eggplant"
+              />
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {COMMON_FOOD_DISLIKES.map(f => (
+                  <button
+                    key={f}
+                    type="button"
+                    onClick={() => setFoodDislikes(prev => {
+                      const items = prev.split(',').map(s => s.trim()).filter(Boolean)
+                      if (items.some(i => i.toLowerCase() === f.toLowerCase())) return prev
+                      return prev ? `${prev}, ${f}` : f
+                    })}
+                    className="text-xs px-2.5 py-1 bg-gray-100 text-gray-600 rounded-full hover:bg-red-100 hover:text-red-700 transition-colors"
+                  >
+                    + {f}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <Label>Favourite foods</Label>
+              <p className="text-sm text-gray-500 mb-2">Foods you love &mdash; we&apos;ll prioritize these in your meal plans</p>
+              <textarea
+                value={favouriteFoods}
+                onChange={(e) => setFavouriteFoods(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
+                rows={2}
+                placeholder="e.g. chicken breast, rice, sweet potato, eggs, avocado, salmon"
               />
             </div>
             <div>
@@ -699,7 +730,8 @@ export default function OnboardingPage() {
                         value={dietaryRestrictions.map(r => DIETARY_RESTRICTIONS.find(d => d.value === r)?.label ?? r).join(', ')}
                       />
                     )}
-                    {foodDislikes.length > 0 && <ReviewRow label="Dislikes" value={foodDislikes.join(', ')} />}
+                    {foodDislikes.trim() && <ReviewRow label="Dislikes" value={foodDislikes} />}
+                    {favouriteFoods.trim() && <ReviewRow label="Favourites" value={favouriteFoods} />}
                   </div>
                 </div>
 

@@ -140,6 +140,7 @@ export default function GeneratePlansPage() {
         dietaryRestrictions: profile!.dietary_restrictions ?? [],
         allergies: profile!.allergies ?? [],
         foodDislikes: profile!.food_dislikes ?? [],
+        favouriteFoods: profile!.favourite_foods ?? [],
         cookingSkill: profile!.cooking_skill ?? 'intermediate',
         mealPrepPreference: profile!.meal_prep_preference ?? 'daily',
         medicalConditions: profile!.medical_conditions ?? [],

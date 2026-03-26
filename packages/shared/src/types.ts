@@ -62,6 +62,7 @@ export interface UserProfile {
   // Nutrition background
   dietary_restrictions: string[]
   food_dislikes: string[]
+  favourite_foods: string[]
   cooking_skill: CookingSkill | null
   meal_prep_preference: MealPrepPreference | null
   // Lifestyle
