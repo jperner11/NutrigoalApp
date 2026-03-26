@@ -21,6 +21,10 @@ import {
 import Link from 'next/link'
 import { toast } from 'react-hot-toast'
 import MealPlanTracker from '@/components/dashboard/MealPlanTracker'
+import StreaksWidget from '@/components/dashboard/StreaksWidget'
+import TodayTrainingPreview from '@/components/dashboard/TodayTrainingPreview'
+import QuickWeightLog from '@/components/dashboard/QuickWeightLog'
+import SupplementWidget from '@/components/dashboard/SupplementWidget'
 
 function getGreeting(): string {
   const hour = new Date().getHours()
@@ -416,6 +420,25 @@ export default function DashboardPage() {
             }))
           }}
         />
+      )}
+
+      {/* Widgets: Streaks, Training Preview, Quick Weight, Supplements */}
+      {profile.onboarding_completed && (
+        <div className="grid md:grid-cols-3 gap-6 mb-8">
+          <StreaksWidget userId={profile.id} />
+          <TodayTrainingPreview userId={profile.id} />
+          <QuickWeightLog
+            userId={profile.id}
+            currentWeight={weightData.current}
+            onWeightLogged={(w) => setWeightData(prev => ({
+              ...prev,
+              previous: prev.current,
+              current: w,
+              trend: prev.current ? (w > prev.current + 0.3 ? 'up' : w < prev.current - 0.3 ? 'down' : 'stable') : 'stable',
+            }))}
+          />
+          <SupplementWidget userId={profile.id} />
+        </div>
       )}
 
       {/* Quick Actions */}
