@@ -262,6 +262,7 @@ export default function GeneratePlansPage() {
     title: string
     time?: string
     timing_note?: string
+    notes?: string
     ingredients: {
       name: string
       amount: number
@@ -270,6 +271,7 @@ export default function GeneratePlansPage() {
       protein: number
       carbs: number
       fat: number
+      alternatives?: { name: string; amount: number; unit: string }[]
     }[]
     calories: number
     protein: number
@@ -307,16 +309,24 @@ export default function GeneratePlansPage() {
       day_of_week: null,
       meal_type: meal.meal_type || 'snack',
       meal_name: meal.title || 'Meal',
-      foods: meal.ingredients.map(ing => ({
-        spoonacular_id: 0,
-        name: ing.name,
-        amount: ing.amount,
-        unit: ing.unit || 'g',
-        calories: ing.calories,
-        protein: ing.protein,
-        carbs: ing.carbs,
-        fat: ing.fat,
-      })),
+      foods: {
+        _meta: {
+          time: meal.time || '12:00',
+          timing_note: meal.timing_note || '',
+          notes: meal.notes || '',
+        },
+        items: meal.ingredients.map(ing => ({
+          spoonacular_id: 0,
+          name: ing.name,
+          amount: ing.amount,
+          unit: ing.unit || 'g',
+          calories: ing.calories,
+          protein: ing.protein,
+          carbs: ing.carbs,
+          fat: ing.fat,
+          alternatives: ing.alternatives ?? [],
+        })),
+      },
       total_calories: Math.round(meal.calories),
       total_protein: Math.round(meal.protein * 10) / 10,
       total_carbs: Math.round(meal.carbs * 10) / 10,

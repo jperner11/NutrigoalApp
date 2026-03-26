@@ -99,8 +99,21 @@ Format:
       "title": "Meal name",
       "time": "07:00",
       "timing_note": "1h before workout - light, carb-focused",
+      "notes": "Optional tips: e.g. protein options, salad ideas, cooking tips",
       "ingredients": [
-        { "name": "oats", "amount": 80, "unit": "g", "calories": 300, "protein": 10, "carbs": 54, "fat": 5 }
+        {
+          "name": "oats",
+          "amount": 80,
+          "unit": "g",
+          "calories": 300,
+          "protein": 10,
+          "carbs": 54,
+          "fat": 5,
+          "alternatives": [
+            { "name": "quinoa", "amount": 70, "unit": "g" },
+            { "name": "sweet potato", "amount": 150, "unit": "g" }
+          ]
+        }
       ]
     }
   ]
@@ -108,9 +121,12 @@ Format:
 
 Rules:
 - Return exactly ${mealsPerDay} meals
-- Each meal MUST have "time" (HH:MM) and "timing_note"
+- Each meal MUST have "time" (HH:MM), "timing_note", and optionally "notes"
+- "notes" should contain practical tips: protein swap options (e.g. "Protein: chicken OR fish OR lean beef (150g)"), salad/vegetable suggestions (e.g. "Greens: spinach, kale, lettuce, rocket — eat freely"), or cooking tips
 - meal_type: breakfast, lunch, dinner, or snack
 - Keep meals SIMPLE and practical: each main meal should have 1 protein source, 1 carb source, and 1 fat source (e.g. olive oil, avocado). Snacks can be simpler (1-2 items). Aim for 3-4 ingredients per meal, max 5.
+- For the PRIMARY carb source in each main meal, include "alternatives": an array of 3-5 substitute options with equivalent portions. Example: if rice 200g, alternatives could be pasta 180g, sweet potato 250g, quinoa 160g, potato 280g.
+- Other ingredients do NOT need alternatives (set to [] or omit)
 - ALWAYS measure solid foods in grams (g) and liquids in milliliters (ml). Examples: "banana" = 120g, "whole milk" = 200ml, "chicken breast" = 150g, "olive oil" = 15ml, "rice" = 80g (dry). Never use cups, tablespoons, or "1 medium".
 - SUM across ALL meals must match daily targets within 5%
 - Protein accuracy is critical: chicken breast 100g = 31g protein, eggs 1 large (50g) = 6g protein
@@ -136,7 +152,7 @@ Return JSON only.`
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
         ],
-        max_tokens: 2500,
+        max_tokens: 4000,
         temperature: 0.7,
       }),
     })
@@ -165,6 +181,7 @@ Return JSON only.`
         protein: Math.round((Number(ing.protein) || 0) * 10) / 10,
         carbs: Math.round((Number(ing.carbs) || 0) * 10) / 10,
         fat: Math.round((Number(ing.fat) || 0) * 10) / 10,
+        alternatives: Array.isArray(ing.alternatives) ? ing.alternatives : [],
       }))
 
       return {
@@ -172,6 +189,7 @@ Return JSON only.`
         title: meal.title || 'Meal',
         time: meal.time || '12:00',
         timing_note: meal.timing_note || '',
+        notes: meal.notes || '',
         ingredients,
         calories: ingredients.reduce((s: number, i: { calories: number }) => s + i.calories, 0),
         protein: Math.round(ingredients.reduce((s: number, i: { protein: number }) => s + i.protein, 0) * 10) / 10,

@@ -220,7 +220,10 @@ export default function MealPlanTracker({ userId, onMacrosUpdate }: MealPlanTrac
           {meals.map(meal => {
             const isEaten = loggedMealIds.has(meal.id)
             const isExpanded = expandedMeal === meal.id
-            const foods = (meal.foods as FoodItem[]) ?? []
+            const rawFoods = meal.foods as FoodItem[] | { _meta?: unknown; items?: FoodItem[] }
+            const foods: FoodItem[] = Array.isArray(rawFoods)
+              ? rawFoods
+              : (rawFoods?.items ?? []) as FoodItem[]
 
             return (
               <div

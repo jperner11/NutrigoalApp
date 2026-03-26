@@ -15,21 +15,46 @@ import {
   Shield,
   Flame,
   Droplets,
+  Clock,
+  Check,
+  X,
+  RefreshCw,
 } from 'lucide-react'
-import type { DietPlan, DietPlanMeal, FoodItem } from '@/lib/supabase/types'
+import type { DietPlan, DietPlanMeal } from '@/lib/supabase/types'
 
-function getMealIcon(mealType: string) {
-  switch (mealType) {
-    case 'breakfast': return '🌅'
-    case 'lunch': return '☀️'
-    case 'dinner': return '🌙'
-    case 'snack': return '🥜'
-    default: return '🍽️'
-  }
+interface FoodItemExtended {
+  spoonacular_id?: number
+  name: string
+  amount: number
+  unit: string
+  calories: number
+  protein: number
+  carbs: number
+  fat: number
+  alternatives?: { name: string; amount: number; unit: string }[]
 }
 
-function getMealLabel(mealType: string) {
-  return mealType.charAt(0).toUpperCase() + mealType.slice(1)
+interface MealMeta {
+  time?: string
+  timing_note?: string
+  notes?: string
+}
+
+function parseFoods(raw: unknown): { meta: MealMeta; items: FoodItemExtended[] } {
+  if (!raw) return { meta: {}, items: [] }
+
+  // New format: { _meta: {...}, items: [...] }
+  if (typeof raw === 'object' && raw !== null && '_meta' in raw) {
+    const obj = raw as { _meta: MealMeta; items: FoodItemExtended[] }
+    return { meta: obj._meta ?? {}, items: obj.items ?? [] }
+  }
+
+  // Old format: FoodItem[]
+  if (Array.isArray(raw)) {
+    return { meta: {}, items: raw as FoodItemExtended[] }
+  }
+
+  return { meta: {}, items: [] }
 }
 
 export default function DietPlanDetailPage() {
@@ -43,6 +68,12 @@ export default function DietPlanDetailPage() {
   const [expandedMeals, setExpandedMeals] = useState<Set<string>>(new Set())
   const [deleting, setDeleting] = useState(false)
   const [activating, setActivating] = useState(false)
+  const [alternativesModal, setAlternativesModal] = useState<{
+    foodName: string
+    amount: number
+    unit: string
+    alternatives: { name: string; amount: number; unit: string }[]
+  } | null>(null)
 
   const loadPlan = useCallback(async () => {
     if (!profile || !params.id) return
@@ -68,7 +99,6 @@ export default function DietPlanDetailPage() {
       .eq('diet_plan_id', params.id)
 
     setMeals(mealsData ?? [])
-    // Expand all meals by default
     setExpandedMeals(new Set((mealsData ?? []).map(m => m.id)))
     setLoading(false)
   }, [profile, params.id, router])
@@ -246,7 +276,7 @@ export default function DietPlanDetailPage() {
         <div className="space-y-4">
           {meals.map((meal) => {
             const isExpanded = expandedMeals.has(meal.id)
-            const foods = (meal.foods ?? []) as FoodItem[]
+            const { meta, items } = parseFoods(meal.foods)
 
             return (
               <div
@@ -254,70 +284,159 @@ export default function DietPlanDetailPage() {
                 className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all"
               >
                 {/* Meal Header */}
-                <button
-                  onClick={() => toggleMeal(meal.id)}
-                  className="w-full flex items-center justify-between p-5 hover:bg-gray-50/50 transition-colors text-left"
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-100 to-amber-100 flex items-center justify-center text-2xl">
-                      {getMealIcon(meal.meal_type)}
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900">{meal.meal_name}</h3>
-                      <div className="flex items-center gap-3 text-sm text-gray-500 mt-0.5">
-                        <span>{getMealLabel(meal.meal_type)}</span>
-                        <span>{foods.length} {foods.length === 1 ? 'item' : 'items'}</span>
+                <div className="p-5">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-gray-900">{meal.meal_name}</h3>
+                      <div className="flex items-center gap-3 mt-1">
+                        <p className="text-sm text-gray-500">
+                          {Math.round(meal.total_calories ?? 0)} cal
+                          <span className="mx-1.5 text-gray-300">|</span>
+                          {Math.round(meal.total_protein ?? 0)}P · {Math.round(meal.total_carbs ?? 0)}C · {Math.round(meal.total_fat ?? 0)}F
+                        </p>
                       </div>
                     </div>
+                    {meta.time && (
+                      <span className="flex items-center gap-1.5 text-sm text-gray-500 bg-gray-100 px-3 py-1.5 rounded-full font-medium">
+                        <Clock className="h-3.5 w-3.5" />
+                        {meta.time}
+                      </span>
+                    )}
                   </div>
-                  <div className="flex items-center gap-4">
-                    <div className="text-right">
-                      <p className="text-sm font-bold text-gray-900">{Math.round(meal.total_calories ?? 0)} cal</p>
-                      <p className="text-xs text-gray-500">
-                        {Math.round(meal.total_protein ?? 0)}P · {Math.round(meal.total_carbs ?? 0)}C · {Math.round(meal.total_fat ?? 0)}F
-                      </p>
-                    </div>
-                    <div className={`p-1 rounded-full transition-colors ${isExpanded ? 'bg-purple-100' : ''}`}>
-                      {isExpanded ? (
-                        <ChevronUp className="h-5 w-5 text-purple-500" />
-                      ) : (
-                        <ChevronDown className="h-5 w-5 text-gray-400" />
-                      )}
-                    </div>
-                  </div>
-                </button>
 
-                {/* Expanded: Ingredients */}
-                {isExpanded && foods.length > 0 && (
-                  <div className="border-t border-gray-100 px-5 py-4">
-                    {/* Header row */}
-                    <div className="grid grid-cols-12 gap-2 text-xs text-gray-500 font-medium px-2 pb-2 border-b border-gray-100">
-                      <div className="col-span-5">Ingredient</div>
-                      <div className="col-span-2 text-right">Cal</div>
-                      <div className="col-span-1 text-right">P</div>
-                      <div className="col-span-1 text-right">C</div>
-                      <div className="col-span-1 text-right">F</div>
-                      <div className="col-span-2"></div>
-                    </div>
-                    {foods.map((food, idx) => (
-                      <div key={idx} className="grid grid-cols-12 gap-2 items-center py-2.5 px-2 rounded-lg hover:bg-gray-50 transition-colors">
-                        <div className="col-span-5">
-                          <p className="text-sm font-medium text-gray-900">
-                            {food.amount}{food.unit} {food.name}
-                          </p>
-                        </div>
-                        <div className="col-span-2 text-right text-sm text-gray-700">{Math.round(food.calories)}</div>
-                        <div className="col-span-1 text-right text-sm text-green-700">{Math.round(food.protein)}g</div>
-                        <div className="col-span-1 text-right text-sm text-amber-700">{Math.round(food.carbs)}g</div>
-                        <div className="col-span-1 text-right text-sm text-rose-700">{Math.round(food.fat)}g</div>
-                        <div className="col-span-2"></div>
+                  {/* Expand/Collapse toggle */}
+                  <button
+                    onClick={() => toggleMeal(meal.id)}
+                    className="flex items-center gap-1 text-sm font-medium text-purple-600 hover:text-purple-800 mt-3 transition-colors"
+                  >
+                    {isExpanded ? (
+                      <>
+                        <span>Hide</span>
+                        <ChevronUp className="h-4 w-4" />
+                      </>
+                    ) : (
+                      <>
+                        <span>Show</span>
+                        <ChevronDown className="h-4 w-4" />
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {/* Expanded Content */}
+                {isExpanded && (
+                  <div className="border-t border-gray-100">
+                    {/* Notes / Observations */}
+                    {(meta.notes || meta.timing_note) && (
+                      <div className="px-5 py-4 bg-gray-50/80 border-b border-gray-100">
+                        <h4 className="text-sm font-semibold text-gray-800 mb-2">Notes</h4>
+                        {meta.timing_note && (
+                          <p className="text-sm text-gray-600 mb-1">{meta.timing_note}</p>
+                        )}
+                        {meta.notes && (
+                          <p className="text-sm text-gray-600 whitespace-pre-line">{meta.notes}</p>
+                        )}
                       </div>
-                    ))}
+                    )}
+
+                    {/* Ingredients checklist */}
+                    {items.length > 0 && (
+                      <div className="px-5 py-4">
+                        <div className="space-y-1">
+                          {items.map((food, idx) => (
+                            <div key={idx} className="flex items-center gap-3 py-2.5">
+                              {/* Checkmark icon */}
+                              <div className="flex-shrink-0 w-7 h-7 rounded-full bg-purple-100 flex items-center justify-center">
+                                <Check className="h-4 w-4 text-purple-600" />
+                              </div>
+
+                              {/* Connector line */}
+                              {idx < items.length - 1 && (
+                                <div className="absolute ml-3.5 mt-10 w-px h-5 bg-purple-200" style={{ position: 'relative', left: '-2.15rem', top: '0.75rem', height: '0' }} />
+                              )}
+
+                              {/* Food info */}
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-gray-900">
+                                  {food.amount}{food.unit} {food.name}
+                                </p>
+                                <p className="text-xs text-gray-400">
+                                  {Math.round(food.calories)} cal · {Math.round(food.protein)}P · {Math.round(food.carbs)}C · {Math.round(food.fat)}F
+                                </p>
+                              </div>
+
+                              {/* Alternatives button */}
+                              {food.alternatives && food.alternatives.length > 0 && (
+                                <button
+                                  onClick={() => setAlternativesModal({
+                                    foodName: food.name,
+                                    amount: food.amount,
+                                    unit: food.unit,
+                                    alternatives: food.alternatives!,
+                                  })}
+                                  className="flex-shrink-0 flex items-center gap-1 text-xs font-medium text-purple-700 bg-purple-50 border border-purple-200 px-3 py-1.5 rounded-lg hover:bg-purple-100 transition-colors"
+                                >
+                                  <RefreshCw className="h-3 w-3" />
+                                  Alternatives
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
             )
           })}
+        </div>
+      )}
+
+      {/* Alternatives Modal */}
+      {alternativesModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md max-h-[80vh] overflow-y-auto shadow-2xl">
+            {/* Modal header */}
+            <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 rounded-t-2xl">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-gray-900">Alternatives</h3>
+                <button
+                  onClick={() => setAlternativesModal(null)}
+                  className="p-1 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <X className="h-5 w-5 text-gray-500" />
+                </button>
+              </div>
+              <p className="text-sm text-gray-500 mt-1">
+                You can substitute {alternativesModal.amount}{alternativesModal.unit} {alternativesModal.foodName} with:
+              </p>
+            </div>
+
+            {/* Alternatives list */}
+            <div className="px-6 py-4 space-y-3">
+              {alternativesModal.alternatives.map((alt, idx) => (
+                <div key={idx} className="flex items-center gap-3">
+                  <div className="flex-shrink-0 w-7 h-7 rounded-full bg-green-100 flex items-center justify-center">
+                    <Check className="h-4 w-4 text-green-600" />
+                  </div>
+                  <p className="text-sm font-medium text-gray-900">
+                    {alt.amount}{alt.unit} {alt.name}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* Close button */}
+            <div className="px-6 pb-6">
+              <button
+                onClick={() => setAlternativesModal(null)}
+                className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-xl text-sm font-semibold hover:shadow-lg transition-all"
+              >
+                Got it
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
