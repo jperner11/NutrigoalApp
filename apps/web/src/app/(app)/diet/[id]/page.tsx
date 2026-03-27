@@ -22,7 +22,8 @@ import {
   Lock,
 } from 'lucide-react'
 import type { DietPlan, DietPlanMeal } from '@/lib/supabase/types'
-import { isFeatureLocked } from '@/lib/tierUtils'
+import { isFeatureLocked, canAccess } from '@/lib/tierUtils'
+import PlanChat from '@/components/diet/PlanChat'
 import UpgradeModal from '@/components/ui/UpgradeModal'
 
 interface FoodItemExtended {
@@ -553,6 +554,48 @@ export default function DietPlanDetailPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* AI Chat — paid users only */}
+      {profile && plan && canAccess(profile.role, 'ai_suggestions') && (
+        <PlanChat
+          planId={plan.id}
+          meals={meals.map(meal => {
+            const { meta, items } = parseFoods(meal.foods)
+            return {
+              id: meal.id,
+              label: meta.label || meal.meal_type,
+              meal_type: meal.meal_type,
+              meal_name: meal.meal_name,
+              time: meta.time || '',
+              calories: meal.total_calories ?? 0,
+              protein: meal.total_protein ?? 0,
+              carbs: meal.total_carbs ?? 0,
+              fat: meal.total_fat ?? 0,
+              ingredients: items.map(item => ({
+                name: item.name,
+                amount: item.amount,
+                unit: item.unit,
+                calories: item.calories,
+                protein: item.protein,
+                carbs: item.carbs,
+                fat: item.fat,
+              })),
+            }
+          })}
+          targets={{
+            calories: plan.target_calories,
+            protein: plan.target_protein,
+            carbs: plan.target_carbs,
+            fat: plan.target_fat,
+          }}
+          userProfile={{
+            goal: profile.goal ?? undefined,
+            allergies: profile.allergies ?? [],
+            foodDislikes: profile.food_dislikes ?? [],
+          }}
+          onMealsUpdated={loadPlan}
+        />
       )}
     </div>
   )
