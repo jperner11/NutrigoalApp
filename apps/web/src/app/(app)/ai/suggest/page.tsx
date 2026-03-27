@@ -54,7 +54,6 @@ export default function AISuggestPage() {
 
       const data = await res.json()
       setResponse(data.suggestion)
-      setUsageCount(prev => prev + 1)
       toast.success('Suggestion generated!')
     } catch {
       toast.error('Failed to get suggestion')
