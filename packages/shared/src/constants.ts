@@ -54,6 +54,19 @@ export const PRICING = {
       'Additional clients at $3.99/mo each',
     ],
   },
+  nutritionist_client: {
+    name: 'Client Plan',
+    price: 0,
+    regenCooldownDays: null as number | null,
+    features: [
+      'Full meal plan access',
+      'Full training plan access',
+      'Cardio tracking',
+      'Supplement tracking',
+      'Meal notes & alternatives',
+      'Plans managed by your nutritionist',
+    ],
+  },
 } as const
 
 export type PlanType = keyof typeof PRICING

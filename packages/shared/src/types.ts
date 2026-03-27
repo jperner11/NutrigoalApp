@@ -1,6 +1,6 @@
 // Database types for NutriGoal v2
 
-export type UserRole = 'free' | 'pro' | 'unlimited' | 'nutritionist'
+export type UserRole = 'free' | 'pro' | 'unlimited' | 'nutritionist' | 'nutritionist_client'
 export type Gender = 'male' | 'female' | 'other'
 export type ActivityLevel = 'sedentary' | 'lightly_active' | 'moderately_active' | 'very_active' | 'extremely_active'
 export type FitnessGoal = 'bulking' | 'cutting' | 'maintenance'
@@ -45,6 +45,7 @@ export interface UserProfile {
   daily_water_ml: number | null
   avatar_url: string | null
   onboarding_completed: boolean
+  nutritionist_id: string | null
   // Schedule
   wake_time: string | null
   sleep_time: string | null

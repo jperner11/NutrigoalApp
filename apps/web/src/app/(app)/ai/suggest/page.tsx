@@ -12,8 +12,10 @@ export default function AISuggestPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [loadingUsage, setLoadingUsage] = useState(true)
 
-  const isFree = (profile?.role ?? 'free') === 'free'
-  const canUse = !isFree
+  const role = profile?.role ?? 'free'
+  const isFree = role === 'free'
+  const isClient = role === 'nutritionist_client'
+  const canUse = !isFree && !isClient
 
   useEffect(() => {
     if (profile) setLoadingUsage(false)
@@ -76,14 +78,16 @@ export default function AISuggestPage() {
         <div className="flex items-center space-x-3">
           <Sparkles className="h-5 w-5 text-purple-600" />
           <span className="text-sm text-gray-700">
-            {isFree ? (
+            {isClient ? (
+              <span>AI features are managed by your nutritionist</span>
+            ) : isFree ? (
               <span>AI suggestions are a <span className="font-semibold">Pro</span> feature</span>
             ) : (
               <span>AI meal suggestions available</span>
             )}
           </span>
         </div>
-        {isFree && (
+        {isFree && !isClient && (
           <a
             href="/pricing"
             className="text-sm text-purple-600 hover:text-purple-800 font-medium"

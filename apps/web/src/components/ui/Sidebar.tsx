@@ -12,6 +12,7 @@ import {
   TrendingUp,
   Pill,
   Users,
+  UserCheck,
   Settings,
   Sparkles,
   LogOut,
@@ -37,16 +38,17 @@ const navItems: {
   roles: string[]
   gatedFeature?: GatedFeature
 }[] = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['free', 'pro', 'unlimited', 'nutritionist'] },
-  { href: '/diet', label: 'Diet', icon: Utensils, roles: ['free', 'pro', 'unlimited', 'nutritionist'] },
-  { href: '/training', label: 'Training', icon: Dumbbell, roles: ['free', 'pro', 'unlimited', 'nutritionist'] },
-  { href: '/cardio', label: 'Cardio', icon: HeartPulse, roles: ['free', 'pro', 'unlimited', 'nutritionist'], gatedFeature: 'cardio' },
-  { href: '/water', label: 'Water', icon: Droplets, roles: ['free', 'pro', 'unlimited', 'nutritionist'] },
-  { href: '/progress', label: 'Progress', icon: TrendingUp, roles: ['free', 'pro', 'unlimited', 'nutritionist'] },
-  { href: '/supplements', label: 'Supplements', icon: Pill, roles: ['free', 'pro', 'unlimited', 'nutritionist'], gatedFeature: 'supplements' },
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['free', 'pro', 'unlimited', 'nutritionist', 'nutritionist_client'] },
+  { href: '/diet', label: 'Diet', icon: Utensils, roles: ['free', 'pro', 'unlimited', 'nutritionist', 'nutritionist_client'] },
+  { href: '/training', label: 'Training', icon: Dumbbell, roles: ['free', 'pro', 'unlimited', 'nutritionist', 'nutritionist_client'] },
+  { href: '/cardio', label: 'Cardio', icon: HeartPulse, roles: ['free', 'pro', 'unlimited', 'nutritionist', 'nutritionist_client'], gatedFeature: 'cardio' },
+  { href: '/water', label: 'Water', icon: Droplets, roles: ['free', 'pro', 'unlimited', 'nutritionist', 'nutritionist_client'] },
+  { href: '/progress', label: 'Progress', icon: TrendingUp, roles: ['free', 'pro', 'unlimited', 'nutritionist', 'nutritionist_client'] },
+  { href: '/supplements', label: 'Supplements', icon: Pill, roles: ['free', 'pro', 'unlimited', 'nutritionist', 'nutritionist_client'], gatedFeature: 'supplements' },
   { href: '/ai/suggest', label: 'AI Suggestions', icon: Sparkles, roles: ['free', 'pro', 'unlimited', 'nutritionist'], gatedFeature: 'ai_suggestions' },
   { href: '/clients', label: 'Clients', icon: Users, roles: ['nutritionist'] },
-  { href: '/settings', label: 'Settings', icon: Settings, roles: ['free', 'pro', 'unlimited', 'nutritionist'] },
+  { href: '/my-nutritionist', label: 'My Nutritionist', icon: UserCheck, roles: ['nutritionist_client'] },
+  { href: '/settings', label: 'Settings', icon: Settings, roles: ['free', 'pro', 'unlimited', 'nutritionist', 'nutritionist_client'] },
 ]
 
 export default function Sidebar({ userRole, userName, onSignOut }: SidebarProps) {
@@ -113,7 +115,7 @@ export default function Sidebar({ userRole, userName, onSignOut }: SidebarProps)
         {!collapsed && (
           <div className="px-3 py-2 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl">
             <p className="text-sm font-semibold text-gray-900 truncate">{userName}</p>
-            <p className="text-xs text-purple-600 capitalize font-medium">{userRole} plan</p>
+            <p className="text-xs text-purple-600 capitalize font-medium">{userRole === 'nutritionist_client' ? 'Client Plan' : `${userRole} plan`}</p>
           </div>
         )}
 

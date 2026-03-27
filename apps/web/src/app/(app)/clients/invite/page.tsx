@@ -75,6 +75,14 @@ export default function InviteClientPage() {
       return
     }
 
+    // If existing user, set their role to nutritionist_client and link nutritionist
+    if (existingUser) {
+      await supabase
+        .from('user_profiles')
+        .update({ role: 'nutritionist_client', nutritionist_id: profile.id })
+        .eq('id', existingUser.id)
+    }
+
     toast.success(`Invitation sent to ${email}`)
     router.push('/clients')
   }

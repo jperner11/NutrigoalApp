@@ -22,6 +22,13 @@ export default function GeneratePlansPage() {
   const { profile } = useUser()
   const startedRef = useRef(false)
 
+  // Block nutritionist_client — their plans come from the nutritionist
+  useEffect(() => {
+    if (profile?.role === 'nutritionist_client') {
+      router.replace('/dashboard')
+    }
+  }, [profile, router])
+
   const [steps, setSteps] = useState<GenerationStep[]>([
     { label: 'Generating your training plan', icon: <Dumbbell className="h-5 w-5" />, status: 'pending' },
     { label: 'Generating your meal plan', icon: <Utensils className="h-5 w-5" />, status: 'pending' },
