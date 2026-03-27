@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { useUser } from '@/hooks/useUser'
-import { createClient } from '@/lib/supabase/client'
 import { Sparkles, Send, Lock } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 
@@ -13,38 +12,12 @@ export default function AISuggestPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [loadingUsage, setLoadingUsage] = useState(true)
 
-  const tier = profile?.role ?? 'free'
-  const isFree = tier === 'free'
+  const isFree = (profile?.role ?? 'free') === 'free'
+  const canUse = !isFree
 
   useEffect(() => {
-    if (!profile) return
-
-    async function loadUsage() {
-      if (isFree) {
-        // Free users can't use AI suggestions at all
-        setLoadingUsage(false)
-        return
-      }
-
-      const supabase = createClient()
-      // Paid users: check last 7 days for rolling limit (pro) or unlimited
-      const sevenDaysAgo = new Date()
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
-
-      const { count } = await supabase
-        .from('ai_usage')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', profile!.id)
-        .eq('type', 'meal_suggestion')
-        .gte('created_at', sevenDaysAgo.toISOString())
-
-      setLoadingUsage(false)
-    }
-
-    loadUsage()
-  }, [profile, isFree])
-
-  const canUse = !isFree
+    if (profile) setLoadingUsage(false)
+  }, [profile])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
