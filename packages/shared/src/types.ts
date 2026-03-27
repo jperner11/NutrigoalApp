@@ -133,6 +133,7 @@ export interface DietPlan {
   target_fat: number | null
   notes: string | null
   is_active: boolean
+  is_ai_generated: boolean
   created_at: string
 }
 
@@ -184,6 +185,7 @@ export interface TrainingPlan {
   description: string | null
   days_per_week: number
   is_active: boolean
+  is_ai_generated: boolean
   created_at: string
 }
 

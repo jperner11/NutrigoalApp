@@ -83,7 +83,8 @@ export default function DietPlanDetailPage() {
   const [showMealPicker, setShowMealPicker] = useState(false)
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
 
-  const isFreeUser = isFeatureLocked(profile?.role ?? 'free', 'full_meals')
+  const isRoleLocked = isFeatureLocked(profile?.role ?? 'free', 'full_meals')
+  const isFreeUser = isRoleLocked && (plan?.is_ai_generated !== false)
 
   const loadPlan = useCallback(async () => {
     if (!profile || !params.id) return

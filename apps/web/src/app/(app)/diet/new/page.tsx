@@ -4,11 +4,12 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
-import { Utensils, Sparkles, Plus, Trash2, ArrowLeft, Loader2, RefreshCw } from 'lucide-react'
+import { Utensils, Sparkles, Plus, Trash2, ArrowLeft, Loader2, RefreshCw, Lock } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import Link from 'next/link'
 import { MEAL_TYPES } from '@/lib/constants'
 import type { FoodItem, MealType } from '@/lib/supabase/types'
+import { canAccess } from '@/lib/tierUtils'
 
 interface MealEntry {
   meal_type: MealType
@@ -384,6 +385,7 @@ export default function NewDietPlanPage() {
       </div>
 
       {/* Auto-Generate with Preferences */}
+      {canAccess(profile.role, 'ai_suggestions') ? (
       <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-6 border border-purple-200 mb-8">
         <div className="flex items-center gap-2 mb-4">
           <Sparkles className="h-5 w-5 text-purple-600" />
@@ -453,6 +455,23 @@ export default function NewDietPlanPage() {
           <span>{generating ? 'Generating meals...' : 'Generate Meal Plan'}</span>
         </button>
       </div>
+      ) : (
+      <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 mb-8">
+        <div className="flex items-center gap-2 mb-2">
+          <Lock className="h-5 w-5 text-gray-400" />
+          <h3 className="font-semibold text-gray-700">Auto-Generate Plan</h3>
+        </div>
+        <p className="text-sm text-gray-500 mb-3">
+          AI meal plan generation is a Pro feature. You can still manually build your plan below using the food search.
+        </p>
+        <Link
+          href="/pricing"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-purple-600 hover:text-purple-800"
+        >
+          Upgrade to Pro
+        </Link>
+      </div>
+      )}
 
       {/* Macro Summary */}
       {meals.length > 0 && (

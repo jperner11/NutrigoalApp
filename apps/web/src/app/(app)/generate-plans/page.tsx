@@ -240,6 +240,7 @@ export default function GeneratePlansPage() {
         description: data.description || null,
         days_per_week: data.days?.length ?? profile!.workout_days_per_week ?? 4,
         is_active: true,
+        is_ai_generated: true,
       })
       .select()
       .single()
@@ -347,6 +348,7 @@ export default function GeneratePlansPage() {
         target_carbs: profile!.daily_carbs,
         target_fat: profile!.daily_fat,
         is_active: true,
+        is_ai_generated: true,
       })
       .select()
       .single()

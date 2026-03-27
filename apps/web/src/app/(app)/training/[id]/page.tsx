@@ -64,7 +64,8 @@ export default function TrainingPlanDetailPage() {
   const [showDayPicker, setShowDayPicker] = useState(false)
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
 
-  const isFreeUser = isFeatureLocked(profile?.role ?? 'free', 'full_training')
+  const isRoleLocked = isFeatureLocked(profile?.role ?? 'free', 'full_training')
+  const isFreeUser = isRoleLocked && (plan?.is_ai_generated !== false)
 
   const loadPlan = useCallback(async () => {
     if (!profile || !params.id) return
