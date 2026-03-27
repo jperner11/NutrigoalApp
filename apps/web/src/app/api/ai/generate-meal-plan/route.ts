@@ -144,15 +144,33 @@ Rules:
 - For the PRIMARY carb source in each main meal, include "alternatives": an array of 3-5 substitute options with equivalent portions. Example: if rice 200g, alternatives could be pasta 180g, sweet potato 250g, quinoa 160g, potato 280g.
 - Other ingredients do NOT need alternatives (set to [] or omit)
 - ALWAYS measure solid foods in grams (g) and liquids in milliliters (ml). Examples: "banana" = 120g, "whole milk" = 200ml, "chicken breast" = 150g, "olive oil" = 15ml, "rice" = 80g (dry). Never use cups, tablespoons, or "1 medium".
-- SUM across ALL meals must match daily targets within 5%
-- Protein accuracy is critical: chicken breast 100g = 31g protein, eggs 1 large (50g) = 6g protein
+- MACRO ACCURACY IS THE #1 PRIORITY. The SUM of all meals MUST match daily targets within 3%. This is a clinical prescription.
+- Before responding, mentally add up total calories, protein, carbs, and fat across ALL meals. If they don't match the targets, adjust ingredient amounts until they do.
+- Use accurate nutritional data: chicken breast 100g = 165cal/31P/0C/3.6F, rice (cooked) 100g = 130cal/2.7P/28C/0.3F, oats 100g = 389cal/13P/66C/7F, eggs 50g = 78cal/6P/0.6C/5F, olive oil 15ml = 120cal/0P/0C/14F, banana 120g = 107cal/1.3P/27C/0.4F, salmon 100g = 208cal/20P/0C/13F, sweet potato 100g = 86cal/1.6P/20C/0.1F
 - Pre-workout = lighter, carb-focused. Post-workout = protein-heavy + fast carbs`
 
-    const userPrompt = `Generate a ${mealsPerDay}-meal plan hitting these DAILY targets:
-- Calories: ${calories} kcal
-- Protein: ${protein}g
-- Carbs: ${carbs}g
-- Fat: ${fat}g
+    // Calculate per-meal budgets to guide the AI
+    const mainMeals = Math.min(mealsPerDay, 3)
+    const snackMeals = mealsPerDay - mainMeals
+    // Main meals get ~25-30% each, snacks get the remainder split
+    const mainPct = snackMeals > 0 ? 0.27 : (1 / mainMeals)
+    const snackPct = snackMeals > 0 ? ((1 - mainPct * mainMeals) / snackMeals) : 0
+
+    const budgetGuide = [
+      `Per-meal budget guide (approximate):`,
+      `- Each main meal (~${mainMeals} meals): ~${Math.round(calories * mainPct)} cal, ~${Math.round(protein * mainPct)}P, ~${Math.round(carbs * mainPct)}C, ~${Math.round(fat * mainPct)}F`,
+      snackMeals > 0 ? `- Each snack (~${snackMeals} snacks): ~${Math.round(calories * snackPct)} cal, ~${Math.round(protein * snackPct)}P, ~${Math.round(carbs * snackPct)}C, ~${Math.round(fat * snackPct)}F` : '',
+    ].filter(Boolean).join('\n')
+
+    const userPrompt = `Generate a ${mealsPerDay}-meal plan hitting these EXACT daily targets:
+- Calories: ${calories} kcal (tolerance: ±${Math.round(calories * 0.03)})
+- Protein: ${protein}g (tolerance: ±${Math.round(protein * 0.03)})
+- Carbs: ${carbs}g (tolerance: ±${Math.round(carbs * 0.03)})
+- Fat: ${fat}g (tolerance: ±${Math.round(fat * 0.03)})
+
+${budgetGuide}
+
+CRITICAL: After building all meals, verify the totals add up. If protein is over target, reduce a protein source. If carbs are under, add more carbs. Adjust amounts until totals match.
 
 Return JSON only.`
 
@@ -169,7 +187,7 @@ Return JSON only.`
           { role: 'user', content: userPrompt },
         ],
         max_tokens: 4000,
-        temperature: 0.7,
+        temperature: 0.4,
       }),
     })
 

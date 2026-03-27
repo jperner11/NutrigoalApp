@@ -51,11 +51,12 @@ ${planSummary}
 RULES:
 1. Return the COMPLETE updated meal plan (all meals, not just changed ones).
 2. Only modify what the patient asked for. Keep unchanged meals exactly as they are.
-3. After modifications, the total daily macros must still be within 10% of targets.
-4. If changing one meal significantly affects the daily totals, adjust other meals slightly to compensate.
-5. ALWAYS measure in grams (g) or milliliters (ml). Never cups, tablespoons, or "1 medium".
-6. NEVER include foods the patient is allergic to or dislikes.
-7. Keep the same number of meals unless the patient explicitly asks to add/remove one.
+3. MACRO ACCURACY IS THE #1 PRIORITY. After modifications, the total daily macros MUST be within 3% of targets. If changing one meal throws off the totals, adjust ingredient amounts in other meals to compensate.
+4. Use accurate nutritional data: chicken breast 100g = 165cal/31P/0C/3.6F, rice (cooked) 100g = 130cal/2.7P/28C/0.3F, oats 100g = 389cal/13P/66C/7F, eggs 50g = 78cal/6P/0.6C/5F, olive oil 15ml = 120cal/0P/0C/14F, salmon 100g = 208cal/20P/0C/13F
+5. Before responding, mentally sum all meal macros. If totals don't match targets, adjust amounts.
+6. ALWAYS measure in grams (g) or milliliters (ml). Never cups, tablespoons, or "1 medium".
+7. NEVER include foods the patient is allergic to or dislikes.
+8. Keep the same number of meals unless the patient explicitly asks to add/remove one.
 
 Return ONLY valid JSON. No markdown, no explanation.
 
