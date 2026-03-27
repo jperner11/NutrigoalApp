@@ -48,4 +48,6 @@ export type {
   GoalTimeline,
   SupplementFrequency,
   SupplementTime,
+  TierSelectionType,
+  UserTierSelection,
 } from '@nutrigoal/shared'

@@ -12,7 +12,10 @@ import {
   X,
   Clock,
   ChevronDown,
+  Lock,
 } from 'lucide-react'
+import Link from 'next/link'
+import { isFeatureLocked } from '@/lib/tierUtils'
 import {
   SUPPLEMENT_FREQUENCIES,
   SUPPLEMENT_TIMES,
@@ -150,6 +153,28 @@ export default function SupplementsPage() {
   }
 
   if (!profile) return null
+
+  if (isFeatureLocked(profile.role, 'supplements')) {
+    return (
+      <div className="max-w-3xl mx-auto">
+        <div className="bg-white rounded-xl p-12 shadow-sm border border-gray-200 text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-purple-100 mb-4">
+            <Lock className="h-7 w-7 text-purple-600" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Supplement Tracking</h2>
+          <p className="text-gray-500 mb-6 max-w-sm mx-auto">
+            Track your daily supplements and vitamins. Available on Pro plan and above.
+          </p>
+          <Link
+            href="/pricing"
+            className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
+          >
+            <span>Upgrade to Pro</span>
+          </Link>
+        </div>
+      </div>
+    )
+  }
 
   const takenCount = todayLogs.length
   const totalActive = supplements.length

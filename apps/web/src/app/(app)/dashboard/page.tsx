@@ -17,10 +17,12 @@ import {
   Crown,
   Plus,
   Scale,
+  RefreshCw,
 } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'react-hot-toast'
 import MealPlanTracker from '@/components/dashboard/MealPlanTracker'
+import { canAccess } from '@/lib/tierUtils'
 import StreaksWidget from '@/components/dashboard/StreaksWidget'
 import TodayTrainingPreview from '@/components/dashboard/TodayTrainingPreview'
 import QuickWeightLog from '@/components/dashboard/QuickWeightLog'
@@ -410,6 +412,7 @@ export default function DashboardPage() {
       {profile.onboarding_completed && (
         <MealPlanTracker
           userId={profile.id}
+          userRole={profile.role}
           onMacrosUpdate={(macros) => {
             setTodayStats(prev => ({
               ...prev,
@@ -493,6 +496,18 @@ export default function DashboardPage() {
             <p className="text-sm text-gray-500">Get meal ideas</p>
           </div>
         </Link>
+
+        {canAccess(profile.role, 'regenerate') && (
+          <Link href="/generate-plans" className="group bg-gradient-to-br from-white to-green-50/30 rounded-xl p-5 shadow-sm border border-gray-200/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex items-center space-x-4">
+            <div className="bg-gradient-to-br from-green-100 to-emerald-100 rounded-lg p-3 group-hover:shadow-sm transition-shadow">
+              <RefreshCw className="h-6 w-6 text-green-600" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-900">Regenerate Plans</h3>
+              <p className="text-sm text-gray-500">Get new AI-generated plans</p>
+            </div>
+          </Link>
+        )}
 
         {profile.role === 'nutritionist' && (
           <Link href="/clients" className="group bg-gradient-to-br from-white to-indigo-50/30 rounded-xl p-5 shadow-sm border border-gray-200/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex items-center space-x-4">

@@ -6,6 +6,7 @@ import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
 import { Sparkles, Dumbbell, Utensils, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
+import { checkRegenEligibility, getRegenCooldownDays } from '@/lib/tierUtils'
 
 type StepStatus = 'pending' | 'loading' | 'done' | 'error'
 
@@ -42,6 +43,22 @@ export default function GeneratePlansPage() {
 
   async function generateAll() {
     if (!profile) return
+
+    // Check regeneration eligibility (skip for first-time onboarding — no existing plans)
+    const cooldown = getRegenCooldownDays(profile.role)
+    if (cooldown !== null && profile.onboarding_completed) {
+      // Not first generation — check if user can regenerate
+      const { canRegenerate, daysRemaining } = await checkRegenEligibility(profile.id, profile.role)
+      if (!canRegenerate) {
+        if (cooldown === null) {
+          toast.error('Plan regeneration requires a Pro plan or higher.')
+        } else {
+          toast.error(`You can regenerate plans in ${daysRemaining} day${daysRemaining !== 1 ? 's' : ''}.`)
+        }
+        router.push('/dashboard')
+        return
+      }
+    }
 
     // Step 1 & 2: Generate both plans in parallel
     updateStep(0, { status: 'loading' })
@@ -83,6 +100,26 @@ export default function GeneratePlansPage() {
       }
       if (mealPlan) {
         await saveMealPlan(supabase, mealPlan)
+      }
+
+      // Log AI usage for cooldown tracking
+      if (trainingPlan) {
+        await supabase.from('ai_usage').insert({
+          user_id: profile!.id,
+          type: 'workout_suggestion',
+          prompt: 'generate-training-plan',
+          response: 'success',
+          tokens_used: 0,
+        })
+      }
+      if (mealPlan) {
+        await supabase.from('ai_usage').insert({
+          user_id: profile!.id,
+          type: 'meal_suggestion',
+          prompt: 'generate-meal-plan',
+          response: 'success',
+          tokens_used: 0,
+        })
       }
 
       updateStep(2, { status: 'done' })

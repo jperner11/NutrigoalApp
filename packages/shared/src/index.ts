@@ -49,6 +49,8 @@ export type {
   FeedbackQuestion,
   FeedbackResponse,
   FeedbackRequest,
+  TierSelectionType,
+  UserTierSelection,
 } from './types'
 
 // Nutrition

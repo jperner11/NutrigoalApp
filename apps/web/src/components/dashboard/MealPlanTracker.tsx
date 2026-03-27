@@ -2,13 +2,16 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Utensils, ChevronDown, ChevronUp, Check, Clock } from 'lucide-react'
+import { Utensils, ChevronDown, ChevronUp, Check, Clock, Lock } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import Link from 'next/link'
 import type { DietPlan, DietPlanMeal, FoodItem } from '@/lib/supabase/types'
+import { isFeatureLocked } from '@/lib/tierUtils'
+import type { UserRole } from '@/lib/supabase/types'
 
 interface MealPlanTrackerProps {
   userId: string
+  userRole?: UserRole
   onMacrosUpdate: (macros: {
     calories: number
     protein: number
@@ -17,15 +20,17 @@ interface MealPlanTrackerProps {
   }) => void
 }
 
-export default function MealPlanTracker({ userId, onMacrosUpdate }: MealPlanTrackerProps) {
+export default function MealPlanTracker({ userId, userRole = 'free', onMacrosUpdate }: MealPlanTrackerProps) {
   const [activePlan, setActivePlan] = useState<DietPlan | null>(null)
   const [meals, setMeals] = useState<DietPlanMeal[]>([])
   const [loggedMealIds, setLoggedMealIds] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
   const [expandedMeal, setExpandedMeal] = useState<string | null>(null)
+  const [selectedMealId, setSelectedMealId] = useState<string | null>(null)
 
   const today = new Date().toISOString().split('T')[0]
   const dayOfWeek = new Date().getDay()
+  const isFreeUser = isFeatureLocked(userRole, 'full_meals')
 
   useEffect(() => {
     loadPlanAndLogs()
@@ -89,6 +94,18 @@ export default function MealPlanTracker({ userId, onMacrosUpdate }: MealPlanTrac
       carbs: totalCarbs,
       fat: totalFat,
     })
+
+    // Load free user's selected meal
+    if (isFreeUser) {
+      const { data: selection } = await supabase
+        .from('user_tier_selections')
+        .select('selected_id')
+        .eq('user_id', userId)
+        .eq('selection_type', 'meal')
+        .single()
+
+      if (selection) setSelectedMealId(selection.selected_id)
+    }
 
     setLoading(false)
   }
@@ -224,50 +241,61 @@ export default function MealPlanTracker({ userId, onMacrosUpdate }: MealPlanTrac
             const foods: FoodItem[] = Array.isArray(rawFoods)
               ? rawFoods
               : (rawFoods?.items ?? []) as FoodItem[]
+            const isLocked = isFreeUser && selectedMealId !== null && meal.id !== selectedMealId
 
             return (
               <div
                 key={meal.id}
                 className={`border rounded-lg overflow-hidden transition-colors ${
+                  isLocked ? 'border-gray-200 opacity-60' :
                   isEaten ? 'border-purple-200 bg-purple-50/50' : 'border-gray-200'
                 }`}
               >
                 <div className="flex items-center p-4">
                   <button
-                    onClick={() => setExpandedMeal(isExpanded ? null : meal.id)}
+                    onClick={() => !isLocked && setExpandedMeal(isExpanded ? null : meal.id)}
                     className="flex-1 flex items-center gap-3 text-left"
+                    disabled={isLocked}
                   >
-                    <div className={`rounded-lg p-2 ${isEaten ? 'bg-purple-100' : 'bg-gray-100'}`}>
-                      <Utensils className={`h-4 w-4 ${isEaten ? 'text-purple-600' : 'text-gray-500'}`} />
+                    <div className={`rounded-lg p-2 ${isLocked ? 'bg-gray-100' : isEaten ? 'bg-purple-100' : 'bg-gray-100'}`}>
+                      {isLocked ? (
+                        <Lock className="h-4 w-4 text-gray-400" />
+                      ) : (
+                        <Utensils className={`h-4 w-4 ${isEaten ? 'text-purple-600' : 'text-gray-500'}`} />
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className={`font-medium ${isEaten ? 'text-purple-800' : 'text-gray-900'}`}>
+                      <p className={`font-medium ${isLocked ? 'text-gray-400' : isEaten ? 'text-purple-800' : 'text-gray-900'}`}>
                         {meal.meal_name}
                       </p>
-                      <p className="text-xs text-gray-500">
-                        {meal.total_calories} cal &middot; {Math.round(meal.total_protein)}g P &middot; {Math.round(meal.total_carbs)}g C &middot; {Math.round(meal.total_fat)}g F
-                      </p>
+                      {!isLocked && (
+                        <p className="text-xs text-gray-500">
+                          {meal.total_calories} cal &middot; {Math.round(meal.total_protein)}g P &middot; {Math.round(meal.total_carbs)}g C &middot; {Math.round(meal.total_fat)}g F
+                        </p>
+                      )}
                     </div>
-                    {isExpanded ? (
+                    {!isLocked && (isExpanded ? (
                       <ChevronUp className="h-4 w-4 text-gray-400" />
                     ) : (
                       <ChevronDown className="h-4 w-4 text-gray-400" />
-                    )}
+                    ))}
                   </button>
 
-                  <button
-                    onClick={() => toggleMeal(meal)}
-                    className={`ml-3 flex-shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center transition-colors ${
-                      isEaten
-                        ? 'bg-purple-600 border-purple-600 text-white'
-                        : 'border-gray-300 hover:border-purple-400'
-                    }`}
-                  >
-                    {isEaten && <Check className="h-4 w-4" />}
-                  </button>
+                  {!isLocked && (
+                    <button
+                      onClick={() => toggleMeal(meal)}
+                      className={`ml-3 flex-shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center transition-colors ${
+                        isEaten
+                          ? 'bg-purple-600 border-purple-600 text-white'
+                          : 'border-gray-300 hover:border-purple-400'
+                      }`}
+                    >
+                      {isEaten && <Check className="h-4 w-4" />}
+                    </button>
+                  )}
                 </div>
 
-                {isExpanded && foods.length > 0 && (
+                {isExpanded && !isLocked && foods.length > 0 && (
                   <div className="px-4 pb-4 border-t border-gray-100">
                     <div className="space-y-2 mt-3">
                       {foods.map((food, i) => (

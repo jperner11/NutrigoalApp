@@ -16,6 +16,7 @@ import {
   Calendar,
   Clock,
   Shield,
+  Lock,
 } from 'lucide-react'
 import type {
   TrainingPlan,
@@ -23,6 +24,8 @@ import type {
   TrainingPlanExercise,
   Exercise,
 } from '@/lib/supabase/types'
+import { isFeatureLocked } from '@/lib/tierUtils'
+import UpgradeModal from '@/components/ui/UpgradeModal'
 
 interface DayWithExercises extends TrainingPlanDay {
   exercises: (TrainingPlanExercise & { exercises: Exercise })[]
@@ -57,6 +60,11 @@ export default function TrainingPlanDetailPage() {
   const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set())
   const [deleting, setDeleting] = useState(false)
   const [activating, setActivating] = useState(false)
+  const [selectedDayId, setSelectedDayId] = useState<string | null>(null)
+  const [showDayPicker, setShowDayPicker] = useState(false)
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false)
+
+  const isFreeUser = isFeatureLocked(profile?.role ?? 'free', 'full_training')
 
   const loadPlan = useCallback(async () => {
     if (!profile || !params.id) return
@@ -119,6 +127,46 @@ export default function TrainingPlanDetailPage() {
   useEffect(() => {
     loadPlan()
   }, [loadPlan])
+
+  // Load free user's selected training day
+  useEffect(() => {
+    if (!isFreeUser || !profile) return
+
+    async function loadSelection() {
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('user_tier_selections')
+        .select('selected_id')
+        .eq('user_id', profile!.id)
+        .eq('selection_type', 'training_day')
+        .single()
+
+      if (data) {
+        setSelectedDayId(data.selected_id)
+      } else if (days.length > 0) {
+        setShowDayPicker(true)
+      }
+    }
+
+    if (days.length > 0) loadSelection()
+  }, [isFreeUser, profile, days])
+
+  async function handleSelectFreeDay(dayId: string) {
+    if (!profile) return
+    const supabase = createClient()
+
+    await supabase
+      .from('user_tier_selections')
+      .upsert({
+        user_id: profile.id,
+        selection_type: 'training_day' as const,
+        selected_id: dayId,
+      }, { onConflict: 'user_id,selection_type' })
+
+    setSelectedDayId(dayId)
+    setShowDayPicker(false)
+    toast.success('Training day unlocked!')
+  }
 
   function toggleDay(dayId: string) {
     setExpandedDays((prev) => {
@@ -291,53 +339,68 @@ export default function TrainingPlanDetailPage() {
         <div className="space-y-4">
           {days.map((day) => {
             const isExpanded = expandedDays.has(day.id)
+            const isLocked = isFreeUser && selectedDayId !== null && day.id !== selectedDayId
 
             return (
               <div
                 key={day.id}
-                className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-200"
+                className={`bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200 overflow-hidden transition-all duration-200 ${
+                  isLocked ? 'opacity-60' : 'hover:shadow-md'
+                }`}
               >
                 {/* Day Header */}
                 <button
-                  onClick={() => toggleDay(day.id)}
+                  onClick={() => isLocked ? setShowUpgradeModal(true) : toggleDay(day.id)}
                   className="w-full flex items-center justify-between p-5 hover:bg-gray-50/50 transition-colors text-left"
                 >
                   <div className="flex items-center space-x-4">
-                    {/* Day Number Circle */}
                     <div className="relative flex-shrink-0">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shadow-sm">
-                        <span className="text-white font-bold text-lg">{day.day_number}</span>
-                      </div>
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900">
-                        {day.name}
-                      </h3>
-                      <div className="flex items-center gap-3 text-sm text-gray-500 mt-0.5">
-                        <span>
-                          {day.exercises.length}{' '}
-                          {day.exercises.length === 1 ? 'exercise' : 'exercises'}
-                        </span>
-                        {day.lastWorkout && (
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-3.5 w-3.5" />
-                            Last: {new Date(day.lastWorkout).toLocaleDateString()}
-                          </span>
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center shadow-sm ${
+                        isLocked ? 'bg-gray-300' : 'bg-gradient-to-br from-purple-500 to-indigo-600'
+                      }`}>
+                        {isLocked ? (
+                          <Lock className="h-5 w-5 text-white" />
+                        ) : (
+                          <span className="text-white font-bold text-lg">{day.day_number}</span>
                         )}
                       </div>
                     </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className={`font-semibold ${isLocked ? 'text-gray-400' : 'text-gray-900'}`}>
+                          {day.name}
+                        </h3>
+                        {isLocked && <Lock className="h-3.5 w-3.5 text-gray-400" />}
+                      </div>
+                      {!isLocked && (
+                        <div className="flex items-center gap-3 text-sm text-gray-500 mt-0.5">
+                          <span>
+                            {day.exercises.length}{' '}
+                            {day.exercises.length === 1 ? 'exercise' : 'exercises'}
+                          </span>
+                          {day.lastWorkout && (
+                            <span className="flex items-center gap-1">
+                              <Clock className="h-3.5 w-3.5" />
+                              Last: {new Date(day.lastWorkout).toLocaleDateString()}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <div className={`p-1 rounded-full transition-colors ${isExpanded ? 'bg-purple-100' : ''}`}>
-                    {isExpanded ? (
-                      <ChevronUp className="h-5 w-5 text-purple-500" />
-                    ) : (
-                      <ChevronDown className="h-5 w-5 text-gray-400" />
-                    )}
-                  </div>
+                  {!isLocked && (
+                    <div className={`p-1 rounded-full transition-colors ${isExpanded ? 'bg-purple-100' : ''}`}>
+                      {isExpanded ? (
+                        <ChevronUp className="h-5 w-5 text-purple-500" />
+                      ) : (
+                        <ChevronDown className="h-5 w-5 text-gray-400" />
+                      )}
+                    </div>
+                  )}
                 </button>
 
-                {/* Expanded Content */}
-                {isExpanded && (
+                {/* Expanded Content — only for unlocked days */}
+                {isExpanded && !isLocked && (
                   <div className="border-t border-gray-100">
                     {day.exercises.length === 0 ? (
                       <div className="p-5 text-center text-gray-500 text-sm">
@@ -401,6 +464,51 @@ export default function TrainingPlanDetailPage() {
           })}
         </div>
       )}
+
+      {/* Free User Day Picker Modal */}
+      {showDayPicker && isFreeUser && (
+        <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl">
+            <div className="px-6 py-5 border-b border-gray-100">
+              <h3 className="text-lg font-bold text-gray-900">Choose a training day to unlock</h3>
+              <p className="text-sm text-gray-500 mt-1">
+                Free plan includes 1 training day. Pick the one you&apos;d like to see.
+              </p>
+            </div>
+            <div className="px-6 py-4 space-y-2">
+              {days.map(day => (
+                <button
+                  key={day.id}
+                  onClick={() => handleSelectFreeDay(day.id)}
+                  className="w-full flex items-center gap-3 p-3 rounded-xl border border-gray-200 hover:border-purple-300 hover:bg-purple-50/50 transition-all text-left"
+                >
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
+                    <span className="text-white font-bold">{day.day_number}</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-gray-900">{day.name}</p>
+                    <p className="text-xs text-gray-500">
+                      {day.exercises.length} exercises
+                    </p>
+                  </div>
+                </button>
+              ))}
+            </div>
+            <div className="px-6 pb-5">
+              <p className="text-xs text-gray-400 text-center">
+                Upgrade to Pro to see all training days
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Upgrade Modal */}
+      <UpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        feature="Full training plan access"
+      />
     </div>
   )
 }

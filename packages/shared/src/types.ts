@@ -1,6 +1,6 @@
 // Database types for NutriGoal v2
 
-export type UserRole = 'free' | 'pro' | 'nutritionist'
+export type UserRole = 'free' | 'pro' | 'unlimited' | 'nutritionist'
 export type Gender = 'male' | 'female' | 'other'
 export type ActivityLevel = 'sedentary' | 'lightly_active' | 'moderately_active' | 'very_active' | 'extremely_active'
 export type FitnessGoal = 'bulking' | 'cutting' | 'maintenance'
@@ -304,6 +304,18 @@ export interface SupplementLog {
   supplement_id: string
   date: string
   taken_at: string
+}
+
+// ─── Tier Gating ─────────────────────────────────────
+
+export type TierSelectionType = 'meal' | 'training_day'
+
+export interface UserTierSelection {
+  id: string
+  user_id: string
+  selection_type: TierSelectionType
+  selected_id: string
+  created_at: string
 }
 
 // ─── Messaging & Feedback ──────────────────────────────

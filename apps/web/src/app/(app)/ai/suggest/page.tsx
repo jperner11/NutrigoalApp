@@ -5,7 +5,6 @@ import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
 import { Sparkles, Send, Lock } from 'lucide-react'
 import { toast } from 'react-hot-toast'
-import { PRICING } from '@/lib/constants'
 
 export default function AISuggestPage() {
   const { profile } = useUser()
@@ -16,44 +15,38 @@ export default function AISuggestPage() {
   const [loadingUsage, setLoadingUsage] = useState(true)
 
   const tier = profile?.role ?? 'free'
-  const limit = PRICING[tier].aiSuggestionsLimit
-  const limitType = PRICING[tier].aiLimitType
+  const isFree = tier === 'free'
 
   useEffect(() => {
     if (!profile) return
 
     async function loadUsage() {
-      const supabase = createClient()
-
-      if (limitType === 'lifetime') {
-        const { count } = await supabase
-          .from('ai_usage')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', profile!.id)
-
-        setUsageCount(count ?? 0)
-      } else {
-        const startOfMonth = new Date()
-        startOfMonth.setDate(1)
-        startOfMonth.setHours(0, 0, 0, 0)
-
-        const { count } = await supabase
-          .from('ai_usage')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', profile!.id)
-          .gte('created_at', startOfMonth.toISOString())
-
-        setUsageCount(count ?? 0)
+      if (isFree) {
+        // Free users can't use AI suggestions at all
+        setLoadingUsage(false)
+        return
       }
 
+      const supabase = createClient()
+      // Paid users: check last 7 days for rolling limit (pro) or unlimited
+      const sevenDaysAgo = new Date()
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+
+      const { count } = await supabase
+        .from('ai_usage')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', profile!.id)
+        .eq('type', 'meal_suggestion')
+        .gte('created_at', sevenDaysAgo.toISOString())
+
+      setUsageCount(count ?? 0)
       setLoadingUsage(false)
     }
 
     loadUsage()
-  }, [profile, limitType])
+  }, [profile, isFree])
 
-  const remaining = Math.max(0, limit - usageCount)
-  const canUse = remaining > 0
+  const canUse = !isFree
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -113,17 +106,19 @@ export default function AISuggestPage() {
         <div className="flex items-center space-x-3">
           <Sparkles className="h-5 w-5 text-purple-600" />
           <span className="text-sm text-gray-700">
-            <span className="font-semibold">{remaining}</span> suggestion{remaining !== 1 ? 's' : ''} remaining
-            {limitType === 'monthly' && <span className="text-gray-400"> this month</span>}
-            {limitType === 'lifetime' && <span className="text-gray-400"> total</span>}
+            {isFree ? (
+              <span>AI suggestions are a <span className="font-semibold">Pro</span> feature</span>
+            ) : (
+              <span>AI meal suggestions available</span>
+            )}
           </span>
         </div>
-        {!canUse && tier === 'free' && (
+        {isFree && (
           <a
             href="/pricing"
             className="text-sm text-purple-600 hover:text-purple-800 font-medium"
           >
-            Upgrade for more
+            Upgrade to Pro
           </a>
         )}
       </div>

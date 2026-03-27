@@ -20,6 +20,9 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import type { UserRole } from '@/lib/supabase/types'
+import type { GatedFeature } from '@/lib/tierUtils'
+import { isFeatureLocked } from '@/lib/tierUtils'
+import ProBadge from './ProBadge'
 
 interface SidebarProps {
   userRole: UserRole
@@ -27,17 +30,23 @@ interface SidebarProps {
   onSignOut: () => void
 }
 
-const navItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['free', 'pro', 'nutritionist'] },
-  { href: '/diet', label: 'Diet', icon: Utensils, roles: ['free', 'pro', 'nutritionist'] },
-  { href: '/training', label: 'Training', icon: Dumbbell, roles: ['free', 'pro', 'nutritionist'] },
-  { href: '/cardio', label: 'Cardio', icon: HeartPulse, roles: ['free', 'pro', 'nutritionist'] },
-  { href: '/water', label: 'Water', icon: Droplets, roles: ['free', 'pro', 'nutritionist'] },
-  { href: '/progress', label: 'Progress', icon: TrendingUp, roles: ['free', 'pro', 'nutritionist'] },
-  { href: '/supplements', label: 'Supplements', icon: Pill, roles: ['free', 'pro', 'nutritionist'] },
-  { href: '/ai/suggest', label: 'AI Suggestions', icon: Sparkles, roles: ['free', 'pro', 'nutritionist'] },
+const navItems: {
+  href: string
+  label: string
+  icon: React.ComponentType<{ className?: string }>
+  roles: string[]
+  gatedFeature?: GatedFeature
+}[] = [
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['free', 'pro', 'unlimited', 'nutritionist'] },
+  { href: '/diet', label: 'Diet', icon: Utensils, roles: ['free', 'pro', 'unlimited', 'nutritionist'] },
+  { href: '/training', label: 'Training', icon: Dumbbell, roles: ['free', 'pro', 'unlimited', 'nutritionist'] },
+  { href: '/cardio', label: 'Cardio', icon: HeartPulse, roles: ['free', 'pro', 'unlimited', 'nutritionist'], gatedFeature: 'cardio' },
+  { href: '/water', label: 'Water', icon: Droplets, roles: ['free', 'pro', 'unlimited', 'nutritionist'] },
+  { href: '/progress', label: 'Progress', icon: TrendingUp, roles: ['free', 'pro', 'unlimited', 'nutritionist'] },
+  { href: '/supplements', label: 'Supplements', icon: Pill, roles: ['free', 'pro', 'unlimited', 'nutritionist'], gatedFeature: 'supplements' },
+  { href: '/ai/suggest', label: 'AI Suggestions', icon: Sparkles, roles: ['free', 'pro', 'unlimited', 'nutritionist'], gatedFeature: 'ai_suggestions' },
   { href: '/clients', label: 'Clients', icon: Users, roles: ['nutritionist'] },
-  { href: '/settings', label: 'Settings', icon: Settings, roles: ['free', 'pro', 'nutritionist'] },
+  { href: '/settings', label: 'Settings', icon: Settings, roles: ['free', 'pro', 'unlimited', 'nutritionist'] },
 ]
 
 export default function Sidebar({ userRole, userName, onSignOut }: SidebarProps) {
@@ -86,7 +95,14 @@ export default function Sidebar({ userRole, userName, onSignOut }: SidebarProps)
               <Icon className={`h-5 w-5 flex-shrink-0 transition-transform duration-200 ${
                 isActive ? 'text-white' : 'group-hover:scale-110'
               }`} />
-              {!collapsed && <span>{item.label}</span>}
+              {!collapsed && (
+                <>
+                  <span>{item.label}</span>
+                  {item.gatedFeature && isFeatureLocked(userRole, item.gatedFeature) && !isActive && (
+                    <ProBadge />
+                  )}
+                </>
+              )}
             </Link>
           )
         })}

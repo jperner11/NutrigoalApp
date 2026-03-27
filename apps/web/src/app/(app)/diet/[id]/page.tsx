@@ -19,8 +19,11 @@ import {
   Check,
   X,
   RefreshCw,
+  Lock,
 } from 'lucide-react'
 import type { DietPlan, DietPlanMeal } from '@/lib/supabase/types'
+import { isFeatureLocked } from '@/lib/tierUtils'
+import UpgradeModal from '@/components/ui/UpgradeModal'
 
 interface FoodItemExtended {
   spoonacular_id?: number
@@ -74,6 +77,11 @@ export default function DietPlanDetailPage() {
     unit: string
     alternatives: { name: string; amount: number; unit: string }[]
   } | null>(null)
+  const [selectedMealId, setSelectedMealId] = useState<string | null>(null)
+  const [showMealPicker, setShowMealPicker] = useState(false)
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false)
+
+  const isFreeUser = isFeatureLocked(profile?.role ?? 'free', 'full_meals')
 
   const loadPlan = useCallback(async () => {
     if (!profile || !params.id) return
@@ -107,6 +115,29 @@ export default function DietPlanDetailPage() {
     loadPlan()
   }, [loadPlan])
 
+  // Load free user's selected meal from user_tier_selections
+  useEffect(() => {
+    if (!isFreeUser || !profile) return
+
+    async function loadSelection() {
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('user_tier_selections')
+        .select('selected_id')
+        .eq('user_id', profile!.id)
+        .eq('selection_type', 'meal')
+        .single()
+
+      if (data) {
+        setSelectedMealId(data.selected_id)
+      } else if (meals.length > 0) {
+        setShowMealPicker(true)
+      }
+    }
+
+    if (meals.length > 0) loadSelection()
+  }, [isFreeUser, profile, meals])
+
   function toggleMeal(mealId: string) {
     setExpandedMeals(prev => {
       const next = new Set(prev)
@@ -135,6 +166,23 @@ export default function DietPlanDetailPage() {
 
     toast.success('Diet plan deleted')
     router.push('/diet')
+  }
+
+  async function handleSelectFreeMeal(mealId: string) {
+    if (!profile) return
+    const supabase = createClient()
+
+    await supabase
+      .from('user_tier_selections')
+      .upsert({
+        user_id: profile.id,
+        selection_type: 'meal' as const,
+        selected_id: mealId,
+      }, { onConflict: 'user_id,selection_type' })
+
+    setSelectedMealId(mealId)
+    setShowMealPicker(false)
+    toast.success('Meal unlocked!')
   }
 
   async function handleSetActive() {
@@ -277,24 +325,32 @@ export default function DietPlanDetailPage() {
           {meals.map((meal) => {
             const isExpanded = expandedMeals.has(meal.id)
             const { meta, items } = parseFoods(meal.foods)
+            const isLocked = isFreeUser && selectedMealId !== null && meal.id !== selectedMealId
 
             return (
               <div
                 key={meal.id}
-                className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all"
+                className={`relative bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200 overflow-hidden transition-all ${
+                  isLocked ? '' : 'hover:shadow-md'
+                }`}
               >
-                {/* Meal Header */}
+                {/* Meal Header — always visible */}
                 <div className="p-5">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <h3 className="text-xl font-bold text-gray-900">{meal.meal_name}</h3>
-                      <div className="flex items-center gap-3 mt-1">
-                        <p className="text-sm text-gray-500">
-                          {Math.round(meal.total_calories ?? 0)} cal
-                          <span className="mx-1.5 text-gray-300">|</span>
-                          {Math.round(meal.total_protein ?? 0)}P · {Math.round(meal.total_carbs ?? 0)}C · {Math.round(meal.total_fat ?? 0)}F
-                        </p>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-xl font-bold text-gray-900">{meal.meal_name}</h3>
+                        {isLocked && <Lock className="h-4 w-4 text-gray-400" />}
                       </div>
+                      {!isLocked && (
+                        <div className="flex items-center gap-3 mt-1">
+                          <p className="text-sm text-gray-500">
+                            {Math.round(meal.total_calories ?? 0)} cal
+                            <span className="mx-1.5 text-gray-300">|</span>
+                            {Math.round(meal.total_protein ?? 0)}P · {Math.round(meal.total_carbs ?? 0)}C · {Math.round(meal.total_fat ?? 0)}F
+                          </p>
+                        </div>
+                      )}
                     </div>
                     {meta.time && (
                       <span className="flex items-center gap-1.5 text-sm text-gray-500 bg-gray-100 px-3 py-1.5 rounded-full font-medium">
@@ -304,27 +360,36 @@ export default function DietPlanDetailPage() {
                     )}
                   </div>
 
-                  {/* Expand/Collapse toggle */}
-                  <button
-                    onClick={() => toggleMeal(meal.id)}
-                    className="flex items-center gap-1 text-sm font-medium text-purple-600 hover:text-purple-800 mt-3 transition-colors"
-                  >
-                    {isExpanded ? (
-                      <>
-                        <span>Hide</span>
-                        <ChevronUp className="h-4 w-4" />
-                      </>
-                    ) : (
-                      <>
-                        <span>Show</span>
-                        <ChevronDown className="h-4 w-4" />
-                      </>
-                    )}
-                  </button>
+                  {isLocked ? (
+                    <button
+                      onClick={() => setShowUpgradeModal(true)}
+                      className="flex items-center gap-1.5 text-sm font-medium text-purple-600 hover:text-purple-800 mt-3 transition-colors"
+                    >
+                      <Lock className="h-3.5 w-3.5" />
+                      <span>Upgrade to see this meal</span>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => toggleMeal(meal.id)}
+                      className="flex items-center gap-1 text-sm font-medium text-purple-600 hover:text-purple-800 mt-3 transition-colors"
+                    >
+                      {isExpanded ? (
+                        <>
+                          <span>Hide</span>
+                          <ChevronUp className="h-4 w-4" />
+                        </>
+                      ) : (
+                        <>
+                          <span>Show</span>
+                          <ChevronDown className="h-4 w-4" />
+                        </>
+                      )}
+                    </button>
+                  )}
                 </div>
 
-                {/* Expanded Content */}
-                {isExpanded && (
+                {/* Expanded Content — only for unlocked meals */}
+                {isExpanded && !isLocked && (
                   <div className="border-t border-gray-100">
                     {/* Notes / Observations */}
                     {(meta.notes || meta.timing_note) && (
@@ -345,17 +410,10 @@ export default function DietPlanDetailPage() {
                         <div className="space-y-1">
                           {items.map((food, idx) => (
                             <div key={idx} className="flex items-center gap-3 py-2.5">
-                              {/* Checkmark icon */}
                               <div className="flex-shrink-0 w-7 h-7 rounded-full bg-purple-100 flex items-center justify-center">
                                 <Check className="h-4 w-4 text-purple-600" />
                               </div>
 
-                              {/* Connector line */}
-                              {idx < items.length - 1 && (
-                                <div className="absolute ml-3.5 mt-10 w-px h-5 bg-purple-200" style={{ position: 'relative', left: '-2.15rem', top: '0.75rem', height: '0' }} />
-                              )}
-
-                              {/* Food info */}
                               <div className="flex-1 min-w-0">
                                 <p className="text-sm font-medium text-gray-900">
                                   {food.amount}{food.unit} {food.name}
@@ -365,7 +423,6 @@ export default function DietPlanDetailPage() {
                                 </p>
                               </div>
 
-                              {/* Alternatives button */}
                               {food.alternatives && food.alternatives.length > 0 && (
                                 <button
                                   onClick={() => setAlternativesModal({
@@ -392,6 +449,55 @@ export default function DietPlanDetailPage() {
           })}
         </div>
       )}
+
+      {/* Free User Meal Picker Modal */}
+      {showMealPicker && isFreeUser && (
+        <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl">
+            <div className="px-6 py-5 border-b border-gray-100">
+              <h3 className="text-lg font-bold text-gray-900">Choose a meal to unlock</h3>
+              <p className="text-sm text-gray-500 mt-1">
+                Free plan includes 1 meal. Pick the one you&apos;d like to see in full detail.
+              </p>
+            </div>
+            <div className="px-6 py-4 space-y-2">
+              {meals.map(meal => {
+                const { meta } = parseFoods(meal.foods)
+                return (
+                  <button
+                    key={meal.id}
+                    onClick={() => handleSelectFreeMeal(meal.id)}
+                    className="w-full flex items-center gap-3 p-3 rounded-xl border border-gray-200 hover:border-purple-300 hover:bg-purple-50/50 transition-all text-left"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
+                      <Utensils className="h-4 w-4 text-purple-600" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-900">{meal.meal_name}</p>
+                      <p className="text-xs text-gray-500">
+                        {Math.round(meal.total_calories ?? 0)} cal
+                        {meta.time && ` · ${meta.time}`}
+                      </p>
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+            <div className="px-6 pb-5">
+              <p className="text-xs text-gray-400 text-center">
+                Upgrade to Pro to see all meals
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Upgrade Modal */}
+      <UpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        feature="Full meal plan access"
+      />
 
       {/* Alternatives Modal */}
       {alternativesModal && (

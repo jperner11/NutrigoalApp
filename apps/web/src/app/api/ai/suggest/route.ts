@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { PRICING } from '@/lib/constants'
 
 export async function POST(request: Request) {
   try {
@@ -23,38 +22,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 })
     }
 
-    const tier = profile.role as keyof typeof PRICING
-    const limit = PRICING[tier].aiSuggestionsLimit
-    const limitType = PRICING[tier].aiLimitType
-
-    // Check usage
-    let usageCount: number
-
-    if (limitType === 'lifetime') {
-      const { count } = await supabase
-        .from('ai_usage')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', userId)
-
-      usageCount = count ?? 0
-    } else {
-      const startOfMonth = new Date()
-      startOfMonth.setDate(1)
-      startOfMonth.setHours(0, 0, 0, 0)
-
-      const { count } = await supabase
-        .from('ai_usage')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', userId)
-        .gte('created_at', startOfMonth.toISOString())
-
-      usageCount = count ?? 0
-    }
-
-    if (usageCount >= limit) {
+    // Free users cannot use AI suggestions
+    if (profile.role === 'free') {
       return NextResponse.json(
-        { message: `AI suggestion limit reached (${limit} ${limitType === 'lifetime' ? 'total' : 'per month'}). Upgrade your plan for more.` },
-        { status: 429 }
+        { message: 'AI suggestions require a Pro plan or higher. Upgrade to unlock.' },
+        { status: 403 }
       )
     }
 

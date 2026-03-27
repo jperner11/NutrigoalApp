@@ -6,44 +6,51 @@ export const PRICING = {
   free: {
     name: 'Free',
     price: 0,
-    aiSuggestionsLimit: 1, // lifetime
-    aiLimitType: 'lifetime' as const,
+    regenCooldownDays: null as number | null, // no regeneration
     features: [
-      'Basic diet planning (manual)',
+      'AI-generated meal & training plan',
+      'View 1 meal of your choice',
+      'View 1 training day of your choice',
       'Water intake tracking',
-      'Cardio logging',
-      'View workout templates',
-      '1 AI meal suggestion (lifetime)',
+      'Weight logging',
     ],
   },
   pro: {
     name: 'Pro',
-    price: 14.99,
-    aiSuggestionsLimit: 5, // per month
-    aiLimitType: 'monthly' as const,
+    price: 4.99,
+    regenCooldownDays: 7, // 1x per week rolling
     features: [
-      'Full diet planning with food search',
-      'AI-powered meal suggestions (5/month)',
-      'Custom workout plan builder',
-      'Cardio tracking with analytics',
-      'Water intake tracking',
-      'Progress analytics',
+      'Full meal plan access',
+      'Full training plan access',
+      'Regenerate plans 1×/week',
+      'Cardio tracking',
+      'Supplement tracking',
+      'AI meal suggestions',
+      'Meal notes & alternatives',
+    ],
+  },
+  unlimited: {
+    name: 'Unlimited',
+    price: 9.99,
+    regenCooldownDays: 0, // unlimited
+    features: [
+      'Everything in Pro',
+      'Unlimited plan regeneration',
+      'Priority AI generation',
     ],
   },
   nutritionist: {
     name: 'Nutritionist',
     price: 49.99,
-    aiSuggestionsLimit: 20, // per month
-    aiLimitType: 'monthly' as const,
+    regenCooldownDays: 0, // unlimited
     baseClients: 10,
     extraClientPrice: 3.99,
     features: [
-      'Everything in Pro',
+      'Everything in Unlimited',
       'Client management (10 included)',
       'Create plans for clients',
       'Monitor client progress',
       'Prescribe cardio sessions',
-      'AI suggestions (20/month)',
       'Additional clients at $3.99/mo each',
     ],
   },
