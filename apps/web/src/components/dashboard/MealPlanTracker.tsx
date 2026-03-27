@@ -237,10 +237,11 @@ export default function MealPlanTracker({ userId, userRole = 'free', onMacrosUpd
           {meals.map(meal => {
             const isEaten = loggedMealIds.has(meal.id)
             const isExpanded = expandedMeal === meal.id
-            const rawFoods = meal.foods as FoodItem[] | { _meta?: unknown; items?: FoodItem[] }
+            const rawFoods = meal.foods as FoodItem[] | { _meta?: Record<string, string>; items?: FoodItem[] }
             const foods: FoodItem[] = Array.isArray(rawFoods)
               ? rawFoods
               : (rawFoods?.items ?? []) as FoodItem[]
+            const mealLabel = !Array.isArray(rawFoods) ? rawFoods?._meta?.label : undefined
             const isLocked = isFreeUser && selectedMealId !== null && meal.id !== selectedMealId
 
             return (
@@ -265,6 +266,9 @@ export default function MealPlanTracker({ userId, userRole = 'free', onMacrosUpd
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
+                      {mealLabel && !isLocked && (
+                        <p className="text-[10px] font-semibold uppercase tracking-wide text-purple-600">{mealLabel}</p>
+                      )}
                       <p className={`font-medium ${isLocked ? 'text-gray-400' : isEaten ? 'text-purple-800' : 'text-gray-900'}`}>
                         {meal.meal_name}
                       </p>

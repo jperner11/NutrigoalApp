@@ -14,6 +14,9 @@ export async function POST(request: Request) {
       mealsPerDay = 3,
       wakeTime = '07:00',
       workoutTime = '08:00',
+      workStartTime = '09:00',
+      workEndTime = '17:00',
+      sleepTime = '23:00',
       // Anamnesis data
       dietaryPreferences = [],
       allergies = [],
@@ -33,7 +36,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Missing nutritional targets' }, { status: 400 })
     }
 
-    const mealTimingGuide = buildMealTimingGuide(wakeTime, workoutTime, mealsPerDay)
+    const mealTimingGuide = buildMealTimingGuide(wakeTime, workoutTime, workStartTime, workEndTime, sleepTime, mealsPerDay)
 
     // Build dietary constraints section
     const constraints: string[] = []
@@ -65,27 +68,36 @@ export async function POST(request: Request) {
       eat_out: 'User eats out often. Suggest meals that are easy to order or replicate at restaurants.',
     }[mealPrepPreference as string] ?? 'User cooks fresh daily.'
 
-    const systemPrompt = `You are a sports nutritionist creating a daily meal plan optimized around a workout schedule.
+    const systemPrompt = `You are a certified clinical sports nutritionist with 15+ years of experience creating personalised nutrition protocols for athletes and fitness clients. You treat every user as a real patient — their health data, restrictions, allergies, and medical conditions are non-negotiable constraints, not suggestions.
+
+YOUR APPROACH:
+- You follow evidence-based sports nutrition principles (ISSN, ACSM guidelines).
+- You NEVER include foods the patient is allergic to, dislikes, or that conflict with their medical conditions/medications — there are no exceptions.
+- You design meals that are realistic for the patient's cooking ability, schedule, and lifestyle.
+- You optimise nutrient timing around training for performance and recovery.
+- You ensure macro and calorie targets are hit precisely — this is a clinical prescription, not a rough guide.
 
 MEAL TIMING RESEARCH:
 - Pre-workout meal: 1-2 hours before training. Easily digestible carbs + moderate protein, low fat/fiber.
-- Post-workout meal: Within 30-60 minutes after training. High protein (30-40g) + fast carbs for glycogen.
+- Post-workout meal: Within 30-60 minutes after training. High protein (30-40g) + fast carbs for glycogen replenishment.
 - First meal within 1 hour of waking. Last meal at least 2 hours before sleep.
 
-SCHEDULE:
+PATIENT SCHEDULE:
 - Wake time: ${wakeTime}
+- Work: ${workStartTime} – ${workEndTime}
 - Workout time: ${workoutTime}
+- Sleep time: ${sleepTime}
 ${mealTimingGuide}
 
-USER PROFILE:
+PATIENT PROFILE:
 - Goal: ${goal || 'maintenance'}${targetWeight ? ` (target: ${targetWeight}kg)` : ''}
 - Gender: ${gender || 'not specified'}, Age: ${age || 'not specified'}, Weight: ${weight_kg || 'not specified'}kg
 
-${constraints.length > 0 ? 'DIETARY CONSTRAINTS (CRITICAL):\n' + constraints.map(c => '- ' + c).join('\n') : ''}
+${constraints.length > 0 ? 'PATIENT DIETARY CONSTRAINTS (MANDATORY — ZERO TOLERANCE):\n' + constraints.map(c => '- ' + c).join('\n') : ''}
 
-${healthNotes.length > 0 ? 'HEALTH CONSIDERATIONS:\n' + healthNotes.map(n => '- ' + n).join('\n') : ''}
+${healthNotes.length > 0 ? 'PATIENT HEALTH CONSIDERATIONS (CLINICAL):\n' + healthNotes.map(n => '- ' + n).join('\n') : ''}
 
-COOKING & PREP:
+PATIENT COOKING & PREP CONTEXT:
 - ${cookingContext}
 - ${prepContext}
 
@@ -96,7 +108,8 @@ Format:
   "meals": [
     {
       "meal_type": "breakfast",
-      "title": "Meal name",
+      "label": "Breakfast",
+      "title": "Oatmeal with Banana and Peanut Butter",
       "time": "07:00",
       "timing_note": "1h before workout - light, carb-focused",
       "notes": "Optional tips: e.g. protein options, salad ideas, cooking tips",
@@ -121,9 +134,12 @@ Format:
 
 Rules:
 - Return exactly ${mealsPerDay} meals
-- Each meal MUST have "time" (HH:MM), "timing_note", and optionally "notes"
+- Each meal MUST have "time" (HH:MM), "timing_note", "label", and optionally "notes"
+- "label" is the meal's role in the day: "Breakfast", "Pre-Workout Snack", "Post-Workout Meal", "Lunch", "Afternoon Snack", "Dinner", "Evening Snack", etc. This is displayed to the user as the meal category.
+- "title" is the descriptive name of the food (e.g. "Salmon with Rice and Broccoli")
 - "notes" should contain practical tips: protein swap options (e.g. "Protein: chicken OR fish OR lean beef (150g)"), salad/vegetable suggestions (e.g. "Greens: spinach, kale, lettuce, rocket — eat freely"), or cooking tips
-- meal_type: breakfast, lunch, dinner, or snack
+- meal_type: breakfast, lunch, dinner, or snack (for DB categorization)
+- MEAL TIMING IS CRITICAL: Spread meals EVENLY across the waking day (${wakeTime} to ${sleepTime}). Aim for 2-3 hour gaps between meals. NEVER have a gap longer than 4 hours between any two consecutive meals. Account for the work schedule (${workStartTime}–${workEndTime}) — meals during work hours should be practical/portable.
 - Keep meals SIMPLE and practical: each main meal should have 1 protein source, 1 carb source, and 1 fat source (e.g. olive oil, avocado). Snacks can be simpler (1-2 items). Aim for 3-4 ingredients per meal, max 5.
 - For the PRIMARY carb source in each main meal, include "alternatives": an array of 3-5 substitute options with equivalent portions. Example: if rice 200g, alternatives could be pasta 180g, sweet potato 250g, quinoa 160g, potato 280g.
 - Other ingredients do NOT need alternatives (set to [] or omit)
@@ -186,6 +202,7 @@ Return JSON only.`
 
       return {
         meal_type: meal.meal_type || 'snack',
+        label: meal.label || '',
         title: meal.title || 'Meal',
         time: meal.time || '12:00',
         timing_note: meal.timing_note || '',
@@ -205,17 +222,28 @@ Return JSON only.`
   }
 }
 
-function buildMealTimingGuide(wakeTime: string, workoutTime: string, mealsPerDay: number): string {
+function buildMealTimingGuide(
+  wakeTime: string, workoutTime: string,
+  workStartTime: string, workEndTime: string, sleepTime: string,
+  mealsPerDay: number
+): string {
   const wake = timeToMinutes(wakeTime)
   const workout = timeToMinutes(workoutTime)
+  const sleep = timeToMinutes(sleepTime)
   const preWorkout = workout - 60
   const postWorkout = workout + 75
+  const wakingHours = ((sleep - wake + 1440) % 1440) / 60
+  const idealGap = Math.round((wakingHours * 60) / mealsPerDay)
 
   return [
+    `- First meal: ~${minutesToTime(wake + 30)} (30min after waking)`,
     `- Suggested pre-workout meal: ~${minutesToTime(preWorkout)} (1h before workout)`,
     `- Suggested post-workout meal: ~${minutesToTime(postWorkout)} (within 30min after ~1h workout)`,
-    `- First meal: ~${minutesToTime(wake + 30)} (30min after waking)`,
+    `- Work hours: ${workStartTime}–${workEndTime} (meals during work should be easy to prep/eat)`,
+    `- Last meal: no later than ${minutesToTime(sleep - 120)} (2h before sleep)`,
     `- Total meals: ${mealsPerDay}`,
+    `- Waking hours: ~${wakingHours.toFixed(1)}h → aim for ~${idealGap}min between meals`,
+    `- IMPORTANT: Space meals evenly. Never more than 4h between consecutive meals.`,
   ].join('\n')
 }
 

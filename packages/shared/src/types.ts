@@ -49,6 +49,8 @@ export interface UserProfile {
   wake_time: string | null
   sleep_time: string | null
   workout_time: string | null
+  work_start_time: string | null
+  work_end_time: string | null
   workout_days_per_week: number | null
   meals_per_day: number | null
   // Health & medical

@@ -80,6 +80,8 @@ export default function OnboardingPage() {
   // Step 6: Schedule
   const [wakeTime, setWakeTime] = useState('07:00')
   const [workoutTime, setWorkoutTime] = useState('08:00')
+  const [workStartTime, setWorkStartTime] = useState('09:00')
+  const [workEndTime, setWorkEndTime] = useState('17:00')
   const [workoutDays, setWorkoutDays] = useState(4)
   const [mealsPerDay, setMealsPerDay] = useState(3)
 
@@ -163,6 +165,8 @@ export default function OnboardingPage() {
         // Schedule
         wake_time: wakeTime,
         workout_time: workoutTime,
+        work_start_time: workStartTime,
+        work_end_time: workEndTime,
         workout_days_per_week: workoutDays,
         meals_per_day: mealsPerDay,
         onboarding_completed: true,
@@ -620,6 +624,32 @@ export default function OnboardingPage() {
                   <option key={t} value={t}>{fmt12(t)}</option>
                 ))}
               </select>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Work start time</Label>
+                <select
+                  value={workStartTime}
+                  onChange={(e) => setWorkStartTime(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 font-semibold text-sm text-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all bg-white"
+                >
+                  {TIME_OPTIONS.map((t) => (
+                    <option key={t} value={t}>{fmt12(t)}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <Label>Work end time</Label>
+                <select
+                  value={workEndTime}
+                  onChange={(e) => setWorkEndTime(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 font-semibold text-sm text-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all bg-white"
+                >
+                  {TIME_OPTIONS.map((t) => (
+                    <option key={t} value={t}>{fmt12(t)}</option>
+                  ))}
+                </select>
+              </div>
             </div>
             <div>
               <Label>Training days per week</Label>

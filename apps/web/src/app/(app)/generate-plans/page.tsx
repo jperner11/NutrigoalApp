@@ -175,6 +175,9 @@ export default function GeneratePlansPage() {
         mealsPerDay: profile!.meals_per_day ?? 3,
         wakeTime: profile!.wake_time ?? '07:00',
         workoutTime: profile!.workout_time ?? '08:00',
+        workStartTime: profile!.work_start_time ?? '09:00',
+        workEndTime: profile!.work_end_time ?? '17:00',
+        sleepTime: profile!.sleep_time ?? '23:00',
         dietaryRestrictions: profile!.dietary_restrictions ?? [],
         allergies: profile!.allergies ?? [],
         foodDislikes: profile!.food_dislikes ?? [],
@@ -297,6 +300,7 @@ export default function GeneratePlansPage() {
 
   interface MealPlanMeal {
     meal_type: string
+    label?: string
     title: string
     time?: string
     timing_note?: string
@@ -350,6 +354,7 @@ export default function GeneratePlansPage() {
       meal_name: meal.title || 'Meal',
       foods: {
         _meta: {
+          label: meal.label || '',
           time: meal.time || '12:00',
           timing_note: meal.timing_note || '',
           notes: meal.notes || '',
