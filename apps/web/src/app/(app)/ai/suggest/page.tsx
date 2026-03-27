@@ -8,7 +8,6 @@ import { toast } from 'react-hot-toast'
 
 export default function AISuggestPage() {
   const { profile } = useUser()
-  const [usageCount, setUsageCount] = useState(0)
   const [prompt, setPrompt] = useState('')
   const [response, setResponse] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -39,7 +38,6 @@ export default function AISuggestPage() {
         .eq('type', 'meal_suggestion')
         .gte('created_at', sevenDaysAgo.toISOString())
 
-      setUsageCount(count ?? 0)
       setLoadingUsage(false)
     }
 
