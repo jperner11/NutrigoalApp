@@ -99,6 +99,7 @@ export default function GeneratePlansPage() {
         await saveTrainingPlan(supabase, trainingPlan)
       }
       if (mealPlan) {
+        console.log('Meal plan data to save:', JSON.stringify(mealPlan).slice(0, 500))
         await saveMealPlan(supabase, mealPlan)
       }
 
@@ -341,10 +342,11 @@ export default function GeneratePlansPage() {
 
     if (planError || !plan) throw new Error('Failed to save diet plan')
 
+    const VALID_MEAL_TYPES = ['breakfast', 'lunch', 'dinner', 'snack']
     const mealInserts = (data.meals ?? []).map(meal => ({
       diet_plan_id: plan.id,
       day_of_week: null,
-      meal_type: meal.meal_type || 'snack',
+      meal_type: VALID_MEAL_TYPES.includes(meal.meal_type) ? meal.meal_type : 'snack',
       meal_name: meal.title || 'Meal',
       foods: {
         _meta: {
@@ -364,14 +366,20 @@ export default function GeneratePlansPage() {
           alternatives: ing.alternatives ?? [],
         })),
       },
-      total_calories: Math.round(meal.calories),
-      total_protein: Math.round(meal.protein * 10) / 10,
-      total_carbs: Math.round(meal.carbs * 10) / 10,
-      total_fat: Math.round(meal.fat * 10) / 10,
+      total_calories: Math.round(meal.calories || 0),
+      total_protein: Math.round((meal.protein || 0) * 10) / 10,
+      total_carbs: Math.round((meal.carbs || 0) * 10) / 10,
+      total_fat: Math.round((meal.fat || 0) * 10) / 10,
     }))
 
     if (mealInserts.length > 0) {
-      await supabase.from('diet_plan_meals').insert(mealInserts)
+      const { error: mealsError } = await supabase.from('diet_plan_meals').insert(mealInserts)
+      if (mealsError) {
+        console.error('Failed to insert meals:', mealsError)
+        throw new Error('Failed to save meals: ' + mealsError.message)
+      }
+    } else {
+      console.warn('No meals to insert — data.meals was empty:', data)
     }
   }
 
