@@ -50,4 +50,7 @@ export type {
   SupplementTime,
   TierSelectionType,
   UserTierSelection,
+  PhotoPose,
+  ProgressPhoto,
+  BodyMeasurement,
 } from '@nutrigoal/shared'

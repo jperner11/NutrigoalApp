@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'react-hot-toast'
+import Link from 'next/link'
 import {
   TrendingUp,
   TrendingDown,
@@ -200,10 +201,23 @@ export default function ProgressPage() {
 
   return (
     <div className="max-w-4xl mx-auto">
+      {/* Tab nav */}
+      <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-6">
+        <Link href="/progress" className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-center bg-white text-purple-700 shadow-sm">
+          Weight
+        </Link>
+        <Link href="/progress/measurements" className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-center text-gray-600 hover:text-gray-900">
+          Measurements
+        </Link>
+        <Link href="/progress/photos" className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-center text-gray-600 hover:text-gray-900">
+          Photos
+        </Link>
+      </div>
+
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Progress</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Weight Tracking</h1>
           <p className="text-gray-500 mt-1">Track your weight and body composition over time.</p>
         </div>
         <button

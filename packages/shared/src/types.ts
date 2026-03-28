@@ -323,6 +323,39 @@ export interface UserTierSelection {
   created_at: string
 }
 
+// ─── Progress Photos & Measurements ─────────────────────
+
+export type PhotoPose = 'front' | 'side' | 'back'
+
+export interface ProgressPhoto {
+  id: string
+  user_id: string
+  date: string
+  photo_url: string
+  pose: PhotoPose
+  notes: string | null
+  created_at: string
+}
+
+export interface BodyMeasurement {
+  id: string
+  user_id: string
+  date: string
+  neck: number | null
+  shoulders: number | null
+  chest: number | null
+  left_arm: number | null
+  right_arm: number | null
+  waist: number | null
+  hips: number | null
+  left_thigh: number | null
+  right_thigh: number | null
+  left_calf: number | null
+  right_calf: number | null
+  notes: string | null
+  created_at: string
+}
+
 // ─── Messaging & Feedback ──────────────────────────────
 
 export interface Conversation {
