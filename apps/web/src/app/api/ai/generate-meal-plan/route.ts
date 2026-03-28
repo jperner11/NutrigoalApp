@@ -147,9 +147,10 @@ Rules:
 - For the PRIMARY carb source in each main meal, include "alternatives": an array of 3-5 substitute options with equivalent portions. Example: if rice 200g, alternatives could be pasta 180g, sweet potato 250g, quinoa 160g, potato 280g.
 - Other ingredients do NOT need alternatives (set to [] or omit)
 - ALWAYS measure solid foods in grams (g) and liquids in milliliters (ml). Examples: "banana" = 120g, "whole milk" = 200ml, "chicken breast" = 150g, "olive oil" = 15ml, "rice" = 80g (dry). Never use cups, tablespoons, or "1 medium".
-- MACRO ACCURACY IS THE #1 PRIORITY. The SUM of all meals MUST match daily targets within 3%. This is a clinical prescription.
-- Before responding, mentally add up total calories, protein, carbs, and fat across ALL meals. If they don't match the targets, adjust ingredient amounts until they do.
-- Use accurate nutritional data: chicken breast 100g = 165cal/31P/0C/3.6F, rice (cooked) 100g = 130cal/2.7P/28C/0.3F, oats 100g = 389cal/13P/66C/7F, eggs 50g = 78cal/6P/0.6C/5F, olive oil 15ml = 120cal/0P/0C/14F, banana 120g = 107cal/1.3P/27C/0.4F, salmon 100g = 208cal/20P/0C/13F, sweet potato 100g = 86cal/1.6P/20C/0.1F
+- MACRO ACCURACY IS THE #1 PRIORITY — THIS IS NON-NEGOTIABLE. The SUM of all meals MUST hit the daily calorie target EXACTLY (within ±50 kcal). You will be penalized for being off by more than 50 kcal.
+- STEP 1: Plan meals conceptually. STEP 2: Assign ingredient amounts. STEP 3: Add up ALL ingredient macros. STEP 4: Compare totals to targets. STEP 5: If off by more than 50 kcal, adjust ingredient amounts (increase/decrease portions) until the sum matches. DO NOT SKIP STEP 3-5.
+- Common mistake: generating ~2500-2800 cal when target is 3000+. If the target is high, use LARGER portions (e.g. 250g rice instead of 150g, 200g chicken instead of 120g) and calorie-dense ingredients (nuts, olive oil, avocado, whole milk).
+- Use accurate nutritional data: chicken breast 100g = 165cal/31P/0C/3.6F, rice (cooked) 100g = 130cal/2.7P/28C/0.3F, oats 100g = 389cal/13P/66C/7F, eggs 50g = 78cal/6P/0.6C/5F, olive oil 15ml = 120cal/0P/0C/14F, banana 120g = 107cal/1.3P/27C/0.4F, salmon 100g = 208cal/20P/0C/13F, sweet potato 100g = 86cal/1.6P/20C/0.1F, peanut butter 30g = 188cal/7P/6C/16F, whole milk 250ml = 150cal/8P/12C/8F, almonds 30g = 173cal/6P/6C/15F
 - Pre-workout = lighter, carb-focused. Post-workout = protein-heavy + fast carbs`
 
     // Calculate per-meal budgets to guide the AI
@@ -166,14 +167,19 @@ Rules:
     ].filter(Boolean).join('\n')
 
     const userPrompt = `Generate a ${mealsPerDay}-meal plan hitting these EXACT daily targets:
-- Calories: ${calories} kcal (tolerance: ±${Math.round(calories * 0.03)})
-- Protein: ${protein}g (tolerance: ±${Math.round(protein * 0.03)})
-- Carbs: ${carbs}g (tolerance: ±${Math.round(carbs * 0.03)})
-- Fat: ${fat}g (tolerance: ±${Math.round(fat * 0.03)})
+- Calories: ${calories} kcal (HARD LIMIT: must be between ${calories - 50} and ${calories + 50})
+- Protein: ${protein}g (tolerance: ±5g)
+- Carbs: ${carbs}g (tolerance: ±10g)
+- Fat: ${fat}g (tolerance: ±5g)
 
 ${budgetGuide}
 
-CRITICAL: After building all meals, verify the totals add up. If protein is over target, reduce a protein source. If carbs are under, add more carbs. Adjust amounts until totals match.
+VERIFICATION PROTOCOL (MANDATORY):
+1. After writing all meals, add up every ingredient's calories across ALL ${mealsPerDay} meals.
+2. If the total is below ${calories - 50}: increase carb portions (more rice, oats, bread) or add calorie-dense items (olive oil, nuts, peanut butter).
+3. If the total is above ${calories + 50}: reduce portion sizes of the largest calorie contributors.
+4. Re-verify until the sum is between ${calories - 50} and ${calories + 50} kcal.
+5. Do the same check for protein (${protein}g ±5g), carbs (${carbs}g ±10g), and fat (${fat}g ±5g).
 
 Return JSON only.`
 
@@ -212,12 +218,12 @@ Return JSON only.`
     const meals = (parsed.meals ?? parsed).map((meal: Record<string, unknown>) => {
       const ingredients = ((meal.ingredients as Record<string, unknown>[]) ?? []).map((ing: Record<string, unknown>) => ({
         name: ing.name || 'ingredient',
-        amount: ing.amount || 0,
+        amount: Number(ing.amount) || 0,
         unit: ing.unit || 'g',
-        calories: Math.round(Number(ing.calories) || 0),
-        protein: Math.round((Number(ing.protein) || 0) * 10) / 10,
-        carbs: Math.round((Number(ing.carbs) || 0) * 10) / 10,
-        fat: Math.round((Number(ing.fat) || 0) * 10) / 10,
+        calories: Number(ing.calories) || 0,
+        protein: Number(ing.protein) || 0,
+        carbs: Number(ing.carbs) || 0,
+        fat: Number(ing.fat) || 0,
         alternatives: Array.isArray(ing.alternatives) ? ing.alternatives : [],
       }))
 
@@ -229,14 +235,46 @@ Return JSON only.`
         timing_note: meal.timing_note || '',
         notes: meal.notes || '',
         ingredients,
-        calories: ingredients.reduce((s: number, i: { calories: number }) => s + i.calories, 0),
-        protein: Math.round(ingredients.reduce((s: number, i: { protein: number }) => s + i.protein, 0) * 10) / 10,
-        carbs: Math.round(ingredients.reduce((s: number, i: { carbs: number }) => s + i.carbs, 0) * 10) / 10,
-        fat: Math.round(ingredients.reduce((s: number, i: { fat: number }) => s + i.fat, 0) * 10) / 10,
       }
     })
 
-    return NextResponse.json({ meals })
+    // --- Post-processing: scale ingredients to hit calorie target exactly ---
+    const totalCal = meals.reduce((s: number, m: { ingredients: { calories: number }[] }) =>
+      s + m.ingredients.reduce((ms: number, i: { calories: number }) => ms + i.calories, 0), 0)
+
+    const calDiff = Math.abs(totalCal - calories)
+
+    if (calDiff > 50 && totalCal > 0) {
+      // Scale all ingredients proportionally to hit the target
+      const scale = calories / totalCal
+      for (const meal of meals) {
+        for (const ing of meal.ingredients) {
+          ing.amount = Math.round(ing.amount * scale)
+          ing.calories = Math.round(ing.calories * scale)
+          ing.protein = Math.round(ing.protein * scale * 10) / 10
+          ing.carbs = Math.round(ing.carbs * scale * 10) / 10
+          ing.fat = Math.round(ing.fat * scale * 10) / 10
+        }
+      }
+    }
+
+    // Compute per-meal totals from (possibly scaled) ingredients
+    const finalMeals = meals.map((meal: { meal_type: string; label: string; title: string; time: string; timing_note: string; notes: string; ingredients: { name: string; amount: number; unit: string; calories: number; protein: number; carbs: number; fat: number; alternatives: unknown[] }[] }) => ({
+      ...meal,
+      ingredients: meal.ingredients.map(ing => ({
+        ...ing,
+        calories: Math.round(ing.calories),
+        protein: Math.round(ing.protein * 10) / 10,
+        carbs: Math.round(ing.carbs * 10) / 10,
+        fat: Math.round(ing.fat * 10) / 10,
+      })),
+      calories: meal.ingredients.reduce((s, i) => s + Math.round(i.calories), 0),
+      protein: Math.round(meal.ingredients.reduce((s, i) => s + i.protein, 0) * 10) / 10,
+      carbs: Math.round(meal.ingredients.reduce((s, i) => s + i.carbs, 0) * 10) / 10,
+      fat: Math.round(meal.ingredients.reduce((s, i) => s + i.fat, 0) * 10) / 10,
+    }))
+
+    return NextResponse.json({ meals: finalMeals })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Internal server error'
     return NextResponse.json({ message }, { status: 500 })
