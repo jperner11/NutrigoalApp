@@ -25,6 +25,8 @@ import type { DietPlan, DietPlanMeal } from '@/lib/supabase/types'
 import { isFeatureLocked, canAccess } from '@/lib/tierUtils'
 import PlanChat from '@/components/diet/PlanChat'
 import UpgradeModal from '@/components/ui/UpgradeModal'
+import WeekDayTabs from '@/components/diet/WeekDayTabs'
+import type { DaySummary } from '@/components/diet/WeekDayTabs'
 
 interface FoodItemExtended {
   spoonacular_id?: number
@@ -82,9 +84,31 @@ export default function DietPlanDetailPage() {
   const [selectedMealId, setSelectedMealId] = useState<string | null>(null)
   const [showMealPicker, setShowMealPicker] = useState(false)
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
+  const [selectedDay, setSelectedDay] = useState(0)
 
   const isRoleLocked = isFeatureLocked(profile?.role ?? 'free', 'full_meals')
   const isFreeUser = isRoleLocked && (plan?.is_ai_generated !== false)
+
+  // Check if this plan has multi-day meals
+  const hasMultipleDays = meals.some(m => m.day_of_week !== null && m.day_of_week !== undefined)
+  const filteredMeals = hasMultipleDays
+    ? meals.filter(m => m.day_of_week === selectedDay)
+    : meals
+
+  // Compute per-day summaries for the tab badges
+  const daySummaries: Record<number, DaySummary> = {}
+  if (hasMultipleDays) {
+    for (let d = 0; d < 7; d++) {
+      const dayMeals = meals.filter(m => m.day_of_week === d)
+      daySummaries[d] = {
+        calories: dayMeals.reduce((s, m) => s + (m.total_calories || 0), 0),
+        protein: dayMeals.reduce((s, m) => s + (m.total_protein || 0), 0),
+        carbs: dayMeals.reduce((s, m) => s + (m.total_carbs || 0), 0),
+        fat: dayMeals.reduce((s, m) => s + (m.total_fat || 0), 0),
+        mealCount: dayMeals.length,
+      }
+    }
+  }
 
   const loadPlan = useCallback(async () => {
     if (!profile || !params.id) return
@@ -224,10 +248,10 @@ export default function DietPlanDetailPage() {
 
   if (!plan) return null
 
-  const totalCalories = meals.reduce((s, m) => s + (m.total_calories ?? 0), 0)
-  const totalProtein = meals.reduce((s, m) => s + (m.total_protein ?? 0), 0)
-  const totalCarbs = meals.reduce((s, m) => s + (m.total_carbs ?? 0), 0)
-  const totalFat = meals.reduce((s, m) => s + (m.total_fat ?? 0), 0)
+  const totalCalories = filteredMeals.reduce((s, m) => s + (m.total_calories ?? 0), 0)
+  const totalProtein = filteredMeals.reduce((s, m) => s + (m.total_protein ?? 0), 0)
+  const totalCarbs = filteredMeals.reduce((s, m) => s + (m.total_carbs ?? 0), 0)
+  const totalFat = filteredMeals.reduce((s, m) => s + (m.total_fat ?? 0), 0)
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -273,6 +297,15 @@ export default function DietPlanDetailPage() {
         </div>
       </div>
 
+      {/* Week Day Tabs */}
+      {hasMultipleDays && (
+        <WeekDayTabs
+          selectedDay={selectedDay}
+          onSelectDay={setSelectedDay}
+          daySummaries={daySummaries}
+        />
+      )}
+
       {/* Daily Totals */}
       <div className="bg-white/80 backdrop-blur-sm rounded-xl p-5 shadow-sm border border-gray-200 mb-6">
         <div className="flex items-center gap-2 mb-3">
@@ -317,15 +350,19 @@ export default function DietPlanDetailPage() {
       )}
 
       {/* Meals */}
-      {meals.length === 0 ? (
+      {filteredMeals.length === 0 ? (
         <div className="bg-white rounded-xl p-12 shadow-sm border border-gray-200 text-center">
           <Utensils className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No meals in this plan</h3>
-          <p className="text-gray-500">This plan doesn&apos;t have any meals yet.</p>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            {hasMultipleDays && meals.length > 0 ? 'No meals for this day' : 'No meals in this plan'}
+          </h3>
+          <p className="text-gray-500">
+            {hasMultipleDays && meals.length > 0 ? 'Select a different day to view meals.' : "This plan doesn't have any meals yet."}
+          </p>
         </div>
       ) : (
         <div className="space-y-4">
-          {meals.map((meal) => {
+          {filteredMeals.map((meal) => {
             const isExpanded = expandedMeals.has(meal.id)
             const { meta, items } = parseFoods(meal.foods)
             const isLocked = isFreeUser && selectedMealId !== null && meal.id !== selectedMealId
@@ -469,7 +506,7 @@ export default function DietPlanDetailPage() {
               </p>
             </div>
             <div className="px-6 py-4 space-y-2">
-              {meals.map(meal => {
+              {filteredMeals.map(meal => {
                 const { meta } = parseFoods(meal.foods)
                 return (
                   <button
@@ -561,7 +598,8 @@ export default function DietPlanDetailPage() {
       {profile && plan && canAccess(profile.role, 'ai_suggestions') && (
         <PlanChat
           planId={plan.id}
-          meals={meals.map(meal => {
+          dayOfWeek={hasMultipleDays ? selectedDay : null}
+          meals={filteredMeals.map(meal => {
             const { meta, items } = parseFoods(meal.foods)
             return {
               id: meal.id,

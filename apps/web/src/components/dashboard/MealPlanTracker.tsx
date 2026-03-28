@@ -29,8 +29,9 @@ export default function MealPlanTracker({ userId, userRole = 'free', onMacrosUpd
   const [selectedMealId, setSelectedMealId] = useState<string | null>(null)
 
   const today = new Date().toISOString().split('T')[0]
-  const dayOfWeek = new Date().getDay()
-  const isFreeUser = isFeatureLocked(userRole, 'full_meals')
+  // Convert JS day (0=Sun) to our format (0=Mon): (jsDay + 6) % 7
+  const dayOfWeek = (new Date().getDay() + 6) % 7
+  const isFreeUser = isFeatureLocked(userRole, 'full_meals') && (activePlan?.is_ai_generated !== false)
 
   useEffect(() => {
     loadPlanAndLogs()

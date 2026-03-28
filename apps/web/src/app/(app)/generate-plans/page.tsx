@@ -31,9 +31,10 @@ export default function GeneratePlansPage() {
 
   const [steps, setSteps] = useState<GenerationStep[]>([
     { label: 'Generating your training plan', icon: <Dumbbell className="h-5 w-5" />, status: 'pending' },
-    { label: 'Generating your meal plan', icon: <Utensils className="h-5 w-5" />, status: 'pending' },
+    { label: 'Generating your 7-day meal plan', icon: <Utensils className="h-5 w-5" />, status: 'pending' },
     { label: 'Saving your plans', icon: <Sparkles className="h-5 w-5" />, status: 'pending' },
   ])
+  const [mealDayProgress, setMealDayProgress] = useState(0)
 
   const updateStep = (index: number, update: Partial<GenerationStep>) => {
     setSteps(prev => prev.map((s, i) => i === index ? { ...s, ...update } : s))
@@ -67,31 +68,27 @@ export default function GeneratePlansPage() {
       }
     }
 
-    // Step 1 & 2: Generate both plans in parallel
+    // Step 1: Generate training plan
     updateStep(0, { status: 'loading' })
-    updateStep(1, { status: 'loading' })
-
-    const [trainingResult, mealResult] = await Promise.allSettled([
-      generateTrainingPlan(),
-      generateMealPlan(),
-    ])
-
-    const trainingPlan = trainingResult.status === 'fulfilled' ? trainingResult.value : null
-    const mealPlan = mealResult.status === 'fulfilled' ? mealResult.value : null
-
-    if (trainingResult.status === 'rejected') {
-      updateStep(0, { status: 'error', error: 'Failed to generate training plan' })
-    } else {
+    let trainingPlan = null
+    try {
+      trainingPlan = await generateTrainingPlan()
       updateStep(0, { status: 'done' })
+    } catch {
+      updateStep(0, { status: 'error', error: 'Failed to generate training plan' })
     }
 
-    if (mealResult.status === 'rejected') {
-      updateStep(1, { status: 'error', error: 'Failed to generate meal plan' })
-    } else {
+    // Step 2: Generate 7-day meal plan (day by day)
+    updateStep(1, { status: 'loading' })
+    let weekMealPlan: { meals: MealPlanMeal[]; dayOfWeek: number }[] | null = null
+    try {
+      weekMealPlan = await generateWeekMealPlan()
       updateStep(1, { status: 'done' })
+    } catch {
+      updateStep(1, { status: 'error', error: 'Failed to generate meal plan' })
     }
 
-    if (!trainingPlan && !mealPlan) {
+    if (!trainingPlan && !weekMealPlan) {
       toast.error('Failed to generate plans. Please try again from the dashboard.')
       setTimeout(() => router.push('/dashboard'), 2000)
       return
@@ -105,9 +102,8 @@ export default function GeneratePlansPage() {
       if (trainingPlan) {
         await saveTrainingPlan(supabase, trainingPlan)
       }
-      if (mealPlan) {
-        console.log('Meal plan data to save:', JSON.stringify(mealPlan).slice(0, 500))
-        await saveMealPlan(supabase, mealPlan)
+      if (weekMealPlan) {
+        await saveWeekMealPlan(supabase, weekMealPlan)
       }
 
       // Log AI usage for cooldown tracking
@@ -120,11 +116,11 @@ export default function GeneratePlansPage() {
           tokens_used: 0,
         })
       }
-      if (mealPlan) {
+      if (weekMealPlan) {
         await supabase.from('ai_usage').insert({
           user_id: profile!.id,
           type: 'meal_suggestion',
-          prompt: 'generate-meal-plan',
+          prompt: 'generate-meal-plan-7day',
           response: 'success',
           tokens_used: 0,
         })
@@ -166,7 +162,9 @@ export default function GeneratePlansPage() {
     return res.json()
   }
 
-  async function generateMealPlan() {
+  const DAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+
+  async function generateMealPlanDay(dayIndex: number) {
     const res = await fetch('/api/ai/generate-meal-plan', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -196,11 +194,26 @@ export default function GeneratePlansPage() {
         stressLevel: profile!.stress_level ?? 'moderate',
         sleepQuality: profile!.sleep_quality ?? 'average',
         targetWeight: profile!.target_weight_kg,
+        dayName: DAY_NAMES[dayIndex],
+        dayIndex,
       }),
     })
 
-    if (!res.ok) throw new Error('Meal plan generation failed')
+    if (!res.ok) throw new Error(`Meal plan generation failed for ${DAY_NAMES[dayIndex]}`)
     return res.json()
+  }
+
+  async function generateWeekMealPlan(): Promise<{ meals: MealPlanMeal[]; dayOfWeek: number }[]> {
+    const results: { meals: MealPlanMeal[]; dayOfWeek: number }[] = []
+
+    // Generate days sequentially to avoid rate limits and keep progress visible
+    for (let day = 0; day < 7; day++) {
+      setMealDayProgress(day + 1)
+      const data = await generateMealPlanDay(day)
+      results.push({ meals: data.meals, dayOfWeek: day })
+    }
+
+    return results
   }
 
   interface TrainingPlanResponse {
@@ -329,7 +342,10 @@ export default function GeneratePlansPage() {
     fat: number
   }
 
-  async function saveMealPlan(supabase: ReturnType<typeof createClient>, data: { meals: MealPlanMeal[] }) {
+  async function saveWeekMealPlan(
+    supabase: ReturnType<typeof createClient>,
+    weekData: { meals: MealPlanMeal[]; dayOfWeek: number }[]
+  ) {
     // Deactivate existing active plans
     await supabase
       .from('diet_plans')
@@ -356,44 +372,46 @@ export default function GeneratePlansPage() {
     if (planError || !plan) throw new Error('Failed to save diet plan')
 
     const VALID_MEAL_TYPES = ['breakfast', 'lunch', 'dinner', 'snack']
-    const mealInserts = (data.meals ?? []).map(meal => ({
-      diet_plan_id: plan.id,
-      day_of_week: null,
-      meal_type: VALID_MEAL_TYPES.includes(meal.meal_type) ? meal.meal_type : 'snack',
-      meal_name: meal.title || 'Meal',
-      foods: {
-        _meta: {
-          label: meal.label || '',
-          time: meal.time || '12:00',
-          timing_note: meal.timing_note || '',
-          notes: meal.notes || '',
+    const allMealInserts = weekData.flatMap(({ meals, dayOfWeek }) =>
+      (meals ?? []).map(meal => ({
+        diet_plan_id: plan.id,
+        day_of_week: dayOfWeek,
+        meal_type: VALID_MEAL_TYPES.includes(meal.meal_type) ? meal.meal_type : 'snack',
+        meal_name: meal.title || 'Meal',
+        foods: {
+          _meta: {
+            label: meal.label || '',
+            time: meal.time || '12:00',
+            timing_note: meal.timing_note || '',
+            notes: meal.notes || '',
+          },
+          items: meal.ingredients.map(ing => ({
+            spoonacular_id: 0,
+            name: ing.name,
+            amount: ing.amount,
+            unit: ing.unit || 'g',
+            calories: ing.calories,
+            protein: ing.protein,
+            carbs: ing.carbs,
+            fat: ing.fat,
+            alternatives: ing.alternatives ?? [],
+          })),
         },
-        items: meal.ingredients.map(ing => ({
-          spoonacular_id: 0,
-          name: ing.name,
-          amount: ing.amount,
-          unit: ing.unit || 'g',
-          calories: ing.calories,
-          protein: ing.protein,
-          carbs: ing.carbs,
-          fat: ing.fat,
-          alternatives: ing.alternatives ?? [],
-        })),
-      },
-      total_calories: Math.round(meal.calories || 0),
-      total_protein: Math.round((meal.protein || 0) * 10) / 10,
-      total_carbs: Math.round((meal.carbs || 0) * 10) / 10,
-      total_fat: Math.round((meal.fat || 0) * 10) / 10,
-    }))
+        total_calories: Math.round(meal.calories || 0),
+        total_protein: Math.round((meal.protein || 0) * 10) / 10,
+        total_carbs: Math.round((meal.carbs || 0) * 10) / 10,
+        total_fat: Math.round((meal.fat || 0) * 10) / 10,
+      }))
+    )
 
-    if (mealInserts.length > 0) {
-      const { error: mealsError } = await supabase.from('diet_plan_meals').insert(mealInserts)
+    if (allMealInserts.length > 0) {
+      const { error: mealsError } = await supabase.from('diet_plan_meals').insert(allMealInserts)
       if (mealsError) {
         console.error('Failed to insert meals:', mealsError)
         throw new Error('Failed to save meals: ' + mealsError.message)
       }
     } else {
-      console.warn('No meals to insert — data.meals was empty:', data)
+      console.warn('No meals to insert — weekData was empty')
     }
   }
 
@@ -458,6 +476,8 @@ export default function GeneratePlansPage() {
                 }`}>
                   {step.status === 'done'
                     ? step.label.replace('Generating', 'Generated').replace('Saving', 'Saved')
+                    : step.status === 'loading' && i === 1 && mealDayProgress > 0
+                    ? `Generating day ${mealDayProgress} of 7...`
                     : step.label}
                 </p>
                 {step.error && (
@@ -466,7 +486,10 @@ export default function GeneratePlansPage() {
               </div>
               {step.status === 'loading' && (
                 <div className="w-16 h-1.5 bg-purple-200 rounded-full overflow-hidden">
-                  <div className="h-full bg-purple-600 rounded-full animate-pulse" style={{ width: '60%' }} />
+                  <div
+                    className="h-full bg-purple-600 rounded-full transition-all duration-500"
+                    style={{ width: i === 1 && mealDayProgress > 0 ? `${Math.round((mealDayProgress / 7) * 100)}%` : '60%' }}
+                  />
                 </div>
               )}
             </div>

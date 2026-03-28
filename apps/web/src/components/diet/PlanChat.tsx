@@ -30,10 +30,11 @@ interface PlanChatProps {
     allergies?: string[]
     foodDislikes?: string[]
   }
+  dayOfWeek?: number | null
   onMealsUpdated: () => void
 }
 
-export default function PlanChat({ planId, meals, targets, userProfile, onMealsUpdated }: PlanChatProps) {
+export default function PlanChat({ planId, meals, targets, userProfile, dayOfWeek, onMealsUpdated }: PlanChatProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState('')
@@ -101,14 +102,18 @@ export default function PlanChat({ planId, meals, targets, userProfile, onMealsU
     const { createClient } = await import('@/lib/supabase/client')
     const supabase = createClient()
 
-    // Delete existing meals and insert fresh ones
-    await supabase.from('diet_plan_meals').delete().eq('diet_plan_id', planId)
+    // Delete existing meals for this day only (or all if no day specified)
+    if (dayOfWeek !== null && dayOfWeek !== undefined) {
+      await supabase.from('diet_plan_meals').delete().eq('diet_plan_id', planId).eq('day_of_week', dayOfWeek)
+    } else {
+      await supabase.from('diet_plan_meals').delete().eq('diet_plan_id', planId)
+    }
 
     const inserts = updatedMeals.map(meal => {
       const ingredients = (meal.ingredients as Record<string, unknown>[]) ?? []
       return {
         diet_plan_id: planId,
-        day_of_week: null,
+        day_of_week: dayOfWeek ?? null,
         meal_type: VALID_MEAL_TYPES.includes(meal.meal_type as string) ? meal.meal_type : 'snack',
         meal_name: (meal.title as string) || 'Meal',
         foods: {

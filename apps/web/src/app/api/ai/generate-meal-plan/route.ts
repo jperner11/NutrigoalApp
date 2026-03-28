@@ -30,6 +30,8 @@ export async function POST(request: Request) {
       stressLevel = 'moderate',
       sleepQuality = 'average',
       targetWeight = null,
+      dayName = null,
+      dayIndex = 0,
     } = body
 
     if (!calories || !protein) {
@@ -92,6 +94,7 @@ ${mealTimingGuide}
 PATIENT PROFILE:
 - Goal: ${goal || 'maintenance'}${targetWeight ? ` (target: ${targetWeight}kg)` : ''}
 - Gender: ${gender || 'not specified'}, Age: ${age || 'not specified'}, Weight: ${weight_kg || 'not specified'}kg
+${dayName ? `\nYou are generating the meal plan for **${dayName}** (day ${dayIndex + 1} of 7 in a weekly plan). Ensure variety — use different protein sources, vegetables, grains, and cooking methods than other days. Think about weekly variety: rotate between chicken, beef, fish, eggs, legumes, pork, etc. across the week.` : ''}
 
 ${constraints.length > 0 ? 'PATIENT DIETARY CONSTRAINTS (MANDATORY — ZERO TOLERANCE):\n' + constraints.map(c => '- ' + c).join('\n') : ''}
 
