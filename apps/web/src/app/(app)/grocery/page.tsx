@@ -144,7 +144,7 @@ export default function GroceryPage() {
       </div>
 
       {/* Progress */}
-      <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 mb-6">
+      <div className="card p-4 mb-6">
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-medium text-gray-700">
             {checkedCount} of {totalItems} items checked
@@ -174,7 +174,7 @@ export default function GroceryPage() {
           const categoryChecked = items.filter(i => checkedItems.has(`${i.name}|${i.unit}`)).length
 
           return (
-            <div key={category} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div key={category} className="card overflow-hidden">
               <button
                 onClick={() => toggleCategory(category)}
                 className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-gray-50 transition-colors"

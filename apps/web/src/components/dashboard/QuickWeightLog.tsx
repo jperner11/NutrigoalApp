@@ -50,7 +50,7 @@ export default function QuickWeightLog({ userId, currentWeight, onWeightLogged }
   }
 
   return (
-    <div className="bg-gradient-to-br from-white to-indigo-50/40 rounded-xl p-5 shadow-sm border border-indigo-100/60 hover:shadow-md transition-all duration-200">
+    <div className="bg-gradient-to-br from-white to-indigo-50/40 rounded-2xl p-5 shadow-sm border border-indigo-100/60 hover:shadow-md transition-all duration-200">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <div className="bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full p-2">

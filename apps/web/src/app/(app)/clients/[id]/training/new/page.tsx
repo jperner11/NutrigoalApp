@@ -183,7 +183,7 @@ export default function NewClientTrainingPlanPage() {
 
       {/* Days */}
       {days.map((day, di) => (
-        <div key={day.tempId} className="bg-white rounded-xl p-5 shadow-sm border border-gray-200 mb-4">
+        <div key={day.tempId} className="card p-5 mb-4">
           <div className="flex items-center justify-between mb-3">
             <input type="text" value={day.name} onChange={e => {
               setDays(prev => { const u = [...prev]; u[di].name = e.target.value; return u })

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { MessageSquare, Send, X, ChevronDown, Sparkles, Loader2 } from 'lucide-react'
+import { toast } from 'react-hot-toast'
 
 interface ChatMessage {
   role: 'user' | 'assistant'
@@ -144,7 +145,7 @@ export default function PlanChat({ planId, meals, targets, userProfile, dayOfWee
 
     const { error } = await supabase.from('diet_plan_meals').insert(inserts)
     if (error) {
-      console.error('Failed to save modified meals:', error)
+      toast.error('Failed to save modified meals')
     }
   }
 

@@ -73,7 +73,7 @@ export default function ClientsPage() {
       </div>
 
       {clients.length === 0 ? (
-        <div className="bg-white rounded-xl p-12 shadow-sm border border-gray-200 text-center">
+        <div className="card p-12 text-center">
           <Users className="h-16 w-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">No clients yet</h3>
           <p className="text-gray-500 mb-6">Invite your first client to start managing their nutrition and training.</p>
@@ -91,7 +91,7 @@ export default function ClientsPage() {
             <Link
               key={row.id}
               href={row.client ? `/clients/${row.client.id}` : '#'}
-              className="bg-white rounded-xl p-5 shadow-sm border border-gray-200 flex items-center justify-between hover:shadow-md transition-shadow block"
+              className="card p-5 flex items-center justify-between hover:shadow-md transition-shadow block"
             >
               <div className="flex items-center space-x-4">
                 <div className={`rounded-full p-2 ${row.status === 'active' ? 'bg-purple-100' : 'bg-yellow-100'}`}>

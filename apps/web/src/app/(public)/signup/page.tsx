@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 
-import { Target, Mail, Lock, Eye, EyeOff, ArrowRight, User, Users } from 'lucide-react'
+import { Target, Mail, Lock, Eye, EyeOff, ArrowRight, User, Users, UserCircle } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 
@@ -11,6 +11,7 @@ export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
+    fullName: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -20,7 +21,7 @@ export default function SignupPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!formData.email || !formData.password) {
+    if (!formData.fullName.trim() || !formData.email || !formData.password) {
       toast.error('Please fill in all fields')
       return
     }
@@ -44,6 +45,7 @@ export default function SignupPage() {
       options: {
         data: {
           role: formData.role,
+          full_name: formData.fullName.trim(),
         },
       },
     })
@@ -54,32 +56,47 @@ export default function SignupPage() {
       return
     }
 
-    // Update the role in user_profiles (trigger creates it with defaults)
-    // We need to wait a moment for the trigger to create the profile
-    setTimeout(async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        await supabase
+    // Wait for the DB trigger to create the user profile before proceeding
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+      // Poll for profile creation (trigger runs async)
+      let profile = null
+      for (let i = 0; i < 10; i++) {
+        const { data } = await supabase
           .from('user_profiles')
-          .update({ role: formData.role })
+          .select('id')
           .eq('id', user.id)
-
-        // If nutritionist, create default package
-        if (formData.role === 'nutritionist') {
-          await supabase.from('nutritionist_packages').insert({
-            nutritionist_id: user.id,
-            max_clients: 10,
-          })
-        }
+          .single()
+        if (data) { profile = data; break }
+        await new Promise(r => setTimeout(r, 500))
       }
 
-      toast.success('Account created! Please check your email to confirm.')
-      window.location.href = '/onboarding'
-    }, 1000)
+      if (!profile) {
+        toast.error('Account created but profile setup timed out. Please log in again.')
+        setIsLoading(false)
+        return
+      }
+
+      await supabase
+        .from('user_profiles')
+        .update({ role: formData.role, full_name: formData.fullName.trim() })
+        .eq('id', user.id)
+
+      // If nutritionist, create default package
+      if (formData.role === 'nutritionist') {
+        await supabase.from('nutritionist_packages').insert({
+          nutritionist_id: user.id,
+          max_clients: 10,
+        })
+      }
+    }
+
+    toast.success('Account created! Please check your email to confirm.')
+    window.location.href = '/onboarding'
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-slate-50 flex items-center justify-center px-4">
+    <div className="min-h-screen auth-bg flex items-center justify-center px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center space-x-2 mb-6">
@@ -94,7 +111,7 @@ export default function SignupPage() {
           <p className="text-gray-800">Start your nutrition journey today</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg p-8">
+        <div className="glass-card rounded-2xl shadow-lg p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Role Selection */}
             <div>
@@ -126,6 +143,24 @@ export default function SignupPage() {
                   <span className={`font-medium ${formData.role === 'nutritionist' ? 'text-purple-700' : 'text-gray-700'}`}>Nutritionist</span>
                   <p className="text-xs text-gray-500 mt-1">Manage clients</p>
                 </button>
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <UserCircle className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  id="fullName"
+                  type="text"
+                  value={formData.fullName}
+                  onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  placeholder="Your full name"
+                  required
+                />
               </div>
             </div>
 

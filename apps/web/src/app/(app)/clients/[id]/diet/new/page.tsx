@@ -159,7 +159,7 @@ export default function NewClientDietPlanPage() {
 
       {/* Meals */}
       {meals.map((meal, mi) => (
-        <div key={mi} className="bg-white rounded-xl p-5 shadow-sm border border-gray-200 mb-4">
+        <div key={mi} className="card p-5 mb-4">
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-semibold text-gray-900">{meal.meal_name}</h3>
             <span className="text-sm text-green-600 font-medium">{meal.foods.reduce((s, f) => s + f.calories, 0)} kcal</span>

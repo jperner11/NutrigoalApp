@@ -101,7 +101,7 @@ export default function ClientFeedbackPage() {
 
       {/* Create Form */}
       {showCreate && (
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
+        <div className="card p-6 mb-6">
           <h2 className="text-lg font-bold text-gray-900 mb-4">New Feedback Request</h2>
 
           <div className="mb-4">
@@ -156,7 +156,7 @@ export default function ClientFeedbackPage() {
       {loading ? (
         <div className="text-gray-500">Loading feedback...</div>
       ) : requests.length === 0 && !showCreate ? (
-        <div className="bg-white rounded-xl p-12 shadow-sm border border-gray-200 text-center">
+        <div className="card p-12 text-center">
           <Clock className="h-12 w-12 text-gray-300 mx-auto mb-3" />
           <h3 className="font-semibold text-gray-900 mb-1">No feedback requests</h3>
           <p className="text-sm text-gray-500 mb-4">Send your first feedback request to this client.</p>
@@ -166,7 +166,7 @@ export default function ClientFeedbackPage() {
       ) : (
         <div className="space-y-3">
           {requests.map(fb => (
-            <div key={fb.id} className="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
+            <div key={fb.id} className="card p-5">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-semibold text-gray-900">{fb.title}</h3>
                 <span className={`flex items-center space-x-1 text-xs font-medium px-3 py-1 rounded-full ${

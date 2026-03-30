@@ -1,8 +1,9 @@
 'use client'
 
-import { X, Sparkles } from 'lucide-react'
-import Link from 'next/link'
+import { useState } from 'react'
+import { X, Sparkles, Loader2 } from 'lucide-react'
 import { PRICING } from '@/lib/constants'
+import { toast } from 'react-hot-toast'
 
 interface UpgradeModalProps {
   isOpen: boolean
@@ -11,12 +12,34 @@ interface UpgradeModalProps {
 }
 
 export default function UpgradeModal({ isOpen, onClose, feature }: UpgradeModalProps) {
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null)
+
   if (!isOpen) return null
+
+  async function handleUpgrade(plan: string) {
+    setLoadingPlan(plan)
+    try {
+      const res = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan }),
+      })
+      const data = await res.json()
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        toast.error(data.message || 'Failed to start checkout')
+      }
+    } catch {
+      toast.error('Something went wrong')
+    }
+    setLoadingPlan(null)
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="fixed inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl max-w-md w-full p-6 shadow-xl">
+      <div className="relative glass-card rounded-2xl max-w-md w-full p-6 shadow-xl">
         <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
           <X className="h-5 w-5" />
         </button>
@@ -47,24 +70,35 @@ export default function UpgradeModal({ isOpen, onClose, feature }: UpgradeModalP
                   ${PRICING[tier].price}<span className="text-sm font-normal text-gray-500">/mo</span>
                 </span>
               </div>
-              <ul className="text-sm text-gray-600 space-y-1">
+              <ul className="text-sm text-gray-600 space-y-1 mb-3">
                 {PRICING[tier].features.slice(0, 4).map((f, i) => (
                   <li key={i} className="flex items-center gap-1.5">
                     <span className="text-purple-500">&#10003;</span> {f}
                   </li>
                 ))}
               </ul>
+              <button
+                onClick={() => handleUpgrade(tier)}
+                disabled={loadingPlan !== null}
+                className={`w-full py-2 rounded-lg text-sm font-semibold transition-all disabled:opacity-50 flex items-center justify-center gap-2 ${
+                  tier === 'pro'
+                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:shadow-lg'
+                    : 'bg-gradient-to-r from-indigo-500 to-cyan-500 text-white hover:shadow-lg'
+                }`}
+              >
+                {loadingPlan === tier && <Loader2 className="h-4 w-4 animate-spin" />}
+                {loadingPlan === tier ? 'Redirecting...' : `Upgrade to ${PRICING[tier].name}`}
+              </button>
             </div>
           ))}
         </div>
 
-        <Link
-          href="/pricing"
-          className="block w-full text-center bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
+        <button
           onClick={onClose}
+          className="block w-full text-center text-sm text-gray-500 hover:text-gray-700 transition-colors"
         >
-          View Plans
-        </Link>
+          Maybe later
+        </button>
       </div>
     </div>
   )

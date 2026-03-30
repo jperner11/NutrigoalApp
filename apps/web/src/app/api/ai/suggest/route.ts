@@ -1,7 +1,14 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { rateLimit, getClientIp } from '@/lib/rateLimit'
 
 export async function POST(request: Request) {
+  const ip = getClientIp(request)
+  const { success } = rateLimit(`ai-suggest:${ip}`, { limit: 10, windowMs: 60_000 })
+  if (!success) {
+    return NextResponse.json({ message: 'Too many requests. Please try again later.' }, { status: 429 })
+  }
+
   try {
     const { prompt, userId, userProfile } = await request.json()
 

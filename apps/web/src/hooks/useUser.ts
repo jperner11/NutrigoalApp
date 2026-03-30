@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { UserProfile } from '@/lib/supabase/types'
 import type { User } from '@supabase/supabase-js'
+import { toast } from 'react-hot-toast'
 
 export function useUser() {
   const [user, setUser] = useState<User | null>(null)
@@ -14,25 +15,44 @@ export function useUser() {
     const supabase = createClient()
 
     async function getUser() {
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
+      const { data: { user }, error } = await supabase.auth.getUser()
 
-      if (user) {
-        const { data: profile } = await supabase
-          .from('user_profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single()
-
-        setProfile(profile)
+      if (error || !user) {
+        // Session expired or invalid — only redirect if on a protected page
+        if (error && window.location.pathname !== '/login' && window.location.pathname !== '/signup') {
+          toast.error('Your session has expired. Please sign in again.')
+          window.location.href = '/login'
+          return
+        }
+        setLoading(false)
+        return
       }
 
+      setUser(user)
+
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single()
+
+      setProfile(profile)
       setLoading(false)
     }
 
     getUser()
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED' && !session) {
+        setUser(null)
+        setProfile(null)
+        if (window.location.pathname !== '/login' && window.location.pathname !== '/signup') {
+          toast.error('Your session has expired. Please sign in again.')
+          window.location.href = '/login'
+        }
+        return
+      }
+
       setUser(session?.user ?? null)
       if (!session?.user) {
         setProfile(null)

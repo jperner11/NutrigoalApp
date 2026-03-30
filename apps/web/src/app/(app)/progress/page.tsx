@@ -126,6 +126,7 @@ export default function ProgressPage() {
   }
 
   async function handleDelete(id: string) {
+    if (!window.confirm('Delete this weight entry? This action cannot be undone.')) return
     const supabase = createClient()
     const { error } = await supabase.from('weight_logs').delete().eq('id', id)
     if (error) {
@@ -231,7 +232,7 @@ export default function ProgressPage() {
 
       {/* Quick Log Form */}
       {showForm && (
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-6 animate-[fadeIn_0.2s_ease-out]">
+        <div className="card p-6 mb-6 animate-[fadeIn_0.2s_ease-out]">
           <h3 className="font-semibold text-gray-900 mb-4">Log Weight</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
@@ -313,7 +314,7 @@ export default function ProgressPage() {
 
       {/* Stats Row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 text-center">
+        <div className="card p-4 text-center">
           <div className="inline-flex items-center justify-center w-10 h-10 bg-purple-100 rounded-full mb-2">
             <Scale className="h-5 w-5 text-purple-600" />
           </div>
@@ -325,7 +326,7 @@ export default function ProgressPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 text-center">
+        <div className="card p-4 text-center">
           <div className="inline-flex items-center justify-center w-10 h-10 bg-indigo-100 rounded-full mb-2">
             <Scale className="h-5 w-5 text-indigo-600" />
           </div>
@@ -333,7 +334,7 @@ export default function ProgressPage() {
           <p className="text-2xl font-bold text-gray-900">{startWeight}<span className="text-sm text-gray-400">kg</span></p>
         </div>
 
-        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 text-center">
+        <div className="card p-4 text-center">
           <div className="inline-flex items-center justify-center w-10 h-10 bg-emerald-100 rounded-full mb-2">
             <TrendingUp className="h-5 w-5 text-emerald-600" />
           </div>
@@ -343,7 +344,7 @@ export default function ProgressPage() {
           </p>
         </div>
 
-        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 text-center">
+        <div className="card p-4 text-center">
           <div className="inline-flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full mb-2">
             <Hash className="h-5 w-5 text-blue-600" />
           </div>
@@ -370,7 +371,7 @@ export default function ProgressPage() {
 
       {/* Chart */}
       {chartData.length >= 2 ? (
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
+        <div className="card p-6 mb-6">
           <h3 className="font-semibold text-gray-900 mb-4">Weight Over Time</h3>
           <ResponsiveContainer width="100%" height={320}>
             <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
@@ -416,13 +417,13 @@ export default function ProgressPage() {
           </ResponsiveContainer>
         </div>
       ) : chartData.length === 1 ? (
-        <div className="bg-white rounded-xl p-12 shadow-sm border border-gray-200 mb-6 text-center">
+        <div className="card p-12 mb-6 text-center">
           <Scale className="h-12 w-12 text-gray-300 mx-auto mb-3" />
           <p className="text-gray-500 font-medium">Log at least 2 entries to see your chart</p>
           <p className="text-gray-400 text-sm mt-1">You have 1 entry so far — keep going!</p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl p-12 shadow-sm border border-gray-200 mb-6 text-center">
+        <div className="card p-12 mb-6 text-center">
           <Scale className="h-12 w-12 text-gray-300 mx-auto mb-3" />
           <p className="text-gray-500 font-medium">No weight entries yet</p>
           <p className="text-gray-400 text-sm mt-1">Click &quot;Log Weight&quot; to start tracking your progress.</p>
@@ -431,7 +432,7 @@ export default function ProgressPage() {
 
       {/* Recent Entries */}
       {logs.length > 0 && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="card overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-100">
             <h3 className="font-semibold text-gray-900">All Entries</h3>
           </div>

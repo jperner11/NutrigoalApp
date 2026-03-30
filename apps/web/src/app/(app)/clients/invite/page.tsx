@@ -99,7 +99,7 @@ export default function InviteClientPage() {
         Send an invitation to a client&apos;s email. If they already have an account, they&apos;ll be linked automatically.
       </p>
 
-      <form onSubmit={handleInvite} className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+      <form onSubmit={handleInvite} className="card p-6">
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">Client Email</label>
           <div className="relative">

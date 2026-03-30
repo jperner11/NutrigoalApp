@@ -407,11 +407,8 @@ export default function GeneratePlansPage() {
     if (allMealInserts.length > 0) {
       const { error: mealsError } = await supabase.from('diet_plan_meals').insert(allMealInserts)
       if (mealsError) {
-        console.error('Failed to insert meals:', mealsError)
         throw new Error('Failed to save meals: ' + mealsError.message)
       }
-    } else {
-      console.warn('No meals to insert — weekData was empty')
     }
   }
 

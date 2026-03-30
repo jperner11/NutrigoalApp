@@ -62,7 +62,7 @@ export default function StreaksWidget({ userId }: StreaksWidgetProps) {
 
   if (loading) {
     return (
-      <div className="bg-white/80 backdrop-blur-sm rounded-xl p-5 shadow-sm border border-gray-200 animate-pulse">
+      <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-5 shadow-sm border border-gray-200 animate-pulse">
         <div className="h-5 bg-gray-200 rounded w-1/3 mb-3" />
         <div className="grid grid-cols-3 gap-3">
           <div className="h-16 bg-gray-100 rounded-lg" />
@@ -88,7 +88,7 @@ export default function StreaksWidget({ userId }: StreaksWidgetProps) {
   }
 
   return (
-    <div className="bg-gradient-to-br from-white to-amber-50/30 rounded-xl p-5 shadow-sm border border-amber-100/60 hover:shadow-md transition-all duration-200">
+    <div className="bg-gradient-to-br from-white to-amber-50/30 rounded-2xl p-5 shadow-sm border border-amber-100/60 hover:shadow-md transition-all duration-200">
       <div className="flex items-center gap-2 mb-4">
         <div className="bg-gradient-to-br from-amber-100 to-orange-100 rounded-full p-2">
           <Flame className={`h-5 w-5 ${best >= 7 ? 'text-orange-600' : best >= 3 ? 'text-amber-500' : 'text-gray-400'}`} />

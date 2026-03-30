@@ -235,7 +235,7 @@ export default function DashboardPage() {
   const firstName = profile.full_name?.split(' ')[0] || 'there'
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-indigo-50/20 -m-4 p-4 sm:-m-6 sm:p-6 lg:-m-8 lg:p-8">
+    <div className="-m-4 p-4 sm:-m-6 sm:p-6 lg:-m-8 lg:p-8">
       {/* Welcome */}
       <div className="mb-8 flex items-center justify-between animate-[fadeIn_0.4s_ease-out_forwards]">
         <div>
@@ -259,7 +259,7 @@ export default function DashboardPage() {
 
       {/* Onboarding prompt */}
       {!profile.onboarding_completed && (
-        <div className="mb-6 bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-xl p-6 shadow-sm animate-[fadeIn_0.5s_ease-out_forwards]">
+        <div className="mb-6 bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200/60 rounded-2xl p-6 shadow-sm animate-[fadeIn_0.5s_ease-out_forwards]">
           <h3 className="font-semibold text-gray-900 mb-2">Complete your profile</h3>
           <p className="text-gray-800 text-sm mb-4">
             Set up your metrics and goals to get personalized nutrition targets.
@@ -276,7 +276,7 @@ export default function DashboardPage() {
       {/* Stats Grid */}
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {/* Calories & Macros */}
-        <div className="bg-gradient-to-br from-white to-purple-50/50 rounded-xl p-6 shadow-sm border border-purple-100/60 lg:col-span-2 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 relative overflow-hidden animate-[fadeIn_0.3s_ease-out_forwards]">
+        <div className="bg-gradient-to-br from-white to-purple-50/50 rounded-2xl p-6 shadow-sm border border-purple-100/60 lg:col-span-2 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 relative overflow-hidden animate-[fadeIn_0.3s_ease-out_forwards]">
           {/* Accent bar */}
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 via-indigo-500 to-purple-400 rounded-t-xl" />
           <div className="flex items-center justify-between mb-4">
@@ -337,7 +337,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Water */}
-        <div className="bg-gradient-to-br from-white to-cyan-50/50 rounded-xl p-6 shadow-sm border border-cyan-100/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 relative overflow-hidden animate-[fadeIn_0.4s_ease-out_forwards]">
+        <div className="bg-gradient-to-br from-white to-cyan-50/50 rounded-2xl p-6 shadow-sm border border-cyan-100/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 relative overflow-hidden animate-[fadeIn_0.4s_ease-out_forwards]">
           {/* Accent bar */}
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 via-blue-500 to-cyan-400 rounded-t-xl" />
           <div className="flex items-center justify-between mb-4">
@@ -378,7 +378,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Workouts */}
-        <div className="bg-gradient-to-br from-white to-purple-50/50 rounded-xl p-6 shadow-sm border border-purple-100/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 relative overflow-hidden animate-[fadeIn_0.5s_ease-out_forwards]">
+        <div className="bg-gradient-to-br from-white to-purple-50/50 rounded-2xl p-6 shadow-sm border border-purple-100/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 relative overflow-hidden animate-[fadeIn_0.5s_ease-out_forwards]">
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-400 via-violet-500 to-purple-400 rounded-t-xl" />
           <div className="flex items-center justify-between mb-4">
             <div className="bg-gradient-to-br from-purple-100 to-violet-100 rounded-full p-3 shadow-sm">
@@ -393,7 +393,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Cardio */}
-        <div className="bg-gradient-to-br from-white to-red-50/40 rounded-xl p-6 shadow-sm border border-red-100/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 relative overflow-hidden animate-[fadeIn_0.6s_ease-out_forwards]">
+        <div className="bg-gradient-to-br from-white to-red-50/40 rounded-2xl p-6 shadow-sm border border-red-100/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 relative overflow-hidden animate-[fadeIn_0.6s_ease-out_forwards]">
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-400 via-rose-500 to-red-400 rounded-t-xl" />
           <div className="flex items-center justify-between mb-4">
             <div className="bg-gradient-to-br from-red-100 to-rose-100 rounded-full p-3 shadow-sm">
@@ -447,7 +447,7 @@ export default function DashboardPage() {
       {/* Quick Actions */}
       <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-        <Link href="/diet" className="group bg-gradient-to-br from-white to-orange-50/30 rounded-xl p-5 shadow-sm border border-gray-200/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex items-center space-x-4">
+        <Link href="/diet" className="group bg-gradient-to-br from-white to-orange-50/30 rounded-2xl p-5 shadow-sm border border-gray-200/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex items-center space-x-4">
           <div className="bg-gradient-to-br from-orange-100 to-amber-100 rounded-lg p-3 group-hover:shadow-sm transition-shadow">
             <Utensils className="h-6 w-6 text-orange-600" />
           </div>
@@ -457,7 +457,7 @@ export default function DashboardPage() {
           </div>
         </Link>
 
-        <Link href="/water" className="group bg-gradient-to-br from-white to-cyan-50/30 rounded-xl p-5 shadow-sm border border-gray-200/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex items-center space-x-4">
+        <Link href="/water" className="group bg-gradient-to-br from-white to-cyan-50/30 rounded-2xl p-5 shadow-sm border border-gray-200/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex items-center space-x-4">
           <div className="bg-gradient-to-br from-cyan-100 to-blue-100 rounded-lg p-3 group-hover:shadow-sm transition-shadow">
             <Droplets className="h-6 w-6 text-cyan-600" />
           </div>
@@ -467,7 +467,7 @@ export default function DashboardPage() {
           </div>
         </Link>
 
-        <Link href="/training" className="group bg-gradient-to-br from-white to-purple-50/30 rounded-xl p-5 shadow-sm border border-gray-200/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex items-center space-x-4">
+        <Link href="/training" className="group bg-gradient-to-br from-white to-purple-50/30 rounded-2xl p-5 shadow-sm border border-gray-200/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex items-center space-x-4">
           <div className="bg-gradient-to-br from-purple-100 to-violet-100 rounded-lg p-3 group-hover:shadow-sm transition-shadow">
             <Dumbbell className="h-6 w-6 text-purple-600" />
           </div>
@@ -477,7 +477,7 @@ export default function DashboardPage() {
           </div>
         </Link>
 
-        <Link href="/cardio" className="group bg-gradient-to-br from-white to-red-50/30 rounded-xl p-5 shadow-sm border border-gray-200/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex items-center space-x-4">
+        <Link href="/cardio" className="group bg-gradient-to-br from-white to-red-50/30 rounded-2xl p-5 shadow-sm border border-gray-200/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex items-center space-x-4">
           <div className="bg-gradient-to-br from-red-100 to-rose-100 rounded-lg p-3 group-hover:shadow-sm transition-shadow">
             <HeartPulse className="h-6 w-6 text-red-600" />
           </div>
@@ -487,7 +487,7 @@ export default function DashboardPage() {
           </div>
         </Link>
 
-        <Link href="/ai/suggest" className="group bg-gradient-to-br from-white to-purple-50/30 rounded-xl p-5 shadow-sm border border-gray-200/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex items-center space-x-4">
+        <Link href="/ai/suggest" className="group bg-gradient-to-br from-white to-purple-50/30 rounded-2xl p-5 shadow-sm border border-gray-200/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex items-center space-x-4">
           <div className="bg-gradient-to-br from-purple-100 to-indigo-100 rounded-lg p-3 group-hover:shadow-sm transition-shadow">
             <Sparkles className="h-6 w-6 text-purple-600" />
           </div>
@@ -498,7 +498,7 @@ export default function DashboardPage() {
         </Link>
 
         {canAccess(profile.role, 'regenerate') && (
-          <Link href="/generate-plans" className="group bg-gradient-to-br from-white to-green-50/30 rounded-xl p-5 shadow-sm border border-gray-200/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex items-center space-x-4">
+          <Link href="/generate-plans" className="group bg-gradient-to-br from-white to-green-50/30 rounded-2xl p-5 shadow-sm border border-gray-200/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex items-center space-x-4">
             <div className="bg-gradient-to-br from-green-100 to-emerald-100 rounded-lg p-3 group-hover:shadow-sm transition-shadow">
               <RefreshCw className="h-6 w-6 text-green-600" />
             </div>
@@ -510,7 +510,7 @@ export default function DashboardPage() {
         )}
 
         {profile.role === 'nutritionist' && (
-          <Link href="/clients" className="group bg-gradient-to-br from-white to-indigo-50/30 rounded-xl p-5 shadow-sm border border-gray-200/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex items-center space-x-4">
+          <Link href="/clients" className="group bg-gradient-to-br from-white to-indigo-50/30 rounded-2xl p-5 shadow-sm border border-gray-200/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex items-center space-x-4">
             <div className="bg-gradient-to-br from-indigo-100 to-purple-100 rounded-lg p-3 group-hover:shadow-sm transition-shadow">
               <Users className="h-6 w-6 text-indigo-600" />
             </div>
@@ -524,7 +524,7 @@ export default function DashboardPage() {
 
       {/* Nutritionist Client Summary */}
       {profile.role === 'nutritionist' && (
-        <div className="bg-gradient-to-br from-white to-indigo-50/40 rounded-xl p-6 shadow-sm border border-indigo-100/60 hover:shadow-md transition-all duration-200">
+        <div className="bg-gradient-to-br from-white to-indigo-50/40 rounded-2xl p-6 shadow-sm border border-indigo-100/60 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-gray-900">Client Overview</h2>
             <Link href="/clients" className="text-sm text-purple-600 hover:text-purple-800 font-medium transition-colors">
@@ -556,7 +556,7 @@ export default function DashboardPage() {
 
       {/* Progress Section */}
       {profile.onboarding_completed && (
-        <div className="mt-8 bg-gradient-to-br from-white to-purple-50/40 rounded-xl p-6 shadow-sm border border-purple-100/60 hover:shadow-md transition-all duration-200">
+        <div className="mt-8 bg-gradient-to-br from-white to-purple-50/40 rounded-2xl p-6 shadow-sm border border-purple-100/60 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-gray-900">Weekly Progress</h2>
             <Link href="/progress" className="text-sm text-purple-600 hover:text-purple-800 font-medium transition-colors">

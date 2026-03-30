@@ -63,7 +63,7 @@ export default function WaterPage() {
       </div>
 
       {/* Progress Circle */}
-      <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-200 mb-8">
+      <div className="card p-8 mb-8">
         <div className="flex flex-col items-center">
           <div className="relative w-48 h-48 mb-6">
             <svg className="w-48 h-48 transform -rotate-90" viewBox="0 0 160 160">
@@ -102,7 +102,7 @@ export default function WaterPage() {
       </div>
 
       {/* Quick Add Buttons */}
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-8">
+      <div className="card p-6 mb-8">
         <h3 className="font-semibold text-gray-900 mb-4">Quick Add</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
           {WATER_QUICK_ADD.map(({ amount, label }) => (

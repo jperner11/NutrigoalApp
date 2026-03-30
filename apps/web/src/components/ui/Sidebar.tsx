@@ -20,8 +20,10 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  Menu,
+  X,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { UserRole } from '@/lib/supabase/types'
 import type { GatedFeature } from '@/lib/tierUtils'
 import { isFeatureLocked } from '@/lib/tierUtils'
@@ -58,27 +60,36 @@ const navItems: {
 export default function Sidebar({ userRole, userName, onSignOut }: SidebarProps) {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileOpen(false)
+  }, [pathname])
 
   const filteredItems = navItems.filter(item => item.roles.includes(userRole))
 
-  return (
-    <aside
-      className={`fixed left-0 top-0 h-full bg-white/90 backdrop-blur-xl border-r border-gray-200/80 flex flex-col transition-all duration-300 z-40 ${
-        collapsed ? 'w-16' : 'w-64'
-      }`}
-    >
+  const sidebarContent = (
+    <>
       {/* Logo */}
-      <div className="flex items-center h-16 px-4 border-b border-gray-200/80">
-        <Link href="/dashboard" className="flex items-center space-x-2 min-w-0">
-          <div className="bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl p-1.5 flex-shrink-0 shadow-lg shadow-purple-500/20">
+      <div className="flex items-center h-16 px-4 border-b border-white/10">
+        <Link href="/dashboard" className="flex items-center space-x-2.5 min-w-0">
+          <div className="bg-white/20 backdrop-blur-sm rounded-xl p-1.5 flex-shrink-0 shadow-lg shadow-purple-900/10 border border-white/20">
             <Target className="h-5 w-5 text-white" />
           </div>
-          {!collapsed && (
-            <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent truncate">
+          {(!collapsed || mobileOpen) && (
+            <span className="text-xl font-bold text-white truncate tracking-tight">
               NutriGoal
             </span>
           )}
         </Link>
+        {/* Mobile close button */}
+        <button
+          onClick={() => setMobileOpen(false)}
+          className="ml-auto p-1.5 text-white/60 hover:text-white md:hidden"
+        >
+          <X className="h-5 w-5" />
+        </button>
       </div>
 
       {/* Navigation */}
@@ -93,15 +104,15 @@ export default function Sidebar({ userRole, userName, onSignOut }: SidebarProps)
               href={item.href}
               className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${
                 isActive
-                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-500/20'
-                  : 'text-gray-700 hover:bg-purple-50 hover:text-purple-700'
+                  ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-md shadow-purple-500/30'
+                  : 'text-white/70 hover:bg-white/10 hover:text-white'
               }`}
-              title={collapsed ? item.label : undefined}
+              title={collapsed && !mobileOpen ? item.label : undefined}
             >
               <Icon className={`h-5 w-5 flex-shrink-0 transition-transform duration-200 ${
-                isActive ? 'text-white' : 'group-hover:scale-110'
+                isActive ? 'text-white' : 'text-white/60 group-hover:text-white group-hover:scale-110'
               }`} />
-              {!collapsed && (
+              {(!collapsed || mobileOpen) && (
                 <>
                   <span>{item.label}</span>
                   {item.gatedFeature && isFeatureLocked(userRole, item.gatedFeature) && !isActive && (
@@ -115,30 +126,63 @@ export default function Sidebar({ userRole, userName, onSignOut }: SidebarProps)
       </nav>
 
       {/* User & Collapse */}
-      <div className="border-t border-gray-200/80 p-3 space-y-2">
-        {!collapsed && (
-          <div className="px-3 py-2 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl">
-            <p className="text-sm font-semibold text-gray-900 truncate">{userName}</p>
-            <p className="text-xs text-purple-600 capitalize font-medium">{userRole === 'nutritionist_client' ? 'Client Plan' : `${userRole} plan`}</p>
+      <div className="border-t border-white/10 p-3 space-y-2">
+        {(!collapsed || mobileOpen) && (
+          <div className="px-3 py-2 bg-white/10 backdrop-blur-sm rounded-xl border border-white/10">
+            <p className="text-sm font-semibold text-white truncate">{userName}</p>
+            <p className="text-xs text-purple-300 capitalize font-medium">{userRole === 'nutritionist_client' ? 'Client Plan' : `${userRole} plan`}</p>
           </div>
         )}
 
         <button
           onClick={onSignOut}
-          className="flex items-center space-x-3 px-3 py-2 rounded-xl text-sm text-gray-600 hover:bg-red-50 hover:text-red-600 transition-all duration-200 w-full"
-          title={collapsed ? 'Sign Out' : undefined}
+          className="flex items-center space-x-3 px-3 py-2 rounded-xl text-sm text-white/60 hover:bg-red-500/20 hover:text-red-300 transition-all duration-200 w-full"
+          title={collapsed && !mobileOpen ? 'Sign Out' : undefined}
         >
           <LogOut className="h-5 w-5 flex-shrink-0" />
-          {!collapsed && <span>Sign Out</span>}
+          {(!collapsed || mobileOpen) && <span>Sign Out</span>}
         </button>
 
+        {/* Collapse toggle — desktop only */}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="flex items-center justify-center p-2 rounded-xl text-gray-400 hover:bg-gray-100 hover:text-gray-900 transition-all duration-200 w-full"
+          className="hidden md:flex items-center justify-center p-2 rounded-xl text-white/40 hover:bg-white/10 hover:text-white transition-all duration-200 w-full"
         >
           {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
         </button>
       </div>
-    </aside>
+    </>
+  )
+
+  return (
+    <>
+      {/* Mobile hamburger button */}
+      <button
+        onClick={() => setMobileOpen(true)}
+        className="fixed top-4 left-4 z-50 p-2 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200/60 md:hidden"
+        aria-label="Open menu"
+      >
+        <Menu className="h-5 w-5 text-gray-700" />
+      </button>
+
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 z-40 md:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      {/* Sidebar — desktop: fixed, mobile: drawer */}
+      <aside
+        className={`
+          fixed left-0 top-0 h-full bg-gradient-to-b from-slate-900 via-purple-950 to-indigo-950 backdrop-blur-xl border-r border-white/10 flex flex-col z-40 transition-all duration-300
+          ${mobileOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64'}
+          md:translate-x-0 ${!mobileOpen && (collapsed ? 'md:w-16' : 'md:w-64')}
+        `}
+      >
+        {sidebarContent}
+      </aside>
+    </>
   )
 }

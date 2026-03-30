@@ -1,7 +1,14 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { rateLimit, getClientIp } from '@/lib/rateLimit'
 
 export async function POST(request: Request) {
+  const ip = getClientIp(request)
+  const { success } = rateLimit(`ai-training:${ip}`, { limit: 5, windowMs: 60_000 })
+  if (!success) {
+    return NextResponse.json({ message: 'Too many requests. Please try again later.' }, { status: 429 })
+  }
+
   const apiKey = process.env.OPENAI_API_KEY
   if (!apiKey) {
     return NextResponse.json({ message: 'AI service not configured' }, { status: 503 })

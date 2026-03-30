@@ -50,7 +50,7 @@ export default function ClientDetailPage() {
       </Link>
 
       {/* Profile Card */}
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
+      <div className="card p-6 mb-6">
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-4">
             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center text-2xl font-bold text-white">
@@ -103,12 +103,12 @@ export default function ClientDetailPage() {
       {/* Action Buttons */}
       <div className="grid grid-cols-2 gap-4 mb-6">
         <Link href={`/clients/${id}/messages`}
-          className="flex items-center justify-center space-x-2 bg-white rounded-xl p-4 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+          className="flex items-center justify-center space-x-2 card p-4 hover:shadow-md transition-shadow">
           <MessageSquare className="h-5 w-5 text-blue-600" />
           <span className="font-medium text-gray-900">Messages</span>
         </Link>
         <Link href={`/clients/${id}/feedback`}
-          className="flex items-center justify-center space-x-2 bg-white rounded-xl p-4 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+          className="flex items-center justify-center space-x-2 card p-4 hover:shadow-md transition-shadow">
           <ClipboardList className="h-5 w-5 text-purple-600" />
           <span className="font-medium text-gray-900">Feedback</span>
         </Link>
@@ -129,7 +129,7 @@ export default function ClientDetailPage() {
         ) : (
           <div className="space-y-2">
             {dietPlans.map(plan => (
-              <div key={plan.id} className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 flex items-center justify-between">
+              <div key={plan.id} className="card p-4 flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <Utensils className="h-5 w-5 text-green-500" />
                   <div>
@@ -163,7 +163,7 @@ export default function ClientDetailPage() {
         ) : (
           <div className="space-y-2">
             {trainingPlans.map(plan => (
-              <div key={plan.id} className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 flex items-center justify-between">
+              <div key={plan.id} className="card p-4 flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <Dumbbell className="h-5 w-5 text-purple-500" />
                   <div>

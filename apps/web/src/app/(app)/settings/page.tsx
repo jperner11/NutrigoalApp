@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
-import { Settings, User, Crown, Target, Calendar, HeartPulse, Dumbbell, Utensils, Activity } from 'lucide-react'
+import { Settings, User, Crown, Target, Calendar, HeartPulse, Dumbbell, Utensils, Activity, Lock, Trash2, AlertTriangle, Loader2, ExternalLink } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import {
   PRICING,
@@ -25,7 +25,6 @@ import {
   MOTIVATIONS,
 } from '@/lib/constants'
 import { calculateNutritionTargets } from '@/lib/nutrition'
-import Link from 'next/link'
 import type { ActivityLevel, FitnessGoal, Gender } from '@/lib/supabase/types'
 
 const TABS = [
@@ -36,6 +35,7 @@ const TABS = [
   { key: 'fitness', label: 'Fitness', icon: Dumbbell },
   { key: 'nutrition', label: 'Nutrition', icon: Utensils },
   { key: 'lifestyle', label: 'Lifestyle', icon: Activity },
+  { key: 'account', label: 'Account', icon: Lock },
 ] as const
 
 type TabKey = typeof TABS[number]['key']
@@ -184,6 +184,77 @@ export default function SettingsPage() {
     }
   }, [profile, initialized])
 
+  // Subscription management state
+  const [managingSubscription, setManagingSubscription] = useState(false)
+
+  async function handleManageSubscription() {
+    setManagingSubscription(true)
+    try {
+      const res = await fetch('/api/stripe/portal', { method: 'POST' })
+      const data = await res.json()
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        toast.error(data.message || 'Could not open billing portal')
+      }
+    } catch {
+      toast.error('Something went wrong')
+    }
+    setManagingSubscription(false)
+  }
+
+  // Password change state
+  const [passwords, setPasswords] = useState({ newPassword: '', confirmPassword: '' })
+  const [changingPassword, setChangingPassword] = useState(false)
+
+  // Account deletion state
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [deleteConfirmText, setDeleteConfirmText] = useState('')
+  const [deleting, setDeleting] = useState(false)
+
+  async function handlePasswordChange(e: React.FormEvent) {
+    e.preventDefault()
+    if (passwords.newPassword.length < 6) {
+      toast.error('Password must be at least 6 characters')
+      return
+    }
+    if (passwords.newPassword !== passwords.confirmPassword) {
+      toast.error('Passwords do not match')
+      return
+    }
+
+    setChangingPassword(true)
+    const supabase = createClient()
+    const { error } = await supabase.auth.updateUser({ password: passwords.newPassword })
+
+    if (error) {
+      toast.error(error.message)
+    } else {
+      toast.success('Password updated')
+      setPasswords({ newPassword: '', confirmPassword: '' })
+    }
+    setChangingPassword(false)
+  }
+
+  async function handleDeleteAccount() {
+    if (deleteConfirmText !== 'DELETE') return
+
+    setDeleting(true)
+    const supabase = createClient()
+
+    // Delete the user profile (cascading deletes will handle related data via RLS/triggers)
+    const { error } = await supabase.from('user_profiles').delete().eq('id', profile!.id)
+    if (error) {
+      toast.error('Failed to delete account: ' + error.message)
+      setDeleting(false)
+      return
+    }
+
+    // Sign out and redirect
+    await supabase.auth.signOut()
+    window.location.href = '/login'
+  }
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!profile) return
@@ -280,19 +351,28 @@ export default function SettingsPage() {
       </div>
 
       {/* Subscription */}
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
+      <div className="card p-6 mb-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
             <Crown className="h-6 w-6 text-purple-600" />
             <h2 className="text-lg font-semibold text-gray-900">Subscription</h2>
           </div>
-          {profile.role === 'free' && (
-            <Link
+          {profile.role === 'free' ? (
+            <a
               href="/pricing"
               className="text-sm bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-1.5 rounded-lg font-medium hover:shadow-lg transition-all"
             >
               Upgrade
-            </Link>
+            </a>
+          ) : (
+            <button
+              onClick={handleManageSubscription}
+              disabled={managingSubscription}
+              className="flex items-center gap-1.5 text-sm text-purple-600 hover:text-purple-800 font-medium disabled:opacity-50"
+            >
+              {managingSubscription ? <Loader2 className="h-4 w-4 animate-spin" /> : <ExternalLink className="h-4 w-4" />}
+              Manage Subscription
+            </button>
           )}
         </div>
         <div className="flex items-center space-x-2">
@@ -325,7 +405,8 @@ export default function SettingsPage() {
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSave} className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+      <form onSubmit={handleSave} className="card p-6">
+        <div key={activeTab} className="animate-fade-in">
 
         {/* Profile Tab */}
         {activeTab === 'profile' && (
@@ -598,17 +679,118 @@ export default function SettingsPage() {
           </div>
         )}
 
-        {/* Save Button */}
-        <div className="flex justify-end mt-6 pt-4 border-t border-gray-100">
-          <button
-            type="submit"
-            disabled={saving}
-            className="flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-2 rounded-lg font-medium hover:shadow-lg transition-all disabled:opacity-50"
-          >
-            <Settings className="h-4 w-4" />
-            <span>{saving ? 'Saving...' : 'Save Changes'}</span>
-          </button>
-        </div>
+        {/* Account Tab */}
+        {activeTab === 'account' && (
+          <div className="space-y-8">
+            {/* Change Password */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <Lock className="h-5 w-5 text-purple-600" />
+                Change Password
+              </h3>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+                  <input
+                    type="password"
+                    value={passwords.newPassword}
+                    onChange={(e) => setPasswords(p => ({ ...p, newPassword: e.target.value }))}
+                    className={inputClass}
+                    placeholder="Min. 6 characters"
+                    minLength={6}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+                  <input
+                    type="password"
+                    value={passwords.confirmPassword}
+                    onChange={(e) => setPasswords(p => ({ ...p, confirmPassword: e.target.value }))}
+                    className={inputClass}
+                    placeholder="Confirm your new password"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={handlePasswordChange}
+                  disabled={changingPassword || !passwords.newPassword}
+                  className="flex items-center space-x-2 bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors disabled:opacity-50"
+                >
+                  <Lock className="h-4 w-4" />
+                  <span>{changingPassword ? 'Updating...' : 'Update Password'}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Delete Account */}
+            <div className="border-t border-gray-200 pt-6">
+              <h3 className="text-lg font-semibold text-red-600 mb-2 flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5" />
+                Danger Zone
+              </h3>
+              <p className="text-sm text-gray-600 mb-4">
+                Permanently delete your account and all associated data. This action cannot be undone.
+              </p>
+              {!showDeleteConfirm ? (
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="flex items-center space-x-2 border border-red-300 text-red-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-50 transition-colors"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  <span>Delete Account</span>
+                </button>
+              ) : (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 space-y-3">
+                  <p className="text-sm font-medium text-red-800">
+                    Type <span className="font-mono bg-red-100 px-1 rounded">DELETE</span> to confirm:
+                  </p>
+                  <input
+                    type="text"
+                    value={deleteConfirmText}
+                    onChange={(e) => setDeleteConfirmText(e.target.value)}
+                    className="w-full px-3 py-2 border border-red-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    placeholder="Type DELETE"
+                  />
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      onClick={handleDeleteAccount}
+                      disabled={deleteConfirmText !== 'DELETE' || deleting}
+                      className="flex items-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors disabled:opacity-50"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      <span>{deleting ? 'Deleting...' : 'Permanently Delete'}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setShowDeleteConfirm(false); setDeleteConfirmText('') }}
+                      className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        </div>{/* end animate-fade-in */}
+
+        {/* Save Button — hide on account tab since it has its own actions */}
+        {activeTab !== 'account' && (
+          <div className="flex justify-end mt-6 pt-4 border-t border-gray-100">
+            <button
+              type="submit"
+              disabled={saving}
+              className="flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-2 rounded-lg font-medium hover:shadow-lg transition-all disabled:opacity-50"
+            >
+              <Settings className="h-4 w-4" />
+              <span>{saving ? 'Saving...' : 'Save Changes'}</span>
+            </button>
+          </div>
+        )}
       </form>
     </div>
   )

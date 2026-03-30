@@ -31,7 +31,11 @@ export default function LoginPage() {
     })
 
     if (error) {
-      toast.error(error.message)
+      toast.error(
+        error.message === 'Invalid login credentials'
+          ? 'Incorrect email or password. Please try again.'
+          : error.message
+      )
       setIsLoading(false)
       return
     }
@@ -41,7 +45,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-slate-50 flex items-center justify-center px-4">
+    <div className="min-h-screen auth-bg flex items-center justify-center px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center space-x-2 mb-6">
@@ -56,7 +60,7 @@ export default function LoginPage() {
           <p className="text-gray-800">Sign in to continue your journey</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg p-8">
+        <div className="glass-card rounded-2xl shadow-lg p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">Email</label>

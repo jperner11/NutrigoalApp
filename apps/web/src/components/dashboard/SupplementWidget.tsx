@@ -73,7 +73,7 @@ export default function SupplementWidget({ userId }: SupplementWidgetProps) {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200 animate-pulse">
+      <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-200 animate-pulse">
         <div className="h-5 bg-gray-200 rounded w-1/3 mb-3" />
         <div className="space-y-2">
           <div className="h-8 bg-gray-100 rounded" />
@@ -90,7 +90,7 @@ export default function SupplementWidget({ userId }: SupplementWidgetProps) {
   const total = supplements.length
 
   return (
-    <div className="bg-gradient-to-br from-white to-green-50/40 rounded-xl p-5 shadow-sm border border-green-100/60 hover:shadow-md transition-all duration-200">
+    <div className="bg-gradient-to-br from-white to-green-50/40 rounded-2xl p-5 shadow-sm border border-green-100/60 hover:shadow-md transition-all duration-200">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <div className="bg-gradient-to-br from-green-100 to-emerald-100 rounded-full p-2">

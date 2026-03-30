@@ -49,7 +49,7 @@ export default function DietPage() {
       </div>
 
       {plans.length === 0 ? (
-        <div className="bg-white rounded-xl p-12 shadow-sm border border-gray-200 text-center">
+        <div className="card p-12 text-center">
           <Utensils className="h-16 w-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">No diet plans yet</h3>
           <p className="text-gray-500 mb-6">Create your first diet plan to start tracking your nutrition.</p>
@@ -67,7 +67,7 @@ export default function DietPage() {
             <Link
               key={plan.id}
               href={`/diet/${plan.id}`}
-              className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
+              className="card p-6 hover:shadow-md transition-shadow"
             >
               <div className="flex items-center space-x-3 mb-3">
                 <div className="bg-orange-100 rounded-lg p-2">

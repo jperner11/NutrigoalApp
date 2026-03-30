@@ -23,13 +23,40 @@ export default function RootLayout({
         <div className="min-h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-slate-50">
           {children}
         </div>
-        <Toaster 
-          position="top-right"
+        <Toaster
+          position="top-center"
+          reverseOrder={false}
           toastOptions={{
-            duration: 4000,
+            duration: 3500,
             style: {
-              background: "#363636",
-              color: "#fff",
+              padding: '14px 20px',
+              borderRadius: '12px',
+              fontSize: '14px',
+              fontWeight: '500',
+              maxWidth: '420px',
+              boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
+            },
+            success: {
+              style: {
+                background: '#f0fdf4',
+                color: '#166534',
+                border: '1px solid #bbf7d0',
+              },
+              iconTheme: {
+                primary: '#22c55e',
+                secondary: '#f0fdf4',
+              },
+            },
+            error: {
+              style: {
+                background: '#fef2f2',
+                color: '#991b1b',
+                border: '1px solid #fecaca',
+              },
+              iconTheme: {
+                primary: '#ef4444',
+                secondary: '#fef2f2',
+              },
             },
           }}
         />

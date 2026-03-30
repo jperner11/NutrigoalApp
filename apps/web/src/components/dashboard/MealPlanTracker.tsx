@@ -188,7 +188,7 @@ export default function MealPlanTracker({ userId, userRole = 'free', onMacrosUpd
 
   if (loading) {
     return (
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-8">
+      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 mb-8">
         <div className="animate-pulse space-y-3">
           <div className="h-5 bg-gray-200 rounded w-1/3" />
           <div className="h-20 bg-gray-100 rounded" />
@@ -199,7 +199,7 @@ export default function MealPlanTracker({ userId, userRole = 'free', onMacrosUpd
 
   if (!activePlan) {
     return (
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-8">
+      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 mb-8">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-lg font-semibold text-gray-900">Today&apos;s Meals</h2>
         </div>
@@ -220,7 +220,7 @@ export default function MealPlanTracker({ userId, userRole = 'free', onMacrosUpd
   const mealsEaten = meals.filter(m => loggedMealIds.has(m.id)).length
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-8">
+    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 mb-8">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h2 className="text-lg font-semibold text-gray-900">Today&apos;s Meals</h2>

@@ -131,7 +131,7 @@ export default function MeasurementsPage() {
 
       {/* Add Form */}
       {showForm && (
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
+        <div className="card p-6 mb-6">
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
             <input
@@ -196,7 +196,7 @@ export default function MeasurementsPage() {
 
       {/* Latest Comparison Card */}
       {latest && (
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200 mb-6">
+        <div className="card p-5 mb-6">
           <div className="flex items-center gap-2 mb-4">
             <Ruler className="h-5 w-5 text-purple-600" />
             <h2 className="font-semibold text-gray-900">
@@ -235,7 +235,7 @@ export default function MeasurementsPage() {
 
       {/* History */}
       {measurements.length > 1 && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="card overflow-hidden">
           <div className="px-5 py-3 border-b border-gray-100">
             <h3 className="font-semibold text-gray-900">History</h3>
           </div>
@@ -269,7 +269,7 @@ export default function MeasurementsPage() {
       )}
 
       {measurements.length === 0 && !showForm && (
-        <div className="bg-white rounded-xl p-12 shadow-sm border border-gray-200 text-center">
+        <div className="card p-12 text-center">
           <Ruler className="h-12 w-12 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">No measurements yet</h3>
           <p className="text-gray-500 mb-4">Start tracking your body measurements to see changes over time.</p>

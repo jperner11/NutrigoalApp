@@ -41,7 +41,7 @@ function StatCard({ label, value, subtitle, icon: Icon, color }: {
   }
 
   return (
-    <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
+    <div className="card p-4">
       <div className="flex items-center gap-3 mb-2">
         <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${colorClasses[color] || colorClasses.purple}`}>
           <Icon className="h-4.5 w-4.5" />
@@ -110,7 +110,7 @@ export default function ReportsPage() {
       </div>
 
       {/* Week Selector */}
-      <div className="flex items-center justify-between bg-white rounded-xl p-3 shadow-sm border border-gray-200 mb-6">
+      <div className="flex items-center justify-between card p-3 mb-6">
         <button
           onClick={() => setWeekOffset(prev => prev - 1)}
           className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
@@ -132,7 +132,7 @@ export default function ReportsPage() {
       ) : report ? (
         <div className="space-y-6">
           {/* Adherence */}
-          <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
+          <div className="card p-5">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Adherence</h2>
             <div className="space-y-4">
               <AdherenceBar label="Calorie Target" percentage={report.calorieAdherence} color="purple" />

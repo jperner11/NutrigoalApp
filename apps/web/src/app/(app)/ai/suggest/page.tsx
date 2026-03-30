@@ -74,7 +74,7 @@ export default function AISuggestPage() {
       </div>
 
       {/* Usage Counter */}
-      <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 mb-6 flex items-center justify-between">
+      <div className="card p-4 mb-6 flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <Sparkles className="h-5 w-5 text-purple-600" />
           <span className="text-sm text-gray-700">
@@ -98,7 +98,7 @@ export default function AISuggestPage() {
       </div>
 
       {/* Prompt Form */}
-      <form onSubmit={handleSubmit} className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
+      <form onSubmit={handleSubmit} className="card p-6 mb-6">
         <label className="block text-sm font-medium text-gray-700 mb-2">
           What kind of meal are you looking for?
         </label>
@@ -136,7 +136,7 @@ export default function AISuggestPage() {
 
       {/* Response */}
       {response && (
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+        <div className="card p-6">
           <div className="flex items-center space-x-2 mb-4">
             <Sparkles className="h-5 w-5 text-purple-600" />
             <h3 className="font-semibold text-gray-900">AI Suggestion</h3>

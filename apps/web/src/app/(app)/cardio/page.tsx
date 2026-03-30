@@ -113,7 +113,7 @@ export default function CardioPage() {
   if (isFeatureLocked(profile?.role ?? 'free', 'cardio')) {
     return (
       <div className="max-w-3xl mx-auto">
-        <div className="bg-white rounded-xl p-12 shadow-sm border border-gray-200 text-center">
+        <div className="card p-12 text-center">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-purple-100 mb-4">
             <Lock className="h-7 w-7 text-purple-600" />
           </div>
@@ -150,7 +150,7 @@ export default function CardioPage() {
 
       {/* Log Form */}
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-8">
+        <form onSubmit={handleSubmit} className="card p-6 mb-8">
           <h3 className="font-semibold text-gray-900 mb-4">Log Cardio Session</h3>
           <div className="grid md:grid-cols-2 gap-4">
             <div>
@@ -221,7 +221,7 @@ export default function CardioPage() {
 
       {/* Sessions List */}
       {sessions.length === 0 ? (
-        <div className="bg-white rounded-xl p-12 shadow-sm border border-gray-200 text-center">
+        <div className="card p-12 text-center">
           <HeartPulse className="h-16 w-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">No cardio sessions yet</h3>
           <p className="text-gray-500">Start logging your cardio to track calories burned.</p>
@@ -229,7 +229,7 @@ export default function CardioPage() {
       ) : (
         <div className="space-y-3">
           {sessions.map((session) => (
-            <div key={session.id} className="bg-white rounded-xl p-5 shadow-sm border border-gray-200 flex items-center justify-between">
+            <div key={session.id} className="card p-5 flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <div className="bg-red-100 rounded-lg p-2">
                   <HeartPulse className="h-5 w-5 text-red-600" />

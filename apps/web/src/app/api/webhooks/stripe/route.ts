@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server'
+import { getStripe } from '@/lib/stripe'
+import { createAdminClient } from '@/lib/supabase/admin'
+import type Stripe from 'stripe'
+import type { UserRole } from '@nutrigoal/shared'
 
-// Stripe webhook handler - placeholder for Phase 7
-// This will handle subscription events (created, updated, canceled, etc.)
 export async function POST(request: Request) {
   const body = await request.text()
   const signature = request.headers.get('stripe-signature')
@@ -10,13 +12,98 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Missing stripe signature' }, { status: 400 })
   }
 
-  // TODO: Phase 7 - Implement Stripe webhook handling
-  // 1. Verify webhook signature with STRIPE_WEBHOOK_SECRET
-  // 2. Handle events: customer.subscription.created, updated, deleted
-  // 3. Update subscriptions table and user_profiles.role accordingly
-  // 4. Handle nutritionist client package changes
+  let event: Stripe.Event
+  try {
+    event = getStripe().webhooks.constructEvent(
+      body,
+      signature,
+      process.env.STRIPE_WEBHOOK_SECRET!
+    )
+  } catch {
+    return NextResponse.json({ message: 'Invalid signature' }, { status: 400 })
+  }
 
-  console.log('Stripe webhook received', body.substring(0, 100))
+  const supabase = createAdminClient()
+
+  switch (event.type) {
+    case 'checkout.session.completed': {
+      const session = event.data.object as Stripe.Checkout.Session
+      const userId = session.metadata?.userId
+      const plan = session.metadata?.plan as UserRole | undefined
+
+      if (!userId || !plan) break
+
+      // Retrieve full subscription for period dates
+      const subscription = await getStripe().subscriptions.retrieve(
+        session.subscription as string
+      )
+
+      await supabase.from('subscriptions').upsert(
+        {
+          user_id: userId,
+          stripe_customer_id: session.customer as string,
+          stripe_subscription_id: session.subscription as string,
+          plan_type: plan,
+          status: 'active',
+          current_period_start: new Date(subscription.items.data[0].current_period_start * 1000).toISOString(),
+          current_period_end: new Date(subscription.items.data[0].current_period_end * 1000).toISOString(),
+        },
+        { onConflict: 'user_id' }
+      )
+
+      await supabase
+        .from('user_profiles')
+        .update({ role: plan })
+        .eq('id', userId)
+
+      break
+    }
+
+    case 'customer.subscription.updated': {
+      const subscription = event.data.object as Stripe.Subscription
+      const userId = subscription.metadata?.userId
+
+      if (!userId) break
+
+      const statusMap: Record<string, string> = {
+        active: 'active',
+        past_due: 'past_due',
+        canceled: 'canceled',
+        trialing: 'trialing',
+        unpaid: 'past_due',
+      }
+
+      await supabase
+        .from('subscriptions')
+        .update({
+          status: statusMap[subscription.status] || 'active',
+          current_period_start: new Date(subscription.items.data[0].current_period_start * 1000).toISOString(),
+          current_period_end: new Date(subscription.items.data[0].current_period_end * 1000).toISOString(),
+        })
+        .eq('user_id', userId)
+
+      break
+    }
+
+    case 'customer.subscription.deleted': {
+      const subscription = event.data.object as Stripe.Subscription
+      const userId = subscription.metadata?.userId
+
+      if (!userId) break
+
+      await supabase
+        .from('subscriptions')
+        .update({ status: 'canceled' })
+        .eq('user_id', userId)
+
+      await supabase
+        .from('user_profiles')
+        .update({ role: 'free' as UserRole })
+        .eq('id', userId)
+
+      break
+    }
+  }
 
   return NextResponse.json({ received: true })
 }

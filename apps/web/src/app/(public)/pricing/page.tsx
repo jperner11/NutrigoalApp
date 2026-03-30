@@ -1,8 +1,10 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
-import { Target, Check, Zap, Crown, Users, Sparkles } from 'lucide-react'
+import { Target, Check, Zap, Crown, Users, Sparkles, Loader2 } from 'lucide-react'
 import { PRICING } from '@/lib/constants'
+import { toast } from 'react-hot-toast'
 
 const tiers = [
   {
@@ -52,8 +54,35 @@ const tiers = [
 ]
 
 export default function PricingPage() {
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null)
+
+  async function handleCheckout(plan: string) {
+    setLoadingPlan(plan)
+    try {
+      const res = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan }),
+      })
+      const data = await res.json()
+      if (res.status === 401) {
+        // Not logged in — send to signup first
+        window.location.href = '/signup'
+        return
+      }
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        toast.error(data.message || 'Failed to start checkout')
+      }
+    } catch {
+      toast.error('Something went wrong')
+    }
+    setLoadingPlan(null)
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-slate-50">
+    <div className="min-h-screen auth-bg">
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-md border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -134,13 +163,27 @@ export default function PricingPage() {
                   ))}
                 </ul>
 
-                <Link
-                  href="/signup"
-                  className={`w-full ${tier.btnClass} py-3 rounded-lg font-semibold transition-all flex items-center justify-center space-x-2 text-center block`}
-                >
-                  {tier.btnIcon}
-                  <span>{tier.btnLabel}</span>
-                </Link>
+                {tier.key === 'free' ? (
+                  <Link
+                    href="/signup"
+                    className={`w-full ${tier.btnClass} py-3 rounded-lg font-semibold transition-all flex items-center justify-center space-x-2 text-center block`}
+                  >
+                    <span>{tier.btnLabel}</span>
+                  </Link>
+                ) : (
+                  <button
+                    onClick={() => handleCheckout(tier.key)}
+                    disabled={loadingPlan !== null}
+                    className={`w-full ${tier.btnClass} py-3 rounded-lg font-semibold transition-all flex items-center justify-center space-x-2 disabled:opacity-50`}
+                  >
+                    {loadingPlan === tier.key ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                      tier.btnIcon
+                    )}
+                    <span>{loadingPlan === tier.key ? 'Redirecting...' : tier.btnLabel}</span>
+                  </button>
+                )}
               </div>
             )
           })}

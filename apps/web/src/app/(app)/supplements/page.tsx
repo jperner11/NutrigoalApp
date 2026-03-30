@@ -157,7 +157,7 @@ export default function SupplementsPage() {
   if (isFeatureLocked(profile.role, 'supplements')) {
     return (
       <div className="max-w-3xl mx-auto">
-        <div className="bg-white rounded-xl p-12 shadow-sm border border-gray-200 text-center">
+        <div className="card p-12 text-center">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-purple-100 mb-4">
             <Lock className="h-7 w-7 text-purple-600" />
           </div>
@@ -223,7 +223,7 @@ export default function SupplementsPage() {
 
       {/* Add Form */}
       {showForm && (
-        <form onSubmit={handleAdd} className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-6 space-y-4">
+        <form onSubmit={handleAdd} className="card p-6 mb-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Supplement name</label>
             <input
@@ -319,7 +319,7 @@ export default function SupplementsPage() {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600" />
         </div>
       ) : supplements.length === 0 ? (
-        <div className="bg-white rounded-xl p-12 shadow-sm border border-gray-200 text-center">
+        <div className="card p-12 text-center">
           <Pill className="h-16 w-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">No supplements yet</h3>
           <p className="text-gray-500 mb-4">Add your supplements to track daily intake.</p>

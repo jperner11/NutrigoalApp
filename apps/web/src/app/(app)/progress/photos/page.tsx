@@ -98,6 +98,7 @@ export default function PhotosPage() {
   }
 
   async function handleDelete(photo: ProgressPhoto) {
+    if (!window.confirm('Delete this photo? This action cannot be undone.')) return
     const supabase = createClient()
     // Extract storage path from URL
     const urlParts = photo.photo_url.split('/progress-photos/')
@@ -164,7 +165,7 @@ export default function PhotosPage() {
 
       {/* Upload Form */}
       {showForm && (
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
+        <div className="card p-6 mb-6">
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
@@ -298,7 +299,7 @@ export default function PhotosPage() {
           ))}
         </div>
       ) : !showForm && (
-        <div className="bg-white rounded-xl p-12 shadow-sm border border-gray-200 text-center">
+        <div className="card p-12 text-center">
           <Camera className="h-12 w-12 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">No photos yet</h3>
           <p className="text-gray-500 mb-4">Upload progress photos to track your visual transformation.</p>

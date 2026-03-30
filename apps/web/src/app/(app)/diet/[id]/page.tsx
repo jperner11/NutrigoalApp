@@ -351,7 +351,7 @@ export default function DietPlanDetailPage() {
 
       {/* Meals */}
       {filteredMeals.length === 0 ? (
-        <div className="bg-white rounded-xl p-12 shadow-sm border border-gray-200 text-center">
+        <div className="card p-12 text-center">
           <Utensils className="h-16 w-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
             {hasMultipleDays && meals.length > 0 ? 'No meals for this day' : 'No meals in this plan'}

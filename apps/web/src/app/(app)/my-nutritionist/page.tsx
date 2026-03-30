@@ -54,7 +54,7 @@ export default function MyNutritionistPage() {
     <div className="max-w-lg mx-auto">
       <h1 className="text-3xl font-bold text-gray-900 mb-8">My Nutritionist</h1>
 
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
+      <div className="card p-6 mb-6">
         <div className="flex items-center gap-4 mb-4">
           <div className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white text-xl font-bold">
             {(nutritionist.full_name || nutritionist.email)[0].toUpperCase()}
@@ -72,7 +72,7 @@ export default function MyNutritionistPage() {
       <div className="space-y-3">
         <Link
           href={`/my-nutritionist/messages`}
-          className="flex items-center gap-3 bg-white rounded-xl p-4 shadow-sm border border-gray-200 hover:border-purple-300 hover:bg-purple-50/50 transition-all"
+          className="flex items-center gap-3 card p-4 hover:border-purple-300 hover:bg-purple-50/50 transition-all"
         >
           <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
             <MessageSquare className="h-5 w-5 text-purple-600" />
@@ -85,7 +85,7 @@ export default function MyNutritionistPage() {
 
         <Link
           href={`/my-nutritionist/feedback`}
-          className="flex items-center gap-3 bg-white rounded-xl p-4 shadow-sm border border-gray-200 hover:border-purple-300 hover:bg-purple-50/50 transition-all"
+          className="flex items-center gap-3 card p-4 hover:border-purple-300 hover:bg-purple-50/50 transition-all"
         >
           <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
             <FileText className="h-5 w-5 text-indigo-600" />

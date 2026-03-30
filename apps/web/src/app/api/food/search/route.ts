@@ -1,6 +1,13 @@
 import { NextResponse } from 'next/server'
+import { rateLimit, getClientIp } from '@/lib/rateLimit'
 
 export async function GET(request: Request) {
+  const ip = getClientIp(request)
+  const { success } = rateLimit(`food-search:${ip}`, { limit: 30, windowMs: 60_000 })
+  if (!success) {
+    return NextResponse.json({ message: 'Too many requests. Please try again later.' }, { status: 429 })
+  }
+
   const { searchParams } = new URL(request.url)
   const query = searchParams.get('query')
   const number = searchParams.get('number') ?? '10'
