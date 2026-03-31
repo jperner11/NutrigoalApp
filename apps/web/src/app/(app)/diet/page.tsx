@@ -90,7 +90,7 @@ export default function DietPage() {
                   {plan.target_calories} cal · {plan.target_protein}g P · {plan.target_carbs}g C · {plan.target_fat}g F
                 </p>
               )}
-              {plan.notes && (
+              {plan.notes && !plan.notes.startsWith('{') && (
                 <p className="text-sm text-gray-500 mt-2 line-clamp-2">{plan.notes}</p>
               )}
             </Link>
