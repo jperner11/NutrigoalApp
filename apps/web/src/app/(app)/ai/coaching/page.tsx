@@ -2,33 +2,14 @@
 
 import Link from 'next/link'
 import {
-  TrendingUp,
-  Target,
   Moon,
   Shield,
-  ClipboardList,
   Activity,
   ArrowRight,
   Brain,
 } from 'lucide-react'
 
 const TOOLS = [
-  {
-    slug: 'plateau',
-    title: 'Plateau Breaker',
-    description: 'Diagnose why your lifts have stalled and get a detailed 8-week plan to break through.',
-    icon: TrendingUp,
-    color: 'text-red-500',
-    bg: 'bg-red-50',
-  },
-  {
-    slug: 'weak-point',
-    title: 'Weak Point Analyzer',
-    description: 'Identify lagging muscles and performance gaps with a prioritised corrective action plan.',
-    icon: Target,
-    color: 'text-amber-500',
-    bg: 'bg-amber-50',
-  },
   {
     slug: 'recovery',
     title: 'Recovery Protocol',
@@ -44,14 +25,6 @@ const TOOLS = [
     icon: Shield,
     color: 'text-green-500',
     bg: 'bg-green-50',
-  },
-  {
-    slug: 'tracking',
-    title: 'Tracking System',
-    description: 'Professional accountability system — what to track, when, and what to do with the data.',
-    icon: ClipboardList,
-    color: 'text-purple-500',
-    bg: 'bg-purple-50',
   },
   {
     slug: 'recomp',

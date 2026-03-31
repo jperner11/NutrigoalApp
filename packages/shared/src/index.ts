@@ -58,6 +58,8 @@ export type {
   FeedbackRequest,
   TierSelectionType,
   UserTierSelection,
+  ExerciseProgress,
+  TrainingCheckIn,
 } from './types'
 
 // Nutrition

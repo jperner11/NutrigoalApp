@@ -427,3 +427,33 @@ export interface FeedbackRequest {
   created_at: string
   responded_at: string | null
 }
+
+// ─── Training Check-ins ────────────────────────────────
+
+export interface ExerciseProgress {
+  exercise_name: string
+  exercise_id: string
+  first_weight: number
+  last_weight: number
+  weight_change: number
+  best_weight: number
+  total_sets: number
+  avg_reps: number
+  sessions_logged: number
+  trend: 'improving' | 'stalled' | 'declining'
+}
+
+export interface TrainingCheckIn {
+  id: string
+  user_id: string
+  training_plan_id: string | null
+  check_in_date: string
+  period_start: string
+  period_end: string
+  workouts_logged: number
+  workouts_planned: number
+  exercise_progress: ExerciseProgress[]
+  ai_summary: string | null
+  ai_recommendations: string | null
+  created_at: string
+}

@@ -6,11 +6,8 @@ import { useUser } from '@/hooks/useUser'
 import {
   ArrowLeft,
   Loader2,
-  TrendingUp,
-  Target,
   Moon,
   Shield,
-  ClipboardList,
   Activity,
   Sparkles,
 } from 'lucide-react'
@@ -33,49 +30,6 @@ const TOOL_CONFIG: Record<string, {
   bg: string
   fields: FieldDef[]
 }> = {
-  plateau: {
-    title: 'Plateau Breaker',
-    description: 'Tell us which lifts have stalled and we\'ll diagnose the cause and build an 8-week breakthrough plan.',
-    icon: TrendingUp,
-    color: 'text-red-500',
-    bg: 'bg-red-50',
-    fields: [
-      {
-        key: 'stalledLifts',
-        label: 'Which lifts are stalled? Include the weight you\'re stuck at.',
-        type: 'textarea',
-        placeholder: 'e.g. Bench press stuck at 80kg for 4 weeks, squat plateau at 120kg for 3 weeks',
-        required: true,
-      },
-      {
-        key: 'weeksStalled',
-        label: 'How many weeks have you been stuck?',
-        type: 'number',
-        placeholder: 'e.g. 4',
-      },
-    ],
-  },
-  'weak-point': {
-    title: 'Weak Point Analyzer',
-    description: 'Identify your lagging muscles and performance gaps. Get a corrective action plan.',
-    icon: Target,
-    color: 'text-amber-500',
-    bg: 'bg-amber-50',
-    fields: [
-      {
-        key: 'aestheticWeakPoints',
-        label: 'Aesthetic weak points — muscle groups that are visibly underdeveloped',
-        type: 'textarea',
-        placeholder: 'e.g. rear delts, upper chest, hamstrings, calves',
-      },
-      {
-        key: 'performanceWeakPoints',
-        label: 'Performance weak points — where you fail or lose form in your lifts',
-        type: 'textarea',
-        placeholder: 'e.g. squat collapses at the bottom, bench stalls off the chest, deadlift hitches at the knee',
-      },
-    ],
-  },
   recovery: {
     title: 'Recovery Protocol',
     description: 'A complete recovery system built from your profile — sleep, mobility, deload, nutrition, and supplements.',
@@ -91,21 +45,6 @@ const TOOL_CONFIG: Record<string, {
     color: 'text-green-500',
     bg: 'bg-green-50',
     fields: [],
-  },
-  tracking: {
-    title: 'Tracking System',
-    description: 'A data-driven accountability framework to run alongside your training programme.',
-    icon: ClipboardList,
-    color: 'text-purple-500',
-    bg: 'bg-purple-50',
-    fields: [
-      {
-        key: 'programmeDurationWeeks',
-        label: 'Programme duration (weeks)',
-        type: 'number',
-        placeholder: '12',
-      },
-    ],
   },
   recomp: {
     title: 'Body Recomposition',

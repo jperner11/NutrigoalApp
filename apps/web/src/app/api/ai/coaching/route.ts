@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { rateLimit, getClientIp } from '@/lib/rateLimit'
 import { buildCoachingPrompt, type CoachingTool } from '@/lib/coachingPrompts'
 
-const VALID_TOOLS: CoachingTool[] = ['plateau', 'weak-point', 'recovery', 'injury-prevention', 'tracking', 'recomp']
+const VALID_TOOLS: CoachingTool[] = ['recovery', 'injury-prevention', 'recomp']
 
 export async function POST(request: Request) {
   const ip = getClientIp(request)

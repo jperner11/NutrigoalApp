@@ -20,11 +20,6 @@ import {
   X,
   RefreshCw,
   Lock,
-  Sparkles,
-  Lightbulb,
-  TrendingUp,
-  ArrowRightLeft,
-  Pill,
 } from 'lucide-react'
 import type { DietPlan, DietPlanMeal } from '@/lib/supabase/types'
 import { isFeatureLocked, canAccess } from '@/lib/tierUtils'
@@ -50,26 +45,6 @@ interface MealMeta {
   time?: string
   timing_note?: string
   notes?: string
-}
-
-interface CompanionContent {
-  personal_rules: string[]
-  timeline: string
-  hydration_tips: string[]
-  hydration_explanation: string
-  snack_swaps: { current: string; swap: string; calories: number; why: string }[]
-  supplement_note: string
-}
-
-function parseCompanionContent(notes: string | null | undefined): CompanionContent | null {
-  if (!notes) return null
-  try {
-    const parsed = JSON.parse(notes)
-    if (parsed && Array.isArray(parsed.personal_rules)) return parsed as CompanionContent
-  } catch {
-    // Not JSON — regular notes string
-  }
-  return null
 }
 
 function parseFoods(raw: unknown): { meta: MealMeta; items: FoodItemExtended[] } {
@@ -296,7 +271,7 @@ export default function DietPlanDetailPage() {
                 </span>
               )}
             </div>
-            {plan.notes && !parseCompanionContent(plan.notes) && (
+            {plan.notes && !plan.notes.startsWith('{') && (
               <p className="text-gray-600 mt-1">{plan.notes}</p>
             )}
           </div>
@@ -518,116 +493,6 @@ export default function DietPlanDetailPage() {
           })}
         </div>
       )}
-
-      {/* Companion Content — coaching insights */}
-      {(() => {
-        const companion = parseCompanionContent(plan.notes)
-        if (!companion) return null
-        return (
-          <div className="space-y-4 mt-8">
-            {/* Section heading */}
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="h-5 w-5 text-purple-600" />
-              <h2 className="text-xl font-bold text-gray-900">Your Coaching Insights</h2>
-            </div>
-
-            {/* Personal Rules */}
-            {companion.personal_rules?.length > 0 && (
-              <div className="bg-white/80 backdrop-blur-sm rounded-xl p-5 shadow-sm border border-gray-200">
-                <div className="flex items-center gap-2 mb-3">
-                  <Lightbulb className="h-4 w-4 text-amber-500" />
-                  <h3 className="font-semibold text-gray-900 text-sm">Your Personal Rules</h3>
-                </div>
-                <ol className="space-y-2">
-                  {companion.personal_rules.map((rule, i) => (
-                    <li key={i} className="flex gap-3 text-sm text-gray-700">
-                      <span className="flex-shrink-0 w-6 h-6 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-xs font-bold">{i + 1}</span>
-                      <span>{rule}</span>
-                    </li>
-                  ))}
-                </ol>
-              </div>
-            )}
-
-            {/* Realistic Timeline */}
-            {companion.timeline && (
-              <div className="bg-white/80 backdrop-blur-sm rounded-xl p-5 shadow-sm border border-gray-200">
-                <div className="flex items-center gap-2 mb-3">
-                  <TrendingUp className="h-4 w-4 text-green-600" />
-                  <h3 className="font-semibold text-gray-900 text-sm">Your Realistic Timeline</h3>
-                </div>
-                <div className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">
-                  {companion.timeline}
-                </div>
-              </div>
-            )}
-
-            {/* Hydration Tips */}
-            {companion.hydration_tips?.length > 0 && (
-              <div className="bg-blue-50/60 rounded-xl p-5 border border-blue-100">
-                <div className="flex items-center gap-2 mb-3">
-                  <Droplets className="h-4 w-4 text-blue-500" />
-                  <h3 className="font-semibold text-blue-900 text-sm">Hydration Tips</h3>
-                </div>
-                <ul className="space-y-2">
-                  {companion.hydration_tips.map((tip, i) => (
-                    <li key={i} className="flex gap-3 text-sm text-blue-800">
-                      <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">{i + 1}</span>
-                      <span>{tip}</span>
-                    </li>
-                  ))}
-                </ul>
-                {companion.hydration_explanation && (
-                  <p className="mt-4 text-sm text-blue-700/80 border-t border-blue-100 pt-3 leading-relaxed">
-                    {companion.hydration_explanation}
-                  </p>
-                )}
-              </div>
-            )}
-
-            {/* Snack Swaps */}
-            {companion.snack_swaps?.length > 0 && (
-              <div className="bg-white/80 backdrop-blur-sm rounded-xl p-5 shadow-sm border border-gray-200">
-                <div className="flex items-center gap-2 mb-3">
-                  <ArrowRightLeft className="h-4 w-4 text-purple-600" />
-                  <h3 className="font-semibold text-gray-900 text-sm">Smarter Snack Swaps</h3>
-                </div>
-                <div className="space-y-3">
-                  {companion.snack_swaps.map((swap, i) => (
-                    <div key={i} className="flex items-start gap-3 bg-gray-50 rounded-lg p-3">
-                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center mt-0.5">
-                        <X className="h-3.5 w-3.5" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900">
-                          <span className="line-through text-gray-400">{swap.current}</span>
-                          <span className="mx-2 text-gray-300">→</span>
-                          <span className="text-green-700">{swap.swap}</span>
-                          <span className="text-xs text-gray-400 ml-2">~{swap.calories} cal</span>
-                        </p>
-                        <p className="text-xs text-gray-500 mt-0.5">{swap.why}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Supplement Disclaimer */}
-            {companion.supplement_note && (
-              <div className="bg-amber-50/60 rounded-xl p-5 border border-amber-100">
-                <div className="flex items-center gap-2 mb-2">
-                  <Pill className="h-4 w-4 text-amber-600" />
-                  <h3 className="font-semibold text-amber-900 text-sm">Supplements — The 1%</h3>
-                </div>
-                <p className="text-sm text-amber-800 leading-relaxed">
-                  {companion.supplement_note}
-                </p>
-              </div>
-            )}
-          </div>
-        )
-      })()}
 
       {/* Free User Meal Picker Modal */}
       {showMealPicker && isFreeUser && (

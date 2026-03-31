@@ -1,11 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
 import { Dumbbell, Plus, Calendar, Clock, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 import type { TrainingPlan } from '@/lib/supabase/types'
+import ProgressCheckIn from '@/components/training/ProgressCheckIn'
 
 interface PlanWithMeta extends TrainingPlan {
   dayCount: number
@@ -14,6 +16,7 @@ interface PlanWithMeta extends TrainingPlan {
 
 export default function TrainingPage() {
   const { profile } = useUser()
+  const router = useRouter()
   const [plans, setPlans] = useState<PlanWithMeta[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -108,6 +111,13 @@ export default function TrainingPage() {
           <span>New Plan</span>
         </Link>
       </div>
+
+      {profile && (
+        <ProgressCheckIn
+          userId={profile.id}
+          onPlanRegenerate={() => router.push('/generate-plans')}
+        />
+      )}
 
       {plans.length === 0 ? (
         <div className="bg-white/80 backdrop-blur-sm rounded-xl p-12 shadow-sm border border-gray-200 text-center">

@@ -214,8 +214,15 @@ Rules:
 - "title" = descriptive, appetizing name (e.g. "Spicy Chicken Burrito Bowl" not "Chicken with Rice")
 - "notes" should include: batch-cook suitability, treat-meal flags, protein swap options, cooking tips. Flag meals that are great for meal prep with "BATCH COOK:"
 - meal_type: breakfast, lunch, dinner, or snack
-- MEAL TIMING: Spread meals EVENLY (${wakeTime}–${sleepTime}). 2-3h gaps. NEVER >4h gap. Work hours meals (${workStartTime}–${workEndTime}) should be practical/portable.
-- PREFERRED MEAL TIMES: Breakfast ~${breakfastTime}, Lunch ~${lunchTime}, Dinner ~${dinnerTime}. Use these as anchors and fit snacks/pre-post workout meals around them.
+- MEAL TIMING IS STRICT — follow these EXACT rules:
+  * Breakfast MUST be at ${breakfastTime}
+  * Lunch MUST be at ${lunchTime}
+  * Dinner MUST be at ${dinnerTime}
+  * These 3 meals are LOCKED. Do NOT move them.
+  * Snacks and pre/post-workout meals go BETWEEN these anchors with a MINIMUM 1.5h gap from any other meal.
+  * NEVER place two meals within 1 hour of each other. If workout time (${workoutTime}) is too close to a main meal, skip the pre/post-workout snack and adjust the main meal instead.
+  * Work hours meals (${workStartTime}–${workEndTime}) should be practical/portable.
+  * Last meal no later than 2h before sleep (${sleepTime}).
 - Keep meals SIMPLE: 1 protein + 1 carb + 1 fat source per main meal (3-4 ingredients, max 5). Snacks: 1-2 items.
 - For the PRIMARY carb source in main meals, include "alternatives": 3-5 substitutes with equivalent portions
 - ALWAYS use grams (g) for solids and milliliters (ml) for liquids. Never cups, tablespoons, or "1 medium".
