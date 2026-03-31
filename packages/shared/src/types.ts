@@ -23,6 +23,7 @@ export type GoalTimeline = 'steady' | '4_weeks' | '8_weeks' | '12_weeks' | '6_mo
 export type AlcoholFrequency = 'none' | 'light' | 'moderate' | 'heavy'
 export type SnackMotivation = 'hunger' | 'boredom' | 'habit' | 'mixed'
 export type SnackPreference = 'sweet' | 'savoury' | 'both'
+export type SecondaryTrainingGoal = 'mobility' | 'conditioning' | 'sport_performance' | 'injury_rehab' | 'posture' | 'none'
 export type SupplementFrequency = 'daily' | 'twice_daily' | 'three_times' | 'weekly' | 'as_needed'
 export type SupplementTime = 'morning' | 'afternoon' | 'evening' | 'with_meals' | 'pre_workout' | 'post_workout' | 'bedtime'
 
@@ -65,6 +66,12 @@ export interface UserProfile {
   training_experience: TrainingExperience | null
   equipment_access: EquipmentAccess | null
   training_style: TrainingStyle[]
+  secondary_training_goal: SecondaryTrainingGoal | null
+  max_session_minutes: number | null
+  squat_1rm: number | null
+  bench_1rm: number | null
+  deadlift_1rm: number | null
+  ohp_1rm: number | null
   // Nutrition background
   dietary_restrictions: string[]
   food_dislikes: string[]

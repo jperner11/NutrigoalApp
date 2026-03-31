@@ -162,6 +162,24 @@ export const TRAINING_STYLES = [
   { value: 'mixed', label: 'Mixed', description: 'Combination of styles' },
 ] as const
 
+export const SECONDARY_TRAINING_GOALS = [
+  { value: 'mobility', label: 'Mobility & Flexibility', description: 'Improve range of motion and joint health' },
+  { value: 'conditioning', label: 'Conditioning & Cardio', description: 'Better endurance and work capacity' },
+  { value: 'sport_performance', label: 'Sport Performance', description: 'Train for a specific sport or activity' },
+  { value: 'injury_rehab', label: 'Injury Rehab', description: 'Rehabilitation and prehab exercises' },
+  { value: 'posture', label: 'Posture Correction', description: 'Fix imbalances and improve posture' },
+  { value: 'none', label: 'No secondary goal', description: 'Focus entirely on my primary goal' },
+] as const
+
+export const SESSION_DURATIONS = [
+  { value: 30, label: '30 min' },
+  { value: 45, label: '45 min' },
+  { value: 60, label: '60 min' },
+  { value: 75, label: '75 min' },
+  { value: 90, label: '90 min' },
+  { value: 120, label: '120 min' },
+] as const
+
 export const COMMON_INJURIES = [
   'Lower back pain', 'Shoulder impingement', 'Knee pain',
   'Tennis/golfer elbow', 'Wrist issues', 'Hip pain',

@@ -8,7 +8,8 @@ import {
 } from 'lucide-react'
 import {
   ACTIVITY_LEVELS, FITNESS_GOALS, TRAINING_EXPERIENCE, EQUIPMENT_ACCESS,
-  TRAINING_STYLES, COMMON_INJURIES, COMMON_CONDITIONS, DIETARY_RESTRICTIONS,
+  TRAINING_STYLES, SECONDARY_TRAINING_GOALS, SESSION_DURATIONS,
+  COMMON_INJURIES, COMMON_CONDITIONS, DIETARY_RESTRICTIONS,
   COMMON_FOOD_DISLIKES, COOKING_SKILLS, MEAL_PREP_PREFERENCES, WORK_TYPES,
   SLEEP_QUALITY_OPTIONS, STRESS_LEVELS, GOAL_TIMELINES, MOTIVATIONS,
   ALCOHOL_FREQUENCIES, SNACK_MOTIVATIONS, SNACK_PREFERENCES,
@@ -85,6 +86,12 @@ export default function OnboardingPage() {
   const [experience, setExperience] = useState(profile?.training_experience ?? 'beginner')
   const [equipmentAccess, setEquipmentAccess] = useState(profile?.equipment_access ?? 'full_gym')
   const [trainingStyles, setTrainingStyles] = useState<string[]>(profile?.training_style ?? ['hypertrophy'])
+  const [secondaryGoal, setSecondaryGoal] = useState(profile?.secondary_training_goal ?? 'none')
+  const [maxSessionMinutes, setMaxSessionMinutes] = useState(profile?.max_session_minutes ?? 60)
+  const [squat1rm, setSquat1rm] = useState(profile?.squat_1rm?.toString() ?? '')
+  const [bench1rm, setBench1rm] = useState(profile?.bench_1rm?.toString() ?? '')
+  const [deadlift1rm, setDeadlift1rm] = useState(profile?.deadlift_1rm?.toString() ?? '')
+  const [ohp1rm, setOhp1rm] = useState(profile?.ohp_1rm?.toString() ?? '')
 
   // ── Step 6: Schedule ──
   const [wakeTime, setWakeTime] = useState(profile?.wake_time ?? '07:00')
@@ -157,6 +164,12 @@ export default function OnboardingPage() {
         training_experience: experience,
         equipment_access: equipmentAccess,
         training_style: trainingStyles,
+        secondary_training_goal: secondaryGoal,
+        max_session_minutes: maxSessionMinutes,
+        squat_1rm: squat1rm ? parseFloat(squat1rm) : null,
+        bench_1rm: bench1rm ? parseFloat(bench1rm) : null,
+        deadlift_1rm: deadlift1rm ? parseFloat(deadlift1rm) : null,
+        ohp_1rm: ohp1rm ? parseFloat(ohp1rm) : null,
         // Nutrition
         dietary_restrictions: dietaryRestrictions,
         allergies: allergies.split(',').map(a => a.trim()).filter(Boolean),
@@ -213,6 +226,9 @@ export default function OnboardingPage() {
               title="Let's Get to Know You"
               subtitle="Your stats help us calculate your personalized nutrition targets"
             />
+            <div className="flex items-center gap-2 bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-3 -mt-2">
+              <span className="text-indigo-600 text-sm font-medium">This questionnaire takes about 5–10 minutes and helps us build plans tailored specifically to you.</span>
+            </div>
             <div>
               <Label>Full Name</Label>
               <input
@@ -564,7 +580,7 @@ export default function OnboardingPage() {
             <StepHeader
               icon={<Dumbbell className="h-12 w-12 text-purple-600" />}
               title="Training Background"
-              subtitle="Tell us about your training experience"
+              subtitle="This shapes your workout plan — volume, intensity, and exercise selection"
             />
             <div>
               <Label>Training experience</Label>
@@ -593,6 +609,63 @@ export default function OnboardingPage() {
                 onToggle={(val) => toggleArray(trainingStyles, setTrainingStyles, val)}
               />
             </div>
+            <div>
+              <Label>Secondary goal</Label>
+              <p className="text-sm text-gray-500 mb-2">Anything else you&apos;d like your plan to address?</p>
+              <div className="space-y-2">
+                {SECONDARY_TRAINING_GOALS.map((g) => (
+                  <OptionCard key={g.value} title={g.label} description={g.description}
+                    selected={secondaryGoal === g.value} onClick={() => setSecondaryGoal(g.value)} />
+                ))}
+              </div>
+            </div>
+            <div>
+              <Label>How long can you train per session?</Label>
+              <div className="flex flex-wrap gap-3">
+                {SESSION_DURATIONS.map((d) => (
+                  <button key={d.value} type="button" onClick={() => setMaxSessionMinutes(d.value)}
+                    className={`py-2.5 px-5 rounded-xl border-2 font-semibold text-sm transition-all ${
+                      maxSessionMinutes === d.value
+                        ? 'border-purple-500 bg-purple-50 text-purple-700'
+                        : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                    }`}>
+                    {d.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {experience !== 'never' && (
+              <div>
+                <Label>Estimated 1-rep maxes (optional — helps us dial in intensity)</Label>
+                <p className="text-sm text-gray-500 mb-3">Leave blank if you&apos;re not sure — we&apos;ll use conservative estimates</p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs text-gray-500 mb-1 block">Squat (kg)</label>
+                    <input type="number" value={squat1rm} onChange={(e) => setSquat1rm(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                      placeholder="e.g. 100" />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 mb-1 block">Bench Press (kg)</label>
+                    <input type="number" value={bench1rm} onChange={(e) => setBench1rm(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                      placeholder="e.g. 80" />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 mb-1 block">Deadlift (kg)</label>
+                    <input type="number" value={deadlift1rm} onChange={(e) => setDeadlift1rm(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                      placeholder="e.g. 120" />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 mb-1 block">Overhead Press (kg)</label>
+                    <input type="number" value={ohp1rm} onChange={(e) => setOhp1rm(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                      placeholder="e.g. 50" />
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )
 
@@ -737,6 +810,18 @@ export default function OnboardingPage() {
                     {foodDislikes.trim() && <ReviewRow label="Dislikes" value={foodDislikes} />}
                     {currentSnacks.trim() && <ReviewRow label="Snacks" value={currentSnacks} />}
                     {injuries.length > 0 && <ReviewRow label="Injuries" value={injuries.join(', ')} />}
+                    <ReviewRow label="Experience" value={TRAINING_EXPERIENCE.find(t => t.value === experience)?.label ?? experience} />
+                    <ReviewRow label="Equipment" value={EQUIPMENT_ACCESS.find(e => e.value === equipmentAccess)?.label ?? equipmentAccess} />
+                    <ReviewRow label="Session length" value={`${maxSessionMinutes} min`} />
+                    {secondaryGoal !== 'none' && <ReviewRow label="Secondary goal" value={SECONDARY_TRAINING_GOALS.find(g => g.value === secondaryGoal)?.label ?? secondaryGoal} />}
+                    {(squat1rm || bench1rm || deadlift1rm || ohp1rm) && (
+                      <ReviewRow label="1RMs" value={[
+                        squat1rm && `SQ ${squat1rm}`,
+                        bench1rm && `BP ${bench1rm}`,
+                        deadlift1rm && `DL ${deadlift1rm}`,
+                        ohp1rm && `OHP ${ohp1rm}`,
+                      ].filter(Boolean).join(' / ') + ' kg'} />
+                    )}
                   </div>
                 </div>
 

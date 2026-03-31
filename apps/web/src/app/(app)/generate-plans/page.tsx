@@ -146,6 +146,7 @@ export default function GeneratePlansPage() {
         gender: profile!.gender ?? 'male',
         age: profile!.age ?? 30,
         weight_kg: profile!.weight_kg ?? 70,
+        height_cm: profile!.height_cm ?? 175,
         activityLevel: profile!.activity_level ?? 'moderately_active',
         workoutTime: profile!.workout_time ?? '08:00',
         trainingExperience: profile!.training_experience ?? 'beginner',
@@ -155,6 +156,13 @@ export default function GeneratePlansPage() {
         medicalConditions: profile!.medical_conditions ?? [],
         stressLevel: profile!.stress_level ?? 'moderate',
         sleepQuality: profile!.sleep_quality ?? 'average',
+        sleepHours: profile!.sleep_hours ?? 7,
+        secondaryTrainingGoal: profile!.secondary_training_goal ?? 'none',
+        maxSessionMinutes: profile!.max_session_minutes ?? 60,
+        squat1rm: profile!.squat_1rm ?? null,
+        bench1rm: profile!.bench_1rm ?? null,
+        deadlift1rm: profile!.deadlift_1rm ?? null,
+        ohp1rm: profile!.ohp_1rm ?? null,
       }),
     })
 
