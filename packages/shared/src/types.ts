@@ -20,6 +20,9 @@ export type WorkType = 'desk' | 'active' | 'hybrid' | 'remote'
 export type SleepQuality = 'poor' | 'average' | 'good'
 export type StressLevel = 'low' | 'moderate' | 'high'
 export type GoalTimeline = 'steady' | '4_weeks' | '8_weeks' | '12_weeks' | '6_months'
+export type AlcoholFrequency = 'none' | 'light' | 'moderate' | 'heavy'
+export type SnackMotivation = 'hunger' | 'boredom' | 'habit' | 'mixed'
+export type SnackPreference = 'sweet' | 'savoury' | 'both'
 export type SupplementFrequency = 'daily' | 'twice_daily' | 'three_times' | 'weekly' | 'as_needed'
 export type SupplementTime = 'morning' | 'afternoon' | 'evening' | 'with_meals' | 'pre_workout' | 'post_workout' | 'bedtime'
 
@@ -71,7 +74,17 @@ export interface UserProfile {
   // Lifestyle
   work_type: WorkType | null
   sleep_quality: SleepQuality | null
+  sleep_hours: number | null
   stress_level: StressLevel | null
+  alcohol_frequency: AlcoholFrequency | null
+  alcohol_details: string | null
+  // Snack habits
+  current_snacks: string[]
+  snack_motivation: SnackMotivation | null
+  snack_preference: SnackPreference | null
+  late_night_snacking: boolean
+  // Food preferences
+  food_adventurousness: number | null
   // Enhanced goals
   target_weight_kg: number | null
   goal_timeline: GoalTimeline | null

@@ -113,11 +113,11 @@ export const CARDIO_TYPES = [
 // ─── Activity Levels ────────────────────────────────────
 
 export const ACTIVITY_LEVELS = [
-  { value: 'sedentary', label: 'Sedentary', description: 'Little to no exercise' },
-  { value: 'lightly_active', label: 'Lightly Active', description: 'Light exercise 1-3 days/week' },
-  { value: 'moderately_active', label: 'Moderately Active', description: 'Moderate exercise 3-5 days/week' },
-  { value: 'very_active', label: 'Very Active', description: 'Hard exercise 6-7 days/week' },
-  { value: 'extremely_active', label: 'Extremely Active', description: 'Very hard exercise, physical job' },
+  { value: 'sedentary', label: 'Sedentary', description: 'Desk job, no exercise' },
+  { value: 'lightly_active', label: 'Lightly Active', description: 'Desk job + 1-3 workouts/week' },
+  { value: 'moderately_active', label: 'Moderately Active', description: 'Light physical job or desk job + 4-5 workouts' },
+  { value: 'very_active', label: 'Very Active', description: 'Physical job + 4-5 workouts/week' },
+  { value: 'extremely_active', label: 'Extremely Active', description: 'Heavy manual labour + daily training' },
 ] as const
 
 // ─── Fitness Goals ──────────────────────────────────────
@@ -224,6 +224,26 @@ export const STRESS_LEVELS = [
   { value: 'low', label: 'Low', description: 'Generally relaxed' },
   { value: 'moderate', label: 'Moderate', description: 'Normal day-to-day stress' },
   { value: 'high', label: 'High', description: 'Frequently stressed or anxious' },
+] as const
+
+export const ALCOHOL_FREQUENCIES = [
+  { value: 'none', label: 'None', description: "I don't drink" },
+  { value: 'light', label: 'Light', description: '1-3 drinks per week' },
+  { value: 'moderate', label: 'Moderate', description: '4-7 drinks per week' },
+  { value: 'heavy', label: 'Heavy', description: '8+ drinks per week' },
+] as const
+
+export const SNACK_MOTIVATIONS = [
+  { value: 'hunger', label: 'Hunger', description: 'I snack because I genuinely get hungry' },
+  { value: 'boredom', label: 'Boredom', description: 'I snack when I have nothing to do' },
+  { value: 'habit', label: 'Habit', description: "It's just part of my routine" },
+  { value: 'mixed', label: 'All of the above', description: 'A mix of hunger, boredom and habit' },
+] as const
+
+export const SNACK_PREFERENCES = [
+  { value: 'sweet', label: 'Sweet' },
+  { value: 'savoury', label: 'Savoury' },
+  { value: 'both', label: 'Both' },
 ] as const
 
 export const GOAL_TIMELINES = [
