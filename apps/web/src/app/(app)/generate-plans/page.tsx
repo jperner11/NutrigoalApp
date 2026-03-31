@@ -4,7 +4,8 @@ import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
-import { Sparkles, Dumbbell, Utensils, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react'
+import Link from 'next/link'
+import { Sparkles, Dumbbell, Utensils, CheckCircle2, AlertCircle, Loader2, Pill, ArrowRight } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { checkRegenEligibility, getRegenCooldownDays } from '@/lib/tierUtils'
 
@@ -36,6 +37,9 @@ export default function GeneratePlansPage() {
     { label: 'Saving everything', icon: <CheckCircle2 className="h-5 w-5" />, status: 'pending' },
   ])
   const [mealDayProgress, setMealDayProgress] = useState(0)
+  const [savedTraining, setSavedTraining] = useState(false)
+  const [savedMealPlan, setSavedMealPlan] = useState(false)
+  const [savedSupplements, setSavedSupplements] = useState(false)
 
   const updateStep = (index: number, update: Partial<GenerationStep>) => {
     setSteps(prev => prev.map((s, i) => i === index ? { ...s, ...update } : s))
@@ -112,9 +116,11 @@ export default function GeneratePlansPage() {
 
       if (trainingPlan) {
         await saveTrainingPlan(supabase, trainingPlan)
+        setSavedTraining(true)
       }
       if (weekMealPlan) {
         await saveWeekMealPlan(supabase, weekMealPlan)
+        setSavedMealPlan(true)
       }
 
       // Save AI-recommended supplements to user_supplements table
@@ -141,6 +147,7 @@ export default function GeneratePlansPage() {
         }))
 
         await supabase.from('user_supplements').insert(supplementRows)
+        setSavedSupplements(true)
       }
 
       // Log AI usage for cooldown tracking
@@ -181,8 +188,6 @@ export default function GeneratePlansPage() {
       }
 
       updateStep(3, { status: 'done' })
-      toast.success('Your personalized plans are ready!')
-      setTimeout(() => router.push('/dashboard'), 1500)
     } catch {
       updateStep(3, { status: 'error', error: 'Failed to save plans' })
       toast.error('Failed to save plans. Please try again.')
@@ -267,6 +272,9 @@ export default function GeneratePlansPage() {
         lateNightSnacking: profile!.late_night_snacking ?? false,
         workoutDaysPerWeek: profile!.workout_days_per_week ?? 4,
         activityLevel: profile!.activity_level ?? 'moderately_active',
+        breakfastTime: profile!.breakfast_time ?? '08:00',
+        lunchTime: profile!.lunch_time ?? '12:30',
+        dinnerTime: profile!.dinner_time ?? '19:00',
         height_cm: profile!.height_cm,
         dayName: DAY_NAMES[dayIndex],
         dayIndex,
@@ -550,75 +558,126 @@ export default function GeneratePlansPage() {
           <h1 className="text-2xl font-bold text-gray-900">
             {allDone ? 'Your plans are ready!' : hasError ? 'Almost there...' : 'Creating your personalized plans'}
           </h1>
-          <p className="text-gray-600 mt-2">
-            {allDone
-              ? 'Redirecting to your dashboard...'
-              : 'Using your profile to build the perfect training and nutrition plans.'}
-          </p>
+          {!allDone && (
+            <p className="text-gray-600 mt-2">
+              Using your profile to build the perfect training and nutrition plans.
+            </p>
+          )}
         </div>
 
-        {/* Steps */}
-        <div className="space-y-4 text-left">
-          {steps.map((step, i) => (
-            <div
-              key={i}
-              className={`flex items-center gap-4 px-5 py-4 rounded-xl border transition-all duration-300 ${
-                step.status === 'done'
-                  ? 'bg-green-50 border-green-200'
-                  : step.status === 'error'
-                  ? 'bg-red-50 border-red-200'
-                  : step.status === 'loading'
-                  ? 'bg-purple-50 border-purple-200'
-                  : 'bg-gray-50 border-gray-200'
-              }`}
-            >
-              <div className={`flex-shrink-0 ${
-                step.status === 'done' ? 'text-green-600'
-                  : step.status === 'error' ? 'text-red-500'
-                  : step.status === 'loading' ? 'text-purple-600'
-                  : 'text-gray-400'
-              }`}>
-                {step.status === 'loading' ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : step.status === 'done' ? (
-                  <CheckCircle2 className="h-5 w-5" />
-                ) : step.status === 'error' ? (
-                  <AlertCircle className="h-5 w-5" />
-                ) : (
-                  step.icon
-                )}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className={`text-sm font-medium ${
-                  step.status === 'done' ? 'text-green-800'
-                    : step.status === 'error' ? 'text-red-800'
-                    : step.status === 'loading' ? 'text-purple-800'
-                    : 'text-gray-500'
+        {/* Steps — hide once all done */}
+        {!allDone && (
+          <div className="space-y-4 text-left">
+            {steps.map((step, i) => (
+              <div
+                key={i}
+                className={`flex items-center gap-4 px-5 py-4 rounded-xl border transition-all duration-300 ${
+                  step.status === 'done'
+                    ? 'bg-green-50 border-green-200'
+                    : step.status === 'error'
+                    ? 'bg-red-50 border-red-200'
+                    : step.status === 'loading'
+                    ? 'bg-purple-50 border-purple-200'
+                    : 'bg-gray-50 border-gray-200'
+                }`}
+              >
+                <div className={`flex-shrink-0 ${
+                  step.status === 'done' ? 'text-green-600'
+                    : step.status === 'error' ? 'text-red-500'
+                    : step.status === 'loading' ? 'text-purple-600'
+                    : 'text-gray-400'
                 }`}>
-                  {step.status === 'done'
-                    ? step.label.replace('Generating', 'Generated').replace('Saving', 'Saved')
-                    : step.status === 'loading' && i === 1 && mealDayProgress > 0
-                    ? `Generating day ${mealDayProgress} of 7...`
-                    : step.label}
-                </p>
-                {step.error && (
-                  <p className="text-xs text-red-600 mt-0.5">{step.error}</p>
+                  {step.status === 'loading' ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : step.status === 'done' ? (
+                    <CheckCircle2 className="h-5 w-5" />
+                  ) : step.status === 'error' ? (
+                    <AlertCircle className="h-5 w-5" />
+                  ) : (
+                    step.icon
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className={`text-sm font-medium ${
+                    step.status === 'done' ? 'text-green-800'
+                      : step.status === 'error' ? 'text-red-800'
+                      : step.status === 'loading' ? 'text-purple-800'
+                      : 'text-gray-500'
+                  }`}>
+                    {step.status === 'done'
+                      ? step.label.replace('Generating', 'Generated').replace('Saving', 'Saved')
+                      : step.status === 'loading' && i === 1 && mealDayProgress > 0
+                      ? `Generating day ${mealDayProgress} of 7...`
+                      : step.label}
+                  </p>
+                  {step.error && (
+                    <p className="text-xs text-red-600 mt-0.5">{step.error}</p>
+                  )}
+                </div>
+                {step.status === 'loading' && (
+                  <div className="w-16 h-1.5 bg-purple-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-purple-600 rounded-full transition-all duration-500"
+                      style={{ width: i === 1 && mealDayProgress > 0 ? `${Math.round((mealDayProgress / 7) * 100)}%` : '60%' }}
+                    />
+                  </div>
                 )}
               </div>
-              {step.status === 'loading' && (
-                <div className="w-16 h-1.5 bg-purple-200 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-purple-600 rounded-full transition-all duration-500"
-                    style={{ width: i === 1 && mealDayProgress > 0 ? `${Math.round((mealDayProgress / 7) * 100)}%` : '60%' }}
-                  />
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
-        {/* Manual redirect if auto-redirect doesn't work */}
-        {(allDone || hasError) && (
+        {/* Success overview — show where everything was saved */}
+        {allDone && (
+          <div className="space-y-3 text-left">
+            <p className="text-sm text-gray-500 mb-4 text-center">Here&apos;s where to find everything:</p>
+
+            {savedMealPlan && (
+              <Link href="/diet" className="flex items-center gap-4 px-5 py-4 rounded-xl border border-green-200 bg-green-50 hover:bg-green-100 transition-colors group">
+                <Utensils className="h-5 w-5 text-green-600 flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-green-800">7-Day Meal Plan</p>
+                  <p className="text-xs text-green-600">View your meals, macros, and coaching insights</p>
+                </div>
+                <ArrowRight className="h-4 w-4 text-green-400 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            )}
+
+            {savedTraining && (
+              <Link href="/training" className="flex items-center gap-4 px-5 py-4 rounded-xl border border-purple-200 bg-purple-50 hover:bg-purple-100 transition-colors group">
+                <Dumbbell className="h-5 w-5 text-purple-600 flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-purple-800">Training Plan</p>
+                  <p className="text-xs text-purple-600">Your personalised workout programme</p>
+                </div>
+                <ArrowRight className="h-4 w-4 text-purple-400 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            )}
+
+            {savedSupplements && (
+              <Link href="/supplements" className="flex items-center gap-4 px-5 py-4 rounded-xl border border-amber-200 bg-amber-50 hover:bg-amber-100 transition-colors group">
+                <Pill className="h-5 w-5 text-amber-600 flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-amber-800">Supplement Recommendations</p>
+                  <p className="text-xs text-amber-600">Evidence-based suggestions added to your Supplements tab</p>
+                </div>
+                <ArrowRight className="h-4 w-4 text-amber-400 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            )}
+
+            <div className="pt-4">
+              <Link
+                href="/dashboard"
+                className="block w-full text-center px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
+              >
+                Go to Dashboard
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {/* Error state — show dashboard button */}
+        {hasError && !allDone && (
           <button
             onClick={() => router.push('/dashboard')}
             className="mt-8 px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-medium hover:shadow-lg transition-all"

@@ -8,7 +8,7 @@ import {
 } from 'lucide-react'
 import {
   ACTIVITY_LEVELS, FITNESS_GOALS, TRAINING_EXPERIENCE, EQUIPMENT_ACCESS,
-  TRAINING_STYLES, SECONDARY_TRAINING_GOALS, SESSION_DURATIONS,
+  TRAINING_STYLES, SECONDARY_TRAINING_GOALS, SESSION_DURATIONS, CARDIO_TYPES,
   COMMON_INJURIES, COMMON_CONDITIONS, DIETARY_RESTRICTIONS,
   COMMON_FOOD_DISLIKES, COOKING_SKILLS, MEAL_PREP_PREFERENCES, WORK_TYPES,
   SLEEP_QUALITY_OPTIONS, STRESS_LEVELS, GOAL_TIMELINES, MOTIVATIONS,
@@ -98,6 +98,10 @@ export default function OnboardingPage() {
   const [bench1rm, setBench1rm] = useState(profile?.bench_1rm?.toString() ?? '')
   const [deadlift1rm, setDeadlift1rm] = useState(profile?.deadlift_1rm?.toString() ?? '')
   const [ohp1rm, setOhp1rm] = useState(profile?.ohp_1rm?.toString() ?? '')
+  const [doesCardio, setDoesCardio] = useState(profile?.does_cardio ?? false)
+  const [cardioTypesPreferred, setCardioTypesPreferred] = useState<string[]>(profile?.cardio_types_preferred ?? [])
+  const [cardioFrequency, setCardioFrequency] = useState(profile?.cardio_frequency_per_week ?? 2)
+  const [cardioDuration, setCardioDuration] = useState(profile?.cardio_duration_minutes ?? 30)
 
   // ── Step 6: Schedule ──
   const [sleepTime, setSleepTime] = useState(profile?.sleep_time ?? '23:00')
@@ -107,6 +111,9 @@ export default function OnboardingPage() {
   const [workEndTime, setWorkEndTime] = useState(profile?.work_end_time ?? '17:00')
   const [workoutDays, setWorkoutDays] = useState(profile?.workout_days_per_week ?? 4)
   const [mealsPerDay, setMealsPerDay] = useState(profile?.meals_per_day ?? 3)
+  const [breakfastTime, setBreakfastTime] = useState(profile?.breakfast_time ?? '08:00')
+  const [lunchTime, setLunchTime] = useState(profile?.lunch_time ?? '12:30')
+  const [dinnerTime, setDinnerTime] = useState(profile?.dinner_time ?? '19:00')
   const [motivation, setMotivation] = useState<string[]>(profile?.motivation ?? [])
 
   const toggleArray = (arr: string[], setArr: (a: string[]) => void, val: string) => {
@@ -179,6 +186,10 @@ export default function OnboardingPage() {
         bench_1rm: bench1rm ? parseFloat(bench1rm) : null,
         deadlift_1rm: deadlift1rm ? parseFloat(deadlift1rm) : null,
         ohp_1rm: ohp1rm ? parseFloat(ohp1rm) : null,
+        does_cardio: doesCardio,
+        cardio_types_preferred: doesCardio ? cardioTypesPreferred : [],
+        cardio_frequency_per_week: doesCardio ? cardioFrequency : null,
+        cardio_duration_minutes: doesCardio ? cardioDuration : null,
         // Nutrition
         dietary_restrictions: dietaryRestrictions,
         allergies: allergies.split(',').map(a => a.trim()).filter(Boolean),
@@ -211,6 +222,9 @@ export default function OnboardingPage() {
         work_end_time: workEndTime,
         workout_days_per_week: workoutDays,
         meals_per_day: mealsPerDay,
+        breakfast_time: breakfastTime,
+        lunch_time: lunchTime,
+        dinner_time: dinnerTime,
         onboarding_completed: true,
       })
       .eq('id', profile.id)
@@ -689,6 +703,66 @@ export default function OnboardingPage() {
                 </div>
               </div>
             )}
+            <div>
+              <Label>Do you do cardio?</Label>
+              <div className="flex gap-3">
+                {[{ value: true, label: 'Yes' }, { value: false, label: 'No' }].map((opt) => (
+                  <button key={String(opt.value)} type="button" onClick={() => setDoesCardio(opt.value)}
+                    className={`flex-1 py-3 px-5 rounded-xl border-2 font-semibold text-sm transition-all ${
+                      doesCardio === opt.value
+                        ? 'border-purple-500 bg-purple-50 text-purple-700'
+                        : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                    }`}>
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {doesCardio && (
+              <>
+                <div>
+                  <Label>Preferred cardio types</Label>
+                  <p className="text-sm text-gray-500 mb-3">Select all that apply</p>
+                  <ChipGrid
+                    items={CARDIO_TYPES.map(c => ({ value: c.name, label: c.name }))}
+                    selected={cardioTypesPreferred}
+                    onToggle={(val) => toggleArray(cardioTypesPreferred, setCardioTypesPreferred, val)}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Sessions per week</Label>
+                    <div className="flex gap-2">
+                      {[1, 2, 3, 4, 5, 6, 7].map((n) => (
+                        <button key={n} type="button" onClick={() => setCardioFrequency(n)}
+                          className={`w-10 h-10 rounded-full border-2 font-bold text-sm transition-all ${
+                            cardioFrequency === n
+                              ? 'border-purple-500 bg-purple-50 text-purple-700'
+                              : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                          }`}>
+                          {n}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <Label>Typical duration (min)</Label>
+                    <div className="flex flex-wrap gap-2">
+                      {[15, 20, 30, 45, 60].map((d) => (
+                        <button key={d} type="button" onClick={() => setCardioDuration(d)}
+                          className={`py-2 px-4 rounded-xl border-2 font-semibold text-sm transition-all ${
+                            cardioDuration === d
+                              ? 'border-purple-500 bg-purple-50 text-purple-700'
+                              : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                          }`}>
+                          {d}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         )
 
@@ -766,6 +840,33 @@ export default function OnboardingPage() {
                     {m}
                   </button>
                 ))}
+              </div>
+            </div>
+            <div>
+              <Label>When do you usually eat?</Label>
+              <p className="text-sm text-gray-500 mb-3">We&apos;ll build your meal plan around these times</p>
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <p className="text-xs font-semibold text-gray-500 mb-1">Breakfast</p>
+                  <select value={breakfastTime} onChange={(e) => setBreakfastTime(e.target.value)}
+                    className="w-full px-3 py-2.5 rounded-xl border-2 border-gray-200 font-semibold text-sm text-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all bg-white">
+                    {TIME_OPTIONS.map((t) => (<option key={t} value={t}>{fmt12(t)}</option>))}
+                  </select>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-gray-500 mb-1">Lunch</p>
+                  <select value={lunchTime} onChange={(e) => setLunchTime(e.target.value)}
+                    className="w-full px-3 py-2.5 rounded-xl border-2 border-gray-200 font-semibold text-sm text-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all bg-white">
+                    {TIME_OPTIONS.map((t) => (<option key={t} value={t}>{fmt12(t)}</option>))}
+                  </select>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-gray-500 mb-1">Dinner</p>
+                  <select value={dinnerTime} onChange={(e) => setDinnerTime(e.target.value)}
+                    className="w-full px-3 py-2.5 rounded-xl border-2 border-gray-200 font-semibold text-sm text-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all bg-white">
+                    {TIME_OPTIONS.map((t) => (<option key={t} value={t}>{fmt12(t)}</option>))}
+                  </select>
+                </div>
               </div>
             </div>
             <div>
@@ -854,6 +955,7 @@ export default function OnboardingPage() {
                         ohp1rm && `OHP ${ohp1rm}`,
                       ].filter(Boolean).join(' / ') + ' kg'} />
                     )}
+                    <ReviewRow label="Cardio" value={doesCardio ? `${cardioFrequency}x/week, ${cardioDuration} min — ${cardioTypesPreferred.join(', ') || 'any'}` : 'No'} />
                   </div>
                 </div>
 
@@ -866,6 +968,9 @@ export default function OnboardingPage() {
                     <ReviewRow label="Workout" value={fmt12(workoutTime)} />
                     <ReviewRow label="Training" value={`${workoutDays}x / week`} />
                     <ReviewRow label="Meals" value={`${mealsPerDay} / day`} />
+                    <ReviewRow label="Breakfast" value={fmt12(breakfastTime)} />
+                    <ReviewRow label="Lunch" value={fmt12(lunchTime)} />
+                    <ReviewRow label="Dinner" value={fmt12(dinnerTime)} />
                   </div>
                 </div>
 

@@ -58,6 +58,9 @@ export interface UserProfile {
   work_end_time: string | null
   workout_days_per_week: number | null
   meals_per_day: number | null
+  breakfast_time: string | null
+  lunch_time: string | null
+  dinner_time: string | null
   // Health & medical
   injuries: string[]
   medical_conditions: string[]
@@ -92,6 +95,11 @@ export interface UserProfile {
   snack_motivation: SnackMotivation | null
   snack_preference: SnackPreference | null
   late_night_snacking: boolean
+  // Cardio preferences
+  does_cardio: boolean
+  cardio_types_preferred: string[]
+  cardio_frequency_per_week: number | null
+  cardio_duration_minutes: number | null
   // Food preferences
   food_adventurousness: number | null
   // Enhanced goals

@@ -36,6 +36,10 @@ interface ProfileData {
   workout_time: string | null
   wake_time: string | null
   sleep_time: string | null
+  does_cardio: boolean
+  cardio_types_preferred: string[]
+  cardio_frequency_per_week: number | null
+  cardio_duration_minutes: number | null
 }
 
 function buildAthleteBlock(p: ProfileData): string {
@@ -66,6 +70,7 @@ function buildAthleteBlock(p: ProfileData): string {
 - Dietary restrictions: ${p.dietary_restrictions?.length ? p.dietary_restrictions.join(', ') : 'None'}
 - Allergies: ${p.allergies?.length ? p.allergies.join(', ') : 'None'}
 - Alcohol: ${p.alcohol_frequency ?? 'none'}
+- Cardio: ${p.does_cardio ? `Yes — ${p.cardio_types_preferred?.join(', ') || 'various'}, ${p.cardio_frequency_per_week ?? 2}x/week, ${p.cardio_duration_minutes ?? 30} min sessions` : 'No current cardio'}
 - Schedule: Wake ${p.wake_time ?? '07:00'}, Workout ${p.workout_time ?? '08:00'}, Sleep ${p.sleep_time ?? '23:00'}`
 }
 
@@ -108,7 +113,8 @@ Your analysis must cover ALL of these areas:
 1. PROGRAMMING — volume, intensity, frequency, exercise selection, progression model, deload frequency
 2. RECOVERY — sleep quality and duration, stress management, training-to-recovery ratio
 3. NUTRITION — calorie adequacy, protein timing, meal distribution, micronutrient gaps
-4. TRAINING PSYCHOLOGY — staleness, motivation, effort quality, mental fatigue
+4. CARDIO IMPACT — is current cardio volume helping or hindering strength progress? Should it be adjusted?
+5. TRAINING PSYCHOLOGY — staleness, motivation, effort quality, mental fatigue
 
 After your analysis, build a detailed 8-week plan specifically designed to break through each stall, with:
 - Weekly targets and progression scheme
@@ -187,7 +193,9 @@ Build a COMPLETE, STRUCTURED recovery protocol covering ALL of the following in 
 
 6. EVIDENCE-BASED SUPPLEMENTATION — specific supplements with dosing recommendations for recovery. Include: magnesium, omega-3, vitamin D, creatine, and anything else relevant to their profile.
 
-7. UNDER-RECOVERY WARNING SIGNS — a list of early warning signs that indicate under-recovery, and a clear protocol for what to do when they appear
+7. ACTIVE RECOVERY & CARDIO — how to use low-intensity cardio and movement on rest days to enhance recovery without adding fatigue. Recommend specific types, duration, and intensity based on their cardio preferences and training load.
+
+8. UNDER-RECOVERY WARNING SIGNS — a list of early warning signs that indicate under-recovery, and a clear protocol for what to do when they appear
 
 Write this as a complete lifestyle system, not a list of disconnected tips. Use clear headings and actionable sections.`,
 
