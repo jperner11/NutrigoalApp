@@ -9,7 +9,7 @@ export type BodyPart = 'chest' | 'back' | 'shoulders' | 'biceps' | 'triceps' | '
 export type Equipment = 'barbell' | 'dumbbell' | 'machine' | 'cable' | 'bodyweight' | 'band'
 export type ClientStatus = 'active' | 'inactive' | 'pending'
 export type SubscriptionStatus = 'active' | 'canceled' | 'past_due' | 'trialing'
-export type AIUsageType = 'meal_suggestion' | 'workout_suggestion'
+export type AIUsageType = 'meal_suggestion' | 'workout_suggestion' | 'coaching'
 export type FeedbackStatus = 'pending' | 'completed' | 'dismissed'
 export type TrainingExperience = 'never' | 'beginner' | 'intermediate' | 'advanced'
 export type EquipmentAccess = 'full_gym' | 'home_basic' | 'home_full' | 'bodyweight_only' | 'outdoor'
@@ -63,6 +63,8 @@ export interface UserProfile {
   medical_conditions: string[]
   medications: string[]
   // Fitness background
+  years_training: number | null
+  body_fat_pct: number | null
   training_experience: TrainingExperience | null
   equipment_access: EquipmentAccess | null
   training_style: TrainingStyle[]

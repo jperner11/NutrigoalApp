@@ -112,6 +112,22 @@ export async function POST(request: Request) {
         ? 'HIGH food adventurousness — feel free to suggest exciting, diverse cuisines and unusual ingredients. This person loves trying new things!'
         : 'MODERATE food adventurousness — mostly familiar foods but open to some variety.'
 
+    // Build supplement recommendation section (only on first day)
+    const supplementSection = dayIndex === 0 ? `
+
+SUPPLEMENT RECOMMENDATIONS:
+Based on this client's profile, recommend evidence-based supplements. Include in the JSON response a "supplements" array with each supplement having: name, dose, timing, and reason.
+Consider recommending from:
+- Creatine monohydrate (5g/day) — for all trainees
+- Vitamin D3 (2000-4000 IU/day) — especially if desk job / limited sun
+- Omega-3 fish oil (2-3g EPA+DHA/day) — for recovery and inflammation
+- Magnesium glycinate (200-400mg before bed) — especially if high stress or poor sleep
+- Zinc (15-30mg/day) — if training hard
+- Protein powder — if struggling to hit protein targets through food
+- Caffeine guidance — timing relative to their workout
+- Any specific supplements for their medical conditions
+Only recommend what is relevant to THIS specific client based on their profile.` : ''
+
     const systemPrompt = `You are an expert nutritionist with 30 years of experience helping clients lose body fat sustainably without miserable dieting. You've worked with everyone from busy parents who can barely find time to cook, to athletes looking to get shredded for competition — and you know that the secret to lasting fat loss isn't bland food and brutal restriction, it's finding an approach that fits the person in front of you.
 
 YOUR PHILOSOPHY:
@@ -149,6 +165,7 @@ COOKING & LIFESTYLE:
 ${alcoholContext}
 
 ${snackContext}
+${supplementSection}
 
 MEAL TIMING:
 - Pre-workout (1-2h before): light carbs + moderate protein, low fat/fiber
@@ -160,6 +177,7 @@ Return ONLY valid JSON. No markdown, no explanation.
 Format:
 {
   ${dayName ? '"day_theme": "Fun Day Title (e.g. Mediterranean Monday)",' : ''}
+  ${dayIndex === 0 ? '"supplements": [{ "name": "Supplement Name", "dose": "5g daily", "timing": "Morning with breakfast", "reason": "Why this client needs it" }],' : ''}
   "meals": [
     {
       "meal_type": "breakfast",
@@ -241,7 +259,7 @@ Return JSON only.`
         'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4.1-mini',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
@@ -267,6 +285,7 @@ Return JSON only.`
     }
 
     const dayTheme = parsed.day_theme ?? null
+    const supplements = Array.isArray(parsed.supplements) ? parsed.supplements : null
 
     const meals = (parsed.meals ?? parsed).map((meal: Record<string, unknown>) => {
       const ingredients = ((meal.ingredients as Record<string, unknown>[]) ?? []).map((ing: Record<string, unknown>) => ({
@@ -326,7 +345,7 @@ Return JSON only.`
       fat: Math.round(meal.ingredients.reduce((s, i) => s + i.fat, 0) * 10) / 10,
     }))
 
-    return NextResponse.json({ meals: finalMeals, day_theme: dayTheme })
+    return NextResponse.json({ meals: finalMeals, day_theme: dayTheme, supplements })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Internal server error'
     return NextResponse.json({ message }, { status: 500 })

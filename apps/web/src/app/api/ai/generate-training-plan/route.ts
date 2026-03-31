@@ -200,7 +200,7 @@ PROGRAMMING RULES:
         'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4.1',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: `Design a ${daysPerWeek}-day ${trainingStyles.join('/')} training programme for ${goal}. ${maxSessionMinutes <= 45 ? 'Sessions must be efficient — keep them under ' + maxSessionMinutes + ' minutes.' : ''} Return JSON only.` },

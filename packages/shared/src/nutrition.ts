@@ -90,8 +90,25 @@ export function calculateMacros(calories: number, goal: UserMetrics['goal'], wei
 }
 
 // Calculate daily water intake recommendation
-export function calculateWaterIntake(weight: number): number {
-  return Math.round(weight * 35) // 35ml per kg of body weight
+// Base: 35ml per kg bodyweight
+// +500ml per estimated exercise hour
+// +500-1000ml for physical/active jobs
+export function calculateWaterIntake(weight: number, activityLevel?: UserMetrics['activityLevel']): number {
+  let water = Math.round(weight * 35)
+
+  if (activityLevel) {
+    // Add for exercise (estimated daily avg exercise hours based on activity level)
+    const exerciseExtra: Record<string, number> = {
+      sedentary: 0,
+      lightly_active: 500,       // ~1h exercise avg across week
+      moderately_active: 500,    // ~1h exercise
+      very_active: 1000,         // ~2h exercise or physical job
+      extremely_active: 1500,    // heavy labour + training
+    }
+    water += exerciseExtra[activityLevel] ?? 0
+  }
+
+  return water
 }
 
 // Main function to calculate all nutrition targets
@@ -100,7 +117,7 @@ export function calculateNutritionTargets(metrics: UserMetrics): NutritionTarget
   const tdee = calculateTDEE(bmr, metrics.activityLevel)
   const calories = adjustCaloriesForGoal(tdee, metrics.goal)
   const macros = calculateMacros(calories, metrics.goal, metrics.weight)
-  const water = calculateWaterIntake(metrics.weight)
+  const water = calculateWaterIntake(metrics.weight, metrics.activityLevel)
 
   return {
     calories,

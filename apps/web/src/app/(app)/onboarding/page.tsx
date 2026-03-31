@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   ArrowRight, ArrowLeft, User, Utensils,
   Calculator, Heart, Dumbbell, Briefcase, Calendar, Sparkles,
@@ -38,6 +38,10 @@ export default function OnboardingPage() {
   const [step, setStep] = useState(0)
   const [saving, setSaving] = useState(false)
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [step])
+
   // ── Step 0: My Stats ──
   const [fullName, setFullName] = useState(profile?.full_name ?? '')
   const [age, setAge] = useState(profile?.age?.toString() ?? '')
@@ -47,6 +51,7 @@ export default function OnboardingPage() {
   const [goal, setGoal] = useState<UserMetrics['goal']>(
     (profile?.goal as UserMetrics['goal']) ?? 'cutting'
   )
+  const [bodyFatPct, setBodyFatPct] = useState(profile?.body_fat_pct?.toString() ?? '')
   const [targetWeight, setTargetWeight] = useState(profile?.target_weight_kg?.toString() ?? '')
   const [goalTimeline, setGoalTimeline] = useState(profile?.goal_timeline ?? 'steady')
 
@@ -83,6 +88,7 @@ export default function OnboardingPage() {
   const [medications, setMedications] = useState(profile?.medications?.join(', ') ?? '')
 
   // ── Step 5: Training Background ──
+  const [yearsTraining, setYearsTraining] = useState(profile?.years_training?.toString() ?? '')
   const [experience, setExperience] = useState(profile?.training_experience ?? 'beginner')
   const [equipmentAccess, setEquipmentAccess] = useState(profile?.equipment_access ?? 'full_gym')
   const [trainingStyles, setTrainingStyles] = useState<string[]>(profile?.training_style ?? ['hypertrophy'])
@@ -94,6 +100,7 @@ export default function OnboardingPage() {
   const [ohp1rm, setOhp1rm] = useState(profile?.ohp_1rm?.toString() ?? '')
 
   // ── Step 6: Schedule ──
+  const [sleepTime, setSleepTime] = useState(profile?.sleep_time ?? '23:00')
   const [wakeTime, setWakeTime] = useState(profile?.wake_time ?? '07:00')
   const [workoutTime, setWorkoutTime] = useState(profile?.workout_time ?? '08:00')
   const [workStartTime, setWorkStartTime] = useState(profile?.work_start_time ?? '09:00')
@@ -160,7 +167,9 @@ export default function OnboardingPage() {
         injuries: allInjuries,
         medical_conditions: conditions,
         medications: medications.split(',').map(m => m.trim()).filter(Boolean),
+        body_fat_pct: bodyFatPct ? parseFloat(bodyFatPct) : null,
         // Fitness
+        years_training: yearsTraining ? parseFloat(yearsTraining) : null,
         training_experience: experience,
         equipment_access: equipmentAccess,
         training_style: trainingStyles,
@@ -195,6 +204,7 @@ export default function OnboardingPage() {
         goal_timeline: goalTimeline,
         motivation,
         // Schedule
+        sleep_time: sleepTime,
         wake_time: wakeTime,
         workout_time: workoutTime,
         work_start_time: workStartTime,
@@ -273,6 +283,11 @@ export default function OnboardingPage() {
                 <Label>Weight (kg)</Label>
                 <input type="number" value={weight} onChange={(e) => setWeight(e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" placeholder="70" />
+              </div>
+              <div>
+                <Label>Body fat % (optional)</Label>
+                <input type="number" step="0.1" value={bodyFatPct} onChange={(e) => setBodyFatPct(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" placeholder="e.g. 18" />
               </div>
             </div>
 
@@ -591,6 +606,14 @@ export default function OnboardingPage() {
                 ))}
               </div>
             </div>
+            {experience !== 'never' && (
+              <div>
+                <Label>How many years have you been training?</Label>
+                <input type="number" step="0.5" min="0" value={yearsTraining} onChange={(e) => setYearsTraining(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  placeholder="e.g. 3" />
+              </div>
+            )}
             <div>
               <Label>Equipment access</Label>
               <div className="space-y-2">
@@ -709,6 +732,13 @@ export default function OnboardingPage() {
               </div>
             </div>
             <div>
+              <Label>What time do you go to bed?</Label>
+              <select value={sleepTime} onChange={(e) => setSleepTime(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 font-semibold text-sm text-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all bg-white">
+                {TIME_OPTIONS.map((t) => (<option key={t} value={t}>{fmt12(t)}</option>))}
+              </select>
+            </div>
+            <div>
               <Label>Training days per week</Label>
               <div className="flex gap-3">
                 {[3, 4, 5, 6, 7].map((d) => (
@@ -796,6 +826,7 @@ export default function OnboardingPage() {
                   <div className="grid grid-cols-2 gap-3">
                     <ReviewRow label="Goal" value={FITNESS_GOALS.find(g => g.value === goal)?.label ?? goal} />
                     {targetWeight && <ReviewRow label="Target weight" value={`${targetWeight} kg`} />}
+                    {bodyFatPct && <ReviewRow label="Body fat" value={`${bodyFatPct}%`} />}
                     <ReviewRow label="Timeline" value={GOAL_TIMELINES.find(t => t.value === goalTimeline)?.label ?? goalTimeline} />
                     <ReviewRow label="Work" value={WORK_TYPES.find(w => w.value === workType)?.label ?? workType} />
                     <ReviewRow label="Activity" value={ACTIVITY_LEVELS.find(a => a.value === activityLevel)?.label ?? activityLevel} />
@@ -811,6 +842,7 @@ export default function OnboardingPage() {
                     {currentSnacks.trim() && <ReviewRow label="Snacks" value={currentSnacks} />}
                     {injuries.length > 0 && <ReviewRow label="Injuries" value={injuries.join(', ')} />}
                     <ReviewRow label="Experience" value={TRAINING_EXPERIENCE.find(t => t.value === experience)?.label ?? experience} />
+                    {yearsTraining && <ReviewRow label="Years training" value={yearsTraining} />}
                     <ReviewRow label="Equipment" value={EQUIPMENT_ACCESS.find(e => e.value === equipmentAccess)?.label ?? equipmentAccess} />
                     <ReviewRow label="Session length" value={`${maxSessionMinutes} min`} />
                     {secondaryGoal !== 'none' && <ReviewRow label="Secondary goal" value={SECONDARY_TRAINING_GOALS.find(g => g.value === secondaryGoal)?.label ?? secondaryGoal} />}
@@ -830,6 +862,7 @@ export default function OnboardingPage() {
                   <h3 className="text-sm font-bold text-purple-700 uppercase tracking-wider mb-4">Schedule</h3>
                   <div className="grid grid-cols-2 gap-3">
                     <ReviewRow label="Wake up" value={fmt12(wakeTime)} />
+                    <ReviewRow label="Bedtime" value={fmt12(sleepTime)} />
                     <ReviewRow label="Workout" value={fmt12(workoutTime)} />
                     <ReviewRow label="Training" value={`${workoutDays}x / week`} />
                     <ReviewRow label="Meals" value={`${mealsPerDay} / day`} />

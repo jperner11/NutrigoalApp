@@ -32,7 +32,8 @@ export default function GeneratePlansPage() {
   const [steps, setSteps] = useState<GenerationStep[]>([
     { label: 'Generating your training plan', icon: <Dumbbell className="h-5 w-5" />, status: 'pending' },
     { label: 'Generating your 7-day meal plan', icon: <Utensils className="h-5 w-5" />, status: 'pending' },
-    { label: 'Saving your plans', icon: <Sparkles className="h-5 w-5" />, status: 'pending' },
+    { label: 'Personalising your coaching insights', icon: <Sparkles className="h-5 w-5" />, status: 'pending' },
+    { label: 'Saving everything', icon: <CheckCircle2 className="h-5 w-5" />, status: 'pending' },
   ])
   const [mealDayProgress, setMealDayProgress] = useState(0)
 
@@ -88,14 +89,24 @@ export default function GeneratePlansPage() {
       updateStep(1, { status: 'error', error: 'Failed to generate meal plan' })
     }
 
+    // Step 3: Generate companion content (rules, timeline, hydration tips, snack swaps)
+    updateStep(2, { status: 'loading' })
+    let companionContent: CompanionContent | null = null
+    try {
+      companionContent = await generateCompanionContent()
+      updateStep(2, { status: 'done' })
+    } catch {
+      updateStep(2, { status: 'error', error: 'Failed to generate coaching insights' })
+    }
+
     if (!trainingPlan && !weekMealPlan) {
       toast.error('Failed to generate plans. Please try again from the dashboard.')
       setTimeout(() => router.push('/dashboard'), 2000)
       return
     }
 
-    // Step 3: Save to database
-    updateStep(2, { status: 'loading' })
+    // Step 4: Save to database
+    updateStep(3, { status: 'loading' })
     try {
       const supabase = createClient()
 
@@ -104,6 +115,32 @@ export default function GeneratePlansPage() {
       }
       if (weekMealPlan) {
         await saveWeekMealPlan(supabase, weekMealPlan)
+      }
+
+      // Save AI-recommended supplements to user_supplements table
+      if (aiSupplements && aiSupplements.length > 0) {
+        // Deactivate existing AI-generated supplements
+        await supabase
+          .from('user_supplements')
+          .update({ is_active: false })
+          .eq('user_id', profile!.id)
+          .eq('notes', 'AI recommended')
+
+        const supplementRows = aiSupplements.map(s => ({
+          user_id: profile!.id,
+          name: s.name,
+          dosage: s.dose,
+          frequency: 'daily' as const,
+          time_of_day: s.timing.toLowerCase().includes('morning') ? 'morning' as const
+            : s.timing.toLowerCase().includes('bed') || s.timing.toLowerCase().includes('evening') ? 'bedtime' as const
+            : s.timing.toLowerCase().includes('pre') ? 'pre_workout' as const
+            : s.timing.toLowerCase().includes('post') ? 'post_workout' as const
+            : 'with_meals' as const,
+          notes: `AI recommended — ${s.reason}`,
+          is_active: true,
+        }))
+
+        await supabase.from('user_supplements').insert(supplementRows)
       }
 
       // Log AI usage for cooldown tracking
@@ -126,11 +163,28 @@ export default function GeneratePlansPage() {
         })
       }
 
-      updateStep(2, { status: 'done' })
+      // Save companion content to the diet plan's notes field
+      if (companionContent) {
+        const { data: activePlan } = await supabase
+          .from('diet_plans')
+          .select('id')
+          .eq('user_id', profile!.id)
+          .eq('is_active', true)
+          .single()
+
+        if (activePlan) {
+          await supabase
+            .from('diet_plans')
+            .update({ notes: JSON.stringify(companionContent) })
+            .eq('id', activePlan.id)
+        }
+      }
+
+      updateStep(3, { status: 'done' })
       toast.success('Your personalized plans are ready!')
       setTimeout(() => router.push('/dashboard'), 1500)
     } catch {
-      updateStep(2, { status: 'error', error: 'Failed to save plans' })
+      updateStep(3, { status: 'error', error: 'Failed to save plans' })
       toast.error('Failed to save plans. Please try again.')
       setTimeout(() => router.push('/dashboard'), 2000)
     }
@@ -223,6 +277,8 @@ export default function GeneratePlansPage() {
     return res.json()
   }
 
+  const [aiSupplements, setAiSupplements] = useState<{ name: string; dose: string; timing: string; reason: string }[] | null>(null)
+
   async function generateWeekMealPlan(): Promise<{ meals: MealPlanMeal[]; dayOfWeek: number }[]> {
     const results: { meals: MealPlanMeal[]; dayOfWeek: number }[] = []
 
@@ -231,6 +287,10 @@ export default function GeneratePlansPage() {
       setMealDayProgress(day + 1)
       const data = await generateMealPlanDay(day)
       results.push({ meals: data.meals, dayOfWeek: day })
+      // Capture supplement recommendations from first day
+      if (day === 0 && data.supplements) {
+        setAiSupplements(data.supplements)
+      }
     }
 
     return results
@@ -337,6 +397,50 @@ export default function GeneratePlansPage() {
         await supabase.from('training_plan_exercises').insert(exerciseInserts)
       }
     }
+  }
+
+  interface CompanionContent {
+    personal_rules: string[]
+    timeline: string
+    hydration_tips: string[]
+    hydration_explanation: string
+    snack_swaps: { current: string; swap: string; calories: number; why: string }[]
+    supplement_note: string
+  }
+
+  async function generateCompanionContent(): Promise<CompanionContent> {
+    const res = await fetch('/api/ai/meal-plan-companion', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        calories: profile!.daily_calories,
+        protein: profile!.daily_protein,
+        carbs: profile!.daily_carbs,
+        fat: profile!.daily_fat,
+        goal: profile!.goal ?? 'maintenance',
+        gender: profile!.gender ?? 'male',
+        weight_kg: profile!.weight_kg ?? 70,
+        age: profile!.age ?? 30,
+        height_cm: profile!.height_cm ?? 175,
+        activityLevel: profile!.activity_level ?? 'moderately_active',
+        workType: profile!.work_type ?? 'desk',
+        workoutDaysPerWeek: profile!.workout_days_per_week ?? 4,
+        sleepHours: profile!.sleep_hours ?? 7,
+        sleepQuality: profile!.sleep_quality ?? 'average',
+        stressLevel: profile!.stress_level ?? 'moderate',
+        alcoholFrequency: profile!.alcohol_frequency ?? 'none',
+        alcoholDetails: profile!.alcohol_details ?? '',
+        currentSnacks: profile!.current_snacks ?? [],
+        snackMotivation: profile!.snack_motivation ?? 'hunger',
+        snackPreference: profile!.snack_preference ?? 'both',
+        lateNightSnacking: profile!.late_night_snacking ?? false,
+        targetWeight: profile!.target_weight_kg ?? null,
+        dailyWaterMl: profile!.daily_water_ml ?? 2500,
+      }),
+    })
+
+    if (!res.ok) throw new Error('Companion content generation failed')
+    return res.json()
   }
 
   interface MealPlanMeal {
