@@ -18,7 +18,7 @@ export async function POST(request: Request) {
   }
 
   const priceId = PRICE_IDS[plan]!
-  const origin = request.headers.get('origin') || 'http://localhost:3000'
+  const origin = request.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
   const adminSupabase = createAdminClient()
 
   // Look up existing Stripe customer ID
