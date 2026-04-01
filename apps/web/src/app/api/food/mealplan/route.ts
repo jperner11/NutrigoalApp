@@ -33,7 +33,7 @@ export async function GET(request: Request) {
 
   try {
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: 'gpt-4.1-mini',
       temperature: 0.7,
       max_tokens: 2000,
       messages: [
@@ -159,7 +159,7 @@ export async function POST(request: Request) {
       : 'Choose common, tasty ingredients'
 
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: 'gpt-4.1-mini',
       temperature: 0.9,
       max_tokens: 600,
       messages: [
