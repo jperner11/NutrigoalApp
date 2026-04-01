@@ -62,7 +62,6 @@ export async function POST(request: Request) {
     case 'customer.subscription.updated': {
       const subscription = event.data.object as Stripe.Subscription
       const userId = subscription.metadata?.userId
-      const plan = subscription.metadata?.plan as UserRole | undefined
 
       if (!userId) break
 
@@ -74,33 +73,14 @@ export async function POST(request: Request) {
         unpaid: 'past_due',
       }
 
-      const mappedStatus = statusMap[subscription.status] || 'active'
-
       await supabase
         .from('subscriptions')
         .update({
-          status: mappedStatus,
+          status: statusMap[subscription.status] || 'active',
           current_period_start: new Date(subscription.items.data[0].current_period_start * 1000).toISOString(),
           current_period_end: new Date(subscription.items.data[0].current_period_end * 1000).toISOString(),
         })
         .eq('user_id', userId)
-
-      // Keep user role in sync with subscription status
-      if (mappedStatus === 'active' || mappedStatus === 'trialing') {
-        // Active/trialing: grant the purchased plan role
-        if (plan) {
-          await supabase
-            .from('user_profiles')
-            .update({ role: plan })
-            .eq('id', userId)
-        }
-      } else {
-        // past_due / canceled / unpaid: downgrade to free
-        await supabase
-          .from('user_profiles')
-          .update({ role: 'free' as UserRole })
-          .eq('id', userId)
-      }
 
       break
     }
