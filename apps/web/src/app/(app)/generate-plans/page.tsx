@@ -58,16 +58,18 @@ export default function GeneratePlansPage() {
     if (!profile) return
 
     // Check regeneration eligibility (skip for first-time onboarding — no existing plans)
-    const cooldown = getRegenCooldownDays(profile.role)
-    if (cooldown !== null && profile.onboarding_completed) {
-      // Not first generation — check if user can regenerate
+    if (profile.onboarding_completed) {
+      const cooldown = getRegenCooldownDays(profile.role)
+      if (cooldown === null) {
+        // Free or nutritionist_client: cannot regenerate at all
+        toast.error('Plan regeneration requires a Pro plan or higher.')
+        router.push('/dashboard')
+        return
+      }
+      // Pro/Unlimited/Nutritionist: check cooldown
       const { canRegenerate, daysRemaining } = await checkRegenEligibility(profile.id, profile.role)
       if (!canRegenerate) {
-        if (cooldown === null) {
-          toast.error('Plan regeneration requires a Pro plan or higher.')
-        } else {
-          toast.error(`You can regenerate plans in ${daysRemaining} day${daysRemaining !== 1 ? 's' : ''}.`)
-        }
+        toast.error(`You can regenerate plans in ${daysRemaining} day${daysRemaining !== 1 ? 's' : ''}.`)
         router.push('/dashboard')
         return
       }

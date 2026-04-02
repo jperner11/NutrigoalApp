@@ -1,11 +1,35 @@
 import { NextResponse } from 'next/server'
 import { rateLimit, getClientIp } from '@/lib/rateLimit'
+import { createClient } from '@/lib/supabase/server'
 
 export async function POST(request: Request) {
   const ip = getClientIp(request)
   const { success } = rateLimit(`ai-meal:${ip}`, { limit: 5, windowMs: 60_000 })
   if (!success) {
     return NextResponse.json({ message: 'Too many requests. Please try again later.' }, { status: 429 })
+  }
+
+  // Auth + tier check
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
+  }
+  const { data: profile } = await supabase
+    .from('user_profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  if (profile?.role === 'free') {
+    const { count } = await supabase
+      .from('ai_usage')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .eq('type', 'meal_suggestion')
+    if ((count ?? 0) > 0) {
+      return NextResponse.json({ message: 'Upgrade to Pro to regenerate AI meal plans.' }, { status: 403 })
+    }
   }
 
   const apiKey = process.env.OPENAI_API_KEY

@@ -89,6 +89,11 @@ export default function SignupPage() {
           max_clients: 10,
         })
       }
+
+      // Start 7-day Pro trial for individual (free) users
+      if (formData.role === 'free') {
+        await fetch('/api/trial/start', { method: 'POST' })
+      }
     }
 
     toast.success('Account created! Please check your email to confirm.')

@@ -106,6 +106,7 @@ export interface UserProfile {
   target_weight_kg: number | null
   goal_timeline: GoalTimeline | null
   motivation: string[]
+  trial_ends_at: string | null
   created_at: string
   updated_at: string
 }

@@ -71,12 +71,16 @@ export async function POST(request: Request) {
         canceled: 'canceled',
         trialing: 'trialing',
         unpaid: 'past_due',
+        incomplete: 'past_due',
+        incomplete_expired: 'canceled',
       }
+
+      const mappedStatus = statusMap[subscription.status] ?? 'canceled'
 
       await supabase
         .from('subscriptions')
         .update({
-          status: statusMap[subscription.status] || 'active',
+          status: mappedStatus,
           current_period_start: new Date(subscription.items.data[0].current_period_start * 1000).toISOString(),
           current_period_end: new Date(subscription.items.data[0].current_period_end * 1000).toISOString(),
         })
