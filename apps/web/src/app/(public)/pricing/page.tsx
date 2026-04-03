@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight, Check, Crown, Loader2, Sparkles, Users, Zap } from 'lucide-react'
+import { Check, Crown, Loader2, Sparkles, Users, Zap } from 'lucide-react'
 import { PRICING } from '@/lib/constants'
 import { toast } from 'react-hot-toast'
 import BrandLogo from '@/components/brand/BrandLogo'
