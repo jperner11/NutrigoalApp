@@ -239,6 +239,8 @@ input, textarea, select {
   border: 1px solid rgba(127, 147, 167, 0.28);
   background: rgba(255, 255, 255, 0.82);
   padding: 0.95rem 1rem;
+  line-height: 1.5;
+  font-size: 1rem;
   color: var(--foreground);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
   transition: all 0.2s ease;

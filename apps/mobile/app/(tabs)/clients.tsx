@@ -17,6 +17,7 @@ import type {
   Conversation, Message, FeedbackRequest, FeedbackQuestion,
   Exercise, FoodItem, MealType,
 } from '@nutrigoal/shared'
+import { brandColors, brandShadow } from '../../src/theme/brand'
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || ''
 
@@ -140,7 +141,7 @@ export default function ClientsScreen() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView contentContainerStyle={st.content} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+      <ScrollView contentContainerStyle={st.content} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={brandColors.brand500} />}>
         {clients.length === 0 ? (
           <View style={st.empty}>
             <Ionicons name="people-outline" size={48} color="#d1d5db" />
@@ -260,7 +261,7 @@ function ClientDetail({ client, user, onBack, onMessages, onFeedback, onCreateDi
 
             {/* Targets */}
             <View style={st.targetsRow}>
-              <TargetPill label="Cal" value={p.daily_calories} color="#7c3aed" />
+              <TargetPill label="Cal" value={p.daily_calories} color={brandColors.brand500} />
               <TargetPill label="P" value={p.daily_protein} color="#3b82f6" />
               <TargetPill label="C" value={p.daily_carbs} color="#f59e0b" />
               <TargetPill label="F" value={p.daily_fat} color="#ef4444" />
@@ -287,7 +288,7 @@ function ClientDetail({ client, user, onBack, onMessages, onFeedback, onCreateDi
             <Text style={st.actionLabel}>Messages</Text>
           </TouchableOpacity>
           <TouchableOpacity style={st.actionCard} onPress={onFeedback}>
-            <Ionicons name="clipboard" size={24} color="#8b5cf6" />
+            <Ionicons name="clipboard" size={24} color={brandColors.brand500} />
             <Text style={st.actionLabel}>Feedback</Text>
           </TouchableOpacity>
         </View>
@@ -297,7 +298,7 @@ function ClientDetail({ client, user, onBack, onMessages, onFeedback, onCreateDi
           <View style={st.planSectionHeader}>
             <Text style={st.planSectionTitle}>Diet Plans</Text>
             <TouchableOpacity onPress={onCreateDiet}>
-              <Ionicons name="add-circle" size={28} color="#7c3aed" />
+              <Ionicons name="add-circle" size={28} color={brandColors.brand500} />
             </TouchableOpacity>
           </View>
           {loading ? <ActivityIndicator /> : dietPlans.length === 0 ? (
@@ -318,7 +319,7 @@ function ClientDetail({ client, user, onBack, onMessages, onFeedback, onCreateDi
           <View style={st.planSectionHeader}>
             <Text style={st.planSectionTitle}>Training Plans</Text>
             <TouchableOpacity onPress={onCreateTraining}>
-              <Ionicons name="add-circle" size={28} color="#7c3aed" />
+              <Ionicons name="add-circle" size={28} color={brandColors.brand500} />
             </TouchableOpacity>
           </View>
           {loading ? <ActivityIndicator /> : trainingPlans.length === 0 ? (
@@ -547,7 +548,7 @@ function FeedbackScreen({ client, user, onBack }: { client: ClientWithProfile; u
       <View style={st.detailHeader}>
         <TouchableOpacity onPress={onBack}><Ionicons name="arrow-back" size={24} color="#374151" /></TouchableOpacity>
         <Text style={st.detailTitle}>Feedback</Text>
-        <TouchableOpacity onPress={() => setShowCreate(true)}><Ionicons name="add-circle" size={28} color="#7c3aed" /></TouchableOpacity>
+        <TouchableOpacity onPress={() => setShowCreate(true)}><Ionicons name="add-circle" size={28} color={brandColors.brand500} /></TouchableOpacity>
       </View>
 
       <ScrollView contentContainerStyle={st.content}>
@@ -747,7 +748,7 @@ function CreateClientDietPlan({ client, user, onDone, onCancel }: {
 
         {/* Current totals */}
         <View style={st.macroSummary}>
-          <View style={st.macroBox}><Text style={[st.macroValue, { color: '#7c3aed' }]}>{totalCals}</Text><Text style={st.macroLabel}>Cals</Text></View>
+          <View style={st.macroBox}><Text style={[st.macroValue, { color: brandColors.brand500 }]}>{totalCals}</Text><Text style={st.macroLabel}>Cals</Text></View>
           <View style={st.macroBox}><Text style={[st.macroValue, { color: '#3b82f6' }]}>{totalProtein}g</Text><Text style={st.macroLabel}>Protein</Text></View>
           <View style={st.macroBox}><Text style={[st.macroValue, { color: '#f59e0b' }]}>{totalCarbs}g</Text><Text style={st.macroLabel}>Carbs</Text></View>
           <View style={st.macroBox}><Text style={[st.macroValue, { color: '#ef4444' }]}>{totalFat}g</Text><Text style={st.macroLabel}>Fat</Text></View>
@@ -769,14 +770,14 @@ function CreateClientDietPlan({ client, user, onDone, onCancel }: {
               </View>
             ))}
             <TouchableOpacity style={st.addItemBtn} onPress={() => { setSearchMealIdx(mi); setShowFoodSearch(true); setSearchQuery(''); setSearchResults([]) }}>
-              <Ionicons name="search" size={18} color="#7c3aed" />
+              <Ionicons name="search" size={18} color={brandColors.brand500} />
               <Text style={st.addItemText}>Search & Add Food</Text>
             </TouchableOpacity>
           </View>
         ))}
 
         <TouchableOpacity style={st.addRowBtn} onPress={addMeal}>
-          <Ionicons name="add" size={18} color="#7c3aed" />
+          <Ionicons name="add" size={18} color={brandColors.brand500} />
           <Text style={st.addRowText}>Add Snack</Text>
         </TouchableOpacity>
 
@@ -809,7 +810,7 @@ function CreateClientDietPlan({ client, user, onDone, onCancel }: {
             renderItem={({ item }) => (
               <TouchableOpacity style={st.foodSearchItem} onPress={() => addFood(item)} disabled={loadingNutrition === item.id}>
                 <Text style={st.foodSearchName}>{item.name}</Text>
-                {loadingNutrition === item.id ? <ActivityIndicator size="small" color="#7c3aed" /> : <Ionicons name="add-circle" size={24} color="#7c3aed" />}
+                {loadingNutrition === item.id ? <ActivityIndicator size="small" color={brandColors.brand500} /> : <Ionicons name="add-circle" size={24} color={brandColors.brand500} />}
               </TouchableOpacity>
             )}
             ListEmptyComponent={!searching ? <Text style={st.emptySearch}>Search for ingredients to add</Text> : null}
@@ -957,14 +958,14 @@ function CreateClientTrainingPlan({ client, user, onDone, onCancel }: {
               </View>
             ))}
             <TouchableOpacity style={st.addItemBtn} onPress={() => { setPickerDayIdx(di); setShowPicker(true); setSearch(''); setFilterBody('') }}>
-              <Ionicons name="add-circle-outline" size={20} color="#7c3aed" />
+              <Ionicons name="add-circle-outline" size={20} color={brandColors.brand500} />
               <Text style={st.addItemText}>Add Exercise</Text>
             </TouchableOpacity>
           </View>
         ))}
 
         <TouchableOpacity style={st.addRowBtn} onPress={addDay}>
-          <Ionicons name="add" size={18} color="#7c3aed" />
+          <Ionicons name="add" size={18} color={brandColors.brand500} />
           <Text style={st.addRowText}>Add Day</Text>
         </TouchableOpacity>
 
@@ -1005,7 +1006,7 @@ function CreateClientTrainingPlan({ client, user, onDone, onCancel }: {
                   <Text style={st.pickName}>{item.name}</Text>
                   <Text style={st.pickMeta}>{item.body_part} · {item.equipment}{item.is_compound ? ' · compound' : ''}</Text>
                 </View>
-                <Ionicons name="add-circle" size={24} color="#7c3aed" />
+                <Ionicons name="add-circle" size={24} color={brandColors.brand500} />
               </TouchableOpacity>
             )}
           />
@@ -1017,137 +1018,137 @@ function CreateClientTrainingPlan({ client, user, onDone, onCancel }: {
 
 // ─── Styles ─────────────────────────────────────────────
 const st = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f8fafc' },
+  container: { flex: 1, backgroundColor: brandColors.background },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 },
-  title: { fontSize: 24, fontWeight: '800', color: '#111827' },
-  addBtn: { backgroundColor: '#7c3aed', borderRadius: 20, width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
+  title: { fontSize: 24, fontWeight: '800', color: brandColors.foreground, letterSpacing: -0.6 },
+  addBtn: { backgroundColor: brandColors.brand900, borderRadius: 20, width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
   content: { padding: 20, paddingTop: 0, paddingBottom: 40 },
   empty: { alignItems: 'center', paddingTop: 80, gap: 8 },
-  emptyText: { fontSize: 18, fontWeight: '600', color: '#6b7280' },
-  emptyLink: { fontSize: 15, fontWeight: '600', color: '#7c3aed', marginTop: 4 },
-  sectionTitle: { fontSize: 14, fontWeight: '700', color: '#6b7280', textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 16, marginBottom: 8 },
+  emptyText: { fontSize: 18, fontWeight: '600', color: brandColors.textMuted },
+  emptyLink: { fontSize: 15, fontWeight: '600', color: brandColors.brand500, marginTop: 4 },
+  sectionTitle: { fontSize: 14, fontWeight: '700', color: brandColors.textMuted, textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 16, marginBottom: 8 },
   // Client card
-  clientCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 8, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 6, elevation: 1 },
-  avatar: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#ede9fe', alignItems: 'center', justifyContent: 'center' },
-  avatarText: { fontSize: 18, fontWeight: '700', color: '#7c3aed' },
-  clientName: { fontSize: 16, fontWeight: '600', color: '#374151' },
-  clientMeta: { fontSize: 13, color: '#9ca3af', marginTop: 2 },
+  clientCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 8, ...brandShadow },
+  avatar: { width: 44, height: 44, borderRadius: 22, backgroundColor: brandColors.brand100, alignItems: 'center', justifyContent: 'center' },
+  avatarText: { fontSize: 18, fontWeight: '700', color: brandColors.brand500 },
+  clientName: { fontSize: 16, fontWeight: '600', color: brandColors.foregroundSoft },
+  clientMeta: { fontSize: 13, color: brandColors.textSubtle, marginTop: 2 },
   // Modal
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
-  cancelText: { fontSize: 16, color: '#6b7280' },
-  modalTitle: { fontSize: 18, fontWeight: '700', color: '#111827' },
-  label: { fontSize: 14, fontWeight: '600', color: '#374151', marginBottom: 6 },
-  hint: { fontSize: 12, color: '#9ca3af', marginTop: 8 },
-  input: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#d1d5db', borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14, fontSize: 16, color: '#111827' },
-  primaryBtn: { flex: 2, backgroundColor: '#7c3aed', borderRadius: 12, paddingVertical: 16, alignItems: 'center', marginTop: 20 },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: brandColors.line },
+  cancelText: { fontSize: 16, color: brandColors.textMuted },
+  modalTitle: { fontSize: 18, fontWeight: '700', color: brandColors.foreground },
+  label: { fontSize: 14, fontWeight: '600', color: brandColors.foregroundSoft, marginBottom: 6 },
+  hint: { fontSize: 12, color: brandColors.textSubtle, marginTop: 8 },
+  input: { backgroundColor: 'rgba(255,255,255,0.92)', borderWidth: 1, borderColor: brandColors.lineStrong, borderRadius: 16, paddingHorizontal: 16, paddingVertical: 14, fontSize: 16, color: brandColors.foreground },
+  primaryBtn: { flex: 2, backgroundColor: brandColors.brand900, borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginTop: 20 },
   primaryBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
-  cancelBtn: { flex: 1, borderWidth: 2, borderColor: '#e5e7eb', borderRadius: 12, paddingVertical: 14, alignItems: 'center' },
-  cancelBtnText: { fontSize: 15, fontWeight: '600', color: '#6b7280' },
+  cancelBtn: { flex: 1, borderWidth: 1, borderColor: brandColors.lineStrong, borderRadius: 16, paddingVertical: 14, alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.84)' },
+  cancelBtnText: { fontSize: 15, fontWeight: '600', color: brandColors.textMuted },
   // Detail screen
   detailHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 },
-  detailTitle: { fontSize: 18, fontWeight: '700', color: '#111827' },
-  profileCard: { backgroundColor: '#fff', borderRadius: 16, padding: 18, marginBottom: 16, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 },
+  detailTitle: { fontSize: 18, fontWeight: '700', color: brandColors.foreground },
+  profileCard: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 20, borderWidth: 1, borderColor: brandColors.line, padding: 18, marginBottom: 16, ...brandShadow },
   profileRow: { flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 14 },
-  avatarLg: { width: 56, height: 56, borderRadius: 28, backgroundColor: '#ede9fe', alignItems: 'center', justifyContent: 'center' },
-  avatarLgText: { fontSize: 24, fontWeight: '700', color: '#7c3aed' },
-  profileName: { fontSize: 20, fontWeight: '800', color: '#111827' },
-  profileMeta: { fontSize: 14, color: '#6b7280', marginTop: 2 },
+  avatarLg: { width: 56, height: 56, borderRadius: 28, backgroundColor: brandColors.brand100, alignItems: 'center', justifyContent: 'center' },
+  avatarLgText: { fontSize: 24, fontWeight: '700', color: brandColors.brand500 },
+  profileName: { fontSize: 20, fontWeight: '800', color: brandColors.foreground },
+  profileMeta: { fontSize: 14, color: brandColors.textMuted, marginTop: 2 },
   targetsRow: { flexDirection: 'row', justifyContent: 'space-around', marginBottom: 12 },
   targetPill: { alignItems: 'center' },
   targetValue: { fontSize: 18, fontWeight: '800' },
-  targetLabel: { fontSize: 11, color: '#6b7280', marginTop: 2 },
-  anamnesisBox: { borderTopWidth: 1, borderTopColor: '#f3f4f6', paddingTop: 12, gap: 6 },
+  targetLabel: { fontSize: 11, color: brandColors.textMuted, marginTop: 2 },
+  anamnesisBox: { borderTopWidth: 1, borderTopColor: brandColors.line, paddingTop: 12, gap: 6 },
   anamnesisRow: { flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' },
-  anamnesisLabel: { fontSize: 12, fontWeight: '600', color: '#6b7280' },
-  anamnesisValue: { fontSize: 12, color: '#374151', flex: 1 },
+  anamnesisLabel: { fontSize: 12, fontWeight: '600', color: brandColors.textMuted },
+  anamnesisValue: { fontSize: 12, color: brandColors.foregroundSoft, flex: 1 },
   // Actions
   actionsGrid: { flexDirection: 'row', gap: 12, marginBottom: 20 },
-  actionCard: { flex: 1, backgroundColor: '#fff', borderRadius: 12, padding: 16, alignItems: 'center', gap: 6, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 6, elevation: 1 },
-  actionLabel: { fontSize: 13, fontWeight: '600', color: '#374151' },
+  actionCard: { flex: 1, backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 16, borderWidth: 1, borderColor: brandColors.line, padding: 16, alignItems: 'center', gap: 6, ...brandShadow },
+  actionLabel: { fontSize: 13, fontWeight: '600', color: brandColors.foregroundSoft },
   // Plans
   planSection: { marginBottom: 20 },
   planSectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
-  planSectionTitle: { fontSize: 16, fontWeight: '700', color: '#111827' },
-  noPlanText: { fontSize: 14, color: '#9ca3af', fontStyle: 'italic' },
-  planCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 12, padding: 14, marginBottom: 8, shadowColor: '#000', shadowOpacity: 0.03, shadowRadius: 4, elevation: 1 },
-  planName: { fontSize: 15, fontWeight: '600', color: '#374151' },
-  planMeta: { fontSize: 12, color: '#9ca3af', marginTop: 2 },
-  activeBadge: { backgroundColor: '#ede9fe', borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 },
-  badgeText: { fontSize: 11, fontWeight: '600', color: '#7c3aed' },
+  planSectionTitle: { fontSize: 16, fontWeight: '700', color: brandColors.foreground },
+  noPlanText: { fontSize: 14, color: brandColors.textSubtle, fontStyle: 'italic' },
+  planCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 16, borderWidth: 1, borderColor: brandColors.line, padding: 14, marginBottom: 8, ...brandShadow },
+  planName: { fontSize: 15, fontWeight: '600', color: brandColors.foregroundSoft },
+  planMeta: { fontSize: 12, color: brandColors.textSubtle, marginTop: 2 },
+  activeBadge: { backgroundColor: brandColors.brand100, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 },
+  badgeText: { fontSize: 11, fontWeight: '600', color: brandColors.brand500 },
   // Messages
   msgBubble: { maxWidth: '80%', borderRadius: 16, padding: 12, marginBottom: 8 },
-  msgMe: { backgroundColor: '#7c3aed', alignSelf: 'flex-end', borderBottomRightRadius: 4 },
-  msgThem: { backgroundColor: '#fff', alignSelf: 'flex-start', borderBottomLeftRadius: 4 },
-  msgText: { fontSize: 15, color: '#374151', lineHeight: 20 },
-  msgTime: { fontSize: 10, color: '#9ca3af', marginTop: 4, alignSelf: 'flex-end' },
-  inputBar: { flexDirection: 'row', padding: 12, gap: 8, borderTopWidth: 1, borderTopColor: '#e5e7eb', backgroundColor: '#fff' },
-  msgInput: { flex: 1, backgroundColor: '#f3f4f6', borderRadius: 20, paddingHorizontal: 16, paddingVertical: 10, fontSize: 15, color: '#111827', maxHeight: 100 },
-  sendBtn: { backgroundColor: '#7c3aed', width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  msgMe: { backgroundColor: brandColors.brand900, alignSelf: 'flex-end', borderBottomRightRadius: 4 },
+  msgThem: { backgroundColor: 'rgba(255,255,255,0.92)', alignSelf: 'flex-start', borderBottomLeftRadius: 4, borderWidth: 1, borderColor: brandColors.line },
+  msgText: { fontSize: 15, color: brandColors.foregroundSoft, lineHeight: 20 },
+  msgTime: { fontSize: 10, color: brandColors.textSubtle, marginTop: 4, alignSelf: 'flex-end' },
+  inputBar: { flexDirection: 'row', padding: 12, gap: 8, borderTopWidth: 1, borderTopColor: brandColors.line, backgroundColor: 'rgba(255,255,255,0.92)' },
+  msgInput: { flex: 1, backgroundColor: brandColors.panelMuted, borderRadius: 20, paddingHorizontal: 16, paddingVertical: 10, fontSize: 15, color: brandColors.foreground, maxHeight: 100 },
+  sendBtn: { backgroundColor: brandColors.brand900, width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   // Feedback
-  fbCard: { backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 10, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 6, elevation: 1 },
+  fbCard: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 16, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 10, ...brandShadow },
   fbHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  fbTitle: { fontSize: 16, fontWeight: '700', color: '#374151' },
-  fbBadge: { backgroundColor: '#fef3c7', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3 },
-  fbBadgeDone: { backgroundColor: '#ede9fe' },
-  fbBadgeText: { fontSize: 11, fontWeight: '600', color: '#f59e0b' },
-  fbBadgeTextDone: { color: '#7c3aed' },
-  fbDate: { fontSize: 12, color: '#9ca3af', marginTop: 4 },
-  fbResponses: { borderTopWidth: 1, borderTopColor: '#f3f4f6', marginTop: 12, paddingTop: 10, gap: 8 },
+  fbTitle: { fontSize: 16, fontWeight: '700', color: brandColors.foregroundSoft },
+  fbBadge: { backgroundColor: '#fff3d9', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3 },
+  fbBadgeDone: { backgroundColor: brandColors.brand100 },
+  fbBadgeText: { fontSize: 11, fontWeight: '600', color: brandColors.warning },
+  fbBadgeTextDone: { color: brandColors.brand500 },
+  fbDate: { fontSize: 12, color: brandColors.textSubtle, marginTop: 4 },
+  fbResponses: { borderTopWidth: 1, borderTopColor: brandColors.line, marginTop: 12, paddingTop: 10, gap: 8 },
   fbResponseRow: { gap: 2 },
-  fbQuestion: { fontSize: 13, fontWeight: '600', color: '#6b7280' },
-  fbAnswer: { fontSize: 14, color: '#374151' },
-  fbCreateCard: { backgroundColor: '#fff', borderRadius: 14, padding: 18, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 6, elevation: 1 },
-  fbCreateTitle: { fontSize: 17, fontWeight: '700', color: '#111827', marginBottom: 12 },
+  fbQuestion: { fontSize: 13, fontWeight: '600', color: brandColors.textMuted },
+  fbAnswer: { fontSize: 14, color: brandColors.foregroundSoft },
+  fbCreateCard: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 18, ...brandShadow },
+  fbCreateTitle: { fontSize: 17, fontWeight: '700', color: brandColors.foreground, marginBottom: 12 },
   fbQRow: { marginBottom: 12 },
   fbQTypeRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
-  fbQType: { fontSize: 12, fontWeight: '600', color: '#6b7280' },
+  fbQType: { fontSize: 12, fontWeight: '600', color: brandColors.textMuted },
   addQRow: { flexDirection: 'row', gap: 8, marginTop: 8 },
-  addQBtn: { borderWidth: 2, borderColor: '#e5e7eb', borderRadius: 10, paddingVertical: 8, paddingHorizontal: 14 },
-  addQText: { fontSize: 13, fontWeight: '600', color: '#7c3aed' },
+  addQBtn: { borderWidth: 1, borderColor: brandColors.line, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.84)', paddingVertical: 8, paddingHorizontal: 14 },
+  addQText: { fontSize: 13, fontWeight: '600', color: brandColors.brand500 },
   // Plan creation - client target bar
-  clientTargetBar: { flexDirection: 'row', flexWrap: 'wrap', backgroundColor: '#fff', paddingHorizontal: 20, paddingVertical: 10, gap: 8, borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
-  clientTargetLabel: { fontSize: 13, fontWeight: '700', color: '#374151' },
-  clientTargetValue: { fontSize: 13, color: '#6b7280' },
+  clientTargetBar: { flexDirection: 'row', flexWrap: 'wrap', backgroundColor: 'rgba(255,255,255,0.92)', paddingHorizontal: 20, paddingVertical: 10, gap: 8, borderBottomWidth: 1, borderBottomColor: brandColors.line },
+  clientTargetLabel: { fontSize: 13, fontWeight: '700', color: brandColors.foregroundSoft },
+  clientTargetValue: { fontSize: 13, color: brandColors.textMuted },
   // Macro summary
-  macroSummary: { flexDirection: 'row', justifyContent: 'space-around', backgroundColor: '#fff', borderRadius: 12, padding: 14, marginVertical: 14, shadowColor: '#000', shadowOpacity: 0.03, shadowRadius: 4, elevation: 1 },
+  macroSummary: { flexDirection: 'row', justifyContent: 'space-around', backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 16, borderWidth: 1, borderColor: brandColors.line, padding: 14, marginVertical: 14, ...brandShadow },
   macroBox: { alignItems: 'center' },
   macroValue: { fontSize: 18, fontWeight: '800' },
-  macroLabel: { fontSize: 11, color: '#6b7280', marginTop: 2 },
+  macroLabel: { fontSize: 11, color: brandColors.textMuted, marginTop: 2 },
   // Meal card (diet plan creation)
-  mealCard: { backgroundColor: '#fff', borderRadius: 12, padding: 14, marginBottom: 10, shadowColor: '#000', shadowOpacity: 0.03, shadowRadius: 4, elevation: 1 },
+  mealCard: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 16, borderWidth: 1, borderColor: brandColors.line, padding: 14, marginBottom: 10, ...brandShadow },
   mealHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
-  mealName: { fontSize: 15, fontWeight: '700', color: '#374151' },
-  mealCals: { fontSize: 13, fontWeight: '600', color: '#7c3aed' },
-  foodRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 6, borderTopWidth: 1, borderTopColor: '#f3f4f6' },
-  foodName: { fontSize: 14, fontWeight: '500', color: '#374151' },
-  foodMacros: { fontSize: 11, color: '#9ca3af', marginTop: 1 },
+  mealName: { fontSize: 15, fontWeight: '700', color: brandColors.foregroundSoft },
+  mealCals: { fontSize: 13, fontWeight: '600', color: brandColors.brand500 },
+  foodRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 6, borderTopWidth: 1, borderTopColor: brandColors.line },
+  foodName: { fontSize: 14, fontWeight: '500', color: brandColors.foregroundSoft },
+  foodMacros: { fontSize: 11, color: brandColors.textSubtle, marginTop: 1 },
   // Day card (training plan creation)
-  dayCard: { backgroundColor: '#fff', borderRadius: 12, padding: 14, marginTop: 14, shadowColor: '#000', shadowOpacity: 0.03, shadowRadius: 4, elevation: 1 },
+  dayCard: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 16, borderWidth: 1, borderColor: brandColors.line, padding: 14, marginTop: 14, ...brandShadow },
   dayHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
-  dayNameInput: { fontSize: 16, fontWeight: '700', color: '#374151', flex: 1 },
-  exerciseRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8, borderTopWidth: 1, borderTopColor: '#f3f4f6' },
-  exerciseName: { fontSize: 14, fontWeight: '600', color: '#374151' },
+  dayNameInput: { fontSize: 16, fontWeight: '700', color: brandColors.foregroundSoft, flex: 1 },
+  exerciseRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8, borderTopWidth: 1, borderTopColor: brandColors.line },
+  exerciseName: { fontSize: 14, fontWeight: '600', color: brandColors.foregroundSoft },
   exerciseInputRow: { flexDirection: 'row', gap: 10, marginTop: 6 },
   exerciseInputGroup: { alignItems: 'center' },
-  exerciseInputLabel: { fontSize: 10, color: '#9ca3af', marginBottom: 2 },
-  exerciseInputField: { backgroundColor: '#f3f4f6', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6, fontSize: 14, color: '#111827', width: 60, textAlign: 'center' },
+  exerciseInputLabel: { fontSize: 10, color: brandColors.textSubtle, marginBottom: 2 },
+  exerciseInputField: { backgroundColor: brandColors.panelMuted, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 6, fontSize: 14, color: brandColors.foreground, width: 60, textAlign: 'center' },
   // Shared add buttons
   addItemBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 10 },
-  addItemText: { fontSize: 14, fontWeight: '600', color: '#7c3aed' },
-  addRowBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 14, borderWidth: 2, borderColor: '#ede9fe', borderRadius: 12, borderStyle: 'dashed', marginTop: 10 },
-  addRowText: { fontSize: 14, fontWeight: '600', color: '#7c3aed' },
+  addItemText: { fontSize: 14, fontWeight: '600', color: brandColors.brand500 },
+  addRowBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 14, borderWidth: 1, borderColor: brandColors.line, borderRadius: 16, borderStyle: 'dashed', marginTop: 10, backgroundColor: 'rgba(255,255,255,0.84)' },
+  addRowText: { fontSize: 14, fontWeight: '600', color: brandColors.brand500 },
   // Search modal
   searchRow: { flexDirection: 'row', gap: 8 },
-  searchBtn: { backgroundColor: '#7c3aed', width: 48, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-  foodSearchItem: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
-  foodSearchName: { fontSize: 15, fontWeight: '500', color: '#374151' },
-  emptySearch: { textAlign: 'center', color: '#9ca3af', fontSize: 14, paddingTop: 24 },
+  searchBtn: { backgroundColor: brandColors.brand900, width: 48, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
+  foodSearchItem: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: brandColors.line },
+  foodSearchName: { fontSize: 15, fontWeight: '500', color: brandColors.foregroundSoft },
+  emptySearch: { textAlign: 'center', color: brandColors.textSubtle, fontSize: 14, paddingTop: 24 },
   // Exercise picker
-  filterChip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, backgroundColor: '#f3f4f6' },
-  filterChipActive: { backgroundColor: '#7c3aed' },
-  filterChipText: { fontSize: 13, fontWeight: '500', color: '#6b7280' },
+  filterChip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, backgroundColor: brandColors.panelMuted },
+  filterChipActive: { backgroundColor: brandColors.brand900 },
+  filterChipText: { fontSize: 13, fontWeight: '500', color: brandColors.textMuted },
   filterChipTextActive: { color: '#fff' },
-  pickItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
-  pickName: { fontSize: 15, fontWeight: '600', color: '#374151' },
-  pickMeta: { fontSize: 12, color: '#9ca3af', marginTop: 2 },
+  pickItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: brandColors.line },
+  pickName: { fontSize: 15, fontWeight: '600', color: brandColors.foregroundSoft },
+  pickMeta: { fontSize: 12, color: brandColors.textSubtle, marginTop: 2 },
 })

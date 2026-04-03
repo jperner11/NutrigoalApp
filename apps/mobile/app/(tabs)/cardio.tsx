@@ -9,6 +9,7 @@ import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
 import { calculateCardioCalories } from '@nutrigoal/shared'
 import type { CardioSession, CardioType } from '@nutrigoal/shared'
+import { brandColors, brandShadow } from '../../src/theme/brand'
 
 export default function CardioScreen() {
   const { user, profile } = useAuth()
@@ -90,7 +91,7 @@ export default function CardioScreen() {
 
       <ScrollView
         contentContainerStyle={styles.content}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={brandColors.danger} />}
       >
         {sessions.length === 0 ? (
           <View style={styles.empty}>
@@ -105,7 +106,7 @@ export default function CardioScreen() {
             <View key={s.id} style={styles.card}>
               <View style={styles.cardRow}>
                 <View style={styles.cardIconBox}>
-                  <Ionicons name="heart" size={20} color="#ef4444" />
+                  <Ionicons name="heart" size={20} color={brandColors.danger} />
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.cardTitle}>{(s as any).cardio_types?.name || 'Cardio'}</Text>
@@ -147,10 +148,10 @@ export default function CardioScreen() {
             </View>
 
             <Text style={styles.label}>Duration (minutes)</Text>
-            <TextInput style={styles.input} value={duration} onChangeText={setDuration} keyboardType="numeric" placeholder="30" placeholderTextColor="#9ca3af" />
+            <TextInput style={styles.input} value={duration} onChangeText={setDuration} keyboardType="numeric" placeholder="30" placeholderTextColor={brandColors.textSubtle} />
 
             <Text style={styles.label}>Average Heart Rate (optional)</Text>
-            <TextInput style={styles.input} value={bpm} onChangeText={setBpm} keyboardType="numeric" placeholder="e.g. 145" placeholderTextColor="#9ca3af" />
+            <TextInput style={styles.input} value={bpm} onChangeText={setBpm} keyboardType="numeric" placeholder="e.g. 145" placeholderTextColor={brandColors.textSubtle} />
 
             {duration && parseInt(duration) > 0 && selectedTypeId && profile && (
               <View style={styles.previewCard}>
@@ -183,38 +184,38 @@ export default function CardioScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f8fafc' },
+  container: { flex: 1, backgroundColor: brandColors.background },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 },
-  title: { fontSize: 24, fontWeight: '800', color: '#111827' },
-  addBtn: { backgroundColor: '#ef4444', borderRadius: 20, width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
+  title: { fontSize: 24, fontWeight: '800', color: brandColors.foreground, letterSpacing: -0.6 },
+  addBtn: { backgroundColor: brandColors.danger, borderRadius: 20, width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
   content: { padding: 20, paddingTop: 0 },
   empty: { alignItems: 'center', paddingTop: 80, gap: 8 },
-  emptyText: { fontSize: 18, fontWeight: '600', color: '#6b7280' },
-  emptyLink: { fontSize: 15, fontWeight: '600', color: '#ef4444', marginTop: 4 },
-  card: { backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 10, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 6, elevation: 1 },
+  emptyText: { fontSize: 18, fontWeight: '600', color: brandColors.textMuted },
+  emptyLink: { fontSize: 15, fontWeight: '600', color: brandColors.danger, marginTop: 4 },
+  card: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 10, ...brandShadow },
   cardRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  cardIconBox: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#fef2f2', alignItems: 'center', justifyContent: 'center' },
-  cardTitle: { fontSize: 16, fontWeight: '700', color: '#374151' },
-  cardDate: { fontSize: 12, color: '#9ca3af', marginTop: 2 },
-  cardCalories: { fontSize: 15, fontWeight: '700', color: '#ef4444' },
-  cardDuration: { fontSize: 12, color: '#6b7280', marginTop: 2 },
+  cardIconBox: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#fff0ef', alignItems: 'center', justifyContent: 'center' },
+  cardTitle: { fontSize: 16, fontWeight: '700', color: brandColors.foregroundSoft },
+  cardDate: { fontSize: 12, color: brandColors.textSubtle, marginTop: 2 },
+  cardCalories: { fontSize: 15, fontWeight: '700', color: brandColors.danger },
+  cardDuration: { fontSize: 12, color: brandColors.textMuted, marginTop: 2 },
   // Modal
-  modalContainer: { flex: 1, backgroundColor: '#f9fafb' },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
-  cancelText: { fontSize: 16, color: '#6b7280' },
-  modalTitle: { fontSize: 18, fontWeight: '700', color: '#111827' },
+  modalContainer: { flex: 1, backgroundColor: brandColors.background },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: brandColors.line },
+  cancelText: { fontSize: 16, color: brandColors.textMuted },
+  modalTitle: { fontSize: 18, fontWeight: '700', color: brandColors.foreground },
   modalContent: { padding: 20, gap: 4 },
-  label: { fontSize: 14, fontWeight: '600', color: '#374151', marginTop: 12, marginBottom: 6 },
-  input: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#d1d5db', borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14, fontSize: 16, color: '#111827' },
+  label: { fontSize: 14, fontWeight: '600', color: brandColors.foregroundSoft, marginTop: 12, marginBottom: 6 },
+  input: { backgroundColor: 'rgba(255,255,255,0.92)', borderWidth: 1, borderColor: brandColors.lineStrong, borderRadius: 16, paddingHorizontal: 16, paddingVertical: 14, fontSize: 16, color: brandColors.foreground },
   typeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  typeBtn: { backgroundColor: '#fff', borderWidth: 2, borderColor: '#e5e7eb', borderRadius: 10, paddingVertical: 10, paddingHorizontal: 14 },
-  typeBtnActive: { borderColor: '#ef4444', backgroundColor: '#fee2e2' },
-  typeBtnText: { fontSize: 14, fontWeight: '600', color: '#6b7280' },
-  typeBtnTextActive: { color: '#ef4444' },
-  previewCard: { backgroundColor: '#fee2e2', borderRadius: 12, padding: 16, alignItems: 'center', marginTop: 16 },
-  previewLabel: { fontSize: 13, color: '#991b1b' },
-  previewValue: { fontSize: 28, fontWeight: '800', color: '#ef4444', marginTop: 4 },
-  saveBtn: { backgroundColor: '#ef4444', borderRadius: 12, paddingVertical: 16, alignItems: 'center', marginTop: 24 },
+  typeBtn: { backgroundColor: 'rgba(255,255,255,0.88)', borderWidth: 1, borderColor: brandColors.line, borderRadius: 14, paddingVertical: 10, paddingHorizontal: 14 },
+  typeBtnActive: { borderColor: 'rgba(217, 92, 87, 0.35)', backgroundColor: '#fff0ef' },
+  typeBtnText: { fontSize: 14, fontWeight: '600', color: brandColors.textMuted },
+  typeBtnTextActive: { color: brandColors.danger },
+  previewCard: { backgroundColor: '#fff0ef', borderRadius: 18, padding: 16, alignItems: 'center', marginTop: 16, borderWidth: 1, borderColor: 'rgba(217, 92, 87, 0.14)' },
+  previewLabel: { fontSize: 13, color: '#8f3f3b' },
+  previewValue: { fontSize: 28, fontWeight: '800', color: brandColors.danger, marginTop: 4 },
+  saveBtn: { backgroundColor: brandColors.danger, borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginTop: 24 },
   saveBtnDisabled: { opacity: 0.6 },
   saveBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
 })

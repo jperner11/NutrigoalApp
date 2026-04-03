@@ -13,6 +13,8 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
 import { WATER_QUICK_ADD } from '@nutrigoal/shared'
+import { BrandLogo } from '../../src/components/BrandLogo'
+import { brandColors, brandShadow } from '../../src/theme/brand'
 
 export default function DashboardScreen() {
   const { user, profile } = useAuth()
@@ -70,7 +72,7 @@ export default function DashboardScreen() {
       date: today,
       amount_ml: amount,
     })
-    setWaterTotal(prev => prev + amount)
+    setWaterTotal((prev) => prev + amount)
   }
 
   const waterTarget = profile?.daily_water_ml ?? 2500
@@ -82,37 +84,49 @@ export default function DashboardScreen() {
     <SafeAreaView style={styles.container}>
       <ScrollView
         contentContainerStyle={styles.content}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={brandColors.brand500} />}
       >
-        <Text style={styles.greeting}>
-          Hey{profile?.full_name ? `, ${profile.full_name.split(' ')[0]}` : ''}!
-        </Text>
-        <Text style={styles.date}>{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</Text>
+        <View style={styles.hero}>
+          <View style={styles.heroGlow} />
+          <View style={styles.heroHeader}>
+            <BrandLogo compact />
+            <View style={styles.heroBadge}>
+              <Text style={styles.heroBadgeText}>Today's clinic view</Text>
+            </View>
+          </View>
+          <Text style={styles.greeting}>
+            Hey{profile?.full_name ? `, ${profile.full_name.split(' ')[0]}` : ''}.
+          </Text>
+          <Text style={styles.heroTitle}>Stay on target with nutrition, hydration, and training.</Text>
+          <Text style={styles.date}>
+            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+          </Text>
+        </View>
 
-        {/* Calories Card */}
         <View style={styles.card}>
           <View style={styles.cardHeader}>
             <Text style={styles.cardTitle}>Calories</Text>
             <Text style={styles.cardValue}>{mealCalories} / {calTarget}</Text>
           </View>
           <View style={styles.progressBg}>
-            <View style={[styles.progressFill, { width: `${calPercent}%`, backgroundColor: '#7c3aed' }]} />
+            <View style={[styles.progressFill, { width: `${calPercent}%`, backgroundColor: brandColors.brand900 }]} />
           </View>
           <View style={styles.macroRow}>
-            <MacroPill label="Protein" value={mealProtein} target={profile?.daily_protein ?? 150} color="#22c55e" unit="g" />
-            <MacroPill label="Carbs" value={mealCarbs} target={profile?.daily_carbs ?? 250} color="#f59e0b" unit="g" />
-            <MacroPill label="Fat" value={mealFat} target={profile?.daily_fat ?? 65} color="#ef4444" unit="g" />
+            <MacroPill label="Protein" value={mealProtein} target={profile?.daily_protein ?? 150} color={brandColors.success} unit="g" />
+            <MacroPill label="Carbs" value={mealCarbs} target={profile?.daily_carbs ?? 250} color={brandColors.warning} unit="g" />
+            <MacroPill label="Fat" value={mealFat} target={profile?.daily_fat ?? 65} color={brandColors.danger} unit="g" />
           </View>
         </View>
 
-        {/* Water Card */}
         <View style={styles.card}>
           <View style={styles.cardHeader}>
             <Text style={styles.cardTitle}>Water</Text>
-            <Text style={styles.cardValue}>{(waterTotal / 1000).toFixed(1)}L / {(waterTarget / 1000).toFixed(1)}L</Text>
+            <Text style={styles.cardValue}>
+              {(waterTotal / 1000).toFixed(1)}L / {(waterTarget / 1000).toFixed(1)}L
+            </Text>
           </View>
           <View style={styles.progressBg}>
-            <View style={[styles.progressFill, { width: `${waterPercent}%`, backgroundColor: '#3b82f6' }]} />
+            <View style={[styles.progressFill, { width: `${waterPercent}%`, backgroundColor: brandColors.brand500 }]} />
           </View>
           <View style={styles.waterButtons}>
             {WATER_QUICK_ADD.map((opt) => (
@@ -123,7 +137,6 @@ export default function DashboardScreen() {
           </View>
         </View>
 
-        {/* Quick Actions */}
         <Text style={styles.sectionTitle}>Quick Actions</Text>
         <View style={styles.actionsGrid}>
           <QuickAction icon="restaurant" label="Log Meal" onPress={() => router.push('/(tabs)/diet')} />
@@ -147,35 +160,101 @@ function MacroPill({ label, value, target, color, unit }: { label: string; value
 }
 
 function QuickAction({ icon, label, onPress }: { icon: string; label: string; onPress: () => void }) {
+  const iconColor = label === 'Cardio' ? brandColors.danger : brandColors.brand500
+
   return (
     <TouchableOpacity style={styles.actionCard} onPress={onPress}>
-      <Ionicons name={icon as any} size={24} color={label === 'Cardio' ? '#ef4444' : '#7c3aed'} />
+      <Ionicons name={icon as any} size={24} color={iconColor} />
       <Text style={styles.actionLabel}>{label}</Text>
     </TouchableOpacity>
   )
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f8fafc' },
-  content: { padding: 20 },
-  greeting: { fontSize: 28, fontWeight: '800', color: '#111827' },
-  date: { fontSize: 14, color: '#6b7280', marginTop: 4, marginBottom: 20 },
-  card: { backgroundColor: '#fff', borderRadius: 16, padding: 16, marginBottom: 16, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 2 },
+  container: { flex: 1, backgroundColor: brandColors.background },
+  content: { padding: 20, paddingBottom: 32 },
+  hero: {
+    borderRadius: 28,
+    padding: 22,
+    marginBottom: 18,
+    backgroundColor: brandColors.brand900,
+    overflow: 'hidden',
+  },
+  heroGlow: {
+    position: 'absolute',
+    top: -30,
+    right: -20,
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    backgroundColor: 'rgba(77, 196, 255, 0.2)',
+  },
+  heroHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 22,
+  },
+  heroBadge: {
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.18)',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  heroBadgeText: { color: 'rgba(255,255,255,0.8)', fontSize: 11, fontWeight: '600' },
+  greeting: { fontSize: 18, fontWeight: '700', color: 'rgba(255,255,255,0.76)' },
+  heroTitle: {
+    marginTop: 6,
+    fontSize: 30,
+    lineHeight: 34,
+    fontWeight: '800',
+    color: '#ffffff',
+    letterSpacing: -1.1,
+  },
+  date: { fontSize: 14, color: 'rgba(255,255,255,0.72)', marginTop: 14 },
+  card: {
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: brandColors.line,
+    padding: 18,
+    marginBottom: 16,
+    ...brandShadow,
+  },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
-  cardTitle: { fontSize: 16, fontWeight: '700', color: '#374151' },
-  cardValue: { fontSize: 14, fontWeight: '600', color: '#6b7280' },
-  progressBg: { height: 8, backgroundColor: '#e5e7eb', borderRadius: 4, overflow: 'hidden' },
+  cardTitle: { fontSize: 16, fontWeight: '700', color: brandColors.foregroundSoft },
+  cardValue: { fontSize: 14, fontWeight: '600', color: brandColors.textMuted },
+  progressBg: { height: 8, backgroundColor: brandColors.brand200, borderRadius: 4, overflow: 'hidden' },
   progressFill: { height: '100%', borderRadius: 4 },
   macroRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 12 },
   macroPill: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   macroDot: { width: 8, height: 8, borderRadius: 4 },
-  macroLabel: { fontSize: 12, color: '#6b7280' },
-  macroValue: { fontSize: 12, fontWeight: '600', color: '#374151' },
+  macroLabel: { fontSize: 12, color: brandColors.textMuted },
+  macroValue: { fontSize: 12, fontWeight: '600', color: brandColors.foregroundSoft },
   waterButtons: { flexDirection: 'row', gap: 8, marginTop: 12 },
-  waterBtn: { flex: 1, backgroundColor: '#eff6ff', borderRadius: 8, paddingVertical: 10, alignItems: 'center' },
-  waterBtnText: { fontSize: 13, fontWeight: '600', color: '#3b82f6' },
-  sectionTitle: { fontSize: 18, fontWeight: '700', color: '#111827', marginBottom: 12, marginTop: 8 },
+  waterBtn: {
+    flex: 1,
+    backgroundColor: brandColors.brand100,
+    borderRadius: 14,
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(77, 196, 255, 0.2)',
+  },
+  waterBtnText: { fontSize: 13, fontWeight: '700', color: brandColors.brand500 },
+  sectionTitle: { fontSize: 18, fontWeight: '700', color: brandColors.foreground, marginBottom: 12, marginTop: 8 },
   actionsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-  actionCard: { width: '47%', backgroundColor: '#fff', borderRadius: 12, padding: 16, alignItems: 'center', gap: 8, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 6, shadowOffset: { width: 0, height: 1 }, elevation: 1 },
-  actionLabel: { fontSize: 13, fontWeight: '600', color: '#374151' },
+  actionCard: {
+    width: '47%',
+    backgroundColor: 'rgba(255,255,255,0.82)',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: brandColors.line,
+    padding: 18,
+    alignItems: 'center',
+    gap: 8,
+  },
+  actionLabel: { fontSize: 13, fontWeight: '700', color: brandColors.foregroundSoft },
 })

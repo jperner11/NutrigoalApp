@@ -16,6 +16,8 @@ import {
   calculateNutritionTargets,
 } from '@nutrigoal/shared'
 import type { UserMetrics } from '@nutrigoal/shared'
+import { BrandLogo } from '../../src/components/BrandLogo'
+import { brandColors, brandShadow } from '../../src/theme/brand'
 
 const STEPS = ['Basics', 'Health', 'Fitness', 'Nutrition', 'Lifestyle', 'Goals', 'Schedule', 'Review']
 
@@ -157,7 +159,7 @@ export default function OnboardingScreen() {
     } else {
       await refreshProfile()
       Alert.alert(
-        'Welcome to NutriGoal!',
+        'Welcome to Nutrigoal',
         'Would you like AI to generate a personalized meal plan and training program based on your profile?',
         [
           { text: 'Later', style: 'cancel', onPress: () => router.replace('/(tabs)') },
@@ -169,7 +171,15 @@ export default function OnboardingScreen() {
 
   return (
     <SafeAreaView style={st.container}>
-      {/* Progress */}
+      <View style={st.hero}>
+        <View style={st.heroGlow} />
+        <BrandLogo light />
+        <Text style={st.heroTitle}>Build your performance profile.</Text>
+        <Text style={st.heroSubtitle}>
+          We&apos;ll turn this into nutrition targets, training structure, and better AI recommendations.
+        </Text>
+      </View>
+
       <View style={st.progressRow}>
         {STEPS.map((s, i) => (
           <View key={s} style={[st.dot, i <= step && st.dotActive]} />
@@ -538,64 +548,104 @@ function ReviewRow({ label, value }: { label: string; value: string }) {
 }
 
 const st = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f8fafc' },
-  progressRow: { flexDirection: 'row', justifyContent: 'center', gap: 6, paddingTop: 16 },
-  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#d1d5db' },
-  dotActive: { backgroundColor: '#7c3aed', width: 20 },
-  stepLabel: { textAlign: 'center', fontSize: 13, color: '#6b7280', marginTop: 8 },
+  container: { flex: 1, backgroundColor: brandColors.background },
+  hero: {
+    marginHorizontal: 18,
+    marginTop: 10,
+    borderRadius: 28,
+    padding: 20,
+    backgroundColor: brandColors.brand900,
+    overflow: 'hidden',
+  },
+  heroGlow: {
+    position: 'absolute',
+    top: -26,
+    right: -18,
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    backgroundColor: 'rgba(77, 196, 255, 0.2)',
+  },
+  heroTitle: {
+    marginTop: 20,
+    fontSize: 28,
+    lineHeight: 32,
+    fontWeight: '800',
+    color: '#ffffff',
+    letterSpacing: -1,
+  },
+  heroSubtitle: {
+    marginTop: 8,
+    color: 'rgba(255,255,255,0.72)',
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  progressRow: { flexDirection: 'row', justifyContent: 'center', gap: 6, paddingTop: 18 },
+  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: 'rgba(127, 147, 167, 0.34)' },
+  dotActive: { backgroundColor: brandColors.brand500, width: 20 },
+  stepLabel: { textAlign: 'center', fontSize: 13, color: brandColors.textMuted, marginTop: 8 },
   content: { padding: 24, paddingBottom: 40 },
   stepContent: { gap: 6 },
-  question: { fontSize: 24, fontWeight: '800', color: '#111827', marginBottom: 4 },
-  subtitle: { fontSize: 14, color: '#6b7280', marginBottom: 8 },
-  label: { fontSize: 14, fontWeight: '600', color: '#374151', marginTop: 14, marginBottom: 6 },
-  hint: { fontSize: 12, color: '#9ca3af', marginBottom: 6, marginTop: -4 },
-  input: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#d1d5db', borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14, fontSize: 16, color: '#111827' },
+  question: { fontSize: 24, fontWeight: '800', color: brandColors.foreground, marginBottom: 4, letterSpacing: -0.6 },
+  subtitle: { fontSize: 14, color: brandColors.textMuted, marginBottom: 8 },
+  label: { fontSize: 14, fontWeight: '700', color: brandColors.foregroundSoft, marginTop: 14, marginBottom: 6 },
+  hint: { fontSize: 12, color: brandColors.textSubtle, marginBottom: 6, marginTop: -4 },
+  input: {
+    backgroundColor: 'rgba(255,255,255,0.88)',
+    borderWidth: 1,
+    borderColor: brandColors.lineStrong,
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 16,
+    color: brandColors.foreground,
+  },
   // Two-option row
   optionRow: { flexDirection: 'row', gap: 10 },
-  optionBtn: { flex: 1, backgroundColor: '#fff', borderWidth: 2, borderColor: '#e5e7eb', borderRadius: 12, paddingVertical: 14, alignItems: 'center' },
-  optionActive: { borderColor: '#7c3aed', backgroundColor: '#f8fafc' },
-  optionText: { fontSize: 16, fontWeight: '600', color: '#6b7280' },
-  optionTextActive: { color: '#7c3aed' },
+  optionBtn: { flex: 1, backgroundColor: 'rgba(255,255,255,0.88)', borderWidth: 1, borderColor: brandColors.line, borderRadius: 16, paddingVertical: 14, alignItems: 'center' },
+  optionActive: { borderColor: 'rgba(29, 168, 240, 0.4)', backgroundColor: brandColors.brand100 },
+  optionText: { fontSize: 16, fontWeight: '600', color: brandColors.textMuted },
+  optionTextActive: { color: brandColors.brand500 },
   // List options
-  listOption: { backgroundColor: '#fff', borderWidth: 2, borderColor: '#e5e7eb', borderRadius: 12, padding: 14, marginBottom: 8 },
-  listOptionActive: { borderColor: '#7c3aed', backgroundColor: '#f8fafc' },
-  listOptionTitle: { fontSize: 15, fontWeight: '700', color: '#374151' },
-  listOptionTitleActive: { color: '#7c3aed' },
-  listOptionDesc: { fontSize: 12, color: '#6b7280', marginTop: 2 },
+  listOption: { backgroundColor: 'rgba(255,255,255,0.9)', borderWidth: 1, borderColor: brandColors.line, borderRadius: 18, padding: 14, marginBottom: 8 },
+  listOptionActive: { borderColor: 'rgba(29, 168, 240, 0.42)', backgroundColor: brandColors.brand100, ...brandShadow },
+  listOptionTitle: { fontSize: 15, fontWeight: '700', color: brandColors.foregroundSoft },
+  listOptionTitleActive: { color: brandColors.brand500 },
+  listOptionDesc: { fontSize: 12, color: brandColors.textMuted, marginTop: 2 },
   // Chip grid (multi-select)
   chipGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  chip: { backgroundColor: '#fff', borderWidth: 2, borderColor: '#e5e7eb', borderRadius: 10, paddingVertical: 9, paddingHorizontal: 14 },
+  chip: { backgroundColor: 'rgba(255,255,255,0.88)', borderWidth: 1, borderColor: brandColors.line, borderRadius: 14, paddingVertical: 9, paddingHorizontal: 14 },
   chipWide: { width: '100%' as unknown as number },
-  chipActive: { borderColor: '#7c3aed', backgroundColor: '#f8fafc' },
-  chipText: { fontSize: 13, fontWeight: '600', color: '#6b7280' },
-  chipTextActive: { color: '#7c3aed' },
-  chipDesc: { fontSize: 11, color: '#9ca3af', marginTop: 2 },
+  chipActive: { borderColor: 'rgba(29, 168, 240, 0.42)', backgroundColor: brandColors.brand100 },
+  chipText: { fontSize: 13, fontWeight: '600', color: brandColors.textMuted },
+  chipTextActive: { color: brandColors.brand500 },
+  chipDesc: { fontSize: 11, color: brandColors.textSubtle, marginTop: 2 },
   // Time pickers
   timeScroll: { marginBottom: 4 },
   timeRow: { flexDirection: 'row', gap: 8, paddingVertical: 4 },
-  timeBtn: { backgroundColor: '#fff', borderWidth: 2, borderColor: '#e5e7eb', borderRadius: 10, paddingVertical: 10, paddingHorizontal: 14 },
-  timeBtnActive: { borderColor: '#7c3aed', backgroundColor: '#f8fafc' },
-  timeBtnText: { fontSize: 14, fontWeight: '600', color: '#6b7280' },
-  timeBtnTextActive: { color: '#7c3aed' },
+  timeBtn: { backgroundColor: 'rgba(255,255,255,0.88)', borderWidth: 1, borderColor: brandColors.line, borderRadius: 14, paddingVertical: 10, paddingHorizontal: 14 },
+  timeBtnActive: { borderColor: 'rgba(29, 168, 240, 0.42)', backgroundColor: brandColors.brand100 },
+  timeBtnText: { fontSize: 14, fontWeight: '600', color: brandColors.textMuted },
+  timeBtnTextActive: { color: brandColors.brand500 },
   // Day pickers
   daysRow: { flexDirection: 'row', gap: 10, marginTop: 4 },
-  dayBtn: { width: 48, height: 48, borderRadius: 24, backgroundColor: '#fff', borderWidth: 2, borderColor: '#e5e7eb', alignItems: 'center', justifyContent: 'center' },
-  dayBtnActive: { borderColor: '#7c3aed', backgroundColor: '#f8fafc' },
-  dayBtnText: { fontSize: 18, fontWeight: '700', color: '#6b7280' },
-  dayBtnTextActive: { color: '#7c3aed' },
+  dayBtn: { width: 48, height: 48, borderRadius: 24, backgroundColor: 'rgba(255,255,255,0.88)', borderWidth: 1, borderColor: brandColors.line, alignItems: 'center', justifyContent: 'center' },
+  dayBtnActive: { borderColor: 'rgba(29, 168, 240, 0.42)', backgroundColor: brandColors.brand100 },
+  dayBtnText: { fontSize: 18, fontWeight: '700', color: brandColors.textMuted },
+  dayBtnTextActive: { color: brandColors.brand500 },
   // Review
-  reviewCard: { backgroundColor: '#fff', borderRadius: 16, padding: 18, gap: 10, marginBottom: 12, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 },
-  reviewSection: { fontSize: 14, fontWeight: '700', color: '#7c3aed', marginBottom: 2 },
+  reviewCard: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 22, borderWidth: 1, borderColor: brandColors.line, padding: 18, gap: 10, marginBottom: 12, ...brandShadow },
+  reviewSection: { fontSize: 14, fontWeight: '700', color: brandColors.brand500, marginBottom: 2 },
   reviewRow: { flexDirection: 'row', justifyContent: 'space-between' },
-  reviewLabel: { fontSize: 14, color: '#6b7280', flex: 1 },
-  reviewValue: { fontSize: 14, fontWeight: '700', color: '#111827', flex: 1, textAlign: 'right' },
-  aiNote: { flexDirection: 'row', backgroundColor: '#ede9fe', borderRadius: 12, padding: 14, gap: 10, marginTop: 8, alignItems: 'flex-start' },
-  aiNoteText: { fontSize: 13, color: '#5b21b6', flex: 1, lineHeight: 18 },
+  reviewLabel: { fontSize: 14, color: brandColors.textMuted, flex: 1 },
+  reviewValue: { fontSize: 14, fontWeight: '700', color: brandColors.foreground, flex: 1, textAlign: 'right' },
+  aiNote: { flexDirection: 'row', backgroundColor: brandColors.brand100, borderRadius: 18, padding: 14, gap: 10, marginTop: 8, alignItems: 'flex-start', borderWidth: 1, borderColor: 'rgba(77, 196, 255, 0.2)' },
+  aiNoteText: { fontSize: 13, color: '#0f4262', flex: 1, lineHeight: 18 },
   // Nav
   navRow: { flexDirection: 'row', paddingHorizontal: 24, paddingBottom: 32, gap: 12 },
-  backBtn: { flex: 1, borderWidth: 2, borderColor: '#e5e7eb', borderRadius: 12, paddingVertical: 16, alignItems: 'center' },
-  backText: { fontSize: 16, fontWeight: '600', color: '#6b7280' },
-  nextBtn: { flex: 2, backgroundColor: '#7c3aed', borderRadius: 12, paddingVertical: 16, alignItems: 'center' },
+  backBtn: { flex: 1, borderWidth: 1, borderColor: brandColors.lineStrong, borderRadius: 16, paddingVertical: 16, alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.84)' },
+  backText: { fontSize: 16, fontWeight: '600', color: brandColors.textMuted },
+  nextBtn: { flex: 2, backgroundColor: brandColors.brand900, borderRadius: 16, paddingVertical: 16, alignItems: 'center' },
   nextText: { color: '#fff', fontSize: 16, fontWeight: '700' },
   btnDisabled: { opacity: 0.5 },
 })

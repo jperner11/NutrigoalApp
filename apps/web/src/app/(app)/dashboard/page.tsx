@@ -274,9 +274,9 @@ export default function DashboardPage() {
       )}
 
       {/* Stats Grid */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="mb-8 grid gap-6 md:grid-cols-2 lg:grid-cols-12">
         {/* Calories & Macros */}
-        <div className="panel-strong lg:col-span-2 relative overflow-hidden p-6 animate-[fadeIn_0.3s_ease-out_forwards]">
+        <div className="panel-strong relative overflow-hidden p-6 animate-[fadeIn_0.3s_ease-out_forwards] lg:col-span-7 lg:row-span-2">
           {/* Accent bar */}
           <div className="absolute left-0 right-0 top-0 h-1 bg-[linear-gradient(90deg,#0d1b2a,#1da8f0,#4dc4ff)] rounded-t-xl" />
           <div className="flex items-center justify-between mb-4">
@@ -337,7 +337,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Water */}
-        <div className="panel-strong relative overflow-hidden p-6 animate-[fadeIn_0.4s_ease-out_forwards]">
+        <div className="panel-strong relative overflow-hidden p-6 animate-[fadeIn_0.4s_ease-out_forwards] lg:col-span-3">
           {/* Accent bar */}
           <div className="absolute left-0 right-0 top-0 h-1 rounded-t-xl bg-[linear-gradient(90deg,#4dc4ff,#1da8f0,#0d1b2a)]" />
           <div className="flex items-center justify-between mb-4">
@@ -378,7 +378,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Workouts */}
-        <div className="panel-strong relative overflow-hidden p-6 animate-[fadeIn_0.5s_ease-out_forwards]">
+        <div className="panel-strong relative overflow-hidden p-6 animate-[fadeIn_0.5s_ease-out_forwards] lg:col-span-2">
           <div className="absolute left-0 right-0 top-0 h-1 rounded-t-xl bg-[linear-gradient(90deg,#0d1b2a,#1f3650,#4dc4ff)]" />
           <div className="flex items-center justify-between mb-4">
             <div className="rounded-full bg-[var(--brand-100)] p-3 shadow-sm">
@@ -393,7 +393,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Cardio */}
-        <div className="bg-gradient-to-br from-white to-red-50/40 rounded-2xl p-6 shadow-sm border border-red-100/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 relative overflow-hidden animate-[fadeIn_0.6s_ease-out_forwards]">
+        <div className="relative overflow-hidden rounded-2xl border border-red-100/60 bg-gradient-to-br from-white to-red-50/40 p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md animate-[fadeIn_0.6s_ease-out_forwards] lg:col-span-5 lg:col-start-8">
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-400 via-rose-500 to-red-400 rounded-t-xl" />
           <div className="flex items-center justify-between mb-4">
             <div className="bg-gradient-to-br from-red-100 to-rose-100 rounded-full p-3 shadow-sm">

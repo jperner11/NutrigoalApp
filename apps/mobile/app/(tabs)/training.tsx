@@ -15,6 +15,7 @@ import type {
   TrainingPlan, Exercise, BodyPart, Equipment,
   TrainingPlanDay, TrainingPlanExercise, WorkoutSetLog, WorkoutExerciseLog,
 } from '@nutrigoal/shared'
+import { brandColors, brandShadow } from '../../src/theme/brand'
 
 // ─── Types ──────────────────────────────────────────────
 interface DayEntry {
@@ -53,7 +54,7 @@ export default function TrainingScreen() {
   const onRefresh = async () => { setRefreshing(true); await fetchPlans(); setRefreshing(false) }
 
   if (screen === 'create') return <CreatePlan user={user} profile={profile} onDone={() => { setScreen('list'); fetchPlans() }} onCancel={() => setScreen('list')} />
-  if (screen === 'detail' && selectedPlanId) return <PlanDetail planId={selectedPlanId} user={user} onBack={() => { setScreen('list'); fetchPlans() }} onStartSession={(dayId) => { setSessionDayId(dayId); setScreen('session') }} />
+  if (screen === 'detail' && selectedPlanId) return <PlanDetail planId={selectedPlanId} user={user} onBack={() => { setScreen('list'); fetchPlans() }} onStartSession={(dayId: string) => { setSessionDayId(dayId); setScreen('session') }} />
   if (screen === 'session' && sessionDayId) return <WorkoutSession dayId={sessionDayId} user={user} profile={profile} onDone={() => { setScreen('list'); fetchPlans() }} />
 
   return (
@@ -64,7 +65,7 @@ export default function TrainingScreen() {
           <Ionicons name="add" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
-      <ScrollView contentContainerStyle={s.content} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+      <ScrollView contentContainerStyle={s.content} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={brandColors.brand500} />}>
         {plans.length === 0 ? (
           <View style={s.empty}>
             <Ionicons name="barbell-outline" size={48} color="#d1d5db" />
@@ -184,14 +185,14 @@ function CreatePlan({ user, profile, onDone, onCancel }: any) {
               </View>
             ))}
             <TouchableOpacity style={s.addExBtn} onPress={() => { setPickerDayIdx(di); setShowPicker(true); setSearch(''); setFilterBody('') }}>
-              <Ionicons name="add-circle-outline" size={20} color="#7c3aed" />
+              <Ionicons name="add-circle-outline" size={20} color={brandColors.brand500} />
               <Text style={s.addExText}>Add Exercise</Text>
             </TouchableOpacity>
           </View>
         ))}
 
         <TouchableOpacity style={s.addDayBtn} onPress={addDay}>
-          <Ionicons name="add" size={20} color="#7c3aed" />
+          <Ionicons name="add" size={20} color={brandColors.brand500} />
           <Text style={s.addDayText}>Add Day</Text>
         </TouchableOpacity>
 
@@ -229,7 +230,7 @@ function CreatePlan({ user, profile, onDone, onCancel }: any) {
                   <Text style={s.pickName}>{item.name}</Text>
                   <Text style={s.pickMeta}>{item.body_part} · {item.equipment}{item.is_compound ? ' · compound' : ''}</Text>
                 </View>
-                <Ionicons name="add-circle" size={24} color="#7c3aed" />
+                <Ionicons name="add-circle" size={24} color={brandColors.brand500} />
               </TouchableOpacity>
             )}
           />
@@ -412,7 +413,7 @@ function WorkoutSession({ dayId, user, profile, onDone }: any) {
 
         {suggestion && (
           <View style={s.suggestionCard}>
-            <Ionicons name="trending-up" size={18} color="#7c3aed" />
+            <Ionicons name="trending-up" size={18} color={brandColors.brand500} />
             <Text style={s.suggestionText}>{suggestion.reason}</Text>
           </View>
         )}
@@ -444,7 +445,7 @@ function WorkoutSession({ dayId, user, profile, onDone }: any) {
               placeholderTextColor="#c4b5fd"
             />
             <TouchableOpacity style={[s.checkBtn, set.completed && s.checkBtnDone]} onPress={() => toggleComplete(si)}>
-              <Ionicons name={set.completed ? 'checkmark-circle' : 'ellipse-outline'} size={28} color={set.completed ? '#7c3aed' : '#d1d5db'} />
+              <Ionicons name={set.completed ? 'checkmark-circle' : 'ellipse-outline'} size={28} color={set.completed ? brandColors.brand500 : brandColors.textSubtle} />
             </TouchableOpacity>
           </View>
         ))}
@@ -480,70 +481,70 @@ function WorkoutSession({ dayId, user, profile, onDone }: any) {
 
 // ─── Styles ─────────────────────────────────────────────
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f8fafc' },
+  container: { flex: 1, backgroundColor: brandColors.background },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 },
-  title: { fontSize: 24, fontWeight: '800', color: '#111827' },
-  addBtn: { backgroundColor: '#7c3aed', borderRadius: 20, width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
+  title: { fontSize: 24, fontWeight: '800', color: brandColors.foreground, letterSpacing: -0.6 },
+  addBtn: { backgroundColor: brandColors.brand900, borderRadius: 20, width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
   content: { padding: 20, paddingTop: 0 },
   empty: { alignItems: 'center', paddingTop: 80, gap: 8 },
-  emptyText: { fontSize: 18, fontWeight: '600', color: '#6b7280' },
-  emptyLink: { fontSize: 15, fontWeight: '600', color: '#7c3aed', marginTop: 4 },
-  card: { backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 10, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 6, elevation: 1 },
+  emptyText: { fontSize: 18, fontWeight: '600', color: brandColors.textMuted },
+  emptyLink: { fontSize: 15, fontWeight: '600', color: brandColors.brand500, marginTop: 4 },
+  card: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 10, ...brandShadow },
   cardRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  cardTitle: { fontSize: 16, fontWeight: '700', color: '#374151' },
-  cardSub: { fontSize: 13, color: '#6b7280', marginTop: 2 },
-  activeBadge: { backgroundColor: '#ede9fe', borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 },
-  badgeText: { fontSize: 12, fontWeight: '600', color: '#7c3aed' },
-  ptBadge: { backgroundColor: '#ede9fe', borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4, marginRight: 6 },
-  ptBadgeText: { fontSize: 11, fontWeight: '600', color: '#7c3aed' },
+  cardTitle: { fontSize: 16, fontWeight: '700', color: brandColors.foregroundSoft },
+  cardSub: { fontSize: 13, color: brandColors.textMuted, marginTop: 2 },
+  activeBadge: { backgroundColor: brandColors.brand100, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 },
+  badgeText: { fontSize: 12, fontWeight: '600', color: brandColors.brand500 },
+  ptBadge: { backgroundColor: brandColors.brand100, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4, marginRight: 6 },
+  ptBadgeText: { fontSize: 11, fontWeight: '600', color: brandColors.brand500 },
   // Modal/Form shared
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
-  cancelText: { fontSize: 16, color: '#6b7280' },
-  modalTitle: { fontSize: 18, fontWeight: '700', color: '#111827' },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: brandColors.line },
+  cancelText: { fontSize: 16, color: brandColors.textMuted },
+  modalTitle: { fontSize: 18, fontWeight: '700', color: brandColors.foreground },
   modalContent: { padding: 20 },
-  label: { fontSize: 14, fontWeight: '600', color: '#374151', marginTop: 12, marginBottom: 6 },
-  input: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#d1d5db', borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14, fontSize: 16, color: '#111827' },
+  label: { fontSize: 14, fontWeight: '600', color: brandColors.foregroundSoft, marginTop: 12, marginBottom: 6 },
+  input: { backgroundColor: 'rgba(255,255,255,0.92)', borderWidth: 1, borderColor: brandColors.lineStrong, borderRadius: 16, paddingHorizontal: 16, paddingVertical: 14, fontSize: 16, color: brandColors.foreground },
   // Day card
-  dayCard: { backgroundColor: '#fff', borderRadius: 14, padding: 16, marginTop: 16, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 6, elevation: 1 },
+  dayCard: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginTop: 16, ...brandShadow },
   dayHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  dayNameInput: { fontSize: 16, fontWeight: '700', color: '#374151', flex: 1 },
-  dayNameDisplay: { fontSize: 16, fontWeight: '700', color: '#374151' },
-  exerciseCount: { fontSize: 13, color: '#6b7280' },
-  exerciseRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
-  exerciseName: { fontSize: 15, fontWeight: '600', color: '#374151' },
-  exerciseMeta: { fontSize: 12, color: '#9ca3af', marginTop: 2 },
+  dayNameInput: { fontSize: 16, fontWeight: '700', color: brandColors.foregroundSoft, flex: 1 },
+  dayNameDisplay: { fontSize: 16, fontWeight: '700', color: brandColors.foregroundSoft },
+  exerciseCount: { fontSize: 13, color: brandColors.textMuted },
+  exerciseRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: brandColors.line },
+  exerciseName: { fontSize: 15, fontWeight: '600', color: brandColors.foregroundSoft },
+  exerciseMeta: { fontSize: 12, color: brandColors.textSubtle, marginTop: 2 },
   addExBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingTop: 12 },
-  addExText: { fontSize: 14, fontWeight: '600', color: '#7c3aed' },
+  addExText: { fontSize: 14, fontWeight: '600', color: brandColors.brand500 },
   addDayBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 16, marginTop: 8 },
-  addDayText: { fontSize: 15, fontWeight: '600', color: '#7c3aed' },
-  startBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, backgroundColor: '#7c3aed', borderRadius: 10, paddingVertical: 12, marginTop: 12 },
+  addDayText: { fontSize: 15, fontWeight: '600', color: brandColors.brand500 },
+  startBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, backgroundColor: brandColors.brand900, borderRadius: 14, paddingVertical: 12, marginTop: 12 },
   startBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
-  saveBtn: { backgroundColor: '#7c3aed', borderRadius: 12, paddingVertical: 16, alignItems: 'center', marginTop: 24 },
+  saveBtn: { backgroundColor: brandColors.brand900, borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginTop: 24 },
   saveBtnDisabled: { opacity: 0.6 },
   saveBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
   // Picker
-  filterChip: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6 },
-  filterChipActive: { backgroundColor: '#7c3aed', borderColor: '#7c3aed' },
-  filterChipText: { fontSize: 13, fontWeight: '600', color: '#6b7280' },
+  filterChip: { backgroundColor: 'rgba(255,255,255,0.84)', borderWidth: 1, borderColor: brandColors.line, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6 },
+  filterChipActive: { backgroundColor: brandColors.brand900, borderColor: brandColors.brand900 },
+  filterChipText: { fontSize: 13, fontWeight: '600', color: brandColors.textMuted },
   filterChipTextActive: { color: '#fff' },
-  pickItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
-  pickName: { fontSize: 15, fontWeight: '600', color: '#374151' },
-  pickMeta: { fontSize: 12, color: '#9ca3af', marginTop: 2 },
+  pickItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: brandColors.line },
+  pickName: { fontSize: 15, fontWeight: '600', color: brandColors.foregroundSoft },
+  pickMeta: { fontSize: 12, color: brandColors.textSubtle, marginTop: 2 },
   // Session
-  sessionExName: { fontSize: 22, fontWeight: '800', color: '#111827', textAlign: 'center' },
-  sessionExMeta: { fontSize: 14, color: '#6b7280', textAlign: 'center', marginTop: 4, marginBottom: 16 },
-  suggestionCard: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#ede9fe', borderRadius: 10, padding: 12, marginBottom: 16 },
-  suggestionText: { fontSize: 13, color: '#5b21b6', flex: 1 },
-  setsHeader: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8, borderBottomWidth: 2, borderBottomColor: '#e5e7eb' },
-  setCol: { flex: 1, fontSize: 12, fontWeight: '700', color: '#6b7280', textAlign: 'center' },
+  sessionExName: { fontSize: 22, fontWeight: '800', color: brandColors.foreground, textAlign: 'center' },
+  sessionExMeta: { fontSize: 14, color: brandColors.textMuted, textAlign: 'center', marginTop: 4, marginBottom: 16 },
+  suggestionCard: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: brandColors.brand100, borderRadius: 14, borderWidth: 1, borderColor: 'rgba(77, 196, 255, 0.2)', padding: 12, marginBottom: 16 },
+  suggestionText: { fontSize: 13, color: '#0f4262', flex: 1 },
+  setsHeader: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: brandColors.lineStrong },
+  setCol: { flex: 1, fontSize: 12, fontWeight: '700', color: brandColors.textMuted, textAlign: 'center' },
   setRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 6 },
-  setRowDone: { backgroundColor: '#f8fafc', borderRadius: 8 },
-  setInput: { flex: 1, backgroundColor: '#f9fafb', borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 8, paddingVertical: 10, paddingHorizontal: 12, fontSize: 16, textAlign: 'center', color: '#111827', marginHorizontal: 4 },
+  setRowDone: { backgroundColor: brandColors.panelMuted, borderRadius: 8 },
+  setInput: { flex: 1, backgroundColor: 'rgba(255,255,255,0.9)', borderWidth: 1, borderColor: brandColors.line, borderRadius: 10, paddingVertical: 10, paddingHorizontal: 12, fontSize: 16, textAlign: 'center', color: brandColors.foreground, marginHorizontal: 4 },
   checkBtn: { flex: 0.5, alignItems: 'center' },
   checkBtnDone: {},
   addSetBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, paddingVertical: 12 },
-  addSetText: { fontSize: 14, color: '#6b7280' },
-  sessionNav: { flexDirection: 'row', padding: 20, gap: 12, borderTopWidth: 1, borderTopColor: '#e5e7eb' },
-  prevBtn: { flex: 1, borderWidth: 2, borderColor: '#e5e7eb', borderRadius: 12, paddingVertical: 16, alignItems: 'center' },
-  prevBtnText: { fontSize: 16, fontWeight: '600', color: '#6b7280' },
+  addSetText: { fontSize: 14, color: brandColors.textMuted },
+  sessionNav: { flexDirection: 'row', padding: 20, gap: 12, borderTopWidth: 1, borderTopColor: brandColors.line },
+  prevBtn: { flex: 1, borderWidth: 1, borderColor: brandColors.lineStrong, borderRadius: 16, paddingVertical: 16, alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.84)' },
+  prevBtnText: { fontSize: 16, fontWeight: '600', color: brandColors.textMuted },
 })

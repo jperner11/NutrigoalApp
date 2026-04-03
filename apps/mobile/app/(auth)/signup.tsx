@@ -9,9 +9,12 @@ import {
   Platform,
   Alert,
   ActivityIndicator,
+  ScrollView,
 } from 'react-native'
 import { Link } from 'expo-router'
 import { supabase } from '../../src/lib/supabase'
+import { BrandLogo } from '../../src/components/BrandLogo'
+import { brandColors, brandShadow } from '../../src/theme/brand'
 
 export default function SignupScreen() {
   const [email, setEmail] = useState('')
@@ -51,66 +54,77 @@ export default function SignupScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
-      <View style={styles.inner}>
-        <View style={styles.header}>
-          <Text style={styles.logo}>NutriGoal</Text>
-          <Text style={styles.subtitle}>Create your account</Text>
-        </View>
+      <View style={styles.topGlow} />
+      <View style={styles.sideGlow} />
 
-        <View style={styles.form}>
-          <Text style={styles.label}>Email</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="your@email.com"
-            placeholderTextColor="#9ca3af"
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
-          />
+      <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+        <View style={styles.inner}>
+          <View style={styles.header}>
+            <BrandLogo />
+            <View style={styles.eyebrow}>
+              <Text style={styles.eyebrowText}>New patient intake</Text>
+            </View>
+            <Text style={styles.title}>Create your account and start the clinic setup.</Text>
+            <Text style={styles.subtitle}>
+              We&apos;ll use your profile to shape nutrition targets, training guidance, and AI-generated plans.
+            </Text>
+          </View>
 
-          <Text style={styles.label}>Password</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="At least 6 characters"
-            placeholderTextColor="#9ca3af"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
+          <View style={styles.formCard}>
+            <Text style={styles.label}>Email</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="your@email.com"
+              placeholderTextColor={brandColors.textSubtle}
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              keyboardType="email-address"
+            />
 
-          <Text style={styles.label}>Confirm Password</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Repeat your password"
-            placeholderTextColor="#9ca3af"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            secureTextEntry
-          />
+            <Text style={styles.label}>Password</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="At least 6 characters"
+              placeholderTextColor={brandColors.textSubtle}
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+            />
 
-          <TouchableOpacity
-            style={[styles.button, loading && styles.buttonDisabled]}
-            onPress={handleSignup}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>Create Account</Text>
-            )}
-          </TouchableOpacity>
-        </View>
+            <Text style={styles.label}>Confirm Password</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Repeat your password"
+              placeholderTextColor={brandColors.textSubtle}
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry
+            />
 
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Already have an account? </Text>
-          <Link href="/(auth)/login" asChild>
-            <TouchableOpacity>
-              <Text style={styles.link}>Sign In</Text>
+            <TouchableOpacity
+              style={[styles.button, loading && styles.buttonDisabled]}
+              onPress={handleSignup}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.buttonText}>Create Account</Text>
+              )}
             </TouchableOpacity>
-          </Link>
+          </View>
+
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>Already have an account? </Text>
+            <Link href="/(auth)/login" asChild>
+              <TouchableOpacity>
+                <Text style={styles.link}>Sign in</Text>
+              </TouchableOpacity>
+            </Link>
+          </View>
         </View>
-      </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   )
 }
@@ -118,51 +132,93 @@ export default function SignupScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: brandColors.background,
+  },
+  topGlow: {
+    position: 'absolute',
+    top: -120,
+    left: -40,
+    width: 280,
+    height: 280,
+    borderRadius: 140,
+    backgroundColor: 'rgba(77, 196, 255, 0.18)',
+  },
+  sideGlow: {
+    position: 'absolute',
+    top: 180,
+    right: -80,
+    width: 210,
+    height: 210,
+    borderRadius: 105,
+    backgroundColor: 'rgba(216, 239, 251, 0.95)',
+  },
+  scrollContent: {
+    flexGrow: 1,
   },
   inner: {
     flex: 1,
     justifyContent: 'center',
     paddingHorizontal: 24,
+    paddingVertical: 36,
   },
   header: {
-    alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 28,
+    gap: 14,
   },
-  logo: {
-    fontSize: 36,
+  eyebrow: {
+    alignSelf: 'flex-start',
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: 'rgba(77, 196, 255, 0.34)',
+    backgroundColor: brandColors.brand100,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+  },
+  eyebrowText: {
+    color: '#0f4262',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  title: {
+    fontSize: 30,
+    lineHeight: 34,
     fontWeight: '800',
-    color: '#7c3aed',
-    letterSpacing: -1,
+    color: brandColors.foreground,
+    letterSpacing: -1.1,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#6b7280',
-    marginTop: 8,
+    fontSize: 15,
+    lineHeight: 22,
+    color: brandColors.textMuted,
   },
-  form: {
-    gap: 4,
+  formCard: {
+    borderRadius: 28,
+    backgroundColor: 'rgba(255,255,255,0.92)',
+    borderWidth: 1,
+    borderColor: brandColors.line,
+    padding: 20,
+    ...brandShadow,
   },
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#374151',
+    color: brandColors.foregroundSoft,
     marginBottom: 4,
     marginTop: 12,
   },
   input: {
-    backgroundColor: '#fff',
+    backgroundColor: brandColors.backgroundElevated,
     borderWidth: 1,
-    borderColor: '#d1d5db',
-    borderRadius: 12,
+    borderColor: brandColors.lineStrong,
+    borderRadius: 18,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 16,
-    color: '#111827',
+    color: brandColors.foreground,
   },
   button: {
-    backgroundColor: '#7c3aed',
-    borderRadius: 12,
+    backgroundColor: brandColors.brand900,
+    borderRadius: 18,
     paddingVertical: 16,
     alignItems: 'center',
     marginTop: 24,
@@ -181,11 +237,11 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   footerText: {
-    color: '#6b7280',
+    color: brandColors.textMuted,
     fontSize: 14,
   },
   link: {
-    color: '#7c3aed',
+    color: brandColors.brand500,
     fontSize: 14,
     fontWeight: '600',
   },

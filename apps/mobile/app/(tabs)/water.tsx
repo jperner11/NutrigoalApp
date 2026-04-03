@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
 import { WATER_QUICK_ADD } from '@nutrigoal/shared'
+import { brandColors, brandShadow } from '../../src/theme/brand'
 
 export default function WaterScreen() {
   const { user, profile } = useAuth()
@@ -43,10 +44,10 @@ export default function WaterScreen() {
       </View>
       <ScrollView
         contentContainerStyle={styles.content}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={brandColors.brand500} />}
       >
         <View style={styles.card}>
-          <Ionicons name="water" size={40} color="#3b82f6" />
+          <Ionicons name="water" size={40} color={brandColors.brand500} />
           <Text style={styles.bigNum}>{(total / 1000).toFixed(1)}L</Text>
           <Text style={styles.target}>of {(target / 1000).toFixed(1)}L target</Text>
           <View style={styles.progressBg}>
@@ -75,20 +76,20 @@ export default function WaterScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f8fafc' },
+  container: { flex: 1, backgroundColor: brandColors.background },
   header: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 },
-  title: { fontSize: 24, fontWeight: '800', color: '#111827' },
+  title: { fontSize: 24, fontWeight: '800', color: brandColors.foreground, letterSpacing: -0.6 },
   content: { padding: 20, paddingTop: 0 },
-  card: { backgroundColor: '#fff', borderRadius: 16, padding: 24, alignItems: 'center', marginBottom: 16, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 },
-  bigNum: { fontSize: 48, fontWeight: '800', color: '#3b82f6', marginTop: 8 },
-  target: { fontSize: 14, color: '#6b7280', marginBottom: 16 },
-  progressBg: { width: '100%', height: 10, backgroundColor: '#e5e7eb', borderRadius: 5, overflow: 'hidden' },
-  progressFill: { height: '100%', backgroundColor: '#3b82f6', borderRadius: 5 },
+  card: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 24, borderWidth: 1, borderColor: brandColors.line, padding: 24, alignItems: 'center', marginBottom: 16, ...brandShadow },
+  bigNum: { fontSize: 48, fontWeight: '800', color: brandColors.brand500, marginTop: 8 },
+  target: { fontSize: 14, color: brandColors.textMuted, marginBottom: 16 },
+  progressBg: { width: '100%', height: 10, backgroundColor: brandColors.brand200, borderRadius: 5, overflow: 'hidden' },
+  progressFill: { height: '100%', backgroundColor: brandColors.brand500, borderRadius: 5 },
   quickRow: { flexDirection: 'row', gap: 10, marginBottom: 20 },
-  quickBtn: { flex: 1, backgroundColor: '#eff6ff', borderRadius: 12, paddingVertical: 14, alignItems: 'center' },
-  quickBtnText: { fontSize: 15, fontWeight: '700', color: '#3b82f6' },
-  sectionTitle: { fontSize: 16, fontWeight: '700', color: '#374151', marginBottom: 8 },
-  logRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
-  logAmount: { fontSize: 15, fontWeight: '600', color: '#374151' },
-  logTime: { fontSize: 14, color: '#9ca3af' },
+  quickBtn: { flex: 1, backgroundColor: brandColors.brand100, borderRadius: 16, borderWidth: 1, borderColor: 'rgba(77, 196, 255, 0.2)', paddingVertical: 14, alignItems: 'center' },
+  quickBtnText: { fontSize: 15, fontWeight: '700', color: brandColors.brand500 },
+  sectionTitle: { fontSize: 16, fontWeight: '700', color: brandColors.foregroundSoft, marginBottom: 8 },
+  logRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: brandColors.line },
+  logAmount: { fontSize: 15, fontWeight: '600', color: brandColors.foregroundSoft },
+  logTime: { fontSize: 14, color: brandColors.textSubtle },
 })

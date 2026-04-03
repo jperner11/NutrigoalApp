@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
+import { brandColors, brandShadow } from '../../src/theme/brand'
 
 export default function AIScreen() {
   const { profile } = useAuth()
@@ -50,7 +51,7 @@ export default function AIScreen() {
       </View>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.card}>
-          <Ionicons name="sparkles" size={24} color="#8b5cf6" />
+          <Ionicons name="sparkles" size={24} color={brandColors.brand500} />
           <Text style={styles.cardText}>
             Ask for meal ideas, nutrition advice, or workout suggestions tailored to your goals.
           </Text>
@@ -59,7 +60,7 @@ export default function AIScreen() {
         <TextInput
           style={styles.input}
           placeholder="e.g., Suggest a high-protein breakfast under 400 calories"
-          placeholderTextColor="#9ca3af"
+          placeholderTextColor={brandColors.textSubtle}
           value={prompt}
           onChangeText={setPrompt}
           multiline
@@ -89,16 +90,16 @@ export default function AIScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f8fafc' },
+  container: { flex: 1, backgroundColor: brandColors.background },
   header: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 },
-  title: { fontSize: 24, fontWeight: '800', color: '#111827' },
+  title: { fontSize: 24, fontWeight: '800', color: brandColors.foreground, letterSpacing: -0.6 },
   content: { padding: 20, paddingTop: 0 },
-  card: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#f5f3ff', borderRadius: 12, padding: 16, marginBottom: 16 },
-  cardText: { flex: 1, fontSize: 14, color: '#6b7280' },
-  input: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#d1d5db', borderRadius: 12, padding: 16, fontSize: 16, color: '#111827', minHeight: 80, textAlignVertical: 'top', marginBottom: 12 },
-  button: { backgroundColor: '#8b5cf6', borderRadius: 12, paddingVertical: 16, alignItems: 'center' },
+  card: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: brandColors.brand100, borderRadius: 18, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: 'rgba(77, 196, 255, 0.2)' },
+  cardText: { flex: 1, fontSize: 14, color: brandColors.textMuted, lineHeight: 20 },
+  input: { backgroundColor: 'rgba(255,255,255,0.92)', borderWidth: 1, borderColor: brandColors.lineStrong, borderRadius: 18, padding: 16, fontSize: 16, color: brandColors.foreground, minHeight: 96, textAlignVertical: 'top', marginBottom: 12 },
+  button: { backgroundColor: brandColors.brand900, borderRadius: 18, paddingVertical: 16, alignItems: 'center' },
   buttonDisabled: { opacity: 0.6 },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: '700' },
-  responseCard: { backgroundColor: '#fff', borderRadius: 12, padding: 16, marginTop: 16, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 6, elevation: 1 },
-  responseText: { fontSize: 15, color: '#374151', lineHeight: 22 },
+  responseCard: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 20, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginTop: 16, ...brandShadow },
+  responseText: { fontSize: 15, color: brandColors.foregroundSoft, lineHeight: 22 },
 })

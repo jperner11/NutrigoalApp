@@ -1,0 +1,30 @@
+export const brandColors = {
+  background: '#f3f8fc',
+  backgroundElevated: '#fbfdff',
+  panel: '#ffffff',
+  panelMuted: '#f8fbfe',
+  foreground: '#0d1b2a',
+  foregroundSoft: '#1f3650',
+  textMuted: '#5b7085',
+  textSubtle: '#7f93a7',
+  line: 'rgba(140, 168, 192, 0.22)',
+  lineStrong: 'rgba(93, 121, 144, 0.3)',
+  brand900: '#0d1b2a',
+  brand800: '#13273c',
+  brand700: '#1f3650',
+  brand500: '#1da8f0',
+  brand400: '#4dc4ff',
+  brand200: '#d8effb',
+  brand100: '#edf8ff',
+  success: '#1f9d73',
+  danger: '#d95c57',
+  warning: '#df9a2b',
+}
+
+export const brandShadow = {
+  shadowColor: '#0d1b2a',
+  shadowOpacity: 0.08,
+  shadowRadius: 24,
+  shadowOffset: { width: 0, height: 12 },
+  elevation: 3,
+} as const

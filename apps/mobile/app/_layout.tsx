@@ -3,6 +3,7 @@ import { Stack, useRouter, useSegments } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
 import { AuthProvider, useAuth } from '../src/contexts/AuthContext'
+import { brandColors } from '../src/theme/brand'
 
 export { ErrorBoundary } from 'expo-router'
 
@@ -40,8 +41,14 @@ export default function RootLayout() {
   return (
     <AuthProvider>
       <AuthGuard>
-        <StatusBar style="dark" />
-        <Stack screenOptions={{ headerShown: false }}>
+        <StatusBar style="dark" backgroundColor={brandColors.background} />
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: brandColors.background },
+            animation: 'fade',
+          }}
+        >
           <Stack.Screen name="(auth)" />
           <Stack.Screen name="(tabs)" />
         </Stack>

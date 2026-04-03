@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
 import type { Message, FeedbackRequest, FeedbackQuestion } from '@nutrigoal/shared'
+import { brandColors, brandShadow } from '../../src/theme/brand'
 
 type Screen = 'home' | 'messages' | 'feedback-list' | 'feedback-respond'
 
@@ -98,7 +99,7 @@ export default function MyPTScreen() {
     <SafeAreaView style={s.container}>
       <View style={s.header}><Text style={s.title}>My PT</Text></View>
       <View style={s.empty}>
-        <Ionicons name="person-outline" size={48} color="#d1d5db" />
+        <Ionicons name="person-outline" size={48} color={brandColors.textSubtle} />
         <Text style={s.emptyText}>No PT assigned</Text>
         <Text style={s.emptyHint}>Ask your PT or nutritionist to invite you.</Text>
       </View>
@@ -123,7 +124,7 @@ export default function MyPTScreen() {
         {/* Action Cards */}
         <TouchableOpacity style={s.actionCard} onPress={() => setScreen('messages')}>
           <View style={[s.actionIcon, { backgroundColor: '#eff6ff' }]}>
-            <Ionicons name="chatbubbles" size={24} color="#3b82f6" />
+            <Ionicons name="chatbubbles" size={24} color={brandColors.brand500} />
           </View>
           <View style={{ flex: 1 }}>
             <Text style={s.actionTitle}>Messages</Text>
@@ -137,14 +138,14 @@ export default function MyPTScreen() {
 
         <TouchableOpacity style={s.actionCard} onPress={() => setScreen('feedback-list')}>
           <View style={[s.actionIcon, { backgroundColor: '#f5f3ff' }]}>
-            <Ionicons name="clipboard" size={24} color="#8b5cf6" />
+            <Ionicons name="clipboard" size={24} color={brandColors.brand500} />
           </View>
           <View style={{ flex: 1 }}>
             <Text style={s.actionTitle}>Feedback Requests</Text>
             <Text style={s.actionSub}>{pendingFeedbackCount > 0 ? `${pendingFeedbackCount} pending` : 'All caught up'}</Text>
           </View>
           {pendingFeedbackCount > 0 && (
-            <View style={[s.badge, { backgroundColor: '#8b5cf6' }]}><Text style={s.badgeText}>{pendingFeedbackCount}</Text></View>
+            <View style={[s.badge, { backgroundColor: brandColors.brand500 }]}><Text style={s.badgeText}>{pendingFeedbackCount}</Text></View>
           )}
           <Ionicons name="chevron-forward" size={20} color="#d1d5db" />
         </TouchableOpacity>
@@ -199,7 +200,7 @@ function ChatScreen({ conversationId, user, ptName, onBack }: {
   return (
     <SafeAreaView style={s.container}>
       <View style={s.chatHeader}>
-        <TouchableOpacity onPress={onBack}><Ionicons name="arrow-back" size={24} color="#374151" /></TouchableOpacity>
+        <TouchableOpacity onPress={onBack}><Ionicons name="arrow-back" size={24} color={brandColors.foregroundSoft} /></TouchableOpacity>
         <Text style={s.chatTitle}>{ptName}</Text>
         <View style={{ width: 24 }} />
       </View>
@@ -223,7 +224,7 @@ function ChatScreen({ conversationId, user, ptName, onBack }: {
 
       <View style={s.inputBar}>
         <TextInput style={s.msgInput} value={text} onChangeText={setText}
-          placeholder="Type a message..." placeholderTextColor="#9ca3af" multiline />
+          placeholder="Type a message..." placeholderTextColor={brandColors.textSubtle} multiline />
         <TouchableOpacity style={s.sendBtn} onPress={handleSend} disabled={sending || !text.trim()}>
           <Ionicons name="send" size={20} color="#fff" />
         </TouchableOpacity>
@@ -239,7 +240,7 @@ function FeedbackListScreen({ requests, onBack, onSelect }: {
   return (
     <SafeAreaView style={s.container}>
       <View style={s.chatHeader}>
-        <TouchableOpacity onPress={onBack}><Ionicons name="arrow-back" size={24} color="#374151" /></TouchableOpacity>
+        <TouchableOpacity onPress={onBack}><Ionicons name="arrow-back" size={24} color={brandColors.foregroundSoft} /></TouchableOpacity>
         <Text style={s.chatTitle}>Feedback Requests</Text>
         <View style={{ width: 24 }} />
       </View>
@@ -247,7 +248,7 @@ function FeedbackListScreen({ requests, onBack, onSelect }: {
       <ScrollView contentContainerStyle={s.content}>
         {requests.length === 0 ? (
           <View style={s.empty}>
-            <Ionicons name="clipboard-outline" size={48} color="#d1d5db" />
+            <Ionicons name="clipboard-outline" size={48} color={brandColors.textSubtle} />
             <Text style={s.emptyText}>No feedback requests</Text>
           </View>
         ) : requests.map(fb => (
@@ -300,7 +301,7 @@ function FeedbackRespondScreen({ feedback, user, onBack }: {
   return (
     <SafeAreaView style={s.container}>
       <View style={s.chatHeader}>
-        <TouchableOpacity onPress={onBack}><Ionicons name="arrow-back" size={24} color="#374151" /></TouchableOpacity>
+        <TouchableOpacity onPress={onBack}><Ionicons name="arrow-back" size={24} color={brandColors.foregroundSoft} /></TouchableOpacity>
         <Text style={s.chatTitle}>{feedback.title}</Text>
         <View style={{ width: 24 }} />
       </View>
@@ -324,7 +325,7 @@ function FeedbackRespondScreen({ feedback, user, onBack }: {
                 </View>
               ) : q.type === 'text' ? (
                 <TextInput style={s.answerInput} multiline
-                  placeholder="Type your answer..." placeholderTextColor="#9ca3af"
+                  placeholder="Type your answer..." placeholderTextColor={brandColors.textSubtle}
                   value={String(answers[q.id] ?? '')}
                   onChangeText={(t) => updateAnswer(q.id, t)} />
               ) : q.type === 'rating' ? (
@@ -364,62 +365,62 @@ function FeedbackRespondScreen({ feedback, user, onBack }: {
 
 // ─── Styles ──────────────────────────────────────────────
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f8fafc' },
+  container: { flex: 1, backgroundColor: brandColors.background },
   header: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 },
-  title: { fontSize: 24, fontWeight: '800', color: '#111827' },
+  title: { fontSize: 24, fontWeight: '800', color: brandColors.foreground, letterSpacing: -0.6 },
   content: { padding: 20, paddingTop: 0, paddingBottom: 40 },
   empty: { alignItems: 'center', paddingTop: 80, gap: 8 },
-  emptyText: { fontSize: 18, fontWeight: '600', color: '#6b7280' },
-  emptyHint: { fontSize: 14, color: '#9ca3af', textAlign: 'center' },
+  emptyText: { fontSize: 18, fontWeight: '600', color: brandColors.textMuted },
+  emptyHint: { fontSize: 14, color: brandColors.textSubtle, textAlign: 'center' },
   // PT card
-  ptCard: { backgroundColor: '#fff', borderRadius: 16, padding: 24, alignItems: 'center', marginBottom: 20, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 },
-  ptAvatar: { width: 64, height: 64, borderRadius: 32, backgroundColor: '#ede9fe', alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
-  ptAvatarText: { fontSize: 28, fontWeight: '700', color: '#7c3aed' },
-  ptName: { fontSize: 22, fontWeight: '800', color: '#111827' },
-  ptLabel: { fontSize: 13, color: '#9ca3af', marginTop: 4 },
+  ptCard: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 24, borderWidth: 1, borderColor: brandColors.line, padding: 24, alignItems: 'center', marginBottom: 20, ...brandShadow },
+  ptAvatar: { width: 64, height: 64, borderRadius: 32, backgroundColor: brandColors.brand100, alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
+  ptAvatarText: { fontSize: 28, fontWeight: '700', color: brandColors.brand500 },
+  ptName: { fontSize: 22, fontWeight: '800', color: brandColors.foreground },
+  ptLabel: { fontSize: 13, color: brandColors.textSubtle, marginTop: 4 },
   // Action cards
-  actionCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#fff', borderRadius: 14, padding: 16, marginBottom: 10, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 6, elevation: 1 },
+  actionCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 10, ...brandShadow },
   actionIcon: { width: 48, height: 48, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-  actionTitle: { fontSize: 16, fontWeight: '700', color: '#374151' },
-  actionSub: { fontSize: 13, color: '#9ca3af', marginTop: 2 },
-  badge: { backgroundColor: '#3b82f6', borderRadius: 12, minWidth: 24, height: 24, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
+  actionTitle: { fontSize: 16, fontWeight: '700', color: brandColors.foregroundSoft },
+  actionSub: { fontSize: 13, color: brandColors.textSubtle, marginTop: 2 },
+  badge: { backgroundColor: brandColors.brand500, borderRadius: 12, minWidth: 24, height: 24, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
   badgeText: { color: '#fff', fontSize: 12, fontWeight: '700' },
   // Chat
   chatHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 },
-  chatTitle: { fontSize: 18, fontWeight: '700', color: '#111827' },
+  chatTitle: { fontSize: 18, fontWeight: '700', color: brandColors.foreground },
   msgBubble: { maxWidth: '80%', borderRadius: 16, padding: 12, marginBottom: 8 },
-  msgMe: { backgroundColor: '#7c3aed', alignSelf: 'flex-end', borderBottomRightRadius: 4 },
-  msgThem: { backgroundColor: '#fff', alignSelf: 'flex-start', borderBottomLeftRadius: 4 },
-  msgText: { fontSize: 15, color: '#374151', lineHeight: 20 },
-  msgTime: { fontSize: 10, color: '#9ca3af', marginTop: 4, alignSelf: 'flex-end' },
-  inputBar: { flexDirection: 'row', padding: 12, gap: 8, borderTopWidth: 1, borderTopColor: '#e5e7eb', backgroundColor: '#fff' },
-  msgInput: { flex: 1, backgroundColor: '#f3f4f6', borderRadius: 20, paddingHorizontal: 16, paddingVertical: 10, fontSize: 15, color: '#111827', maxHeight: 100 },
-  sendBtn: { backgroundColor: '#7c3aed', width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  msgMe: { backgroundColor: brandColors.brand900, alignSelf: 'flex-end', borderBottomRightRadius: 4 },
+  msgThem: { backgroundColor: 'rgba(255,255,255,0.92)', alignSelf: 'flex-start', borderBottomLeftRadius: 4, borderWidth: 1, borderColor: brandColors.line },
+  msgText: { fontSize: 15, color: brandColors.foregroundSoft, lineHeight: 20 },
+  msgTime: { fontSize: 10, color: brandColors.textSubtle, marginTop: 4, alignSelf: 'flex-end' },
+  inputBar: { flexDirection: 'row', padding: 12, gap: 8, borderTopWidth: 1, borderTopColor: brandColors.line, backgroundColor: 'rgba(255,255,255,0.92)' },
+  msgInput: { flex: 1, backgroundColor: brandColors.panelMuted, borderRadius: 20, paddingHorizontal: 16, paddingVertical: 10, fontSize: 15, color: brandColors.foreground, maxHeight: 100 },
+  sendBtn: { backgroundColor: brandColors.brand900, width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   // Feedback list
-  fbCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 8, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 6, elevation: 1 },
-  fbTitle: { fontSize: 16, fontWeight: '600', color: '#374151' },
-  fbDate: { fontSize: 12, color: '#9ca3af', marginTop: 2 },
-  fbBadge: { backgroundColor: '#fef3c7', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 },
-  fbBadgeDone: { backgroundColor: '#ede9fe' },
-  fbBadgeText: { fontSize: 11, fontWeight: '600', color: '#f59e0b' },
-  fbBadgeTextDone: { color: '#7c3aed' },
+  fbCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 8, ...brandShadow },
+  fbTitle: { fontSize: 16, fontWeight: '600', color: brandColors.foregroundSoft },
+  fbDate: { fontSize: 12, color: brandColors.textSubtle, marginTop: 2 },
+  fbBadge: { backgroundColor: '#fff3d9', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 },
+  fbBadgeDone: { backgroundColor: brandColors.brand100 },
+  fbBadgeText: { fontSize: 11, fontWeight: '600', color: brandColors.warning },
+  fbBadgeTextDone: { color: brandColors.brand500 },
   // Feedback respond
-  questionCard: { backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 12, shadowColor: '#000', shadowOpacity: 0.03, shadowRadius: 4, elevation: 1 },
-  questionText: { fontSize: 16, fontWeight: '600', color: '#374151', marginBottom: 4 },
-  questionType: { fontSize: 12, color: '#9ca3af', marginBottom: 12 },
-  answerInput: { backgroundColor: '#f9fafb', borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 10, padding: 12, fontSize: 15, color: '#111827', minHeight: 60, textAlignVertical: 'top' },
-  answerBox: { backgroundColor: '#f8fafc', borderRadius: 10, padding: 12 },
-  answerText: { fontSize: 15, color: '#374151' },
+  questionCard: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 12, ...brandShadow },
+  questionText: { fontSize: 16, fontWeight: '600', color: brandColors.foregroundSoft, marginBottom: 4 },
+  questionType: { fontSize: 12, color: brandColors.textSubtle, marginBottom: 12 },
+  answerInput: { backgroundColor: brandColors.panelMuted, borderWidth: 1, borderColor: brandColors.lineStrong, borderRadius: 12, padding: 12, fontSize: 15, color: brandColors.foreground, minHeight: 60, textAlignVertical: 'top' },
+  answerBox: { backgroundColor: brandColors.panelMuted, borderRadius: 12, padding: 12 },
+  answerText: { fontSize: 15, color: brandColors.foregroundSoft },
   ratingRow: { flexDirection: 'row', gap: 10 },
-  ratingBtn: { width: 44, height: 44, borderRadius: 22, borderWidth: 2, borderColor: '#e5e7eb', alignItems: 'center', justifyContent: 'center' },
-  ratingBtnActive: { backgroundColor: '#7c3aed', borderColor: '#7c3aed' },
-  ratingText: { fontSize: 18, fontWeight: '700', color: '#9ca3af' },
+  ratingBtn: { width: 44, height: 44, borderRadius: 22, borderWidth: 1, borderColor: brandColors.lineStrong, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.84)' },
+  ratingBtnActive: { backgroundColor: brandColors.brand900, borderColor: brandColors.brand900 },
+  ratingText: { fontSize: 18, fontWeight: '700', color: brandColors.textSubtle },
   ratingTextActive: { color: '#fff' },
   yesNoRow: { flexDirection: 'row', gap: 12 },
-  yesNoBtn: { flex: 1, paddingVertical: 14, borderRadius: 12, borderWidth: 2, borderColor: '#e5e7eb', alignItems: 'center' },
-  yesNoBtnActive: { backgroundColor: '#7c3aed', borderColor: '#7c3aed' },
-  yesNoText: { fontSize: 16, fontWeight: '600', color: '#9ca3af' },
+  yesNoBtn: { flex: 1, paddingVertical: 14, borderRadius: 14, borderWidth: 1, borderColor: brandColors.lineStrong, alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.84)' },
+  yesNoBtnActive: { backgroundColor: brandColors.brand900, borderColor: brandColors.brand900 },
+  yesNoText: { fontSize: 16, fontWeight: '600', color: brandColors.textSubtle },
   yesNoTextActive: { color: '#fff' },
-  submitBtn: { backgroundColor: '#7c3aed', borderRadius: 12, paddingVertical: 16, alignItems: 'center', marginTop: 8 },
+  submitBtn: { backgroundColor: brandColors.brand900, borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginTop: 8 },
   submitBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
 })
