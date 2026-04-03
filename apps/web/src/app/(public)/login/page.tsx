@@ -2,10 +2,10 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-
-import { Target, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react'
+import { ArrowRight, Eye, EyeOff, Lock, Mail } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
+import BrandLogo from '@/components/brand/BrandLogo'
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -45,35 +45,58 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen auth-bg flex items-center justify-center px-4">
-      <div className="max-w-md w-full">
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center space-x-2 mb-6">
-            <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg p-2">
-              <Target className="h-6 w-6 text-white" />
-            </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-              NutriGoal
-            </span>
-          </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back!</h1>
-          <p className="text-gray-800">Sign in to continue your journey</p>
-        </div>
+    <div className="auth-bg min-h-screen px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto flex max-w-7xl items-center justify-between pb-8">
+        <BrandLogo href="/" />
+        <Link href="/signup" className="btn-secondary rounded-full px-5 py-3 text-sm font-semibold">
+          Create account
+        </Link>
+      </div>
 
-        <div className="glass-card rounded-2xl shadow-lg p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.95fr_0.85fr] lg:items-center">
+        <section className="panel-strong overflow-hidden p-8 sm:p-10">
+          <div className="eyebrow mb-5">Performance Clinic</div>
+          <h1 className="text-5xl font-bold leading-[0.96] text-[var(--foreground)] sm:text-6xl">
+            Return to your
+            <span className="block text-[var(--brand-500)]">precision dashboard.</span>
+          </h1>
+          <p className="mt-6 max-w-xl text-lg leading-8 text-[var(--muted)]">
+            Meal systems, training structure, AI coaching, and practitioner-grade insight in one calm, focused space.
+          </p>
+          <div className="mt-10 grid gap-4 sm:grid-cols-3">
+            {[
+              ['Meal planning', 'Adaptive'],
+              ['Training', 'Structured'],
+              ['Coaching', 'Context-aware'],
+            ].map(([title, label]) => (
+              <div key={title} className="surface-card p-5">
+                <div className="text-sm font-semibold uppercase tracking-[0.15em] text-[var(--muted-soft)]">{label}</div>
+                <div className="mt-2 font-display text-2xl font-bold text-[var(--foreground)]">{title}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="glass-card rounded-[32px] p-8 sm:p-10">
+          <div className="mb-8">
+            <div className="eyebrow mb-4">Sign in</div>
+            <h2 className="text-4xl font-bold text-[var(--foreground)]">Welcome back</h2>
+            <p className="mt-3 text-base leading-7 text-[var(--muted)]">
+              Sign in to continue your plan, check progress, and keep everything moving.
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+              <label htmlFor="email" className="mb-2 block text-sm font-semibold text-[var(--foreground)]">Email</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
-                </div>
+                <Mail className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--muted-soft)]" />
                 <input
                   id="email"
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="input-field pl-12"
                   placeholder="your.email@example.com"
                   required
                 />
@@ -81,22 +104,20 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+              <label htmlFor="password" className="mb-2 block text-sm font-semibold text-[var(--foreground)]">Password</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
-                </div>
+                <Lock className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--muted-soft)]" />
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                  className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="input-field pl-12 pr-12"
                   placeholder="Enter your password"
                   required
                 />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                  {showPassword ? <EyeOff className="h-5 w-5 text-gray-400" /> : <Eye className="h-5 w-5 text-gray-400" />}
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 pr-4 text-[var(--muted-soft)]">
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
             </div>
@@ -104,28 +125,26 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50 flex items-center justify-center space-x-2"
+              className="btn-primary flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-4 text-base font-semibold disabled:opacity-50"
             >
               {isLoading ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
               ) : (
                 <>
-                  <span>Sign In</span>
+                  <span>Enter dashboard</span>
                   <ArrowRight className="h-4 w-4" />
                 </>
               )}
             </button>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-gray-200 text-center">
-            <p className="text-gray-900">
-              Don&apos;t have an account?{' '}
-              <Link href="/signup" className="text-purple-600 hover:text-purple-800 font-semibold">
-                Create Account
-              </Link>
-            </p>
+          <div className="mt-8 border-t border-[var(--line)] pt-6 text-sm text-[var(--muted)]">
+            Don&apos;t have an account?{' '}
+            <Link href="/signup" className="font-semibold text-[var(--foreground)] transition hover:text-[var(--brand-500)]">
+              Create one
+            </Link>
           </div>
-        </div>
+        </section>
       </div>
     </div>
   )

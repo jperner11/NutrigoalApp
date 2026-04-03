@@ -1,16 +1,24 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import { Toaster } from "react-hot-toast";
+import type { Metadata } from "next"
+import { Manrope, Plus_Jakarta_Sans } from "next/font/google"
+import "./globals.css"
+import { Toaster } from "react-hot-toast"
 
-const inter = Inter({ subsets: ["latin"] });
+const display = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-display",
+})
+
+const body = Manrope({
+  subsets: ["latin"],
+  variable: "--font-body",
+})
 
 export const metadata: Metadata = {
-  title: "NutriGoal - Nutrition, Training & Wellness Platform",
-  description: "All-in-one platform for individuals and nutritionists. AI-powered meal planning, workout builder, cardio tracking, and water intake monitoring.",
+  title: "Nutrigoal - Performance Clinic for Nutrition and Training",
+  description: "Precision meal planning, training systems, coaching intelligence, and practitioner workflows in one sharp performance platform.",
   keywords: "nutrition, diet, meal planning, workout, training, cardio, hydration, nutritionist, fitness",
-  authors: [{ name: "NutriGoal Team" }],
-};
+  authors: [{ name: "Nutrigoal Team" }],
+}
 
 export default function RootLayout({
   children,
@@ -19,8 +27,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <div className="min-h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-slate-50">
+      <body className={`${display.variable} ${body.variable}`}>
+        <div className="min-h-screen bg-[var(--background)]">
           {children}
         </div>
         <Toaster
@@ -30,37 +38,40 @@ export default function RootLayout({
             duration: 3500,
             style: {
               padding: '14px 20px',
-              borderRadius: '12px',
+              borderRadius: '16px',
               fontSize: '14px',
-              fontWeight: '500',
+              fontWeight: '600',
               maxWidth: '420px',
-              boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
+              boxShadow: '0 18px 45px rgba(9, 26, 42, 0.18)',
+              border: '1px solid rgba(149, 176, 201, 0.28)',
+              background: '#fbfdff',
+              color: '#0d1b2a',
             },
             success: {
               style: {
-                background: '#f0fdf4',
-                color: '#166534',
-                border: '1px solid #bbf7d0',
+                background: '#edf9ff',
+                color: '#0d1b2a',
+                border: '1px solid #b6ddf6',
               },
               iconTheme: {
-                primary: '#22c55e',
-                secondary: '#f0fdf4',
+                primary: '#1da8f0',
+                secondary: '#edf9ff',
               },
             },
             error: {
               style: {
-                background: '#fef2f2',
-                color: '#991b1b',
-                border: '1px solid #fecaca',
+                background: '#fdf1f0',
+                color: '#7a2d20',
+                border: '1px solid #f1c7c0',
               },
               iconTheme: {
-                primary: '#ef4444',
-                secondary: '#fef2f2',
+                primary: '#d45f48',
+                secondary: '#fdf1f0',
               },
             },
           }}
         />
       </body>
     </html>
-  );
+  )
 }

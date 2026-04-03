@@ -239,17 +239,17 @@ export default function DashboardPage() {
       {/* Welcome */}
       <div className="mb-8 flex items-center justify-between animate-[fadeIn_0.4s_ease-out_forwards]">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="font-display text-4xl font-bold text-[var(--foreground)]">
             {greeting}, {firstName} <span className="inline-block animate-[wave_1.5s_ease-in-out_infinite]" style={{ transformOrigin: '70% 70%' }}>&#128075;</span>
           </h1>
-          <p className="text-gray-500 mt-1">
-            Here&apos;s your overview for today.
+          <p className="mt-2 text-base text-[var(--muted)]">
+            Here&apos;s your performance overview for today.
           </p>
         </div>
         {profile.role === 'free' && (
           <Link
             href="/pricing"
-            className="flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg hover:scale-105 transition-all duration-200"
+            className="btn-primary flex items-center space-x-2 rounded-2xl px-5 py-3 text-sm font-semibold"
           >
             <Crown className="h-4 w-4" />
             <span>Upgrade</span>
@@ -259,14 +259,14 @@ export default function DashboardPage() {
 
       {/* Onboarding prompt */}
       {!profile.onboarding_completed && (
-        <div className="mb-6 bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200/60 rounded-2xl p-6 shadow-sm animate-[fadeIn_0.5s_ease-out_forwards]">
-          <h3 className="font-semibold text-gray-900 mb-2">Complete your profile</h3>
-          <p className="text-gray-800 text-sm mb-4">
+        <div className="panel-strong mb-6 animate-[fadeIn_0.5s_ease-out_forwards] p-6">
+          <h3 className="font-display text-2xl font-bold text-[var(--foreground)] mb-2">Complete your profile</h3>
+          <p className="text-sm text-[var(--muted)] mb-4">
             Set up your metrics and goals to get personalized nutrition targets.
           </p>
           <Link
             href="/onboarding"
-            className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all"
+            className="btn-primary inline-flex items-center space-x-2 rounded-2xl px-5 py-3 text-sm font-semibold"
           >
             <span>Complete Setup</span>
           </Link>
@@ -276,26 +276,26 @@ export default function DashboardPage() {
       {/* Stats Grid */}
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {/* Calories & Macros */}
-        <div className="bg-gradient-to-br from-white to-purple-50/50 rounded-2xl p-6 shadow-sm border border-purple-100/60 lg:col-span-2 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 relative overflow-hidden animate-[fadeIn_0.3s_ease-out_forwards]">
+        <div className="panel-strong lg:col-span-2 relative overflow-hidden p-6 animate-[fadeIn_0.3s_ease-out_forwards]">
           {/* Accent bar */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 via-indigo-500 to-purple-400 rounded-t-xl" />
+          <div className="absolute left-0 right-0 top-0 h-1 bg-[linear-gradient(90deg,#0d1b2a,#1da8f0,#4dc4ff)] rounded-t-xl" />
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="bg-gradient-to-br from-purple-100 to-indigo-100 rounded-full p-3 shadow-sm">
-                <Target className="h-6 w-6 text-purple-600" />
+              <div className="rounded-full bg-[var(--brand-100)] p-3 shadow-sm">
+                <Target className="h-6 w-6 text-[var(--brand-900)]" />
               </div>
               <div>
-                <span className="text-2xl font-bold text-gray-900">{todayStats.caloriesConsumed}</span>
-                <span className="text-sm text-gray-500 ml-1">/ {profile.daily_calories ?? '\u2014'} cal</span>
+                <span className="text-2xl font-bold text-[var(--foreground)]">{todayStats.caloriesConsumed}</span>
+                <span className="text-sm text-[var(--muted)] ml-1">/ {profile.daily_calories ?? '\u2014'} cal</span>
               </div>
             </div>
-            <span className="text-xs bg-purple-100 text-purple-700 px-2.5 py-1 rounded-full font-semibold">
+            <span className="rounded-full bg-[var(--brand-100)] px-2.5 py-1 text-xs font-semibold text-[#0f4262]">
               {Math.round(calorieProgress)}%
             </span>
           </div>
-          <div className="w-full bg-purple-100/50 rounded-full h-2.5 mb-5">
+          <div className="mb-5 h-2.5 w-full rounded-full bg-[var(--brand-200)]">
             <div
-              className="bg-gradient-to-r from-purple-500 to-indigo-500 h-2.5 rounded-full transition-all duration-500 ease-out"
+              className="h-2.5 rounded-full bg-[linear-gradient(90deg,#0d1b2a,#1da8f0)] transition-all duration-500 ease-out"
               style={{ width: `${calorieProgress}%` }}
             />
           </div>
@@ -337,28 +337,28 @@ export default function DashboardPage() {
         </div>
 
         {/* Water */}
-        <div className="bg-gradient-to-br from-white to-cyan-50/50 rounded-2xl p-6 shadow-sm border border-cyan-100/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 relative overflow-hidden animate-[fadeIn_0.4s_ease-out_forwards]">
+        <div className="panel-strong relative overflow-hidden p-6 animate-[fadeIn_0.4s_ease-out_forwards]">
           {/* Accent bar */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 via-blue-500 to-cyan-400 rounded-t-xl" />
+          <div className="absolute left-0 right-0 top-0 h-1 rounded-t-xl bg-[linear-gradient(90deg,#4dc4ff,#1da8f0,#0d1b2a)]" />
           <div className="flex items-center justify-between mb-4">
-            <div className="bg-gradient-to-br from-cyan-100 to-blue-100 rounded-full p-3 shadow-sm">
-              <Droplets className="h-6 w-6 text-cyan-600" />
+            <div className="rounded-full bg-[var(--brand-100)] p-3 shadow-sm">
+              <Droplets className="h-6 w-6 text-[var(--brand-500)]" />
             </div>
-            <span className="text-xs bg-cyan-100 text-cyan-700 px-2.5 py-1 rounded-full font-semibold">
+            <span className="rounded-full bg-[var(--brand-100)] px-2.5 py-1 text-xs font-semibold text-[#0f4262]">
               {Math.round(waterProgress)}%
             </span>
           </div>
           <div className="space-y-2">
             <div className="flex justify-between items-end">
               <div>
-                <span className="text-3xl font-extrabold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">{todayStats.waterConsumed}</span>
-                <span className="text-sm text-gray-500 ml-0.5">ml</span>
+                <span className="text-3xl font-extrabold text-[var(--brand-900)]">{todayStats.waterConsumed}</span>
+                <span className="text-sm text-[var(--muted)] ml-0.5">ml</span>
               </div>
-              <span className="text-sm text-gray-400">/ {profile.daily_water_ml ?? '\u2014'}ml</span>
+              <span className="text-sm text-[var(--muted-soft)]">/ {profile.daily_water_ml ?? '\u2014'}ml</span>
             </div>
-            <div className="w-full bg-cyan-100/50 rounded-full h-2.5">
+            <div className="h-2.5 w-full rounded-full bg-[var(--brand-200)]">
               <div
-                className="bg-gradient-to-r from-cyan-400 to-blue-500 h-2.5 rounded-full transition-all duration-500 ease-out"
+                className="h-2.5 rounded-full bg-[linear-gradient(90deg,#4dc4ff,#1da8f0)] transition-all duration-500 ease-out"
                 style={{ width: `${waterProgress}%` }}
               />
             </div>
@@ -367,7 +367,7 @@ export default function DashboardPage() {
                 <button
                   key={amount}
                   onClick={() => addWater(amount)}
-                  className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-cyan-50 text-cyan-700 rounded-lg hover:bg-cyan-100 hover:shadow-sm active:scale-95 transition-all duration-150 text-xs font-medium border border-cyan-100/50"
+                  className="flex-1 flex items-center justify-center gap-1 rounded-xl border border-[var(--line)] bg-white/72 px-2 py-1.5 text-xs font-medium text-[var(--brand-900)] transition-all duration-150 hover:border-[rgba(29,168,240,0.3)] hover:bg-[var(--brand-100)] active:scale-95"
                 >
                   <Plus className="h-3 w-3" />
                   {label}
@@ -378,17 +378,17 @@ export default function DashboardPage() {
         </div>
 
         {/* Workouts */}
-        <div className="bg-gradient-to-br from-white to-purple-50/50 rounded-2xl p-6 shadow-sm border border-purple-100/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 relative overflow-hidden animate-[fadeIn_0.5s_ease-out_forwards]">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-400 via-violet-500 to-purple-400 rounded-t-xl" />
+        <div className="panel-strong relative overflow-hidden p-6 animate-[fadeIn_0.5s_ease-out_forwards]">
+          <div className="absolute left-0 right-0 top-0 h-1 rounded-t-xl bg-[linear-gradient(90deg,#0d1b2a,#1f3650,#4dc4ff)]" />
           <div className="flex items-center justify-between mb-4">
-            <div className="bg-gradient-to-br from-purple-100 to-violet-100 rounded-full p-3 shadow-sm">
-              <Dumbbell className="h-6 w-6 text-purple-600" />
+            <div className="rounded-full bg-[var(--brand-100)] p-3 shadow-sm">
+              <Dumbbell className="h-6 w-6 text-[var(--brand-900)]" />
             </div>
-            <span className="text-xs text-gray-400 font-medium">Today</span>
+            <span className="text-xs text-[var(--muted-soft)] font-medium">Today</span>
           </div>
           <div className="space-y-1">
-            <span className="text-3xl font-extrabold text-gray-900">{todayStats.workoutsCompleted}</span>
-            <p className="text-sm text-gray-500">Workouts completed</p>
+            <span className="text-3xl font-extrabold text-[var(--foreground)]">{todayStats.workoutsCompleted}</span>
+            <p className="text-sm text-[var(--muted)]">Workouts completed</p>
           </div>
         </div>
 
@@ -445,78 +445,78 @@ export default function DashboardPage() {
       )}
 
       {/* Quick Actions */}
-      <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
+      <h2 className="font-display mb-4 text-2xl font-bold text-[var(--foreground)]">Quick Actions</h2>
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-        <Link href="/diet" className="group bg-gradient-to-br from-white to-orange-50/30 rounded-2xl p-5 shadow-sm border border-gray-200/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex items-center space-x-4">
-          <div className="bg-gradient-to-br from-orange-100 to-amber-100 rounded-lg p-3 group-hover:shadow-sm transition-shadow">
-            <Utensils className="h-6 w-6 text-orange-600" />
+        <Link href="/diet" className="group panel-strong flex items-center space-x-4 p-5">
+          <div className="rounded-2xl bg-[var(--brand-100)] p-3 transition-shadow group-hover:shadow-sm">
+            <Utensils className="h-6 w-6 text-[var(--brand-900)]" />
           </div>
           <div>
-            <h3 className="font-semibold text-gray-900">Log a Meal</h3>
-            <p className="text-sm text-gray-500">Track your food intake</p>
+            <h3 className="font-semibold text-[var(--foreground)]">Log a Meal</h3>
+            <p className="text-sm text-[var(--muted)]">Track your food intake</p>
           </div>
         </Link>
 
-        <Link href="/water" className="group bg-gradient-to-br from-white to-cyan-50/30 rounded-2xl p-5 shadow-sm border border-gray-200/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex items-center space-x-4">
-          <div className="bg-gradient-to-br from-cyan-100 to-blue-100 rounded-lg p-3 group-hover:shadow-sm transition-shadow">
-            <Droplets className="h-6 w-6 text-cyan-600" />
+        <Link href="/water" className="group panel-strong flex items-center space-x-4 p-5">
+          <div className="rounded-2xl bg-[var(--brand-100)] p-3 transition-shadow group-hover:shadow-sm">
+            <Droplets className="h-6 w-6 text-[var(--brand-500)]" />
           </div>
           <div>
-            <h3 className="font-semibold text-gray-900">Log Water</h3>
-            <p className="text-sm text-gray-500">Track hydration</p>
+            <h3 className="font-semibold text-[var(--foreground)]">Log Water</h3>
+            <p className="text-sm text-[var(--muted)]">Track hydration</p>
           </div>
         </Link>
 
-        <Link href="/training" className="group bg-gradient-to-br from-white to-purple-50/30 rounded-2xl p-5 shadow-sm border border-gray-200/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex items-center space-x-4">
-          <div className="bg-gradient-to-br from-purple-100 to-violet-100 rounded-lg p-3 group-hover:shadow-sm transition-shadow">
-            <Dumbbell className="h-6 w-6 text-purple-600" />
+        <Link href="/training" className="group panel-strong flex items-center space-x-4 p-5">
+          <div className="rounded-2xl bg-[var(--brand-100)] p-3 transition-shadow group-hover:shadow-sm">
+            <Dumbbell className="h-6 w-6 text-[var(--brand-900)]" />
           </div>
           <div>
-            <h3 className="font-semibold text-gray-900">Start Workout</h3>
-            <p className="text-sm text-gray-500">Follow your training plan</p>
+            <h3 className="font-semibold text-[var(--foreground)]">Start Workout</h3>
+            <p className="text-sm text-[var(--muted)]">Follow your training plan</p>
           </div>
         </Link>
 
-        <Link href="/cardio" className="group bg-gradient-to-br from-white to-red-50/30 rounded-2xl p-5 shadow-sm border border-gray-200/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex items-center space-x-4">
-          <div className="bg-gradient-to-br from-red-100 to-rose-100 rounded-lg p-3 group-hover:shadow-sm transition-shadow">
-            <HeartPulse className="h-6 w-6 text-red-600" />
+        <Link href="/cardio" className="group panel-strong flex items-center space-x-4 p-5">
+          <div className="rounded-2xl bg-[var(--brand-100)] p-3 transition-shadow group-hover:shadow-sm">
+            <HeartPulse className="h-6 w-6 text-[var(--brand-500)]" />
           </div>
           <div>
-            <h3 className="font-semibold text-gray-900">Log Cardio</h3>
-            <p className="text-sm text-gray-500">Record a cardio session</p>
+            <h3 className="font-semibold text-[var(--foreground)]">Log Cardio</h3>
+            <p className="text-sm text-[var(--muted)]">Record a cardio session</p>
           </div>
         </Link>
 
-        <Link href="/ai/suggest" className="group bg-gradient-to-br from-white to-purple-50/30 rounded-2xl p-5 shadow-sm border border-gray-200/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex items-center space-x-4">
-          <div className="bg-gradient-to-br from-purple-100 to-indigo-100 rounded-lg p-3 group-hover:shadow-sm transition-shadow">
-            <Sparkles className="h-6 w-6 text-purple-600" />
+        <Link href="/ai/suggest" className="group panel-strong flex items-center space-x-4 p-5">
+          <div className="rounded-2xl bg-[var(--brand-100)] p-3 transition-shadow group-hover:shadow-sm">
+            <Sparkles className="h-6 w-6 text-[var(--brand-500)]" />
           </div>
           <div>
-            <h3 className="font-semibold text-gray-900">AI Suggestions</h3>
-            <p className="text-sm text-gray-500">Get meal ideas</p>
+            <h3 className="font-semibold text-[var(--foreground)]">AI Suggestions</h3>
+            <p className="text-sm text-[var(--muted)]">Get meal ideas</p>
           </div>
         </Link>
 
         {canAccess(profile.role, 'regenerate') && (
-          <Link href="/generate-plans" className="group bg-gradient-to-br from-white to-green-50/30 rounded-2xl p-5 shadow-sm border border-gray-200/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex items-center space-x-4">
-            <div className="bg-gradient-to-br from-green-100 to-emerald-100 rounded-lg p-3 group-hover:shadow-sm transition-shadow">
-              <RefreshCw className="h-6 w-6 text-green-600" />
+          <Link href="/generate-plans" className="group panel-strong flex items-center space-x-4 p-5">
+            <div className="rounded-2xl bg-[var(--brand-100)] p-3 transition-shadow group-hover:shadow-sm">
+              <RefreshCw className="h-6 w-6 text-[var(--brand-900)]" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900">Regenerate Plans</h3>
-              <p className="text-sm text-gray-500">Get new AI-generated plans</p>
+              <h3 className="font-semibold text-[var(--foreground)]">Regenerate Plans</h3>
+              <p className="text-sm text-[var(--muted)]">Get new AI-generated plans</p>
             </div>
           </Link>
         )}
 
         {profile.role === 'nutritionist' && (
-          <Link href="/clients" className="group bg-gradient-to-br from-white to-indigo-50/30 rounded-2xl p-5 shadow-sm border border-gray-200/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex items-center space-x-4">
-            <div className="bg-gradient-to-br from-indigo-100 to-purple-100 rounded-lg p-3 group-hover:shadow-sm transition-shadow">
-              <Users className="h-6 w-6 text-indigo-600" />
+          <Link href="/clients" className="group panel-strong flex items-center space-x-4 p-5">
+            <div className="rounded-2xl bg-[var(--brand-100)] p-3 transition-shadow group-hover:shadow-sm">
+              <Users className="h-6 w-6 text-[var(--brand-900)]" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900">My Clients</h3>
-              <p className="text-sm text-gray-500">{clientCount} active clients</p>
+              <h3 className="font-semibold text-[var(--foreground)]">My Clients</h3>
+              <p className="text-sm text-[var(--muted)]">{clientCount} active clients</p>
             </div>
           </Link>
         )}
@@ -524,31 +524,31 @@ export default function DashboardPage() {
 
       {/* Nutritionist Client Summary */}
       {profile.role === 'nutritionist' && (
-        <div className="bg-gradient-to-br from-white to-indigo-50/40 rounded-2xl p-6 shadow-sm border border-indigo-100/60 hover:shadow-md transition-all duration-200">
+        <div className="panel-strong p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-900">Client Overview</h2>
-            <Link href="/clients" className="text-sm text-purple-600 hover:text-purple-800 font-medium transition-colors">
+            <h2 className="font-display text-2xl font-bold text-[var(--foreground)]">Client Overview</h2>
+            <Link href="/clients" className="text-sm font-semibold text-[var(--brand-500)] transition-colors hover:text-[var(--brand-900)]">
               View All
             </Link>
           </div>
           {clientCount === 0 ? (
             <div className="text-center py-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full mb-4">
-                <Users className="h-8 w-8 text-indigo-400" />
+              <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-[var(--brand-100)]">
+                <Users className="h-8 w-8 text-[var(--brand-500)]" />
               </div>
-              <p className="text-gray-500 mb-1 font-medium">No clients yet</p>
-              <p className="text-gray-400 text-sm mb-5">Start growing your practice by inviting your first client!</p>
+              <p className="mb-1 font-medium text-[var(--muted)]">No clients yet</p>
+              <p className="mb-5 text-sm text-[var(--muted-soft)]">Start growing your practice by inviting your first client.</p>
               <Link
                 href="/clients/invite"
-                className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:shadow-lg hover:scale-105 transition-all duration-200"
+                className="btn-primary inline-flex items-center space-x-2 rounded-2xl px-5 py-3 text-sm font-semibold"
               >
                 <Plus className="h-4 w-4" />
                 <span>Invite Client</span>
               </Link>
             </div>
           ) : (
-            <p className="text-gray-900">
-              You have <span className="font-semibold text-purple-600">{clientCount}</span> active client{clientCount !== 1 ? 's' : ''}.
+            <p className="text-[var(--foreground)]">
+              You have <span className="font-semibold text-[var(--brand-500)]">{clientCount}</span> active client{clientCount !== 1 ? 's' : ''}.
             </p>
           )}
         </div>
@@ -556,10 +556,10 @@ export default function DashboardPage() {
 
       {/* Progress Section */}
       {profile.onboarding_completed && (
-        <div className="mt-8 bg-gradient-to-br from-white to-purple-50/40 rounded-2xl p-6 shadow-sm border border-purple-100/60 hover:shadow-md transition-all duration-200">
+        <div className="panel-strong mt-8 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-900">Weekly Progress</h2>
-            <Link href="/progress" className="text-sm text-purple-600 hover:text-purple-800 font-medium transition-colors">
+            <h2 className="font-display text-2xl font-bold text-[var(--foreground)]">Weekly Progress</h2>
+            <Link href="/progress" className="text-sm font-semibold text-[var(--brand-500)] transition-colors hover:text-[var(--brand-900)]">
               View All
             </Link>
           </div>

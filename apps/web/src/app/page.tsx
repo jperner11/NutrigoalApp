@@ -1,312 +1,235 @@
 import Link from 'next/link'
-import { ArrowRight, Target, Zap, Brain, Dumbbell, Users, Droplets, HeartPulse } from 'lucide-react'
+import {
+  ArrowRight,
+  Brain,
+  CheckCircle2,
+  Dumbbell,
+  HeartPulse,
+  Sparkles,
+  Target,
+  TrendingUp,
+  Users,
+} from 'lucide-react'
+import BrandLogo from '@/components/brand/BrandLogo'
+
+const pillars = [
+  {
+    title: 'Personal systems, not generic plans',
+    body: 'Every recommendation is shaped around goals, restrictions, schedule, recovery, and training context.',
+    icon: Target,
+  },
+  {
+    title: 'Nutrition and training in one engine',
+    body: 'Meal planning, training structure, check-ins, and coaching all live inside one performance workflow.',
+    icon: Dumbbell,
+  },
+  {
+    title: 'Built for individuals and practitioners',
+    body: 'Self-serve users and nutrition professionals can work from the same system instead of disconnected tools.',
+    icon: Users,
+  },
+]
+
+const metrics = [
+  { label: 'Profile depth', value: '60+' },
+  { label: 'Guided onboarding steps', value: '8' },
+  { label: 'Core systems unified', value: '4' },
+]
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen">
-      {/* Navigation */}
-      <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-2">
-              <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg p-2">
-                <Target className="h-6 w-6 text-white" />
-              </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-                NutriGoal
-              </span>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link href="/pricing" className="text-gray-900 hover:text-gray-900 transition-colors">
-                Pricing
-              </Link>
-              <Link href="/login" className="text-gray-900 hover:text-gray-900 transition-colors">
-                Sign In
-              </Link>
-              <Link
-                href="/signup"
-                className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-5 py-2.5 rounded-lg hover:shadow-lg hover:shadow-[0_0_20px_rgba(139,92,246,0.3)] transition-all duration-300 flex items-center space-x-2"
-              >
-                <span>Get Started</span>
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
+    <div className="min-h-screen overflow-x-hidden">
+      <header className="sticky top-0 z-50 border-b border-[var(--line)] bg-[rgba(251,253,255,0.82)] backdrop-blur-xl">
+        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+          <BrandLogo href="/" />
+          <div className="flex items-center gap-3">
+            <Link href="/pricing" className="hidden rounded-full px-4 py-2 text-sm font-semibold text-[var(--muted)] transition hover:text-[var(--foreground)] sm:inline-flex">
+              Pricing
+            </Link>
+            <Link href="/login" className="rounded-full px-4 py-2 text-sm font-semibold text-[var(--muted)] transition hover:text-[var(--foreground)]">
+              Sign in
+            </Link>
+            <Link href="/signup" className="btn-primary inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold">
+              <span>Create account</span>
+              <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
         </div>
-      </nav>
+      </header>
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,80,255,0.3),rgba(255,255,255,0))]">
-        {/* Secondary gradient layer */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_80%_60%,rgba(139,92,246,0.1),rgba(255,255,255,0))]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_40%_40%_at_20%_80%,rgba(99,102,241,0.08),rgba(255,255,255,0))]" />
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-20">
-          <div className="text-center">
-            <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6">
-              Your Complete{' '}
-              <span className="bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent bg-[length:200%] animate-[gradient_3s_linear_infinite]">
-                Wellness
-              </span>
-              <br />
-              Platform
+      <section className="relative overflow-hidden px-4 pb-24 pt-16 sm:px-6 lg:px-8 lg:pb-28 lg:pt-24">
+        <div className="absolute inset-x-0 top-0 h-[28rem] bg-[radial-gradient(circle_at_top_left,rgba(29,168,240,0.18),transparent_36%),radial-gradient(circle_at_86%_12%,rgba(13,27,42,0.14),transparent_32%)]" />
+        <div className="relative mx-auto grid max-w-7xl gap-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+          <div>
+            <div className="eyebrow mb-6">
+              <Sparkles className="h-4 w-4" />
+              Performance Clinic
+            </div>
+            <h1 className="max-w-4xl text-5xl font-extrabold leading-[0.94] text-[var(--foreground)] sm:text-6xl lg:text-7xl">
+              Precision nutrition
+              <span className="block text-[var(--brand-500)]">for how you actually train.</span>
             </h1>
-
-            <p className="text-xl text-gray-800 mb-10 max-w-3xl mx-auto leading-relaxed">
-              Diet planning, workout building, cardio tracking, and hydration monitoring&mdash;all in one place.
-              For individuals pursuing their goals and nutritionists managing their clients.
+            <p className="mt-7 max-w-2xl text-lg leading-8 text-[var(--muted)] sm:text-xl">
+              Nutrigoal brings meal planning, training structure, AI coaching, and practitioner workflows into one
+              sharp system that feels more like a performance clinic than another wellness app.
             </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-              <Link
-                href="/signup"
-                className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-10 py-5 rounded-xl text-lg font-semibold hover:shadow-xl hover:shadow-[0_0_30px_rgba(139,92,246,0.3)] transition-all duration-300 flex items-center space-x-2 group"
-              >
-                <span>Start Free</span>
-                <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <Link
-                href="/pricing"
-                className="border-2 border-gray-300 text-gray-700 px-10 py-5 rounded-xl text-lg font-semibold hover:border-purple-300 hover:shadow-md hover:shadow-purple-100 transition-all duration-300"
-              >
-                View Plans
-              </Link>
-            </div>
-
-            {/* Social Proof */}
-            <div className="flex flex-col items-center gap-4 mb-12">
-              <div className="flex -space-x-3">
-                {[
-                  { initials: 'JR', bg: 'bg-purple-500' },
-                  { initials: 'AM', bg: 'bg-indigo-500' },
-                  { initials: 'KT', bg: 'bg-violet-500' },
-                  { initials: 'LS', bg: 'bg-fuchsia-500' },
-                  { initials: 'DP', bg: 'bg-purple-600' },
-                ].map((avatar, i) => (
-                  <div
-                    key={i}
-                    className={`${avatar.bg} w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold border-2 border-white shadow-sm`}
-                  >
-                    {avatar.initials}
-                  </div>
-                ))}
-                <div className="bg-gray-100 w-10 h-10 rounded-full flex items-center justify-center text-gray-500 text-xs font-bold border-2 border-white shadow-sm">
-                  +
-                </div>
-              </div>
-              <p className="text-sm text-gray-500 font-medium">
-                Join <span className="text-purple-600 font-semibold">1,000+</span> users tracking their fitness journey
-              </p>
-            </div>
-
-            <div className="text-sm text-gray-500">
-              <p>For individuals &amp; nutritionists &bull; AI-powered suggestions &bull; Science-based calculations</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-20 bg-white/50 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Everything You Need in One Platform
-            </h2>
-            <p className="text-xl text-gray-800 max-w-2xl mx-auto">
-              From nutrition to training, cardio to hydration&mdash;track every aspect of your wellness journey.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100">
-              <div className="bg-orange-100 rounded-full p-3 w-fit mb-4">
-                <Target className="h-7 w-7 text-orange-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Diet Planning</h3>
-              <p className="text-gray-800 text-sm">
-                Create meal plans with real food data from Spoonacular. Track macros automatically.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100">
-              <div className="bg-purple-100 rounded-full p-3 w-fit mb-4">
-                <Dumbbell className="h-7 w-7 text-purple-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Workout Builder</h3>
-              <p className="text-gray-800 text-sm">
-                Choose from a library of exercises. Build custom training plans with sets, reps, and rest.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100">
-              <div className="bg-red-100 rounded-full p-3 w-fit mb-4">
-                <HeartPulse className="h-7 w-7 text-red-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Cardio Tracking</h3>
-              <p className="text-gray-800 text-sm">
-                Log cardio sessions with heart rate. Calories burned calculated using proven formulas.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100">
-              <div className="bg-cyan-100 rounded-full p-3 w-fit mb-4">
-                <Droplets className="h-7 w-7 text-cyan-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Water Tracking</h3>
-              <p className="text-gray-800 text-sm">
-                Monitor daily hydration with quick-add buttons and progress tracking.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* For Nutritionists */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="inline-flex items-center space-x-2 bg-purple-100 text-purple-700 px-4 py-2 rounded-full text-sm font-medium mb-6">
-                <Users className="h-4 w-4" />
-                <span>For Nutritionists</span>
-              </div>
-              <h2 className="text-4xl font-bold text-gray-900 mb-6">
-                Manage Your Clients with Ease
-              </h2>
-              <p className="text-lg text-gray-800 mb-8">
-                Create personalized diet plans, training programs, and cardio prescriptions for your clients.
-                Monitor their progress and keep them on track&mdash;all from one dashboard.
-              </p>
-              <ul className="space-y-4 mb-8">
-                {[
-                  'Invite and manage up to 10+ clients',
-                  'Create diet and training plans for each client',
-                  'Monitor water intake, cardio, and workouts',
-                  'AI-powered suggestions (20/month)',
-                  'Client self-service logging',
-                ].map((item, i) => (
-                  <li key={i} className="flex items-center space-x-3">
-                    <div className="bg-purple-600 rounded-full p-0.5">
-                      <svg className="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    <span className="text-gray-700">{item}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/signup"
-                className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-xl hover:shadow-[0_0_30px_rgba(139,92,246,0.3)] transition-all duration-300"
-              >
-                <span>Start as Nutritionist</span>
+            <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+              <Link href="/signup" className="btn-primary inline-flex items-center justify-center gap-2 rounded-2xl px-7 py-4 text-base font-semibold">
+                Start your performance setup
                 <ArrowRight className="h-5 w-5" />
               </Link>
+              <Link href="/pricing" className="btn-secondary inline-flex items-center justify-center rounded-2xl px-7 py-4 text-base font-semibold">
+                Explore plans
+              </Link>
             </div>
-            <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-8 border border-purple-100">
-              <div className="space-y-4">
-                {['Sarah M.', 'David J.', 'Lisa K.'].map((name, i) => (
-                  <div key={i} className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="bg-gray-200 rounded-full w-10 h-10 flex items-center justify-center">
-                        <span className="text-sm font-bold text-gray-900">{name.split(' ').map(n => n[0]).join('')}</span>
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-900">{name}</p>
-                        <p className="text-xs text-gray-500">{['Cutting', 'Bulking', 'Maintenance'][i]}</p>
-                      </div>
-                    </div>
-                    <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">Active</span>
+            <div className="mt-10 grid max-w-2xl grid-cols-3 gap-4">
+              {metrics.map((item) => (
+                <div key={item.label} className="surface-card p-5">
+                  <div className="font-display text-3xl font-bold text-[var(--foreground)]">{item.value}</div>
+                  <div className="mt-2 text-sm font-semibold text-[var(--muted)]">{item.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="relative">
+            <div className="panel-strong relative overflow-hidden p-6 sm:p-8">
+              <div className="absolute inset-x-0 top-0 h-40 bg-[linear-gradient(180deg,rgba(29,168,240,0.08),transparent)]" />
+              <div className="relative flex items-center justify-between rounded-[26px] bg-[var(--brand-900)] px-6 py-5 text-white shadow-[0_18px_45px_rgba(13,27,42,0.24)]">
+                <div>
+                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-sky-200/80">Adaptive engine</p>
+                  <h2 className="mt-2 font-display text-3xl font-bold">Today’s performance brief</h2>
+                </div>
+                <div className="rounded-2xl bg-white/10 px-4 py-3 text-right backdrop-blur">
+                  <div className="text-2xl font-bold text-[var(--brand-400)]">2,350</div>
+                  <div className="text-xs uppercase tracking-[0.16em] text-sky-100/70">Target kcal</div>
+                </div>
+              </div>
+
+              <div className="mt-6 grid gap-5 md:grid-cols-2">
+                <div className="surface-card p-6">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-display text-xl font-bold text-[var(--foreground)]">Nutrition compliance</h3>
+                    <TrendingUp className="h-5 w-5 text-[var(--brand-500)]" />
                   </div>
-                ))}
+                  <div className="mt-5 h-3 rounded-full bg-[var(--brand-200)]">
+                    <div className="h-3 w-[76%] rounded-full bg-[linear-gradient(90deg,#1da8f0,#4dc4ff)]" />
+                  </div>
+                  <div className="mt-4 flex justify-between text-sm font-semibold text-[var(--muted)]">
+                    <span>76% aligned this week</span>
+                    <span>Protein ahead</span>
+                  </div>
+                </div>
+
+                <div className="surface-card p-6">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-display text-xl font-bold text-[var(--foreground)]">Next session</h3>
+                    <HeartPulse className="h-5 w-5 text-[var(--brand-500)]" />
+                  </div>
+                  <div className="mt-4 text-2xl font-bold text-[var(--foreground)]">Upper strength / 45 min</div>
+                  <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+                    Volume adjusted around recovery, sleep, and available equipment.
+                  </p>
+                  <div className="mt-5 inline-flex items-center gap-2 rounded-full bg-[var(--brand-100)] px-4 py-2 text-sm font-semibold text-[#0f4262]">
+                    <CheckCircle2 className="h-4 w-4" />
+                    Clinically adjusted
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-5 surface-card p-6">
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="eyebrow">
+                    <Brain className="h-4 w-4" />
+                    AI coaching
+                  </div>
+                  <div className="eyebrow">
+                    <Users className="h-4 w-4" />
+                    Practitioner-ready
+                  </div>
+                  <div className="eyebrow">
+                    <Dumbbell className="h-4 w-4" />
+                    Training intelligence
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* AI Section */}
-      <section className="py-20 bg-white/50 backdrop-blur-sm">
-        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <div className="bg-purple-100 rounded-full p-4 w-fit mx-auto mb-6">
-            <Brain className="h-10 w-10 text-purple-600" />
+      <section className="px-4 py-20 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-12 max-w-3xl">
+            <div className="eyebrow mb-5">Why it feels different</div>
+            <h2 className="text-4xl font-bold text-[var(--foreground)] sm:text-5xl">
+              Built like a performance system, not a feature pile.
+            </h2>
           </div>
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            AI-Powered Meal Suggestions
-          </h2>
-          <p className="text-lg text-gray-800 mb-8 max-w-2xl mx-auto">
-            Get personalized meal ideas based on your macros, dietary preferences, and allergies.
-            Powered by AI, tailored to your goals.
-          </p>
-          <div className="flex justify-center gap-8 text-sm text-gray-500">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-gray-900">1</div>
-              <div>Free suggestion</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">5/mo</div>
-              <div>Pro plan</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">20/mo</div>
-              <div>Nutritionist</div>
-            </div>
+
+          <div className="grid gap-6 lg:grid-cols-3">
+            {pillars.map((pillar) => {
+              const Icon = pillar.icon
+              return (
+                <div key={pillar.title} className="panel-strong p-8">
+                  <div className="mb-6 inline-flex rounded-2xl bg-[var(--brand-100)] p-4 text-[var(--brand-900)]">
+                    <Icon className="h-6 w-6" />
+                  </div>
+                  <h3 className="font-display text-2xl font-bold text-[var(--foreground)]">{pillar.title}</h3>
+                  <p className="mt-4 text-base leading-7 text-[var(--muted)]">{pillar.body}</p>
+                </div>
+              )
+            })}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-24 relative overflow-hidden bg-[radial-gradient(ellipse_80%_60%_at_50%_120%,rgba(120,80,255,0.15),rgba(255,255,255,0))]">
-        <div className="relative max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-4xl font-bold text-gray-900 mb-6">
-            Ready to Transform Your Wellness?
-          </h2>
-          <p className="text-xl text-gray-800 mb-10">
-            Join NutriGoal today&mdash;whether you&apos;re training solo or managing a roster of clients.
-          </p>
-
-          <Link
-            href="/signup"
-            className="inline-flex items-center space-x-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-12 py-6 rounded-xl text-xl font-semibold hover:shadow-xl hover:shadow-[0_0_30px_rgba(139,92,246,0.3)] transition-all duration-300 group"
-          >
-            <Zap className="h-6 w-6" />
-            <span>Get Started Free</span>
-            <ArrowRight className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
-          </Link>
-
-          <p className="text-sm text-gray-500 mt-6">
-            No credit card required &bull; Free plan available forever
-          </p>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="flex items-center justify-center space-x-2 mb-4">
-              <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg p-2">
-                <Target className="h-6 w-6 text-white" />
-              </div>
-              <span className="text-2xl font-bold">NutriGoal</span>
-            </div>
-            <p className="text-gray-400 mb-6">
-              Your complete nutrition, training &amp; wellness platform
+      <section className="px-4 pb-24 sm:px-6 lg:px-8">
+        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.95fr_1.05fr]">
+          <div className="panel-strong p-8">
+            <div className="eyebrow mb-5">For practitioners</div>
+            <h2 className="text-4xl font-bold text-[var(--foreground)]">A cleaner system for clients, plans, and follow-through.</h2>
+            <p className="mt-5 text-lg leading-8 text-[var(--muted)]">
+              Nutritionists and coaches can invite clients, create meal and training plans, manage feedback, and
+              keep communication in one place instead of stitching together five tools.
             </p>
-            <div className="flex justify-center space-x-6 text-sm text-gray-500 mb-6">
-              <Link href="/pricing" className="hover:text-gray-300 transition-colors">Pricing</Link>
-              <Link href="/login" className="hover:text-gray-300 transition-colors">Sign In</Link>
-              <Link href="/signup" className="hover:text-gray-300 transition-colors">Sign Up</Link>
+            <div className="mt-8 space-y-4 text-base text-[var(--foreground)]">
+              {[
+                'Invite and manage clients from one roster',
+                'Build structured meal and training plans inside the app',
+                'Use AI and check-ins to keep the plan adaptive',
+              ].map((item) => (
+                <div key={item} className="flex items-start gap-3">
+                  <div className="mt-1 h-2.5 w-2.5 rounded-full bg-[var(--brand-500)]" />
+                  <span>{item}</span>
+                </div>
+              ))}
             </div>
-            <div className="border-t border-gray-800 pt-6">
-              <p className="text-sm text-gray-500">
-                &copy; 2025 NutriGoal. Built for better wellness.
-              </p>
+          </div>
+
+          <div className="panel-strong p-8">
+            <div className="eyebrow mb-5">For self-serve users</div>
+            <h2 className="text-4xl font-bold text-[var(--foreground)]">An onboarding flow that actually powers the plan.</h2>
+            <p className="mt-5 text-lg leading-8 text-[var(--muted)]">
+              The platform gathers the kind of context most apps ignore: injuries, schedule, training background,
+              food dislikes, and recovery signals. That means the plan feels believable instead of templated.
+            </p>
+            <div className="mt-8 grid gap-4 sm:grid-cols-2">
+              {[
+                'Meal structure',
+                'Training structure',
+                'Check-ins and progression',
+                'Hydration and cardio',
+              ].map((item) => (
+                <div key={item} className="surface-card p-5">
+                  <div className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--muted-soft)]">System</div>
+                  <div className="mt-2 font-display text-2xl font-bold text-[var(--foreground)]">{item}</div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
-      </footer>
+      </section>
     </div>
   )
 }

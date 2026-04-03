@@ -5,6 +5,7 @@ import { Sparkles, X } from 'lucide-react'
 import { useState } from 'react'
 import Sidebar from '@/components/ui/Sidebar'
 import { useUser } from '@/hooks/useUser'
+import BrandLogo from '@/components/brand/BrandLogo'
 
 function TrialBanner({ trialEndsAt }: { trialEndsAt: string }) {
   const [dismissed, setDismissed] = useState(false)
@@ -14,19 +15,24 @@ function TrialBanner({ trialEndsAt }: { trialEndsAt: string }) {
   if (daysLeft === 0) return null
 
   return (
-    <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2.5 flex items-center justify-between gap-4 text-sm">
-      <div className="flex items-center gap-2 flex-1 justify-center">
+    <div className="border-b border-[rgba(77,196,255,0.2)] bg-[linear-gradient(90deg,#0d1b2a,#173149)] px-4 py-3 text-sm text-white">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+        <div className="hidden lg:block">
+          <BrandLogo href="/dashboard" compact light className="pointer-events-none" />
+        </div>
+        <div className="flex flex-1 items-center justify-center gap-2">
         <Sparkles className="h-4 w-4 flex-shrink-0" />
         <span>
           You&apos;re on a <strong>7-day Pro trial</strong> — {daysLeft} day{daysLeft !== 1 ? 's' : ''} left.{' '}
-          <Link href="/pricing" className="underline font-semibold hover:text-purple-200">
+            <Link href="/pricing" className="font-semibold text-sky-200 underline hover:text-white">
             Upgrade to keep access →
           </Link>
         </span>
       </div>
-      <button onClick={() => setDismissed(true)} className="flex-shrink-0 p-1 hover:bg-white/20 rounded">
+        <button onClick={() => setDismissed(true)} className="flex-shrink-0 rounded p-1 hover:bg-white/10">
         <X className="h-4 w-4" />
       </button>
+      </div>
     </div>
   )
 }
@@ -38,8 +44,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     return (
       <div className="min-h-screen flex items-center justify-center app-bg">
         <div className="flex flex-col items-center space-y-4">
-          <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin" />
-          <p className="text-gray-500 text-sm">Loading...</p>
+          <div className="brand-mark">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-[var(--brand-900)] border-t-transparent" />
+          </div>
+          <p className="text-sm font-semibold text-[var(--muted)]">Loading your workspace...</p>
         </div>
       </div>
     )
@@ -57,7 +65,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <div className="md:ml-64">
         {showTrial && <TrialBanner trialEndsAt={profile!.trial_ends_at!} />}
         <main className="min-h-screen pt-16 md:pt-0">
-          <div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
+          <div className="mx-auto max-w-7xl px-4 py-8 md:px-6">
             {children}
           </div>
         </main>

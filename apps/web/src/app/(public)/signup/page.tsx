@@ -2,10 +2,10 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-
-import { Target, Mail, Lock, Eye, EyeOff, ArrowRight, User, Users, UserCircle } from 'lucide-react'
+import { ArrowRight, Eye, EyeOff, Lock, Mail, User, UserCircle, Users } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
+import BrandLogo from '@/components/brand/BrandLogo'
 
 export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -56,10 +56,8 @@ export default function SignupPage() {
       return
     }
 
-    // Wait for the DB trigger to create the user profile before proceeding
     const { data: { user } } = await supabase.auth.getUser()
     if (user) {
-      // Poll for profile creation (trigger runs async)
       let profile = null
       for (let i = 0; i < 10; i++) {
         const { data } = await supabase
@@ -82,7 +80,6 @@ export default function SignupPage() {
         .update({ role: formData.role, full_name: formData.fullName.trim() })
         .eq('id', user.id)
 
-      // If nutritionist, create default package
       if (formData.role === 'nutritionist') {
         await supabase.from('nutritionist_packages').insert({
           nutritionist_id: user.id,
@@ -90,7 +87,6 @@ export default function SignupPage() {
         })
       }
 
-      // Start 7-day Pro trial for individual (free) users
       if (formData.role === 'free') {
         await fetch('/api/trial/start', { method: 'POST' })
       }
@@ -101,68 +97,87 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen auth-bg flex items-center justify-center px-4">
-      <div className="max-w-md w-full">
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center space-x-2 mb-6">
-            <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg p-2">
-              <Target className="h-6 w-6 text-white" />
-            </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-              NutriGoal
-            </span>
-          </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h1>
-          <p className="text-gray-800">Start your nutrition journey today</p>
-        </div>
+    <div className="auth-bg min-h-screen px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto flex max-w-7xl items-center justify-between pb-8">
+        <BrandLogo href="/" />
+        <Link href="/login" className="btn-secondary rounded-full px-5 py-3 text-sm font-semibold">
+          Sign in
+        </Link>
+      </div>
 
-        <div className="glass-card rounded-2xl shadow-lg p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Role Selection */}
+      <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.95fr_0.95fr] lg:items-start">
+        <section className="panel-strong p-8 sm:p-10">
+          <div className="eyebrow mb-5">Performance Clinic</div>
+          <h1 className="text-5xl font-bold leading-[0.96] text-[var(--foreground)] sm:text-6xl">
+            Start with a
+            <span className="block text-[var(--brand-500)]">serious setup.</span>
+          </h1>
+          <p className="mt-6 max-w-xl text-lg leading-8 text-[var(--muted)]">
+            Nutrigoal is designed for people who want a system that feels considered, precise, and actually useful once they begin.
+          </p>
+          <div className="mt-10 grid gap-4 sm:grid-cols-2">
+            {[
+              ['Individuals', 'Guided plan generation, structured tracking, sharper coaching'],
+              ['Nutritionists', 'Client workflows, manual planning, practitioner oversight'],
+            ].map(([title, body]) => (
+              <div key={title} className="surface-card p-5">
+                <div className="font-display text-2xl font-bold text-[var(--foreground)]">{title}</div>
+                <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="glass-card rounded-[32px] p-8 sm:p-10">
+          <div className="mb-8">
+            <div className="eyebrow mb-4">Create account</div>
+            <h2 className="text-4xl font-bold text-[var(--foreground)]">Choose your setup</h2>
+            <p className="mt-3 text-base leading-7 text-[var(--muted)]">
+              Start as an individual or practitioner. You can refine everything once you&apos;re inside.
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">I am a...</label>
+              <label className="mb-3 block text-sm font-semibold text-[var(--foreground)]">I am joining as</label>
               <div className="grid grid-cols-2 gap-3">
                 <button
                   type="button"
                   onClick={() => setFormData(prev => ({ ...prev, role: 'free' }))}
-                  className={`p-4 border-2 rounded-xl text-center transition-all ${
-                    formData.role === 'free'
-                      ? 'border-purple-500 bg-purple-50'
-                      : 'border-gray-200 hover:border-gray-300'
+                  className={`rounded-[22px] border p-5 text-left transition ${formData.role === 'free'
+                    ? 'border-[rgba(29,168,240,0.34)] bg-[var(--brand-100)] shadow-[0_14px_32px_rgba(29,168,240,0.12)]'
+                    : 'border-[var(--line)] bg-white/65 hover:border-[rgba(29,168,240,0.24)]'
                   }`}
                 >
-                  <User className={`h-8 w-8 mx-auto mb-2 ${formData.role === 'free' ? 'text-purple-600' : 'text-gray-400'}`} />
-                  <span className={`font-medium ${formData.role === 'free' ? 'text-purple-700' : 'text-gray-700'}`}>Individual</span>
-                  <p className="text-xs text-gray-500 mt-1">Personal use</p>
+                  <User className={`mb-3 h-7 w-7 ${formData.role === 'free' ? 'text-[var(--brand-900)]' : 'text-[var(--muted-soft)]'}`} />
+                  <div className="font-display text-xl font-bold text-[var(--foreground)]">Individual</div>
+                  <div className="mt-1 text-sm text-[var(--muted)]">For personal use and self-serve progress.</div>
                 </button>
                 <button
                   type="button"
                   onClick={() => setFormData(prev => ({ ...prev, role: 'nutritionist' }))}
-                  className={`p-4 border-2 rounded-xl text-center transition-all ${
-                    formData.role === 'nutritionist'
-                      ? 'border-purple-500 bg-purple-50'
-                      : 'border-gray-200 hover:border-gray-300'
+                  className={`rounded-[22px] border p-5 text-left transition ${formData.role === 'nutritionist'
+                    ? 'border-[rgba(29,168,240,0.34)] bg-[var(--brand-100)] shadow-[0_14px_32px_rgba(29,168,240,0.12)]'
+                    : 'border-[var(--line)] bg-white/65 hover:border-[rgba(29,168,240,0.24)]'
                   }`}
                 >
-                  <Users className={`h-8 w-8 mx-auto mb-2 ${formData.role === 'nutritionist' ? 'text-purple-600' : 'text-gray-400'}`} />
-                  <span className={`font-medium ${formData.role === 'nutritionist' ? 'text-purple-700' : 'text-gray-700'}`}>Nutritionist</span>
-                  <p className="text-xs text-gray-500 mt-1">Manage clients</p>
+                  <Users className={`mb-3 h-7 w-7 ${formData.role === 'nutritionist' ? 'text-[var(--brand-900)]' : 'text-[var(--muted-soft)]'}`} />
+                  <div className="font-display text-xl font-bold text-[var(--foreground)]">Nutritionist</div>
+                  <div className="mt-1 text-sm text-[var(--muted)]">For client management and plan delivery.</div>
                 </button>
               </div>
             </div>
 
             <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+              <label htmlFor="fullName" className="mb-2 block text-sm font-semibold text-[var(--foreground)]">Full name</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <UserCircle className="h-5 w-5 text-gray-400" />
-                </div>
+                <UserCircle className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--muted-soft)]" />
                 <input
                   id="fullName"
                   type="text"
                   value={formData.fullName}
                   onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="input-field pl-12"
                   placeholder="Your full name"
                   required
                 />
@@ -170,17 +185,15 @@ export default function SignupPage() {
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+              <label htmlFor="email" className="mb-2 block text-sm font-semibold text-[var(--foreground)]">Email</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
-                </div>
+                <Mail className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--muted-soft)]" />
                 <input
                   id="email"
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="input-field pl-12"
                   placeholder="your.email@example.com"
                   required
                 />
@@ -188,40 +201,35 @@ export default function SignupPage() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+              <label htmlFor="password" className="mb-2 block text-sm font-semibold text-[var(--foreground)]">Password</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
-                </div>
+                <Lock className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--muted-soft)]" />
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                  className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  placeholder="Min. 6 characters"
+                  className="input-field pl-12 pr-12"
+                  placeholder="Minimum 6 characters"
                   required
-                  minLength={6}
                 />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                  {showPassword ? <EyeOff className="h-5 w-5 text-gray-400" /> : <Eye className="h-5 w-5 text-gray-400" />}
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 pr-4 text-[var(--muted-soft)]">
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+              <label htmlFor="confirmPassword" className="mb-2 block text-sm font-semibold text-[var(--foreground)]">Confirm password</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
-                </div>
+                <Lock className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--muted-soft)]" />
                 <input
                   id="confirmPassword"
                   type="password"
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  placeholder="Confirm your password"
+                  className="input-field pl-12"
+                  placeholder="Re-enter your password"
                   required
                 />
               </div>
@@ -230,36 +238,26 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50 flex items-center justify-center space-x-2"
+              className="btn-primary flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-4 text-base font-semibold disabled:opacity-50"
             >
               {isLoading ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
               ) : (
                 <>
-                  <span>Create Account</span>
+                  <span>Create account</span>
                   <ArrowRight className="h-4 w-4" />
                 </>
               )}
             </button>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-gray-200 text-center">
-            <p className="text-gray-900">
-              Already have an account?{' '}
-              <Link href="/login" className="text-purple-600 hover:text-purple-800 font-semibold">
-                Sign In
-              </Link>
-            </p>
+          <div className="mt-8 border-t border-[var(--line)] pt-6 text-sm text-[var(--muted)]">
+            Already have an account?{' '}
+            <Link href="/login" className="font-semibold text-[var(--foreground)] transition hover:text-[var(--brand-500)]">
+              Sign in
+            </Link>
           </div>
-        </div>
-
-        <div className="text-center mt-6">
-          <p className="text-sm text-gray-500">
-            By creating an account, you agree to our{' '}
-            <span className="text-purple-600">Terms of Service</span> and{' '}
-            <span className="text-purple-600">Privacy Policy</span>
-          </p>
-        </div>
+        </section>
       </div>
     </div>
   )
