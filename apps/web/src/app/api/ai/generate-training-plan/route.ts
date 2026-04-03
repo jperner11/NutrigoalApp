@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { rateLimit, getClientIp } from '@/lib/rateLimit'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function POST(request: Request) {
   const ip = getClientIp(request)
@@ -255,11 +256,11 @@ PROGRAMMING RULES:
       return NextResponse.json(parsed) // fallback: return without IDs
     }
 
-    const supabase = createClient(supabaseUrl, serviceRoleKey)
+    const adminSupabase = createAdminClient()
 
     // Load existing exercises
-    const { data: dbExercises } = await supabase.from('exercises').select('id, name')
-    const exerciseMap = new Map((dbExercises ?? []).map(e => [e.name.toLowerCase(), e.id]))
+    const { data: dbExercises } = await adminSupabase.from('exercises').select('id, name')
+    const exerciseMap = new Map((dbExercises ?? []).map((e: { id: string; name: string }) => [e.name.toLowerCase(), e.id]))
 
     const validBodyParts = new Set(['chest', 'back', 'shoulders', 'biceps', 'triceps', 'legs', 'core', 'full_body'])
     const validEquipment = new Set(['barbell', 'dumbbell', 'machine', 'cable', 'bodyweight', 'band'])
@@ -273,7 +274,7 @@ PROGRAMMING RULES:
           // Create the exercise
           const bodyPart = validBodyParts.has(ex.body_part) ? ex.body_part : 'full_body'
           const equip = validEquipment.has(ex.equipment) ? ex.equipment : 'bodyweight'
-          const { data: newEx } = await supabase
+          const { data: newEx } = await adminSupabase
             .from('exercises')
             .insert({
               name: ex.name,
