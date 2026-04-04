@@ -32,6 +32,9 @@ export type AlcoholFrequency = 'none' | 'light' | 'moderate' | 'heavy'
 export type SnackMotivation = 'hunger' | 'boredom' | 'habit' | 'mixed'
 export type SnackPreference = 'sweet' | 'savoury' | 'both'
 export type SecondaryTrainingGoal = 'mobility' | 'conditioning' | 'sport_performance' | 'injury_rehab' | 'posture' | 'none'
+export type PlanPreference = 'structured' | 'balanced' | 'flexible'
+export type HarderDays = 'weekdays' | 'weekends' | 'both'
+export type EatingOutFrequency = 'rarely' | 'sometimes' | 'often' | 'very_often'
 export type SupplementFrequency = 'daily' | 'twice_daily' | 'three_times' | 'weekly' | 'as_needed'
 export type SupplementTime = 'morning' | 'afternoon' | 'evening' | 'with_meals' | 'pre_workout' | 'post_workout' | 'bedtime'
 
@@ -115,6 +118,12 @@ export interface UserProfile {
   target_weight_kg: number | null
   goal_timeline: GoalTimeline | null
   motivation: string[]
+  desired_outcome: string | null
+  past_dieting_challenges: string | null
+  weekly_derailers: string | null
+  plan_preference: PlanPreference | null
+  harder_days: HarderDays | null
+  eating_out_frequency: EatingOutFrequency | null
   trial_ends_at: string | null
   created_at: string
   updated_at: string

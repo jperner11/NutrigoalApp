@@ -15,6 +15,7 @@ import {
   COMMON_FOOD_DISLIKES, COOKING_SKILLS, MEAL_PREP_PREFERENCES, WORK_TYPES,
   SLEEP_QUALITY_OPTIONS, STRESS_LEVELS, GOAL_TIMELINES, MOTIVATIONS,
   ALCOHOL_FREQUENCIES, SNACK_MOTIVATIONS, SNACK_PREFERENCES,
+  PLAN_PREFERENCES, HARDER_DAYS_OPTIONS, EATING_OUT_FREQUENCIES,
   calculateNutritionTargets,
 } from '@nutrigoal/shared'
 import type { UserMetrics } from '@nutrigoal/shared'
@@ -75,6 +76,10 @@ export default function OnboardingScreen() {
   const [snackMotivation, setSnackMotivation] = useState('hunger')
   const [snackPreference, setSnackPreference] = useState('both')
   const [lateNightSnacking, setLateNightSnacking] = useState(false)
+  const [harderDays, setHarderDays] = useState('weekends')
+  const [eatingOutFrequency, setEatingOutFrequency] = useState('sometimes')
+  const [planPreference, setPlanPreference] = useState('balanced')
+  const [weeklyDerailers, setWeeklyDerailers] = useState('')
 
   // Step 4: Health & Medical
   const [injuries, setInjuries] = useState<string[]>([])
@@ -103,6 +108,8 @@ export default function OnboardingScreen() {
   const [targetWeight, setTargetWeight] = useState('')
   const [goalTimeline, setGoalTimeline] = useState('steady')
   const [motivation, setMotivation] = useState<string[]>([])
+  const [desiredOutcome, setDesiredOutcome] = useState('')
+  const [pastDietingChallenges, setPastDietingChallenges] = useState('')
 
   // Step 7: Schedule
   const [wakeTime, setWakeTime] = useState('07:00')
@@ -192,10 +199,16 @@ export default function OnboardingScreen() {
       snack_motivation: snackMotivation,
       snack_preference: snackPreference,
       late_night_snacking: lateNightSnacking,
+      harder_days: harderDays,
+      eating_out_frequency: eatingOutFrequency,
+      plan_preference: planPreference,
+      weekly_derailers: weeklyDerailers.trim() || null,
       // Goals
       target_weight_kg: targetWeight ? parseFloat(targetWeight) : null,
       goal_timeline: goalTimeline,
       motivation,
+      desired_outcome: desiredOutcome.trim() || null,
+      past_dieting_challenges: pastDietingChallenges.trim() || null,
       // Schedule
       wake_time: wakeTime,
       sleep_time: sleepTime,
@@ -448,6 +461,40 @@ export default function OnboardingScreen() {
                 </TouchableOpacity>
               ))}
             </View>
+
+            <Text style={st.label}>Which days are harder to stay on track?</Text>
+            {HARDER_DAYS_OPTIONS.map((option) => (
+              <TouchableOpacity key={option.value} style={[st.listOption, harderDays === option.value && st.listOptionActive]} onPress={() => setHarderDays(option.value)}>
+                <Text style={[st.listOptionTitle, harderDays === option.value && st.listOptionTitleActive]}>{option.label}</Text>
+                <Text style={st.listOptionDesc}>{option.description}</Text>
+              </TouchableOpacity>
+            ))}
+
+            <Text style={st.label}>How often do you eat out or order in?</Text>
+            {EATING_OUT_FREQUENCIES.map((option) => (
+              <TouchableOpacity key={option.value} style={[st.listOption, eatingOutFrequency === option.value && st.listOptionActive]} onPress={() => setEatingOutFrequency(option.value)}>
+                <Text style={[st.listOptionTitle, eatingOutFrequency === option.value && st.listOptionTitleActive]}>{option.label}</Text>
+                <Text style={st.listOptionDesc}>{option.description}</Text>
+              </TouchableOpacity>
+            ))}
+
+            <Text style={st.label}>What style of plan helps you most?</Text>
+            {PLAN_PREFERENCES.map((option) => (
+              <TouchableOpacity key={option.value} style={[st.listOption, planPreference === option.value && st.listOptionActive]} onPress={() => setPlanPreference(option.value)}>
+                <Text style={[st.listOptionTitle, planPreference === option.value && st.listOptionTitleActive]}>{option.label}</Text>
+                <Text style={st.listOptionDesc}>{option.description}</Text>
+              </TouchableOpacity>
+            ))}
+
+            <Text style={st.label}>What usually throws you off track?</Text>
+            <TextInput
+              style={[st.input, st.textarea]}
+              multiline
+              placeholder="e.g. stressful work days, social drinks, skipping meals then overeating later"
+              placeholderTextColor="#9ca3af"
+              value={weeklyDerailers}
+              onChangeText={setWeeklyDerailers}
+            />
           </View>
         )}
 
@@ -621,6 +668,26 @@ export default function OnboardingScreen() {
                 </TouchableOpacity>
               ))}
             </View>
+
+            <Text style={st.label}>What do you want to look, feel, or perform like?</Text>
+            <TextInput
+              style={[st.input, st.textarea]}
+              multiline
+              placeholder="e.g. feel leaner and more confident, perform better in the gym, have steadier energy"
+              placeholderTextColor="#9ca3af"
+              value={desiredOutcome}
+              onChangeText={setDesiredOutcome}
+            />
+
+            <Text style={st.label}>What has made past plans hard to stick to?</Text>
+            <TextInput
+              style={[st.input, st.textarea]}
+              multiline
+              placeholder="e.g. plans were too rigid, meals took too long, weekends always derailed me"
+              placeholderTextColor="#9ca3af"
+              value={pastDietingChallenges}
+              onChangeText={setPastDietingChallenges}
+            />
           </View>
         )}
 
@@ -789,8 +856,14 @@ export default function OnboardingScreen() {
                     {dietaryRestrictions.length > 0 && <ReviewRow label="Diet" value={dietaryRestrictions.map(r => DIETARY_RESTRICTIONS.find(d => d.value === r)?.label ?? r).join(', ')} />}
                     {foodDislikes.length > 0 && <ReviewRow label="Dislikes" value={foodDislikes.join(', ')} />}
                     {currentSnacks ? <ReviewRow label="Snacks" value={currentSnacks} /> : null}
+                    <ReviewRow label="Harder days" value={HARDER_DAYS_OPTIONS.find(d => d.value === harderDays)?.label ?? harderDays} />
+                    <ReviewRow label="Eating out" value={EATING_OUT_FREQUENCIES.find(f => f.value === eatingOutFrequency)?.label ?? eatingOutFrequency} />
+                    <ReviewRow label="Plan style" value={PLAN_PREFERENCES.find(p => p.value === planPreference)?.label ?? planPreference} />
+                    {weeklyDerailers ? <ReviewRow label="Derailers" value={weeklyDerailers} /> : null}
                     {secondaryGoal !== 'none' ? <ReviewRow label="Secondary goal" value={SECONDARY_TRAINING_GOALS.find(g => g.value === secondaryGoal)?.label ?? secondaryGoal} /> : null}
                     <ReviewRow label="Session length" value={`${maxSessionMinutes} min`} />
+                    {desiredOutcome ? <ReviewRow label="Desired outcome" value={desiredOutcome} /> : null}
+                    {pastDietingChallenges ? <ReviewRow label="Past challenges" value={pastDietingChallenges} /> : null}
                   </View>
                 </>
               )

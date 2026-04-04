@@ -306,6 +306,25 @@ export const MOTIVATIONS = [
   'Doctor recommended', 'Event/competition',
 ] as const
 
+export const PLAN_PREFERENCES = [
+  { value: 'structured', label: 'Prefer structure', description: 'A clear meal and training routine helps me stay on track.' },
+  { value: 'balanced', label: 'Balanced', description: 'I want structure, but I still need flexibility for real life.' },
+  { value: 'flexible', label: 'Prefer flexibility', description: 'I do better with looser guardrails than rigid rules.' },
+] as const
+
+export const HARDER_DAYS_OPTIONS = [
+  { value: 'weekdays', label: 'Weekdays', description: 'Work, commuting, and routine pressure make weekdays harder.' },
+  { value: 'weekends', label: 'Weekends', description: 'Social plans, eating out, and less routine make weekends harder.' },
+  { value: 'both', label: 'Both equally', description: 'It can go off track on any day if life gets busy.' },
+] as const
+
+export const EATING_OUT_FREQUENCIES = [
+  { value: 'rarely', label: 'Rarely', description: '0-1 restaurant, takeaway, or delivery meals per week.' },
+  { value: 'sometimes', label: 'Sometimes', description: '2-3 meals per week.' },
+  { value: 'often', label: 'Often', description: '4-6 meals per week.' },
+  { value: 'very_often', label: 'Very often', description: 'Daily or almost daily.' },
+] as const
+
 export const SUPPLEMENT_FREQUENCIES = [
   { value: 'daily', label: 'Once daily' },
   { value: 'twice_daily', label: 'Twice daily' },

@@ -13,6 +13,7 @@ import {
   COMMON_FOOD_DISLIKES, COOKING_SKILLS, MEAL_PREP_PREFERENCES, WORK_TYPES,
   SLEEP_QUALITY_OPTIONS, STRESS_LEVELS, GOAL_TIMELINES, MOTIVATIONS,
   ALCOHOL_FREQUENCIES, SNACK_MOTIVATIONS, SNACK_PREFERENCES,
+  PLAN_PREFERENCES, HARDER_DAYS_OPTIONS, EATING_OUT_FREQUENCIES,
   calculateNutritionTargets,
 } from '@nutrigoal/shared'
 import type { UserMetrics } from '@nutrigoal/shared'
@@ -54,6 +55,8 @@ export default function OnboardingPage() {
   const [bodyFatPct, setBodyFatPct] = useState(profile?.body_fat_pct?.toString() ?? '')
   const [targetWeight, setTargetWeight] = useState(profile?.target_weight_kg?.toString() ?? '')
   const [goalTimeline, setGoalTimeline] = useState(profile?.goal_timeline ?? 'steady')
+  const [desiredOutcome, setDesiredOutcome] = useState(profile?.desired_outcome ?? '')
+  const [pastDietingChallenges, setPastDietingChallenges] = useState(profile?.past_dieting_challenges ?? '')
 
   // ── Step 1: My Lifestyle ──
   const [workType, setWorkType] = useState(profile?.work_type ?? 'desk')
@@ -80,6 +83,10 @@ export default function OnboardingPage() {
   const [snackMotivation, setSnackMotivation] = useState(profile?.snack_motivation ?? 'hunger')
   const [snackPreference, setSnackPreference] = useState(profile?.snack_preference ?? 'both')
   const [lateNightSnacking, setLateNightSnacking] = useState(profile?.late_night_snacking ?? false)
+  const [harderDays, setHarderDays] = useState(profile?.harder_days ?? 'weekends')
+  const [eatingOutFrequency, setEatingOutFrequency] = useState(profile?.eating_out_frequency ?? 'sometimes')
+  const [planPreference, setPlanPreference] = useState(profile?.plan_preference ?? 'balanced')
+  const [weeklyDerailers, setWeeklyDerailers] = useState(profile?.weekly_derailers ?? '')
 
   // ── Step 4: Health & Medical ──
   const [injuries, setInjuries] = useState<string[]>(profile?.injuries ?? [])
@@ -210,10 +217,16 @@ export default function OnboardingPage() {
         snack_motivation: snackMotivation,
         snack_preference: snackPreference,
         late_night_snacking: lateNightSnacking,
+        harder_days: harderDays,
+        eating_out_frequency: eatingOutFrequency,
+        plan_preference: planPreference,
+        weekly_derailers: weeklyDerailers.trim() || null,
         // Goals
         target_weight_kg: targetWeight ? parseFloat(targetWeight) : null,
         goal_timeline: goalTimeline,
         motivation,
+        desired_outcome: desiredOutcome.trim() || null,
+        past_dieting_challenges: pastDietingChallenges.trim() || null,
         // Schedule
         sleep_time: sleepTime,
         wake_time: wakeTime,
@@ -561,6 +574,39 @@ export default function OnboardingPage() {
                 ))}
               </div>
             </div>
+            <div>
+              <Label>Which days are harder to stay on track?</Label>
+              <div className="space-y-2">
+                {HARDER_DAYS_OPTIONS.map((option) => (
+                  <OptionCard key={option.value} title={option.label} description={option.description}
+                    selected={harderDays === option.value} onClick={() => setHarderDays(option.value)} />
+                ))}
+              </div>
+            </div>
+            <div>
+              <Label>How often do you eat out or order in?</Label>
+              <div className="space-y-2">
+                {EATING_OUT_FREQUENCIES.map((option) => (
+                  <OptionCard key={option.value} title={option.label} description={option.description}
+                    selected={eatingOutFrequency === option.value} onClick={() => setEatingOutFrequency(option.value)} />
+                ))}
+              </div>
+            </div>
+            <div>
+              <Label>What style of plan helps you most?</Label>
+              <div className="space-y-2">
+                {PLAN_PREFERENCES.map((option) => (
+                  <OptionCard key={option.value} title={option.label} description={option.description}
+                    selected={planPreference === option.value} onClick={() => setPlanPreference(option.value)} />
+                ))}
+              </div>
+            </div>
+            <div>
+              <Label>What usually throws you off track?</Label>
+              <textarea value={weeklyDerailers} onChange={(e) => setWeeklyDerailers(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
+                rows={3} placeholder="e.g. stressful work days, social drinks, skipping meals then overeating later" />
+            </div>
           </div>
         )
 
@@ -785,6 +831,19 @@ export default function OnboardingPage() {
                 onToggle={(val) => toggleArray(motivation, setMotivation, val)}
               />
             </div>
+            <div>
+              <Label>What do you want to look, feel, or perform like?</Label>
+              <p className="text-sm text-gray-500 mb-2">This gives the AI a more human target than just calories and bodyweight.</p>
+              <textarea value={desiredOutcome} onChange={(e) => setDesiredOutcome(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
+                rows={3} placeholder="e.g. feel leaner and more confident, perform better in the gym, have steadier energy through the day" />
+            </div>
+            <div>
+              <Label>What has made past plans hard to stick to?</Label>
+              <textarea value={pastDietingChallenges} onChange={(e) => setPastDietingChallenges(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
+                rows={3} placeholder="e.g. plans were too rigid, meals took too long, weekends always derailed me" />
+            </div>
           </div>
         )
 
@@ -955,12 +1014,18 @@ export default function OnboardingPage() {
                     {favouriteFoods.trim() && <ReviewRow label="Favourites" value={favouriteFoods} />}
                     {foodDislikes.trim() && <ReviewRow label="Dislikes" value={foodDislikes} />}
                     {currentSnacks.trim() && <ReviewRow label="Snacks" value={currentSnacks} />}
+                    <ReviewRow label="Harder days" value={HARDER_DAYS_OPTIONS.find(d => d.value === harderDays)?.label ?? harderDays} />
+                    <ReviewRow label="Eating out" value={EATING_OUT_FREQUENCIES.find(f => f.value === eatingOutFrequency)?.label ?? eatingOutFrequency} />
+                    <ReviewRow label="Plan style" value={PLAN_PREFERENCES.find(p => p.value === planPreference)?.label ?? planPreference} />
+                    {weeklyDerailers.trim() && <ReviewRow label="Derailers" value={weeklyDerailers} />}
                     {injuries.length > 0 && <ReviewRow label="Injuries" value={injuries.join(', ')} />}
                     <ReviewRow label="Experience" value={TRAINING_EXPERIENCE.find(t => t.value === experience)?.label ?? experience} />
                     {yearsTraining && <ReviewRow label="Years training" value={yearsTraining} />}
                     <ReviewRow label="Equipment" value={EQUIPMENT_ACCESS.find(e => e.value === equipmentAccess)?.label ?? equipmentAccess} />
                     <ReviewRow label="Session length" value={`${maxSessionMinutes} min`} />
                     {secondaryGoal !== 'none' && <ReviewRow label="Secondary goal" value={SECONDARY_TRAINING_GOALS.find(g => g.value === secondaryGoal)?.label ?? secondaryGoal} />}
+                    {desiredOutcome.trim() && <ReviewRow label="Desired outcome" value={desiredOutcome} />}
+                    {pastDietingChallenges.trim() && <ReviewRow label="Past challenges" value={pastDietingChallenges} />}
                     {(squat1rm || bench1rm || deadlift1rm || ohp1rm) && (
                       <ReviewRow label="1RMs" value={[
                         squat1rm && `SQ ${squat1rm}`,

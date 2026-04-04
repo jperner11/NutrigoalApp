@@ -126,16 +126,30 @@ export default function GeneratePlansPage() {
         setSavedMealPlan(true)
       }
 
-      // Save AI-recommended supplements to user_supplements table
-      if (aiSupplements && aiSupplements.length > 0) {
-        // Deactivate existing AI-generated supplements
+      const companionSupplements: SavedSupplementRecommendation[] = (companionContent?.supplement_recommendations ?? []).map((s) => ({
+        name: s.name,
+        dose: s.dose,
+        timing: s.timing,
+        reason: `${s.why}${s.budget_option ? ` Budget-friendly option: ${s.budget_option}.` : ''}`,
+      }))
+
+      const mergedSupplementMap = new Map<string, SavedSupplementRecommendation>()
+      ;(aiSupplements ?? []).forEach((s) => {
+        mergedSupplementMap.set(s.name.trim().toLowerCase(), s)
+      })
+      companionSupplements.forEach((s) => {
+        mergedSupplementMap.set(s.name.trim().toLowerCase(), s)
+      })
+      const supplementsToSave = Array.from(mergedSupplementMap.values())
+
+      if (supplementsToSave.length > 0) {
         await supabase
           .from('user_supplements')
           .update({ is_active: false })
           .eq('user_id', profile!.id)
-          .eq('notes', 'AI recommended')
+          .like('notes', 'AI recommended%')
 
-        const supplementRows = aiSupplements.map(s => ({
+        const supplementRows = supplementsToSave.map((s) => ({
           user_id: profile!.id,
           name: s.name,
           dosage: s.dose,
@@ -225,6 +239,11 @@ export default function GeneratePlansPage() {
         bench1rm: profile!.bench_1rm ?? null,
         deadlift1rm: profile!.deadlift_1rm ?? null,
         ohp1rm: profile!.ohp_1rm ?? null,
+        desiredOutcome: profile!.desired_outcome ?? '',
+        pastDietingChallenges: profile!.past_dieting_challenges ?? '',
+        weeklyDerailers: profile!.weekly_derailers ?? '',
+        planPreference: profile!.plan_preference ?? 'balanced',
+        harderDays: profile!.harder_days ?? 'weekends',
       }),
     })
 
@@ -273,6 +292,12 @@ export default function GeneratePlansPage() {
         snackMotivation: profile!.snack_motivation ?? 'hunger',
         snackPreference: profile!.snack_preference ?? 'both',
         lateNightSnacking: profile!.late_night_snacking ?? false,
+        harderDays: profile!.harder_days ?? 'weekends',
+        eatingOutFrequency: profile!.eating_out_frequency ?? 'sometimes',
+        planPreference: profile!.plan_preference ?? 'balanced',
+        weeklyDerailers: profile!.weekly_derailers ?? '',
+        desiredOutcome: profile!.desired_outcome ?? '',
+        pastDietingChallenges: profile!.past_dieting_challenges ?? '',
         workoutDaysPerWeek: profile!.workout_days_per_week ?? 4,
         activityLevel: profile!.activity_level ?? 'moderately_active',
         breakfastTime: profile!.breakfast_time ?? '08:00',
@@ -425,6 +450,13 @@ interface CompanionContent {
   supplement_note: string
 }
 
+interface SavedSupplementRecommendation {
+  name: string
+  dose: string
+  timing: string
+  reason: string
+}
+
   async function generateCompanionContent(): Promise<CompanionContent> {
     const res = await fetch('/api/ai/meal-plan-companion', {
       method: 'POST',
@@ -460,6 +492,12 @@ interface CompanionContent {
         cookingSkill: profile!.cooking_skill ?? 'intermediate',
         mealPrepPreference: profile!.meal_prep_preference ?? 'daily',
         motivation: profile!.motivation ?? [],
+        desiredOutcome: profile!.desired_outcome ?? '',
+        pastDietingChallenges: profile!.past_dieting_challenges ?? '',
+        weeklyDerailers: profile!.weekly_derailers ?? '',
+        planPreference: profile!.plan_preference ?? 'balanced',
+        harderDays: profile!.harder_days ?? 'weekends',
+        eatingOutFrequency: profile!.eating_out_frequency ?? 'sometimes',
       }),
     })
 

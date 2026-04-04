@@ -59,6 +59,12 @@ export async function POST(request: Request) {
       cookingSkill = 'intermediate',
       mealPrepPreference = 'daily',
       motivation = [],
+      desiredOutcome = '',
+      pastDietingChallenges = '',
+      weeklyDerailers = '',
+      planPreference = 'balanced',
+      harderDays = 'weekends',
+      eatingOutFrequency = 'sometimes',
     } = body
 
     // Build snack list for swaps
@@ -115,6 +121,12 @@ CLIENT PROFILE:
 - Cooking skill: ${cookingSkill}
 - Meal prep style: ${mealPrepPreference}
 - Motivation: ${Array.isArray(motivation) && motivation.length > 0 ? motivation.join(', ') : 'not specified'}
+- Desired outcome: ${desiredOutcome || 'not specified'}
+- Past dieting challenges: ${pastDietingChallenges || 'not specified'}
+- Weekly derailers: ${weeklyDerailers || 'not specified'}
+- Plan style preference: ${planPreference}
+- Harder days: ${harderDays}
+- Eating out frequency: ${eatingOutFrequency}
 - Current snacks: ${snackList}
 - Snack motivation: ${snackMotivation}, Preference: ${snackPreference}
 - Late night snacking: ${lateNightSnacking ? 'yes' : 'no'}
@@ -160,7 +172,7 @@ Return ONLY valid JSON matching this exact format:
 
 0.5. MACRO EXPLANATION — Explain why my protein, carbs and fats are set where they are, in plain English, specifically for my goal, lifestyle and recovery.
 
-1. PERSONAL FAT LOSS RULES — 5 rules specific to ME based on everything you know about my lifestyle. Not generic advice. For example, if I drink alcohol, one rule should specifically address managing that. If I snack out of boredom, address that directly.
+1. PERSONAL FAT LOSS RULES — 5 rules specific to ME based on everything you know about my lifestyle. Not generic advice. If I said past plans were too rigid, reflect that. If weekends derail me, address that directly. If I snack out of boredom, address that directly.
 
 2. REALISTIC TIMELINE — Tell me honestly and encouragingly what I can expect following a ${calories} kcal plan. Give rough projections. Be real — no false promises, but keep me motivated.
 
@@ -168,7 +180,7 @@ Return ONLY valid JSON matching this exact format:
 
 4. HYDRATION EXPLANATION — Why staying properly hydrated affects fat loss, hunger, metabolism, gym performance and energy.
 
-5. SNACK SWAPS — For each of my current snacks (${snackList}), suggest a healthier alternative that scratches the same itch — sweet for sweet, crunchy for crunchy. Include calorie counts. Make them exciting, not boring. At least 5 swaps.
+5. SNACK SWAPS — For each of my current snacks (${snackList}), suggest a healthier alternative that scratches the same itch — sweet for sweet, crunchy for crunchy. Include calorie counts. Make them exciting, not boring. At least 5 swaps. If I eat out often or have harder weekends, make some options portable or realistic for that.
 
 6. SUPPLEMENT RECOMMENDATIONS — Recommend only supplements that are genuinely evidence-backed and relevant for THIS person. Prioritise whey protein only if useful, creatine monohydrate, caffeine if strategically relevant, vitamin D when appropriate, omega-3, and magnesium if sleep/recovery suggests it. For each supplement include dose, best timing, why it matters to this person, and a budget-friendly product type suggestion. Do not overprescribe.
 

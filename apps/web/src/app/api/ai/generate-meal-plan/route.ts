@@ -72,6 +72,12 @@ export async function POST(request: Request) {
       snackMotivation = 'hunger',
       snackPreference = 'both',
       lateNightSnacking = false,
+      harderDays = 'weekends',
+      eatingOutFrequency = 'sometimes',
+      planPreference = 'balanced',
+      weeklyDerailers = '',
+      desiredOutcome = '',
+      pastDietingChallenges = '',
       workoutDaysPerWeek = 4,
       activityLevel = 'moderately_active',
       breakfastTime = '08:00',
@@ -91,6 +97,9 @@ export async function POST(request: Request) {
     if (allergies.length > 0) constraints.push(`ALLERGIES (DANGEROUS — MUST AVOID): ${allergies.join(', ')}. Never include these under any circumstances.`)
     if (foodDislikes.length > 0) constraints.push(`Foods this person HATES and would never eat: ${foodDislikes.join(', ')}. Do not include these.`)
     if (favouriteFoods.length > 0) constraints.push(`FAVOURITE meals/dishes/foods: ${favouriteFoods.join(', ')}. Use these as inspiration — build meals that feel like these or include these ingredients.`)
+    if (desiredOutcome) constraints.push(`DESIRED OUTCOME: ${desiredOutcome}. Build the meals so they support this in a realistic, motivating way.`)
+    if (pastDietingChallenges) constraints.push(`PAST PLAN CHALLENGES: ${pastDietingChallenges}. Avoid repeating these mistakes.`)
+    if (weeklyDerailers) constraints.push(`COMMON DERAILERS: ${weeklyDerailers}. Build meals and notes that reduce these friction points.`)
 
     // Build health context
     const healthNotes: string[] = []
@@ -129,6 +138,9 @@ export async function POST(request: Request) {
       snackLines.push(`Snacks mainly out of: ${snackMotivation}`)
       snackLines.push(`Prefers: ${snackPreference === 'both' ? 'sweet AND savoury' : snackPreference} snacks`)
       if (lateNightSnacking) snackLines.push('Tends to snack late at night — plan for a satisfying evening snack to prevent this')
+      snackLines.push(`Harder days to stay on track: ${harderDays}`)
+      snackLines.push(`Eats out/order in: ${eatingOutFrequency}`)
+      snackLines.push(`Plan style preference: ${planPreference}`)
       snackContext = `SNACK PROFILE:\n${snackLines.map(l => '- ' + l).join('\n')}\nFor any snack meals, suggest healthier swaps that scratch the same itch — sweet for sweet, crunchy for crunchy. Make them exciting, not boring.`
     }
 
@@ -164,6 +176,7 @@ YOUR PHILOSOPHY:
 - Include at least 2 meals per week that feel like a treat but are secretly hitting their macros
 - Food should be fun, exciting, and sustainable — not a punishment
 - Protein must be spread across the full day to hit the daily target — never leave large shortfalls
+- The plan must feel realistic for their harder days, eating-out pattern, and preferred level of structure
 
 CLIENT PROFILE:
 - Goal: ${goal || 'maintenance'}${targetWeight ? ` (target: ${targetWeight}kg)` : ''}
@@ -174,6 +187,12 @@ CLIENT PROFILE:
 - Sleep: ${sleepHours ? `${sleepHours}h/night` : 'not specified'} (quality: ${sleepQuality})
 - Stress: ${stressLevel}
 - Food adventurousness: ${foodAdventurousness}/10
+- Harder days: ${harderDays}
+- Eating out frequency: ${eatingOutFrequency}
+- Plan preference: ${planPreference}
+- Desired outcome: ${desiredOutcome || 'not specified'}
+- Past dieting challenges: ${pastDietingChallenges || 'not specified'}
+- Weekly derailers: ${weeklyDerailers || 'not specified'}
 ${dayName ? `\nGenerating plan for **${dayName}** (day ${dayIndex + 1} of 7). Ensure VARIETY — use different protein sources, vegetables, grains, and cooking methods than other days. Rotate between chicken, beef, fish, eggs, legumes, pork, etc. across the week. Give this day a fun theme or title in the day_theme field (e.g. "Mediterranean Monday", "Tex-Mex Tuesday", "Asian Fusion Wednesday").` : ''}
 
 CLIENT SCHEDULE:

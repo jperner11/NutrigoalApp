@@ -65,6 +65,11 @@ export async function POST(request: Request) {
       bench1rm = null,
       deadlift1rm = null,
       ohp1rm = null,
+      desiredOutcome = '',
+      pastDietingChallenges = '',
+      weeklyDerailers = '',
+      planPreference = 'balanced',
+      harderDays = 'weekends',
     } = body
 
     // Map equipment access to available equipment
@@ -155,6 +160,7 @@ YOUR COACHING PHILOSOPHY:
 - You design for the person in front of you, not a template. Beginners get foundational patterns with form cues. Advanced lifters get periodised, challenging programmes.
 - Progressive overload is the backbone of every programme — you build it in systematically.
 - You love well-structured sessions: purposeful warm-ups, smart exercise order, balanced push/pull ratios.
+- Adherence matters. If they struggle with routine, social disruption, or overly rigid plans, bias toward simple, repeatable sessions they can actually complete.
 
 EXPERIENCE LEVEL:
 ${experienceGuide[trainingExperience] || experienceGuide.beginner}
@@ -170,6 +176,11 @@ ATHLETE PROFILE:
 - Preferred workout time: ${workoutTime}
 - Days per week: ${daysPerWeek}
 - Max session duration: ${maxSessionMinutes} minutes (plan exercises to fit within this window including warm-up and rest)
+- Desired outcome: ${desiredOutcome || 'not specified'}
+- Past plan challenges: ${pastDietingChallenges || 'not specified'}
+- Common derailers: ${weeklyDerailers || 'not specified'}
+- Plan preference: ${planPreference}
+- Harder days to stay on track: ${harderDays}
 - Recommended split: ${splitGuide}
 ${strengthContext.length > 0 ? `\nSTRENGTH BENCHMARKS:\n${strengthContext.join('\n')}\nUse these to set appropriate working weights in notes (e.g. "~70% 1RM" or "Start at ${squat1rm ? Math.round(Number(squat1rm) * 0.7) : 60}kg").` : '\nNo 1RM data provided — use conservative weight suggestions based on experience level and bodyweight.'}
 ${injurySection}
