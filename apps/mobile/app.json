@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "mealandmotion",
+    "name": "Meal & Motion",
     "slug": "nutrigoal",
     "version": "1.0.0",
     "entryPoint": "./index.js",
@@ -17,8 +17,8 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.nutrigoal.app",
       "infoPlist": {
-        "NSHealthShareUsageDescription": "mealandmotion reads your health data to sync workouts, steps, weight, and water intake.",
-        "NSHealthUpdateUsageDescription": "mealandmotion writes workout and water data to keep your Health app up to date."
+        "NSHealthShareUsageDescription": "Meal & Motion reads your health data to sync workouts, steps, weight, and water intake.",
+        "NSHealthUpdateUsageDescription": "Meal & Motion writes workout and water data to keep your Health app up to date."
       }
     },
     "android": {

@@ -230,7 +230,7 @@ export default function OnboardingScreen() {
     } else {
       await refreshProfile()
       Alert.alert(
-        'Welcome to mealandmotion',
+        'Welcome to Meal & Motion',
         'Would you like AI to generate a personalized meal plan and training program based on your profile?',
         [
           { text: 'Later', style: 'cancel', onPress: () => router.replace('/(tabs)') },

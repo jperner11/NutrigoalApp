@@ -48,7 +48,7 @@ export default function BrandLogo({
       </div>
       {!compact && (
         <div className="min-w-0">
-          <div className={`brand-wordmark ${light ? 'brand-wordmark-light' : ''}`}>mealandmotion</div>
+          <div className={`brand-wordmark ${light ? 'brand-wordmark-light' : ''}`}>Meal &amp; Motion</div>
           <div className={`brand-tagline ${light ? 'brand-tagline-light' : ''}`}>feel your momentum</div>
         </div>
       )}

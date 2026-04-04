@@ -22,7 +22,7 @@ export function BrandLogo({ compact = false, light = false }: BrandLogoProps) {
       </View>
       {!compact && (
         <View style={styles.copy}>
-          <Text style={[styles.wordmark, { color: wordColor }]}>mealandmotion</Text>
+          <Text style={[styles.wordmark, { color: wordColor }]}>Meal & Motion</Text>
           <Text style={[styles.tagline, { color: tagColor }]}>
             feel your momentum
           </Text>
