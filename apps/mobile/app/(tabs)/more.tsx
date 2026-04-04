@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { BrandLogo } from '../../src/components/BrandLogo'
 import { brandColors, brandShadow } from '../../src/theme/brand'
+import { isManagedClientRole, isTrainerRole } from '@nutrigoal/shared'
 
 interface MenuItem {
   icon: string
@@ -14,7 +15,7 @@ interface MenuItem {
   roles?: string[]
 }
 
-const MENU_ITEMS: MenuItem[] = [
+const CLIENT_MENU_ITEMS: MenuItem[] = [
   { icon: 'water', label: 'Water Tracking', route: '/(tabs)/water', color: brandColors.brand500 },
   { icon: 'sparkles', label: 'AI Generate Plans', route: '/(tabs)/ai-generate', color: brandColors.brand500 },
   { icon: 'sparkles', label: 'AI Suggestions', route: '/(tabs)/ai', color: brandColors.brand400 },
@@ -23,12 +24,19 @@ const MENU_ITEMS: MenuItem[] = [
   { icon: 'settings-sharp', label: 'Settings', route: '/(tabs)/settings', color: brandColors.textMuted },
 ]
 
+const TRAINER_MENU_ITEMS: MenuItem[] = [
+  { icon: 'people', label: 'Client Roster', route: '/(tabs)/clients', color: '#df9a2b' },
+  { icon: 'sparkles', label: 'AI Suggestions', route: '/(tabs)/ai', color: brandColors.brand400 },
+  { icon: 'settings-sharp', label: 'Settings', route: '/(tabs)/settings', color: brandColors.textMuted },
+]
+
 export default function MoreScreen() {
   const router = useRouter()
   const { profile, signOut } = useAuth()
   const userRole = profile?.role ?? 'free'
+  const trainerMode = isTrainerRole(userRole) && !isManagedClientRole(userRole)
 
-  const visibleItems = MENU_ITEMS.filter(
+  const visibleItems = (trainerMode ? TRAINER_MENU_ITEMS : CLIENT_MENU_ITEMS).filter(
     (item) => !item.roles || item.roles.includes(userRole)
   )
 
@@ -37,7 +45,11 @@ export default function MoreScreen() {
       <View style={styles.header}>
         <BrandLogo compact />
         <Text style={styles.title}>More</Text>
-        <Text style={styles.subtitle}>Secondary tools, coaching workflows, and account controls.</Text>
+        <Text style={styles.subtitle}>
+          {trainerMode
+            ? 'Practitioner tools, roster access, and account controls.'
+            : 'Secondary tools, coaching workflows, and account controls.'}
+        </Text>
       </View>
       <View style={styles.content}>
         {visibleItems.map((item) => (

@@ -27,7 +27,8 @@ import StreaksWidget from '@/components/dashboard/StreaksWidget'
 import TodayTrainingPreview from '@/components/dashboard/TodayTrainingPreview'
 import QuickWeightLog from '@/components/dashboard/QuickWeightLog'
 import SupplementWidget from '@/components/dashboard/SupplementWidget'
-import { isTrainerRole } from '@nutrigoal/shared'
+import TrainerDashboard from '@/components/dashboard/TrainerDashboard'
+import { isManagedClientRole, isTrainerRole } from '@nutrigoal/shared'
 
 function getGreeting(): string {
   const hour = new Date().getHours()
@@ -49,6 +50,8 @@ export default function DashboardPage() {
   })
   const [clientCount, setClientCount] = useState(0)
   const [pendingInviteCount, setPendingInviteCount] = useState(0)
+  const [trainerInfo, setTrainerInfo] = useState<{ id: string; full_name: string | null; email: string } | null>(null)
+  const [managedClientPlanState, setManagedClientPlanState] = useState({ hasDietPlan: false, hasTrainingPlan: false })
   const [weeklyStats, setWeeklyStats] = useState({
     avgGoalPct: null as number | null,
     workoutsThisWeek: 0,
@@ -225,6 +228,29 @@ export default function DashboardPage() {
           .eq('status', 'pending')
 
         setPendingInviteCount(pendingCount ?? 0)
+      } else if (isManagedClientRole(profile!.role)) {
+        const trainerId = profile!.personal_trainer_id ?? profile!.nutritionist_id
+        const [{ count: dietCount }, { count: trainingCount }, trainerResponse] = await Promise.all([
+          supabase
+            .from('diet_plans')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', profile!.id)
+            .eq('is_active', true),
+          supabase
+            .from('training_plans')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', profile!.id)
+            .eq('is_active', true),
+          trainerId
+            ? supabase.from('user_profiles').select('id, full_name, email').eq('id', trainerId).single()
+            : Promise.resolve({ data: null }),
+        ])
+
+        setManagedClientPlanState({
+          hasDietPlan: (dietCount ?? 0) > 0,
+          hasTrainingPlan: (trainingCount ?? 0) > 0,
+        })
+        setTrainerInfo(trainerResponse.data ?? null)
       }
     }
 
@@ -232,6 +258,9 @@ export default function DashboardPage() {
   }, [profile])
 
   if (!profile) return null
+  if (isTrainerRole(profile.role)) {
+    return <TrainerDashboard trainerId={profile.id} trainerName={profile.full_name?.split(' ')[0] || profile.email || 'Coach'} />
+  }
 
   const calorieProgress = profile.daily_calories
     ? Math.min((todayStats.caloriesConsumed / profile.daily_calories) * 100, 100)
@@ -279,6 +308,47 @@ export default function DashboardPage() {
           >
             <span>Complete Setup</span>
           </Link>
+        </div>
+      )}
+
+      {isManagedClientRole(profile.role) && (
+        <div className="mb-6 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="panel-strong p-6">
+            <div className="eyebrow mb-3">Trainer connected</div>
+            <h3 className="font-display text-2xl font-bold text-[var(--foreground)]">
+              {trainerInfo?.full_name || 'Your personal trainer'} is managing your plan.
+            </h3>
+            <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
+              Your nutrition and training programme is now coach-managed. Use the app to follow your plans, log progress,
+              and stay in touch when you need support.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <Link href="/my-nutritionist" className="btn-primary rounded-2xl px-5 py-3 text-sm font-semibold">
+                Open My Trainer
+              </Link>
+              <Link href="/diet" className="btn-secondary rounded-2xl px-5 py-3 text-sm font-semibold">
+                View plans
+              </Link>
+            </div>
+          </div>
+
+          <div className="panel-strong p-6">
+            <h3 className="font-display text-2xl font-bold text-[var(--foreground)]">Plan status</h3>
+            <div className="mt-5 space-y-3">
+              <div className="rounded-2xl border border-[var(--line)] bg-white/72 px-4 py-4">
+                <div className="text-sm font-semibold text-[var(--foreground)]">Diet plan</div>
+                <div className="mt-1 text-sm text-[var(--muted)]">
+                  {managedClientPlanState.hasDietPlan ? 'Assigned and ready to follow.' : 'Your trainer has not assigned this yet.'}
+                </div>
+              </div>
+              <div className="rounded-2xl border border-[var(--line)] bg-white/72 px-4 py-4">
+                <div className="text-sm font-semibold text-[var(--foreground)]">Training plan</div>
+                <div className="mt-1 text-sm text-[var(--muted)]">
+                  {managedClientPlanState.hasTrainingPlan ? 'Assigned and ready to follow.' : 'Waiting for your trainer to publish your programme.'}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

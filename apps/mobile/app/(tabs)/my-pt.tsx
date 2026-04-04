@@ -22,6 +22,8 @@ export default function MyPTScreen() {
   const [loading, setLoading] = useState(true)
   const [unreadCount, setUnreadCount] = useState(0)
   const [pendingFeedbackCount, setPendingFeedbackCount] = useState(0)
+  const [hasDietPlan, setHasDietPlan] = useState(false)
+  const [hasTrainingPlan, setHasTrainingPlan] = useState(false)
 
   const loadData = useCallback(async () => {
     if (!user) return
@@ -71,6 +73,14 @@ export default function MyPTScreen() {
       setPendingFeedbackCount(fb.filter(f => f.status === 'pending').length)
     }
 
+    const [{ count: dietCount }, { count: trainingCount }] = await Promise.all([
+      supabase.from('diet_plans').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_active', true),
+      supabase.from('training_plans').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_active', true),
+    ])
+
+    setHasDietPlan((dietCount || 0) > 0)
+    setHasTrainingPlan((trainingCount || 0) > 0)
+
     setLoading(false)
   }, [user])
 
@@ -119,6 +129,17 @@ export default function MyPTScreen() {
           </View>
           <Text style={s.ptName}>{ptName}</Text>
           <Text style={s.ptLabel}>Your personal trainer</Text>
+        </View>
+
+        <View style={s.planStatusRow}>
+          <View style={s.planStatusCard}>
+            <Text style={s.planStatusLabel}>Diet plan</Text>
+            <Text style={s.planStatusValue}>{hasDietPlan ? 'Assigned and live' : 'Waiting for assignment'}</Text>
+          </View>
+          <View style={s.planStatusCard}>
+            <Text style={s.planStatusLabel}>Training plan</Text>
+            <Text style={s.planStatusValue}>{hasTrainingPlan ? 'Assigned and live' : 'Programme coming soon'}</Text>
+          </View>
         </View>
 
         {/* Action Cards */}
@@ -378,6 +399,10 @@ const s = StyleSheet.create({
   ptAvatarText: { fontSize: 28, fontWeight: '700', color: brandColors.brand500 },
   ptName: { fontSize: 22, fontWeight: '800', color: brandColors.foreground },
   ptLabel: { fontSize: 13, color: brandColors.textSubtle, marginTop: 4 },
+  planStatusRow: { flexDirection: 'row', gap: 12, marginBottom: 20 },
+  planStatusCard: { flex: 1, backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, ...brandShadow },
+  planStatusLabel: { fontSize: 12, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, color: brandColors.textSubtle },
+  planStatusValue: { fontSize: 14, fontWeight: '600', color: brandColors.foregroundSoft, marginTop: 8, lineHeight: 20 },
   // Action cards
   actionCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 10, ...brandShadow },
   actionIcon: { width: 48, height: 48, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },

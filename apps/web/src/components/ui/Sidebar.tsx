@@ -29,7 +29,7 @@ import type { GatedFeature } from '@/lib/tierUtils'
 import { isFeatureLocked } from '@/lib/tierUtils'
 import ProBadge from './ProBadge'
 import BrandLogo from '@/components/brand/BrandLogo'
-import { getRolePlanLabel } from '@nutrigoal/shared'
+import { getRolePlanLabel, isManagedClientRole, isTrainerRole } from '@nutrigoal/shared'
 
 interface SidebarProps {
   userRole: UserRole
@@ -37,27 +37,35 @@ interface SidebarProps {
   onSignOut: () => void
 }
 
-const navItems: {
+const clientNavItems: {
   href: string
   label: string
   icon: React.ComponentType<{ className?: string }>
   roles: string[]
   gatedFeature?: GatedFeature
 }[] = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['free', 'pro', 'unlimited', 'nutritionist', 'nutritionist_client', 'personal_trainer', 'personal_trainer_client'] },
-  { href: '/diet', label: 'Diet', icon: Utensils, roles: ['free', 'pro', 'unlimited', 'nutritionist', 'nutritionist_client', 'personal_trainer', 'personal_trainer_client'] },
-  { href: '/training', label: 'Training', icon: Dumbbell, roles: ['free', 'pro', 'unlimited', 'nutritionist', 'nutritionist_client', 'personal_trainer', 'personal_trainer_client'] },
-  { href: '/cardio', label: 'Cardio', icon: HeartPulse, roles: ['free', 'pro', 'unlimited', 'nutritionist', 'nutritionist_client', 'personal_trainer', 'personal_trainer_client'], gatedFeature: 'cardio' },
-  { href: '/water', label: 'Water', icon: Droplets, roles: ['free', 'pro', 'unlimited', 'nutritionist', 'nutritionist_client', 'personal_trainer', 'personal_trainer_client'] },
-  { href: '/progress', label: 'Progress', icon: TrendingUp, roles: ['free', 'pro', 'unlimited', 'nutritionist', 'nutritionist_client', 'personal_trainer', 'personal_trainer_client'] },
-  { href: '/supplements', label: 'Supplements', icon: Pill, roles: ['free', 'pro', 'unlimited', 'nutritionist', 'nutritionist_client', 'personal_trainer', 'personal_trainer_client'], gatedFeature: 'supplements' },
-  { href: '/grocery', label: 'Grocery List', icon: ShoppingCart, roles: ['pro', 'unlimited', 'nutritionist', 'nutritionist_client', 'personal_trainer', 'personal_trainer_client'] },
-  { href: '/reports', label: 'Reports', icon: BarChart3, roles: ['pro', 'unlimited', 'nutritionist', 'nutritionist_client', 'personal_trainer', 'personal_trainer_client'] },
-  { href: '/ai/coaching', label: 'AI Coaching', icon: Brain, roles: ['free', 'pro', 'unlimited', 'nutritionist', 'personal_trainer'] },
-  { href: '/ai/suggest', label: 'AI Suggestions', icon: Sparkles, roles: ['free', 'pro', 'unlimited', 'nutritionist', 'personal_trainer'], gatedFeature: 'ai_suggestions' },
-  { href: '/clients', label: 'Clients', icon: Users, roles: ['nutritionist', 'personal_trainer'] },
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['free', 'pro', 'unlimited', 'nutritionist_client', 'personal_trainer_client'] },
+  { href: '/diet', label: 'Diet', icon: Utensils, roles: ['free', 'pro', 'unlimited', 'nutritionist_client', 'personal_trainer_client'] },
+  { href: '/training', label: 'Training', icon: Dumbbell, roles: ['free', 'pro', 'unlimited', 'nutritionist_client', 'personal_trainer_client'] },
+  { href: '/cardio', label: 'Cardio', icon: HeartPulse, roles: ['free', 'pro', 'unlimited', 'nutritionist_client', 'personal_trainer_client'], gatedFeature: 'cardio' },
+  { href: '/water', label: 'Water', icon: Droplets, roles: ['free', 'pro', 'unlimited', 'nutritionist_client', 'personal_trainer_client'] },
+  { href: '/progress', label: 'Progress', icon: TrendingUp, roles: ['free', 'pro', 'unlimited', 'nutritionist_client', 'personal_trainer_client'] },
+  { href: '/supplements', label: 'Supplements', icon: Pill, roles: ['free', 'pro', 'unlimited', 'nutritionist_client', 'personal_trainer_client'], gatedFeature: 'supplements' },
+  { href: '/grocery', label: 'Grocery List', icon: ShoppingCart, roles: ['pro', 'unlimited', 'nutritionist_client', 'personal_trainer_client'] },
+  { href: '/reports', label: 'Reports', icon: BarChart3, roles: ['pro', 'unlimited', 'nutritionist_client', 'personal_trainer_client'] },
+  { href: '/ai/coaching', label: 'AI Coaching', icon: Brain, roles: ['free', 'pro', 'unlimited'] },
+  { href: '/ai/suggest', label: 'AI Suggestions', icon: Sparkles, roles: ['free', 'pro', 'unlimited'], gatedFeature: 'ai_suggestions' },
   { href: '/my-nutritionist', label: 'My Trainer', icon: UserCheck, roles: ['nutritionist_client', 'personal_trainer_client'] },
-  { href: '/settings', label: 'Settings', icon: Settings, roles: ['free', 'pro', 'unlimited', 'nutritionist', 'nutritionist_client', 'personal_trainer', 'personal_trainer_client'] },
+  { href: '/settings', label: 'Settings', icon: Settings, roles: ['free', 'pro', 'unlimited', 'nutritionist_client', 'personal_trainer_client'] },
+]
+
+const trainerNavItems: typeof clientNavItems = [
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['nutritionist', 'personal_trainer'] },
+  { href: '/clients', label: 'Clients', icon: Users, roles: ['nutritionist', 'personal_trainer'] },
+  { href: '/reports', label: 'Reports', icon: BarChart3, roles: ['nutritionist', 'personal_trainer'] },
+  { href: '/ai/coaching', label: 'AI Coaching', icon: Brain, roles: ['nutritionist', 'personal_trainer'] },
+  { href: '/ai/suggest', label: 'AI Suggestions', icon: Sparkles, roles: ['nutritionist', 'personal_trainer'], gatedFeature: 'ai_suggestions' },
+  { href: '/settings', label: 'Settings', icon: Settings, roles: ['nutritionist', 'personal_trainer'] },
 ]
 
 export default function Sidebar({ userRole, userName, onSignOut }: SidebarProps) {
@@ -70,6 +78,7 @@ export default function Sidebar({ userRole, userName, onSignOut }: SidebarProps)
     setMobileOpen(false)
   }, [pathname])
 
+  const navItems = isTrainerRole(userRole) && !isManagedClientRole(userRole) ? trainerNavItems : clientNavItems
   const filteredItems = navItems.filter(item => item.roles.includes(userRole))
 
   const sidebarContent = (

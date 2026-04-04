@@ -15,6 +15,7 @@ import type {
   TrainingPlan, Exercise, BodyPart, Equipment,
   TrainingPlanDay, TrainingPlanExercise, WorkoutSetLog, WorkoutExerciseLog,
 } from '@nutrigoal/shared'
+import { isManagedClientRole } from '@nutrigoal/shared'
 import { brandColors, brandShadow } from '../../src/theme/brand'
 
 // ─── Types ──────────────────────────────────────────────
@@ -47,6 +48,7 @@ type Screen = 'list' | 'create' | 'detail' | 'session'
 
 export default function TrainingScreen() {
   const { user, profile } = useAuth()
+  const managedClient = isManagedClientRole(profile?.role)
   const [screen, setScreen] = useState<Screen>('list')
   const [plans, setPlans] = useState<TrainingPlan[]>([])
   const [refreshing, setRefreshing] = useState(false)
@@ -62,7 +64,7 @@ export default function TrainingScreen() {
   useEffect(() => { fetchPlans() }, [user])
   const onRefresh = async () => { setRefreshing(true); await fetchPlans(); setRefreshing(false) }
 
-  if (screen === 'create') return <CreatePlan user={user} profile={profile} onDone={() => { setScreen('list'); fetchPlans() }} onCancel={() => setScreen('list')} />
+  if (screen === 'create' && !managedClient) return <CreatePlan user={user} profile={profile} onDone={() => { setScreen('list'); fetchPlans() }} onCancel={() => setScreen('list')} />
   if (screen === 'detail' && selectedPlanId) return <PlanDetail planId={selectedPlanId} user={user} onBack={() => { setScreen('list'); fetchPlans() }} onStartSession={(dayId: string) => { setSessionDayId(dayId); setScreen('session') }} />
   if (screen === 'session' && sessionDayId) return <WorkoutSession dayId={sessionDayId} user={user} profile={profile} onDone={() => { setScreen('list'); fetchPlans() }} />
 
@@ -70,16 +72,22 @@ export default function TrainingScreen() {
     <SafeAreaView style={s.container}>
       <View style={s.header}>
         <Text style={s.title}>Training Plans</Text>
-        <TouchableOpacity style={s.addBtn} onPress={() => setScreen('create')}>
-          <Ionicons name="add" size={24} color="#fff" />
-        </TouchableOpacity>
+        {!managedClient && (
+          <TouchableOpacity style={s.addBtn} onPress={() => setScreen('create')}>
+            <Ionicons name="add" size={24} color="#fff" />
+          </TouchableOpacity>
+        )}
       </View>
       <ScrollView contentContainerStyle={s.content} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={brandColors.brand500} />}>
         {plans.length === 0 ? (
           <View style={s.empty}>
             <Ionicons name="barbell-outline" size={48} color="#d1d5db" />
-            <Text style={s.emptyText}>No training plans yet</Text>
-            <TouchableOpacity onPress={() => setScreen('create')}><Text style={s.emptyLink}>Create your first plan</Text></TouchableOpacity>
+            <Text style={s.emptyText}>{managedClient ? 'No training plan assigned yet' : 'No training plans yet'}</Text>
+            {managedClient ? (
+              <Text style={s.emptyHint}>Your trainer will assign your workouts here when your programme is ready.</Text>
+            ) : (
+              <TouchableOpacity onPress={() => setScreen('create')}><Text style={s.emptyLink}>Create your first plan</Text></TouchableOpacity>
+            )}
           </View>
         ) : plans.map((p) => (
           <TouchableOpacity key={p.id} style={s.card} onPress={() => { setSelectedPlanId(p.id); setScreen('detail') }}>
@@ -613,6 +621,7 @@ const s = StyleSheet.create({
   content: { padding: 20, paddingTop: 0 },
   empty: { alignItems: 'center', paddingTop: 80, gap: 8 },
   emptyText: { fontSize: 18, fontWeight: '600', color: brandColors.textMuted },
+  emptyHint: { fontSize: 14, color: brandColors.textSubtle, textAlign: 'center', maxWidth: 280, lineHeight: 20 },
   emptyLink: { fontSize: 15, fontWeight: '600', color: brandColors.brand500, marginTop: 4 },
   card: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 10, ...brandShadow },
   cardRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },

@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import type { DietPlan } from '@/lib/supabase/types'
+import { isManagedClientRole } from '@nutrigoal/shared'
 
 interface CompanionContent {
   personal_rules: string[]
@@ -57,6 +58,7 @@ export default function DietPage() {
 
   const activePlan = plans.find(p => p.is_active)
   const companion = activePlan ? parseCompanionContent(activePlan.notes) : null
+  const managedClient = isManagedClientRole(profile?.role)
 
   return (
     <div>
@@ -65,27 +67,35 @@ export default function DietPage() {
           <h1 className="text-3xl font-bold text-gray-900">Diet Plans</h1>
           <p className="text-gray-900 mt-1">Manage your meal plans and track your nutrition.</p>
         </div>
-        <Link
-          href="/diet/new"
-          className="flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all"
-        >
-          <Plus className="h-4 w-4" />
-          <span>New Plan</span>
-        </Link>
+        {!managedClient && (
+          <Link
+            href="/diet/new"
+            className="flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all"
+          >
+            <Plus className="h-4 w-4" />
+            <span>New Plan</span>
+          </Link>
+        )}
       </div>
 
       {plans.length === 0 ? (
         <div className="card p-12 text-center">
           <Utensils className="h-16 w-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">No diet plans yet</h3>
-          <p className="text-gray-500 mb-6">Create your first diet plan to start tracking your nutrition.</p>
-          <Link
-            href="/diet/new"
-            className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:shadow-lg transition-all"
-          >
-            <Plus className="h-5 w-5" />
-            <span>Create Diet Plan</span>
-          </Link>
+          <p className="text-gray-500 mb-6">
+            {managedClient
+              ? 'Your trainer has not assigned a diet plan yet. It will appear here as soon as it is ready.'
+              : 'Create your first diet plan to start tracking your nutrition.'}
+          </p>
+          {!managedClient && (
+            <Link
+              href="/diet/new"
+              className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:shadow-lg transition-all"
+            >
+              <Plus className="h-5 w-5" />
+              <span>Create Diet Plan</span>
+            </Link>
+          )}
         </div>
       ) : (
         <>

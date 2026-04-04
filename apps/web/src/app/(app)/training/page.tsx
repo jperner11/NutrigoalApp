@@ -8,6 +8,7 @@ import { Dumbbell, Plus, Calendar, Clock, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 import type { TrainingPlan } from '@/lib/supabase/types'
 import ProgressCheckIn from '@/components/training/ProgressCheckIn'
+import { isManagedClientRole } from '@nutrigoal/shared'
 
 interface PlanWithMeta extends TrainingPlan {
   dayCount: number
@@ -93,6 +94,8 @@ export default function TrainingPage() {
     )
   }
 
+  const managedClient = isManagedClientRole(profile?.role)
+
   return (
     <div className="min-h-screen">
       {/* Subtle background gradient */}
@@ -103,13 +106,15 @@ export default function TrainingPage() {
           <h1 className="text-3xl font-bold text-gray-900">Training Plans</h1>
           <p className="text-gray-800 mt-1">Build and manage your workout routines.</p>
         </div>
-        <Link
-          href="/training/new"
-          className="flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-200"
-        >
-          <Plus className="h-4 w-4" />
-          <span>New Plan</span>
-        </Link>
+        {!managedClient && (
+          <Link
+            href="/training/new"
+            className="flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-200"
+          >
+            <Plus className="h-4 w-4" />
+            <span>New Plan</span>
+          </Link>
+        )}
       </div>
 
       {profile && (
@@ -126,15 +131,19 @@ export default function TrainingPage() {
           </div>
           <h3 className="text-xl font-semibold text-gray-900 mb-2">Ready to build your first workout?</h3>
           <p className="text-gray-500 mb-8 max-w-sm mx-auto">
-            Create a training plan to organize your exercises, track progress, and crush your fitness goals.
+            {managedClient
+              ? 'Your trainer has not assigned a training plan yet. It will show up here as soon as your programme is ready.'
+              : 'Create a training plan to organize your exercises, track progress, and crush your fitness goals.'}
           </p>
-          <Link
-            href="/training/new"
-            className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-200"
-          >
-            <Sparkles className="h-5 w-5" />
-            <span>Create Your First Plan</span>
-          </Link>
+          {!managedClient && (
+            <Link
+              href="/training/new"
+              className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-200"
+            >
+              <Sparkles className="h-5 w-5" />
+              <span>Create Your First Plan</span>
+            </Link>
+          )}
         </div>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

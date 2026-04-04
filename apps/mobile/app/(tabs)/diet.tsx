@@ -13,6 +13,7 @@ import {
 import type {
   DietPlan, DietPlanMeal, FoodItem, MealType, UserSupplement, SupplementFrequency, SupplementTime,
 } from '@nutrigoal/shared'
+import { isManagedClientRole } from '@nutrigoal/shared'
 import { brandColors, brandShadow } from '../../src/theme/brand'
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || ''
@@ -27,6 +28,7 @@ type Screen = 'list' | 'create' | 'log' | 'supplements' | 'detail'
 
 export default function DietScreen() {
   const { user, profile } = useAuth()
+  const managedClient = isManagedClientRole(profile?.role)
   const [screen, setScreen] = useState<Screen>('list')
   const [plans, setPlans] = useState<DietPlan[]>([])
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null)
@@ -66,7 +68,7 @@ export default function DietScreen() {
   useEffect(() => { fetchPlans(); fetchSupplements() }, [user])
   const onRefresh = async () => { setRefreshing(true); await Promise.all([fetchPlans(), fetchSupplements()]); setRefreshing(false) }
 
-  if (screen === 'create') return <CreateDietPlan user={user} profile={profile} onDone={() => { setScreen('list'); fetchPlans() }} onCancel={() => setScreen('list')} />
+  if (screen === 'create' && !managedClient) return <CreateDietPlan user={user} profile={profile} onDone={() => { setScreen('list'); fetchPlans() }} onCancel={() => setScreen('list')} />
   if (screen === 'log') return <LogMeal user={user} onDone={() => { setScreen('list') }} onCancel={() => setScreen('list')} />
   if (screen === 'supplements') return <ManageSupplements user={user} onDone={() => { setScreen('list'); fetchSupplements() }} onCancel={() => setScreen('list')} />
   if (screen === 'detail' && selectedPlanId) return <DietPlanDetail planId={selectedPlanId} user={user} onBack={() => { setScreen('list'); fetchPlans() }} />
@@ -80,17 +82,23 @@ export default function DietScreen() {
             <Ionicons name="add-circle-outline" size={18} color={brandColors.brand500} />
             <Text style={s.logBtnText}>Log Meal</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={s.addBtn} onPress={() => setScreen('create')}>
-            <Ionicons name="add" size={24} color="#fff" />
-          </TouchableOpacity>
+          {!managedClient && (
+            <TouchableOpacity style={s.addBtn} onPress={() => setScreen('create')}>
+              <Ionicons name="add" size={24} color="#fff" />
+            </TouchableOpacity>
+          )}
         </View>
       </View>
       <ScrollView contentContainerStyle={s.content} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={brandColors.brand500} />}>
         {plans.length === 0 ? (
           <View style={s.empty}>
             <Ionicons name="restaurant-outline" size={48} color="#d1d5db" />
-            <Text style={s.emptyText}>No diet plans yet</Text>
-            <TouchableOpacity onPress={() => setScreen('create')}><Text style={s.emptyLink}>Create your first plan</Text></TouchableOpacity>
+            <Text style={s.emptyText}>{managedClient ? 'No diet plan assigned yet' : 'No diet plans yet'}</Text>
+            {managedClient ? (
+              <Text style={s.emptyHint}>Your trainer will assign a meal plan here once it&apos;s ready.</Text>
+            ) : (
+              <TouchableOpacity onPress={() => setScreen('create')}><Text style={s.emptyLink}>Create your first plan</Text></TouchableOpacity>
+            )}
           </View>
         ) : plans.map((plan) => (
           <TouchableOpacity key={plan.id} style={s.card} onPress={() => { setSelectedPlanId(plan.id); setScreen('detail') }}>
@@ -786,6 +794,7 @@ const s = StyleSheet.create({
   content: { padding: 20, paddingTop: 0 },
   empty: { alignItems: 'center', paddingTop: 80, gap: 8 },
   emptyText: { fontSize: 18, fontWeight: '600', color: brandColors.textMuted },
+  emptyHint: { fontSize: 14, color: brandColors.textSubtle, textAlign: 'center', maxWidth: 280, lineHeight: 20 },
   emptyLink: { fontSize: 15, fontWeight: '600', color: brandColors.brand500, marginTop: 4 },
   card: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 10, ...brandShadow },
   cardRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },

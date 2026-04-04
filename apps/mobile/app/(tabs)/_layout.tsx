@@ -2,6 +2,7 @@ import { Tabs } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { brandColors } from '../../src/theme/brand'
+import { isTrainerRole, isManagedClientRole } from '@nutrigoal/shared'
 
 type TabIconName = React.ComponentProps<typeof Ionicons>['name']
 
@@ -13,11 +14,17 @@ interface TabConfig {
   roles?: string[]
 }
 
-const TABS: TabConfig[] = [
+const CLIENT_TABS: TabConfig[] = [
   { name: 'index', title: 'Dashboard', icon: 'home-outline', iconFocused: 'home' },
   { name: 'diet', title: 'Diet', icon: 'restaurant-outline', iconFocused: 'restaurant' },
   { name: 'training', title: 'Training', icon: 'barbell-outline', iconFocused: 'barbell' },
   { name: 'cardio', title: 'Cardio', icon: 'heart-outline', iconFocused: 'heart' },
+  { name: 'more', title: 'More', icon: 'ellipsis-horizontal', iconFocused: 'ellipsis-horizontal' },
+]
+
+const TRAINER_TABS: TabConfig[] = [
+  { name: 'index', title: 'Home', icon: 'home-outline', iconFocused: 'home' },
+  { name: 'clients', title: 'Clients', icon: 'people-outline', iconFocused: 'people' },
   { name: 'more', title: 'More', icon: 'ellipsis-horizontal', iconFocused: 'ellipsis-horizontal' },
 ]
 
@@ -27,6 +34,8 @@ const HIDDEN_TABS = ['onboarding', 'water', 'ai', 'ai-generate', 'clients', 'my-
 export default function TabLayout() {
   const { profile } = useAuth()
   const userRole = profile?.role ?? 'free'
+  const isTrainer = isTrainerRole(userRole) && !isManagedClientRole(userRole)
+  const tabs = isTrainer ? TRAINER_TABS : CLIENT_TABS
 
   return (
     <Tabs
@@ -51,7 +60,7 @@ export default function TabLayout() {
         },
       }}
     >
-      {TABS.map((tab) => {
+      {tabs.map((tab) => {
         const hidden = tab.roles && !tab.roles.includes(userRole)
         return (
           <Tabs.Screen
