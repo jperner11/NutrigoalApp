@@ -410,14 +410,20 @@ export default function GeneratePlansPage() {
     }
   }
 
-  interface CompanionContent {
-    personal_rules: string[]
-    timeline: string
-    hydration_tips: string[]
-    hydration_explanation: string
-    snack_swaps: { current: string; swap: string; calories: number; why: string }[]
-    supplement_note: string
-  }
+interface CompanionContent {
+  nutritionist_summary?: string
+  calorie_warning?: string
+  calorie_calculation?: string
+  macro_explanation?: string
+  personal_rules: string[]
+  timeline: string
+  hydration_target_litres?: string
+  hydration_tips: string[]
+  hydration_explanation: string
+  snack_swaps: { current: string; swap: string; calories: number; why: string }[]
+  supplement_recommendations?: { name: string; dose: string; timing: string; why: string; budget_option: string }[]
+  supplement_note: string
+}
 
   async function generateCompanionContent(): Promise<CompanionContent> {
     const res = await fetch('/api/ai/meal-plan-companion', {
@@ -447,6 +453,13 @@ export default function GeneratePlansPage() {
         lateNightSnacking: profile!.late_night_snacking ?? false,
         targetWeight: profile!.target_weight_kg ?? null,
         dailyWaterMl: profile!.daily_water_ml ?? 2500,
+        goalTimeline: profile!.goal_timeline ?? 'steady',
+        favouriteFoods: profile!.favourite_foods ?? [],
+        foodDislikes: profile!.food_dislikes ?? [],
+        dietaryRestrictions: profile!.dietary_restrictions ?? [],
+        cookingSkill: profile!.cooking_skill ?? 'intermediate',
+        mealPrepPreference: profile!.meal_prep_preference ?? 'daily',
+        motivation: profile!.motivation ?? [],
       }),
     })
 

@@ -24,6 +24,21 @@ interface MealEntry {
   foods: FoodItem[]
 }
 
+interface CompanionContent {
+  nutritionist_summary?: string
+  calorie_warning?: string
+  calorie_calculation?: string
+  macro_explanation?: string
+  personal_rules?: string[]
+  timeline?: string
+  hydration_target_litres?: string
+  hydration_tips?: string[]
+  hydration_explanation?: string
+  snack_swaps?: { current: string; swap: string; calories: number; why: string }[]
+  supplement_recommendations?: { name: string; dose: string; timing: string; why: string; budget_option: string }[]
+  supplement_note?: string
+}
+
 type Screen = 'list' | 'create' | 'log' | 'supplements' | 'detail'
 
 export default function DietScreen() {
@@ -218,6 +233,16 @@ function DietPlanDetail({ planId, user, onBack }: { planId: string; user: { id: 
     return <SafeAreaView style={s.container}><ActivityIndicator style={{ marginTop: 40 }} /></SafeAreaView>
   }
 
+  let companion: CompanionContent | null = null
+  if (plan?.notes) {
+    try {
+      const parsed = JSON.parse(plan.notes)
+      if (parsed && typeof parsed === 'object') companion = parsed as CompanionContent
+    } catch {
+      companion = null
+    }
+  }
+
   return (
     <SafeAreaView style={s.container}>
       <View style={s.modalHeader}>
@@ -232,6 +257,57 @@ function DietPlanDetail({ planId, user, onBack }: { planId: string; user: { id: 
             {loggedMealIds.size}/{meals.length} completed
           </Text>
         </View>
+
+        {companion && (
+          <View style={s.coachCard}>
+            <Text style={s.coachTitle}>Nutritionist insights</Text>
+            {companion.nutritionist_summary ? <Text style={s.coachBody}>{companion.nutritionist_summary}</Text> : null}
+            {companion.calorie_warning ? <Text style={s.coachWarning}>{companion.calorie_warning}</Text> : null}
+            {companion.calorie_calculation ? (
+              <>
+                <Text style={s.coachSection}>How your calories were set</Text>
+                <Text style={s.coachBody}>{companion.calorie_calculation}</Text>
+              </>
+            ) : null}
+            {companion.macro_explanation ? (
+              <>
+                <Text style={s.coachSection}>Why your macros look like this</Text>
+                <Text style={s.coachBody}>{companion.macro_explanation}</Text>
+              </>
+            ) : null}
+            {companion.personal_rules?.length ? (
+              <>
+                <Text style={s.coachSection}>Your personal rules</Text>
+                {companion.personal_rules.map((rule, index) => (
+                  <Text key={`${rule}-${index}`} style={s.ruleItem}>{index + 1}. {rule}</Text>
+                ))}
+              </>
+            ) : null}
+            {companion.hydration_tips?.length ? (
+              <>
+                <Text style={s.coachSection}>
+                  Hydration{companion.hydration_target_litres ? ` · ${companion.hydration_target_litres}L target` : ''}
+                </Text>
+                {companion.hydration_tips.map((tip, index) => (
+                  <Text key={`${tip}-${index}`} style={s.ruleItem}>{index + 1}. {tip}</Text>
+                ))}
+              </>
+            ) : null}
+            {companion.supplement_recommendations?.length ? (
+              <>
+                <Text style={s.coachSection}>Supplement suggestions</Text>
+                {companion.supplement_recommendations.map((supplement, index) => (
+                  <View key={`${supplement.name}-${index}`} style={s.supplementInsightCard}>
+                    <Text style={s.supplementInsightName}>{supplement.name}</Text>
+                    <Text style={s.supplementInsightMeta}>{supplement.dose} · {supplement.timing}</Text>
+                    <Text style={s.supplementInsightBody}>{supplement.why}</Text>
+                    <Text style={s.supplementInsightBudget}>Budget option: {supplement.budget_option}</Text>
+                  </View>
+                ))}
+              </>
+            ) : null}
+          </View>
+        )}
 
         {meals.map((meal) => {
           const isLogged = loggedMealIds.has(meal.id)
@@ -858,6 +934,17 @@ const s = StyleSheet.create({
   planSummaryCard: { backgroundColor: brandColors.brand100, borderRadius: 18, borderWidth: 1, borderColor: 'rgba(77, 196, 255, 0.2)', padding: 16, marginBottom: 14 },
   planSummaryTitle: { fontSize: 16, fontWeight: '700', color: '#0f4262' },
   planSummaryText: { fontSize: 13, color: brandColors.textMuted, marginTop: 4 },
+  coachCard: { backgroundColor: 'rgba(255,255,255,0.94)', borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 14, ...brandShadow },
+  coachTitle: { fontSize: 17, fontWeight: '800', color: brandColors.foregroundSoft, marginBottom: 8 },
+  coachSection: { fontSize: 14, fontWeight: '700', color: brandColors.foregroundSoft, marginTop: 14, marginBottom: 6 },
+  coachBody: { fontSize: 13, lineHeight: 21, color: brandColors.textMuted },
+  coachWarning: { fontSize: 13, lineHeight: 20, color: '#9a6700', backgroundColor: '#fff7ed', borderWidth: 1, borderColor: '#fed7aa', borderRadius: 12, padding: 12, marginTop: 8 },
+  ruleItem: { fontSize: 13, lineHeight: 21, color: brandColors.textMuted, marginTop: 6 },
+  supplementInsightCard: { marginTop: 8, borderWidth: 1, borderColor: '#fde68a', backgroundColor: '#fffbeb', borderRadius: 14, padding: 12 },
+  supplementInsightName: { fontSize: 14, fontWeight: '700', color: brandColors.foregroundSoft },
+  supplementInsightMeta: { fontSize: 12, fontWeight: '600', color: '#b45309', marginTop: 2 },
+  supplementInsightBody: { fontSize: 13, lineHeight: 20, color: brandColors.textMuted, marginTop: 8 },
+  supplementInsightBudget: { fontSize: 12, color: brandColors.textSubtle, marginTop: 8 },
   mealTrackCard: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 12, ...brandShadow },
   mealTrackCardDone: { borderColor: 'rgba(31, 157, 115, 0.24)', backgroundColor: '#f4fcf8' },
   mealTrackHeader: { flexDirection: 'row', alignItems: 'center', gap: 10 },

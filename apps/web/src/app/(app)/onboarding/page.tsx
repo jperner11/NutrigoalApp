@@ -20,7 +20,7 @@ import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'react-hot-toast'
 
-const STEPS = ['My Stats', 'Lifestyle', 'Food Preferences', 'Snack Habits', 'Health', 'Training', 'Schedule', 'Review']
+const STEPS = ['My Stats', 'Lifestyle', 'Food Preferences', 'Snack Habits', 'Health', 'Training', 'Goals', 'Schedule', 'Review']
 const TIME_OPTIONS = Array.from({ length: 48 }, (_, i) => {
   const h = Math.floor(i / 2).toString().padStart(2, '0')
   const m = i % 2 === 0 ? '00' : '30'
@@ -248,7 +248,7 @@ export default function OnboardingPage() {
             <StepHeader
               icon={<User className="h-12 w-12 text-purple-600" />}
               title="Let's Get to Know You"
-              subtitle="Your stats help us calculate your personalized nutrition targets"
+              subtitle="Your stats give us the baseline for calories, macros, hydration, and realistic rate of progress."
             />
             <div className="flex items-center gap-2 bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-3 -mt-2">
               <span className="text-indigo-600 text-sm font-medium">This questionnaire takes about 5–10 minutes and helps us build plans tailored specifically to you.</span>
@@ -317,6 +317,7 @@ export default function OnboardingPage() {
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <Label>Goal weight (optional)</Label>
+                <p className="text-sm text-gray-500 mb-2">Leave this blank if you care more about how you want to look, feel, or perform than a specific number on the scale.</p>
                 <input type="number" value={targetWeight} onChange={(e) => setTargetWeight(e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                   placeholder="kg — or leave blank if you're not sure" />
@@ -347,7 +348,7 @@ export default function OnboardingPage() {
             <StepHeader
               icon={<Briefcase className="h-12 w-12 text-indigo-500" />}
               title="Your Lifestyle"
-              subtitle="This helps us set accurate calorie targets based on your real daily activity"
+              subtitle="This helps us set calorie targets based on your real life, not a generic online calculator."
             />
             <div>
               <Label>What&apos;s your job like?</Label>
@@ -433,7 +434,7 @@ export default function OnboardingPage() {
             <StepHeader
               icon={<Utensils className="h-12 w-12 text-orange-500" />}
               title="Your Food Preferences"
-              subtitle="Tell us what you love eating — we'll build your plan around it"
+              subtitle="Tell us what you genuinely enjoy eating so the plan feels like it was built by a real nutritionist, not a template."
             />
             <div>
               <Label>Top 5 favourite meals or dishes (any cuisine)</Label>
@@ -513,7 +514,7 @@ export default function OnboardingPage() {
             <StepHeader
               icon={<Cookie className="h-12 w-12 text-amber-500" />}
               title="Your Snack Habits"
-              subtitle="No judgment here — understanding your snack patterns helps us build smarter swaps"
+              subtitle="No judgment here. Understanding your snack pattern helps us build smarter swaps and a more realistic cut."
             />
             <div>
               <Label>What snacks do you currently reach for?</Label>
@@ -570,7 +571,7 @@ export default function OnboardingPage() {
             <StepHeader
               icon={<Heart className="h-12 w-12 text-red-500" />}
               title="Health & Medical"
-              subtitle="This helps us avoid exercises and foods that could cause issues"
+              subtitle="This helps us avoid exercises, nutrition choices, or recovery recommendations that could cause problems."
             />
             <div>
               <Label>Any injuries or physical limitations?</Label>
@@ -609,7 +610,7 @@ export default function OnboardingPage() {
             <StepHeader
               icon={<Dumbbell className="h-12 w-12 text-purple-600" />}
               title="Training Background"
-              subtitle="This shapes your workout plan — volume, intensity, and exercise selection"
+              subtitle="This shapes your workout plan: exercise selection, volume, progression, and how hard we push."
             />
             <div>
               <Label>Training experience</Label>
@@ -766,14 +767,35 @@ export default function OnboardingPage() {
           </div>
         )
 
-      /* ── Step 6: Schedule ──────────────────────────── */
+      /* ── Step 6: Goals ─────────────────────────────── */
       case 6:
+        return (
+          <div className="space-y-6">
+            <StepHeader
+              icon={<Sparkles className="h-12 w-12 text-indigo-500" />}
+              title="Your Goals"
+              subtitle="This helps us set the right pace and keep the plan aligned with what actually matters to you."
+            />
+            <div>
+              <Label>What motivates you?</Label>
+              <p className="text-sm text-gray-500 mb-3">Select all that apply so your coaching and check-ins feel more personal.</p>
+              <ChipGrid
+                items={MOTIVATIONS.map(m => ({ value: m, label: m }))}
+                selected={motivation}
+                onToggle={(val) => toggleArray(motivation, setMotivation, val)}
+              />
+            </div>
+          </div>
+        )
+
+      /* ── Step 7: Schedule ──────────────────────────── */
+      case 7:
         return (
           <div className="space-y-6">
             <StepHeader
               icon={<Calendar className="h-12 w-12 text-indigo-500" />}
               title="Your Schedule"
-              subtitle="We'll time your meals around your workout for optimal results"
+              subtitle="We&apos;ll time your meals around your training and working day so the plan is easy to stick to."
             />
             <div>
               <Label>What time do you wake up?</Label>
@@ -830,7 +852,7 @@ export default function OnboardingPage() {
             <div>
               <Label>Meals per day</Label>
               <div className="flex gap-3">
-                {[3, 4, 5, 6, 7].map((m) => (
+                {[2, 3, 4, 5].map((m) => (
                   <button key={m} type="button" onClick={() => setMealsPerDay(m)}
                     className={`w-12 h-12 rounded-full border-2 font-bold text-lg transition-all ${
                       mealsPerDay === m
@@ -869,27 +891,18 @@ export default function OnboardingPage() {
                 </div>
               </div>
             </div>
-            <div>
-              <Label>What motivates you?</Label>
-              <p className="text-sm text-gray-500 mb-3">Select all that apply</p>
-              <ChipGrid
-                items={MOTIVATIONS.map(m => ({ value: m, label: m }))}
-                selected={motivation}
-                onToggle={(val) => toggleArray(motivation, setMotivation, val)}
-              />
-            </div>
           </div>
         )
 
-      /* ── Step 7: Review ────────────────────────────── */
-      case 7: {
+      /* ── Step 8: Review ────────────────────────────── */
+      case 8: {
         const targets = getNutritionTargets()
         return (
           <div className="space-y-6">
             <StepHeader
               icon={<Calculator className="h-12 w-12 text-purple-600" />}
               title="Your Profile Summary"
-              subtitle="Review your personalized nutrition targets"
+              subtitle="Review the full intake your nutritionist and training logic will use."
             />
 
             {targets && (
@@ -935,6 +948,7 @@ export default function OnboardingPage() {
                     {alcoholFrequency !== 'none' && <ReviewRow label="Alcohol" value={ALCOHOL_FREQUENCIES.find(a => a.value === alcoholFrequency)?.label ?? alcoholFrequency} />}
                     <ReviewRow label="Cooking" value={COOKING_SKILLS.find(c => c.value === cookingSkill)?.label ?? cookingSkill} />
                     <ReviewRow label="Adventurousness" value={`${foodAdventurousness}/10`} />
+                    {motivation.length > 0 && <ReviewRow label="Motivation" value={motivation.join(', ')} />}
                     {dietaryRestrictions.length > 0 && (
                       <ReviewRow label="Diet" value={dietaryRestrictions.map(r => DIETARY_RESTRICTIONS.find(d => d.value === r)?.label ?? r).join(', ')} />
                     )}
@@ -979,8 +993,8 @@ export default function OnboardingPage() {
                   <Sparkles className="h-5 w-5 text-purple-600 flex-shrink-0 mt-0.5" />
                   <p className="text-sm text-purple-800 leading-relaxed">
                     Your personal AI coach will use everything you&apos;ve told us to create a meal plan
-                    built around your favourite foods, lifestyle and goals &mdash; no bland chicken and broccoli
-                    unless you asked for it!
+                    and training structure that actually fit your life: favourite meals, snack habits, training level,
+                    schedule, recovery, and pace of progress. No bland template plans unless that&apos;s what you asked for.
                   </p>
                 </div>
 
@@ -1046,7 +1060,7 @@ export default function OnboardingPage() {
         </div>
 
         {/* Navigation (not shown on Review step which has its own buttons) */}
-        {step < 7 && (
+        {step < STEPS.length - 1 && (
           <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-100">
             <button
               onClick={() => setStep(step - 1)}

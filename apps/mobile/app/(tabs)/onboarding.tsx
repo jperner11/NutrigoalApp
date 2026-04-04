@@ -10,16 +10,18 @@ import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
 import {
   ACTIVITY_LEVELS, FITNESS_GOALS, TRAINING_EXPERIENCE, EQUIPMENT_ACCESS,
-  TRAINING_STYLES, COMMON_INJURIES, COMMON_CONDITIONS, DIETARY_RESTRICTIONS,
+  TRAINING_STYLES, SECONDARY_TRAINING_GOALS, SESSION_DURATIONS, CARDIO_TYPES,
+  COMMON_INJURIES, COMMON_CONDITIONS, DIETARY_RESTRICTIONS,
   COMMON_FOOD_DISLIKES, COOKING_SKILLS, MEAL_PREP_PREFERENCES, WORK_TYPES,
   SLEEP_QUALITY_OPTIONS, STRESS_LEVELS, GOAL_TIMELINES, MOTIVATIONS,
+  ALCOHOL_FREQUENCIES, SNACK_MOTIVATIONS, SNACK_PREFERENCES,
   calculateNutritionTargets,
 } from '@nutrigoal/shared'
 import type { UserMetrics } from '@nutrigoal/shared'
 import { BrandLogo } from '../../src/components/BrandLogo'
 import { brandColors, brandShadow } from '../../src/theme/brand'
 
-const STEPS = ['Basics', 'Health', 'Fitness', 'Nutrition', 'Lifestyle', 'Goals', 'Schedule', 'Review']
+const STEPS = ['Stats', 'Lifestyle', 'Food', 'Snacks', 'Health', 'Training', 'Goals', 'Schedule', 'Review']
 
 const TIME_OPTIONS = [
   '05:00', '05:30', '06:00', '06:30', '07:00', '07:30',
@@ -48,42 +50,71 @@ export default function OnboardingScreen() {
   const [gender, setGender] = useState<'male' | 'female'>('male')
   const [height, setHeight] = useState('')
   const [weight, setWeight] = useState('')
+  const [bodyFatPct, setBodyFatPct] = useState('')
 
-  // Step 1: Health & Medical
+  // Step 1: Lifestyle
+  const [activityLevel, setActivityLevel] = useState<UserMetrics['activityLevel']>('moderately_active')
+  const [workType, setWorkType] = useState('desk')
+  const [sleepHours, setSleepHours] = useState('7')
+  const [sleepQuality, setSleepQuality] = useState('average')
+  const [stressLevel, setStressLevel] = useState('moderate')
+  const [alcoholFrequency, setAlcoholFrequency] = useState('none')
+  const [alcoholDetails, setAlcoholDetails] = useState('')
+
+  // Step 2: Food preferences
+  const [dietaryRestrictions, setDietaryRestrictions] = useState<string[]>([])
+  const [allergies, setAllergies] = useState('')
+  const [favouriteFoods, setFavouriteFoods] = useState('')
+  const [foodDislikes, setFoodDislikes] = useState<string[]>([])
+  const [cookingSkill, setCookingSkill] = useState('intermediate')
+  const [mealPrepPref, setMealPrepPref] = useState('daily')
+  const [foodAdventurousness, setFoodAdventurousness] = useState(5)
+
+  // Step 3: Snack habits
+  const [currentSnacks, setCurrentSnacks] = useState('')
+  const [snackMotivation, setSnackMotivation] = useState('hunger')
+  const [snackPreference, setSnackPreference] = useState('both')
+  const [lateNightSnacking, setLateNightSnacking] = useState(false)
+
+  // Step 4: Health & Medical
   const [injuries, setInjuries] = useState<string[]>([])
   const [customInjury, setCustomInjury] = useState('')
   const [conditions, setConditions] = useState<string[]>([])
   const [medications, setMedications] = useState('')
 
-  // Step 2: Fitness Background
+  // Step 5: Training Background
+  const [yearsTraining, setYearsTraining] = useState('')
   const [experience, setExperience] = useState('beginner')
   const [equipmentAccess, setEquipmentAccess] = useState('full_gym')
   const [trainingStyles, setTrainingStyles] = useState<string[]>(['hypertrophy'])
+  const [secondaryGoal, setSecondaryGoal] = useState('none')
+  const [maxSessionMinutes, setMaxSessionMinutes] = useState(60)
+  const [squat1rm, setSquat1rm] = useState('')
+  const [bench1rm, setBench1rm] = useState('')
+  const [deadlift1rm, setDeadlift1rm] = useState('')
+  const [ohp1rm, setOhp1rm] = useState('')
+  const [doesCardio, setDoesCardio] = useState(false)
+  const [cardioTypesPreferred, setCardioTypesPreferred] = useState<string[]>([])
+  const [cardioFrequency, setCardioFrequency] = useState(2)
+  const [cardioDuration, setCardioDuration] = useState(30)
 
-  // Step 3: Nutrition Background
-  const [activityLevel, setActivityLevel] = useState<UserMetrics['activityLevel']>('moderately_active')
-  const [dietaryRestrictions, setDietaryRestrictions] = useState<string[]>([])
-  const [allergies, setAllergies] = useState('')
-  const [foodDislikes, setFoodDislikes] = useState<string[]>([])
-  const [cookingSkill, setCookingSkill] = useState('intermediate')
-  const [mealPrepPref, setMealPrepPref] = useState('daily')
-
-  // Step 4: Lifestyle
-  const [workType, setWorkType] = useState('desk')
-  const [sleepQuality, setSleepQuality] = useState('average')
-  const [stressLevel, setStressLevel] = useState('moderate')
-
-  // Step 5: Goals
+  // Step 6: Goals
   const [goal, setGoal] = useState<UserMetrics['goal']>('maintenance')
   const [targetWeight, setTargetWeight] = useState('')
   const [goalTimeline, setGoalTimeline] = useState('steady')
   const [motivation, setMotivation] = useState<string[]>([])
 
-  // Step 6: Schedule
+  // Step 7: Schedule
   const [wakeTime, setWakeTime] = useState('07:00')
+  const [sleepTime, setSleepTime] = useState('23:00')
   const [workoutTime, setWorkoutTime] = useState('08:00')
+  const [workStartTime, setWorkStartTime] = useState('09:00')
+  const [workEndTime, setWorkEndTime] = useState('17:00')
   const [workoutDays, setWorkoutDays] = useState(4)
   const [mealsPerDay, setMealsPerDay] = useState(3)
+  const [breakfastTime, setBreakfastTime] = useState('08:00')
+  const [lunchTime, setLunchTime] = useState('12:30')
+  const [dinnerTime, setDinnerTime] = useState('19:00')
 
   const toggleArray = (arr: string[], setArr: (a: string[]) => void, val: string) => {
     setArr(arr.includes(val) ? arr.filter(v => v !== val) : [...arr, val])
@@ -126,29 +157,56 @@ export default function OnboardingScreen() {
       injuries: allInjuries,
       medical_conditions: conditions,
       medications: medications.split(',').map(m => m.trim()).filter(Boolean),
+      body_fat_pct: bodyFatPct ? parseFloat(bodyFatPct) : null,
       // Fitness
+      years_training: yearsTraining ? parseFloat(yearsTraining) : null,
       training_experience: experience,
       equipment_access: equipmentAccess,
       training_style: trainingStyles,
+      secondary_training_goal: secondaryGoal,
+      max_session_minutes: maxSessionMinutes,
+      squat_1rm: squat1rm ? parseFloat(squat1rm) : null,
+      bench_1rm: bench1rm ? parseFloat(bench1rm) : null,
+      deadlift_1rm: deadlift1rm ? parseFloat(deadlift1rm) : null,
+      ohp_1rm: ohp1rm ? parseFloat(ohp1rm) : null,
+      does_cardio: doesCardio,
+      cardio_types_preferred: doesCardio ? cardioTypesPreferred : [],
+      cardio_frequency_per_week: doesCardio ? cardioFrequency : null,
+      cardio_duration_minutes: doesCardio ? cardioDuration : null,
       // Nutrition
       dietary_restrictions: dietaryRestrictions,
       allergies: allergies.split(',').map(a => a.trim()).filter(Boolean),
       food_dislikes: foodDislikes,
+      favourite_foods: favouriteFoods.split(',').map(f => f.trim()).filter(Boolean),
       cooking_skill: cookingSkill,
       meal_prep_preference: mealPrepPref,
+      food_adventurousness: foodAdventurousness,
       // Lifestyle
       work_type: workType,
+      sleep_hours: sleepHours ? parseFloat(sleepHours) : null,
       sleep_quality: sleepQuality,
       stress_level: stressLevel,
+      alcohol_frequency: alcoholFrequency,
+      alcohol_details: alcoholDetails.trim() || null,
+      current_snacks: currentSnacks.split(',').map(s => s.trim()).filter(Boolean),
+      snack_motivation: snackMotivation,
+      snack_preference: snackPreference,
+      late_night_snacking: lateNightSnacking,
       // Goals
       target_weight_kg: targetWeight ? parseFloat(targetWeight) : null,
       goal_timeline: goalTimeline,
       motivation,
       // Schedule
       wake_time: wakeTime,
+      sleep_time: sleepTime,
       workout_time: workoutTime,
+      work_start_time: workStartTime,
+      work_end_time: workEndTime,
       workout_days_per_week: workoutDays,
       meals_per_day: mealsPerDay,
+      breakfast_time: breakfastTime,
+      lunch_time: lunchTime,
+      dinner_time: dinnerTime,
       onboarding_completed: true,
     }).eq('id', user.id)
 
@@ -193,6 +251,7 @@ export default function OnboardingScreen() {
         {step === 0 && (
           <View style={st.stepContent}>
             <Text style={st.question}>Let's get to know you</Text>
+            <Text style={st.subtitle}>These basics give your nutritionist logic a strong starting point before we tailor everything else around your lifestyle.</Text>
 
             <Text style={st.label}>Full Name</Text>
             <TextInput style={st.input} placeholder="Your name" placeholderTextColor="#9ca3af" value={fullName} onChangeText={setFullName} />
@@ -214,14 +273,189 @@ export default function OnboardingScreen() {
 
             <Text style={st.label}>Weight (kg)</Text>
             <TextInput style={st.input} placeholder="kg" placeholderTextColor="#9ca3af" value={weight} onChangeText={setWeight} keyboardType="numeric" />
+
+            <Text style={st.label}>Body fat % (optional)</Text>
+            <Text style={st.hint}>Helpful if you know it. Leave blank if you don't.</Text>
+            <TextInput style={st.input} placeholder="e.g. 18" placeholderTextColor="#9ca3af" value={bodyFatPct} onChangeText={setBodyFatPct} keyboardType="numeric" />
           </View>
         )}
 
-        {/* ── Step 1: Health & Medical ──────────── */}
+        {/* ── Step 1: Lifestyle ──────────── */}
         {step === 1 && (
           <View style={st.stepContent}>
+            <Text style={st.question}>Your Lifestyle</Text>
+            <Text style={st.subtitle}>This helps us set accurate calorie targets based on your real life, not a generic calculator.</Text>
+
+            <Text style={st.label}>Work type</Text>
+            {WORK_TYPES.map((w) => (
+              <TouchableOpacity key={w.value} style={[st.listOption, workType === w.value && st.listOptionActive]} onPress={() => setWorkType(w.value)}>
+                <Text style={[st.listOptionTitle, workType === w.value && st.listOptionTitleActive]}>{w.label}</Text>
+                <Text style={st.listOptionDesc}>{w.description}</Text>
+              </TouchableOpacity>
+            ))}
+
+            <Text style={st.label}>Overall activity level</Text>
+            <Text style={st.hint}>Think about your job and your training together</Text>
+            {ACTIVITY_LEVELS.map((level) => (
+              <TouchableOpacity key={level.value} style={[st.listOption, activityLevel === level.value && st.listOptionActive]} onPress={() => setActivityLevel(level.value as UserMetrics['activityLevel'])}>
+                <Text style={[st.listOptionTitle, activityLevel === level.value && st.listOptionTitleActive]}>{level.label}</Text>
+                <Text style={st.listOptionDesc}>{level.description}</Text>
+              </TouchableOpacity>
+            ))}
+
+            <Text style={st.label}>Hours of sleep per night</Text>
+            <TextInput style={st.input} placeholder="e.g. 7" placeholderTextColor="#9ca3af" value={sleepHours} onChangeText={setSleepHours} keyboardType="numeric" />
+
+            <Text style={st.label}>Sleep quality</Text>
+            <View style={st.optionRow}>
+              {SLEEP_QUALITY_OPTIONS.map((s) => (
+                <TouchableOpacity key={s.value} style={[st.optionBtn, sleepQuality === s.value && st.optionActive]} onPress={() => setSleepQuality(s.value)}>
+                  <Text style={[st.optionText, sleepQuality === s.value && st.optionTextActive]}>{s.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <Text style={st.label}>Stress level</Text>
+            <View style={st.optionRow}>
+              {STRESS_LEVELS.map((s) => (
+                <TouchableOpacity key={s.value} style={[st.optionBtn, stressLevel === s.value && st.optionActive]} onPress={() => setStressLevel(s.value)}>
+                  <Text style={[st.optionText, stressLevel === s.value && st.optionTextActive]}>{s.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <Text style={st.label}>Alcohol</Text>
+            {ALCOHOL_FREQUENCIES.map((a) => (
+              <TouchableOpacity key={a.value} style={[st.listOption, alcoholFrequency === a.value && st.listOptionActive]} onPress={() => setAlcoholFrequency(a.value)}>
+                <Text style={[st.listOptionTitle, alcoholFrequency === a.value && st.listOptionTitleActive]}>{a.label}</Text>
+                <Text style={st.listOptionDesc}>{a.description}</Text>
+              </TouchableOpacity>
+            ))}
+            {alcoholFrequency !== 'none' && (
+              <TextInput style={st.input} placeholder="e.g. a few beers at weekends, wine with dinner" placeholderTextColor="#9ca3af" value={alcoholDetails} onChangeText={setAlcoholDetails} />
+            )}
+          </View>
+        )}
+
+        {/* ── Step 2: Food Preferences ────────── */}
+        {step === 2 && (
+          <View style={st.stepContent}>
+            <Text style={st.question}>Food Preferences</Text>
+            <Text style={st.subtitle}>We want enough detail to make your meal plan feel like it was built by a real nutritionist, not a generic bot.</Text>
+
+            <Text style={st.label}>Top 5 favourite meals or dishes</Text>
+            <TextInput
+              style={[st.input, st.textarea]}
+              multiline
+              placeholder="e.g. tacos, pasta carbonara, chicken stir-fry, salmon with rice, burrito bowls"
+              placeholderTextColor="#9ca3af"
+              value={favouriteFoods}
+              onChangeText={setFavouriteFoods}
+            />
+
+            <Text style={st.label}>Foods you dislike</Text>
+            <Text style={st.hint}>We'll avoid these in your meal plans</Text>
+            <View style={st.chipGrid}>
+              {COMMON_FOOD_DISLIKES.map((f) => (
+                <TouchableOpacity key={f} style={[st.chip, foodDislikes.includes(f) && st.chipActive]} onPress={() => toggleArray(foodDislikes, setFoodDislikes, f)}>
+                  <Text style={[st.chipText, foodDislikes.includes(f) && st.chipTextActive]}>{f}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <Text style={st.label}>Dietary restrictions</Text>
+            <View style={st.chipGrid}>
+              {DIETARY_RESTRICTIONS.map((r) => (
+                <TouchableOpacity key={r.value} style={[st.chip, dietaryRestrictions.includes(r.value) && st.chipActive]} onPress={() => toggleArray(dietaryRestrictions, setDietaryRestrictions, r.value)}>
+                  <Text style={[st.chipText, dietaryRestrictions.includes(r.value) && st.chipTextActive]}>{r.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <Text style={st.label}>Food allergies (optional)</Text>
+            <TextInput style={st.input} placeholder="e.g. peanuts, shellfish" placeholderTextColor="#9ca3af" value={allergies} onChangeText={setAllergies} />
+
+            <Text style={st.label}>Cooking skill</Text>
+            <View style={st.chipGrid}>
+              {COOKING_SKILLS.map((c) => (
+                <TouchableOpacity key={c.value} style={[st.chip, st.chipWide, cookingSkill === c.value && st.chipActive]} onPress={() => setCookingSkill(c.value)}>
+                  <Text style={[st.chipText, cookingSkill === c.value && st.chipTextActive]}>{c.label}</Text>
+                  <Text style={st.chipDesc}>{c.description}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <Text style={st.label}>Meal preparation</Text>
+            <View style={st.chipGrid}>
+              {MEAL_PREP_PREFERENCES.map((m) => (
+                <TouchableOpacity key={m.value} style={[st.chip, st.chipWide, mealPrepPref === m.value && st.chipActive]} onPress={() => setMealPrepPref(m.value)}>
+                  <Text style={[st.chipText, mealPrepPref === m.value && st.chipTextActive]}>{m.label}</Text>
+                  <Text style={st.chipDesc}>{m.description}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <Text style={st.label}>How adventurous are you with food?</Text>
+            <Text style={st.hint}>1 = keep it familiar, 10 = happy to try almost anything</Text>
+            <View style={st.chipGrid}>
+              {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
+                <TouchableOpacity key={n} style={[st.numberChip, foodAdventurousness === n && st.numberChipActive]} onPress={() => setFoodAdventurousness(n)}>
+                  <Text style={[st.numberChipText, foodAdventurousness === n && st.numberChipTextActive]}>{n}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        )}
+
+        {/* ── Step 3: Snack habits ────────────────── */}
+        {step === 3 && (
+          <View style={st.stepContent}>
+            <Text style={st.question}>Snack Habits</Text>
+            <Text style={st.subtitle}>Understanding your snack pattern helps us build better swaps and more realistic plans.</Text>
+
+            <Text style={st.label}>What do you currently snack on?</Text>
+            <TextInput
+              style={[st.input, st.textarea]}
+              multiline
+              placeholder="e.g. crisps, chocolate, biscuits, protein bars, fruit, yogurt"
+              placeholderTextColor="#9ca3af"
+              value={currentSnacks}
+              onChangeText={setCurrentSnacks}
+            />
+
+            <Text style={st.label}>Why do you usually snack?</Text>
+            {SNACK_MOTIVATIONS.map((s) => (
+              <TouchableOpacity key={s.value} style={[st.listOption, snackMotivation === s.value && st.listOptionActive]} onPress={() => setSnackMotivation(s.value)}>
+                <Text style={[st.listOptionTitle, snackMotivation === s.value && st.listOptionTitleActive]}>{s.label}</Text>
+                <Text style={st.listOptionDesc}>{s.description}</Text>
+              </TouchableOpacity>
+            ))}
+
+            <Text style={st.label}>Sweet or savoury?</Text>
+            <View style={st.optionRow}>
+              {SNACK_PREFERENCES.map((s) => (
+                <TouchableOpacity key={s.value} style={[st.optionBtn, snackPreference === s.value && st.optionActive]} onPress={() => setSnackPreference(s.value)}>
+                  <Text style={[st.optionText, snackPreference === s.value && st.optionTextActive]}>{s.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <Text style={st.label}>Late-night snacking</Text>
+            <View style={st.optionRow}>
+              {[{ label: 'Yes', value: true }, { label: 'No', value: false }].map((option) => (
+                <TouchableOpacity key={option.label} style={[st.optionBtn, lateNightSnacking === option.value && st.optionActive]} onPress={() => setLateNightSnacking(option.value)}>
+                  <Text style={[st.optionText, lateNightSnacking === option.value && st.optionTextActive]}>{option.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        )}
+
+        {/* ── Step 4: Health ────────────────────── */}
+        {step === 4 && (
+          <View style={st.stepContent}>
             <Text style={st.question}>Health & Medical</Text>
-            <Text style={st.subtitle}>This helps us avoid exercises that could aggravate existing issues</Text>
+            <Text style={st.subtitle}>This helps us avoid exercises or nutrition choices that could cause problems.</Text>
 
             <Text style={st.label}>Any injuries or physical limitations?</Text>
             <Text style={st.hint}>Select all that apply (or skip)</Text>
@@ -249,10 +483,11 @@ export default function OnboardingScreen() {
           </View>
         )}
 
-        {/* ── Step 2: Fitness Background ────────── */}
-        {step === 2 && (
+        {/* ── Step 5: Training ────────────────────── */}
+        {step === 5 && (
           <View style={st.stepContent}>
-            <Text style={st.question}>Fitness Background</Text>
+            <Text style={st.question}>Training Background</Text>
+            <Text style={st.subtitle}>This shapes your programme structure, progression, and exercise selection.</Text>
 
             <Text style={st.label}>Training experience</Text>
             {TRAINING_EXPERIENCE.map((level) => (
@@ -261,6 +496,9 @@ export default function OnboardingScreen() {
                 <Text style={st.listOptionDesc}>{level.description}</Text>
               </TouchableOpacity>
             ))}
+
+            <Text style={st.label}>Years training (optional)</Text>
+            <TextInput style={st.input} placeholder="e.g. 3" placeholderTextColor="#9ca3af" value={yearsTraining} onChangeText={setYearsTraining} keyboardType="numeric" />
 
             <Text style={st.label}>Equipment access</Text>
             {EQUIPMENT_ACCESS.map((eq) => (
@@ -279,104 +517,77 @@ export default function OnboardingScreen() {
                 </TouchableOpacity>
               ))}
             </View>
-          </View>
-        )}
 
-        {/* ── Step 3: Nutrition Background ──────── */}
-        {step === 3 && (
-          <View style={st.stepContent}>
-            <Text style={st.question}>Nutrition Background</Text>
-
-            <Text style={st.label}>How active are you?</Text>
-            {ACTIVITY_LEVELS.map((level) => (
-              <TouchableOpacity key={level.value} style={[st.listOption, activityLevel === level.value && st.listOptionActive]} onPress={() => setActivityLevel(level.value as UserMetrics['activityLevel'])}>
-                <Text style={[st.listOptionTitle, activityLevel === level.value && st.listOptionTitleActive]}>{level.label}</Text>
-                <Text style={st.listOptionDesc}>{level.description}</Text>
+            <Text style={st.label}>Secondary goal</Text>
+            {SECONDARY_TRAINING_GOALS.map((g) => (
+              <TouchableOpacity key={g.value} style={[st.listOption, secondaryGoal === g.value && st.listOptionActive]} onPress={() => setSecondaryGoal(g.value)}>
+                <Text style={[st.listOptionTitle, secondaryGoal === g.value && st.listOptionTitleActive]}>{g.label}</Text>
+                <Text style={st.listOptionDesc}>{g.description}</Text>
               </TouchableOpacity>
             ))}
 
-            <Text style={st.label}>Dietary restrictions</Text>
+            <Text style={st.label}>How long can you train per session?</Text>
             <View style={st.chipGrid}>
-              {DIETARY_RESTRICTIONS.map((r) => (
-                <TouchableOpacity key={r.value} style={[st.chip, dietaryRestrictions.includes(r.value) && st.chipActive]} onPress={() => toggleArray(dietaryRestrictions, setDietaryRestrictions, r.value)}>
-                  <Text style={[st.chipText, dietaryRestrictions.includes(r.value) && st.chipTextActive]}>{r.label}</Text>
+              {SESSION_DURATIONS.map((duration) => (
+                <TouchableOpacity key={duration.value} style={[st.chip, maxSessionMinutes === duration.value && st.chipActive]} onPress={() => setMaxSessionMinutes(duration.value)}>
+                  <Text style={[st.chipText, maxSessionMinutes === duration.value && st.chipTextActive]}>{duration.label}</Text>
                 </TouchableOpacity>
               ))}
             </View>
 
-            <Text style={st.label}>Food allergies (optional)</Text>
-            <TextInput style={st.input} placeholder="e.g. peanuts, shellfish" placeholderTextColor="#9ca3af" value={allergies} onChangeText={setAllergies} />
+            <Text style={st.label}>Estimated 1-rep maxes (optional)</Text>
+            <TextInput style={st.input} placeholder="Squat (kg)" placeholderTextColor="#9ca3af" value={squat1rm} onChangeText={setSquat1rm} keyboardType="numeric" />
+            <TextInput style={st.input} placeholder="Bench press (kg)" placeholderTextColor="#9ca3af" value={bench1rm} onChangeText={setBench1rm} keyboardType="numeric" />
+            <TextInput style={st.input} placeholder="Deadlift (kg)" placeholderTextColor="#9ca3af" value={deadlift1rm} onChangeText={setDeadlift1rm} keyboardType="numeric" />
+            <TextInput style={st.input} placeholder="Overhead press (kg)" placeholderTextColor="#9ca3af" value={ohp1rm} onChangeText={setOhp1rm} keyboardType="numeric" />
 
-            <Text style={st.label}>Foods you dislike</Text>
-            <Text style={st.hint}>We'll avoid these in your meal plans</Text>
-            <View style={st.chipGrid}>
-              {COMMON_FOOD_DISLIKES.map((f) => (
-                <TouchableOpacity key={f} style={[st.chip, foodDislikes.includes(f) && st.chipActive]} onPress={() => toggleArray(foodDislikes, setFoodDislikes, f)}>
-                  <Text style={[st.chipText, foodDislikes.includes(f) && st.chipTextActive]}>{f}</Text>
+            <Text style={st.label}>Do you do cardio?</Text>
+            <View style={st.optionRow}>
+              {[{ label: 'Yes', value: true }, { label: 'No', value: false }].map((option) => (
+                <TouchableOpacity key={option.label} style={[st.optionBtn, doesCardio === option.value && st.optionActive]} onPress={() => setDoesCardio(option.value)}>
+                  <Text style={[st.optionText, doesCardio === option.value && st.optionTextActive]}>{option.label}</Text>
                 </TouchableOpacity>
               ))}
             </View>
 
-            <Text style={st.label}>Cooking skill</Text>
-            <View style={st.chipGrid}>
-              {COOKING_SKILLS.map((c) => (
-                <TouchableOpacity key={c.value} style={[st.chip, st.chipWide, cookingSkill === c.value && st.chipActive]} onPress={() => setCookingSkill(c.value)}>
-                  <Text style={[st.chipText, cookingSkill === c.value && st.chipTextActive]}>{c.label}</Text>
-                  <Text style={st.chipDesc}>{c.description}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+            {doesCardio && (
+              <>
+                <Text style={st.label}>Preferred cardio types</Text>
+                <View style={st.chipGrid}>
+                  {CARDIO_TYPES.map((cardio) => (
+                    <TouchableOpacity key={cardio.name} style={[st.chip, cardioTypesPreferred.includes(cardio.name) && st.chipActive]} onPress={() => toggleArray(cardioTypesPreferred, setCardioTypesPreferred, cardio.name)}>
+                      <Text style={[st.chipText, cardioTypesPreferred.includes(cardio.name) && st.chipTextActive]}>{cardio.name}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
 
-            <Text style={st.label}>Meal preparation</Text>
-            <View style={st.chipGrid}>
-              {MEAL_PREP_PREFERENCES.map((m) => (
-                <TouchableOpacity key={m.value} style={[st.chip, st.chipWide, mealPrepPref === m.value && st.chipActive]} onPress={() => setMealPrepPref(m.value)}>
-                  <Text style={[st.chipText, mealPrepPref === m.value && st.chipTextActive]}>{m.label}</Text>
-                  <Text style={st.chipDesc}>{m.description}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+                <Text style={st.label}>Cardio sessions per week</Text>
+                <View style={st.daysRow}>
+                  {[1, 2, 3, 4, 5, 6, 7].map((d) => (
+                    <TouchableOpacity key={d} style={[st.dayBtn, cardioFrequency === d && st.dayBtnActive]} onPress={() => setCardioFrequency(d)}>
+                      <Text style={[st.dayBtnText, cardioFrequency === d && st.dayBtnTextActive]}>{d}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+
+                <Text style={st.label}>Typical cardio duration</Text>
+                <View style={st.chipGrid}>
+                  {[15, 20, 30, 45, 60].map((d) => (
+                    <TouchableOpacity key={d} style={[st.chip, cardioDuration === d && st.chipActive]} onPress={() => setCardioDuration(d)}>
+                      <Text style={[st.chipText, cardioDuration === d && st.chipTextActive]}>{d} min</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </>
+            )}
           </View>
         )}
 
-        {/* ── Step 4: Lifestyle ────────────────── */}
-        {step === 4 && (
-          <View style={st.stepContent}>
-            <Text style={st.question}>Your Lifestyle</Text>
-            <Text style={st.subtitle}>Helps us adjust calorie needs and recovery recommendations</Text>
-
-            <Text style={st.label}>Work type</Text>
-            {WORK_TYPES.map((w) => (
-              <TouchableOpacity key={w.value} style={[st.listOption, workType === w.value && st.listOptionActive]} onPress={() => setWorkType(w.value)}>
-                <Text style={[st.listOptionTitle, workType === w.value && st.listOptionTitleActive]}>{w.label}</Text>
-                <Text style={st.listOptionDesc}>{w.description}</Text>
-              </TouchableOpacity>
-            ))}
-
-            <Text style={st.label}>Sleep quality</Text>
-            <View style={st.optionRow}>
-              {SLEEP_QUALITY_OPTIONS.map((s) => (
-                <TouchableOpacity key={s.value} style={[st.optionBtn, sleepQuality === s.value && st.optionActive]} onPress={() => setSleepQuality(s.value)}>
-                  <Text style={[st.optionText, sleepQuality === s.value && st.optionTextActive]}>{s.label}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-
-            <Text style={st.label}>Stress level</Text>
-            <View style={st.optionRow}>
-              {STRESS_LEVELS.map((s) => (
-                <TouchableOpacity key={s.value} style={[st.optionBtn, stressLevel === s.value && st.optionActive]} onPress={() => setStressLevel(s.value)}>
-                  <Text style={[st.optionText, stressLevel === s.value && st.optionTextActive]}>{s.label}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-        )}
-
-        {/* ── Step 5: Goals ────────────────────── */}
-        {step === 5 && (
+        {/* ── Step 6: Goals ────────────────────── */}
+        {step === 6 && (
           <View style={st.stepContent}>
             <Text style={st.question}>Your Goals</Text>
+            <Text style={st.subtitle}>This helps us shape the pace of your cut, surplus, or performance phase in a realistic way.</Text>
 
             <Text style={st.label}>Primary goal</Text>
             {FITNESS_GOALS.map((g) => (
@@ -387,6 +598,7 @@ export default function OnboardingScreen() {
             ))}
 
             <Text style={st.label}>Target weight (optional)</Text>
+            <Text style={st.hint}>Leave this blank if you're aiming more for a look, feel, or performance outcome than a specific number.</Text>
             <TextInput style={st.input} placeholder="kg" placeholderTextColor="#9ca3af" value={targetWeight} onChangeText={setTargetWeight} keyboardType="numeric" />
 
             <Text style={st.label}>Timeline</Text>
@@ -412,8 +624,8 @@ export default function OnboardingScreen() {
           </View>
         )}
 
-        {/* ── Step 6: Schedule ─────────────────── */}
-        {step === 6 && (
+        {/* ── Step 7: Schedule ─────────────────── */}
+        {step === 7 && (
           <View style={st.stepContent}>
             <Text style={st.question}>Your Schedule</Text>
             <Text style={st.subtitle}>We'll time your meals around your workout for optimal results</Text>
@@ -440,6 +652,39 @@ export default function OnboardingScreen() {
               </View>
             </ScrollView>
 
+            <Text style={st.label}>What time do you go to bed?</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={st.timeScroll}>
+              <View style={st.timeRow}>
+                {TIME_OPTIONS.filter(t => t >= '20:00' && t <= '23:00').map((t) => (
+                  <TouchableOpacity key={t} style={[st.timeBtn, sleepTime === t && st.timeBtnActive]} onPress={() => setSleepTime(t)}>
+                    <Text style={[st.timeBtnText, sleepTime === t && st.timeBtnTextActive]}>{fmt12(t)}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </ScrollView>
+
+            <Text style={st.label}>Work start time</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={st.timeScroll}>
+              <View style={st.timeRow}>
+                {TIME_OPTIONS.map((t) => (
+                  <TouchableOpacity key={t} style={[st.timeBtn, workStartTime === t && st.timeBtnActive]} onPress={() => setWorkStartTime(t)}>
+                    <Text style={[st.timeBtnText, workStartTime === t && st.timeBtnTextActive]}>{fmt12(t)}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </ScrollView>
+
+            <Text style={st.label}>Work end time</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={st.timeScroll}>
+              <View style={st.timeRow}>
+                {TIME_OPTIONS.map((t) => (
+                  <TouchableOpacity key={t} style={[st.timeBtn, workEndTime === t && st.timeBtnActive]} onPress={() => setWorkEndTime(t)}>
+                    <Text style={[st.timeBtnText, workEndTime === t && st.timeBtnTextActive]}>{fmt12(t)}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </ScrollView>
+
             <Text style={st.label}>Training days per week</Text>
             <View style={st.daysRow}>
               {[2, 3, 4, 5, 6, 7].map((d) => (
@@ -457,11 +702,44 @@ export default function OnboardingScreen() {
                 </TouchableOpacity>
               ))}
             </View>
+
+            <Text style={st.label}>Meal anchors</Text>
+            <Text style={st.hint}>We'll build the plan around these main meal times</Text>
+            <Text style={st.label}>Breakfast</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={st.timeScroll}>
+              <View style={st.timeRow}>
+                {TIME_OPTIONS.map((t) => (
+                  <TouchableOpacity key={t} style={[st.timeBtn, breakfastTime === t && st.timeBtnActive]} onPress={() => setBreakfastTime(t)}>
+                    <Text style={[st.timeBtnText, breakfastTime === t && st.timeBtnTextActive]}>{fmt12(t)}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </ScrollView>
+            <Text style={st.label}>Lunch</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={st.timeScroll}>
+              <View style={st.timeRow}>
+                {TIME_OPTIONS.map((t) => (
+                  <TouchableOpacity key={t} style={[st.timeBtn, lunchTime === t && st.timeBtnActive]} onPress={() => setLunchTime(t)}>
+                    <Text style={[st.timeBtnText, lunchTime === t && st.timeBtnTextActive]}>{fmt12(t)}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </ScrollView>
+            <Text style={st.label}>Dinner</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={st.timeScroll}>
+              <View style={st.timeRow}>
+                {TIME_OPTIONS.map((t) => (
+                  <TouchableOpacity key={t} style={[st.timeBtn, dinnerTime === t && st.timeBtnActive]} onPress={() => setDinnerTime(t)}>
+                    <Text style={[st.timeBtnText, dinnerTime === t && st.timeBtnTextActive]}>{fmt12(t)}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </ScrollView>
           </View>
         )}
 
-        {/* ── Step 7: Review ───────────────────── */}
-        {step === 7 && (
+        {/* ── Step 8: Review ───────────────────── */}
+        {step === 8 && (
           <View style={st.stepContent}>
             <Text style={st.question}>Your Profile Summary</Text>
             {age && height && weight && (() => {
@@ -482,21 +760,37 @@ export default function OnboardingScreen() {
                   <View style={st.reviewCard}>
                     <Text style={st.reviewSection}>Schedule</Text>
                     <ReviewRow label="Wake up" value={fmt12(wakeTime)} />
+                    <ReviewRow label="Sleep" value={fmt12(sleepTime)} />
                     <ReviewRow label="Workout" value={fmt12(workoutTime)} />
+                    <ReviewRow label="Work" value={`${fmt12(workStartTime)} - ${fmt12(workEndTime)}`} />
                     <ReviewRow label="Training" value={`${workoutDays}× / week`} />
                     <ReviewRow label="Meals" value={`${mealsPerDay} / day`} />
+                    <ReviewRow label="Breakfast" value={fmt12(breakfastTime)} />
+                    <ReviewRow label="Lunch" value={fmt12(lunchTime)} />
+                    <ReviewRow label="Dinner" value={fmt12(dinnerTime)} />
                   </View>
 
                   <View style={st.reviewCard}>
                     <Text style={st.reviewSection}>Profile</Text>
+                    {bodyFatPct ? <ReviewRow label="Body fat" value={`${bodyFatPct}%`} /> : null}
+                    <ReviewRow label="Work type" value={WORK_TYPES.find(w => w.value === workType)?.label ?? workType} />
+                    <ReviewRow label="Sleep" value={`${sleepHours || '?'}h · ${SLEEP_QUALITY_OPTIONS.find(s => s.value === sleepQuality)?.label ?? sleepQuality}`} />
+                    <ReviewRow label="Stress" value={STRESS_LEVELS.find(s => s.value === stressLevel)?.label ?? stressLevel} />
+                    {alcoholFrequency !== 'none' ? <ReviewRow label="Alcohol" value={ALCOHOL_FREQUENCIES.find(a => a.value === alcoholFrequency)?.label ?? alcoholFrequency} /> : null}
                     <ReviewRow label="Experience" value={TRAINING_EXPERIENCE.find(t => t.value === experience)?.label ?? experience} />
+                    {yearsTraining ? <ReviewRow label="Years training" value={yearsTraining} /> : null}
                     <ReviewRow label="Equipment" value={EQUIPMENT_ACCESS.find(e => e.value === equipmentAccess)?.label ?? equipmentAccess} />
                     <ReviewRow label="Goal" value={FITNESS_GOALS.find(g => g.value === goal)?.label ?? goal} />
                     {targetWeight ? <ReviewRow label="Target weight" value={`${targetWeight} kg`} /> : null}
+                    <ReviewRow label="Timeline" value={GOAL_TIMELINES.find(t => t.value === goalTimeline)?.label ?? goalTimeline} />
                     <ReviewRow label="Cooking" value={COOKING_SKILLS.find(c => c.value === cookingSkill)?.label ?? cookingSkill} />
+                    {favouriteFoods ? <ReviewRow label="Favourite meals" value={favouriteFoods} /> : null}
                     {injuries.length > 0 && <ReviewRow label="Injuries" value={injuries.join(', ')} />}
                     {dietaryRestrictions.length > 0 && <ReviewRow label="Diet" value={dietaryRestrictions.map(r => DIETARY_RESTRICTIONS.find(d => d.value === r)?.label ?? r).join(', ')} />}
                     {foodDislikes.length > 0 && <ReviewRow label="Dislikes" value={foodDislikes.join(', ')} />}
+                    {currentSnacks ? <ReviewRow label="Snacks" value={currentSnacks} /> : null}
+                    {secondaryGoal !== 'none' ? <ReviewRow label="Secondary goal" value={SECONDARY_TRAINING_GOALS.find(g => g.value === secondaryGoal)?.label ?? secondaryGoal} /> : null}
+                    <ReviewRow label="Session length" value={`${maxSessionMinutes} min`} />
                   </View>
                 </>
               )
@@ -600,6 +894,10 @@ const st = StyleSheet.create({
     fontSize: 16,
     color: brandColors.foreground,
   },
+  textarea: {
+    minHeight: 92,
+    textAlignVertical: 'top',
+  },
   // Two-option row
   optionRow: { flexDirection: 'row', gap: 10 },
   optionBtn: { flex: 1, backgroundColor: 'rgba(255,255,255,0.88)', borderWidth: 1, borderColor: brandColors.line, borderRadius: 16, paddingVertical: 14, alignItems: 'center' },
@@ -620,6 +918,10 @@ const st = StyleSheet.create({
   chipText: { fontSize: 13, fontWeight: '600', color: brandColors.textMuted },
   chipTextActive: { color: brandColors.brand500 },
   chipDesc: { fontSize: 11, color: brandColors.textSubtle, marginTop: 2 },
+  numberChip: { width: 42, height: 42, borderRadius: 21, backgroundColor: 'rgba(255,255,255,0.88)', borderWidth: 1, borderColor: brandColors.line, alignItems: 'center', justifyContent: 'center' },
+  numberChipActive: { borderColor: 'rgba(29, 168, 240, 0.42)', backgroundColor: brandColors.brand100 },
+  numberChipText: { fontSize: 15, fontWeight: '700', color: brandColors.textMuted },
+  numberChipTextActive: { color: brandColors.brand500 },
   // Time pickers
   timeScroll: { marginBottom: 4 },
   timeRow: { flexDirection: 'row', gap: 8, paddingVertical: 4 },

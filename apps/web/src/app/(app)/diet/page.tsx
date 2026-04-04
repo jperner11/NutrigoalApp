@@ -12,11 +12,17 @@ import type { DietPlan } from '@/lib/supabase/types'
 import { isManagedClientRole } from '@nutrigoal/shared'
 
 interface CompanionContent {
+  nutritionist_summary?: string
+  calorie_warning?: string
+  calorie_calculation?: string
+  macro_explanation?: string
   personal_rules: string[]
   timeline: string
+  hydration_target_litres?: string
   hydration_tips: string[]
   hydration_explanation: string
   snack_swaps: { current: string; swap: string; calories: number; why: string }[]
+  supplement_recommendations?: { name: string; dose: string; timing: string; why: string; budget_option: string }[]
   supplement_note: string
 }
 
@@ -143,6 +149,45 @@ export default function DietPage() {
                 <h2 className="text-xl font-bold text-gray-900">Your Coaching Insights</h2>
               </div>
 
+              {companion.nutritionist_summary && (
+                <div className="bg-[linear-gradient(180deg,rgba(237,248,255,0.95),rgba(255,255,255,0.95))] rounded-xl p-5 shadow-sm border border-sky-100">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Sparkles className="h-4 w-4 text-sky-600" />
+                    <h3 className="font-semibold text-gray-900 text-sm">Your Nutritionist Summary</h3>
+                  </div>
+                  <div className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">
+                    {companion.nutritionist_summary}
+                  </div>
+                </div>
+              )}
+
+              {(companion.calorie_warning || companion.calorie_calculation || companion.macro_explanation) && (
+                <div className="bg-white/80 backdrop-blur-sm rounded-xl p-5 shadow-sm border border-gray-200">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Utensils className="h-4 w-4 text-purple-600" />
+                    <h3 className="font-semibold text-gray-900 text-sm">How Your Targets Were Set</h3>
+                  </div>
+                  {companion.calorie_warning && (
+                    <div className="rounded-lg border border-amber-100 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                      {companion.calorie_warning}
+                    </div>
+                  )}
+                  {companion.calorie_calculation && (
+                    <div className="mt-4 whitespace-pre-line text-sm text-gray-700 leading-relaxed">
+                      {companion.calorie_calculation}
+                    </div>
+                  )}
+                  {companion.macro_explanation && (
+                    <div className="mt-4 border-t border-gray-100 pt-4">
+                      <h4 className="text-sm font-semibold text-gray-900 mb-2">Macro breakdown</h4>
+                      <div className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">
+                        {companion.macro_explanation}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Personal Rules */}
               {companion.personal_rules?.length > 0 && (
                 <div className="bg-white/80 backdrop-blur-sm rounded-xl p-5 shadow-sm border border-gray-200">
@@ -179,7 +224,9 @@ export default function DietPage() {
                 <div className="bg-blue-50/60 rounded-xl p-5 border border-blue-100">
                   <div className="flex items-center gap-2 mb-3">
                     <Droplets className="h-4 w-4 text-blue-500" />
-                    <h3 className="font-semibold text-blue-900 text-sm">Hydration Tips</h3>
+                    <h3 className="font-semibold text-blue-900 text-sm">
+                      Hydration Tips{companion.hydration_target_litres ? ` · ${companion.hydration_target_litres}L target` : ''}
+                    </h3>
                   </div>
                   <ul className="space-y-2">
                     {companion.hydration_tips.map((tip, i) => (
@@ -224,6 +271,27 @@ export default function DietPage() {
                   </div>
                 </div>
               )}
+
+              {companion.supplement_recommendations?.length ? (
+                <div className="bg-white/80 backdrop-blur-sm rounded-xl p-5 shadow-sm border border-gray-200">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Pill className="h-4 w-4 text-amber-600" />
+                    <h3 className="font-semibold text-gray-900 text-sm">Evidence-Backed Supplement Recommendations</h3>
+                  </div>
+                  <div className="space-y-3">
+                    {companion.supplement_recommendations.map((supplement, i) => (
+                      <div key={`${supplement.name}-${i}`} className="rounded-lg border border-amber-100 bg-amber-50/70 p-4">
+                        <div className="text-sm font-semibold text-gray-900">{supplement.name}</div>
+                        <div className="mt-1 text-xs uppercase tracking-[0.12em] text-amber-700">
+                          {supplement.dose} · {supplement.timing}
+                        </div>
+                        <p className="mt-3 text-sm text-gray-700 leading-relaxed">{supplement.why}</p>
+                        <p className="mt-2 text-xs text-gray-500">Budget-friendly option: {supplement.budget_option}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
 
               {/* Supplement Disclaimer */}
               {companion.supplement_note && (
