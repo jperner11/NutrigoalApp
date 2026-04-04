@@ -101,7 +101,7 @@ export default function LoginPage() {
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  className="input-field pl-14"
+                  className="input-field input-field-icon-left"
                   placeholder="your.email@example.com"
                   required
                 />
@@ -117,7 +117,7 @@ export default function LoginPage() {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                  className="input-field pl-14 pr-14"
+                  className="input-field input-field-icon-both"
                   placeholder="Enter your password"
                   required
                 />

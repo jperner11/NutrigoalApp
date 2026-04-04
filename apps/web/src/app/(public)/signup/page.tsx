@@ -188,7 +188,7 @@ export default function SignupPage() {
                   type="text"
                   value={formData.fullName}
                   onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
-                  className="input-field pl-14"
+                  className="input-field input-field-icon-left"
                   placeholder="Your full name"
                   required
                 />
@@ -204,7 +204,7 @@ export default function SignupPage() {
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  className="input-field pl-14"
+                  className="input-field input-field-icon-left"
                   placeholder="your.email@example.com"
                   required
                 />
@@ -220,7 +220,7 @@ export default function SignupPage() {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                  className="input-field pl-14 pr-14"
+                  className="input-field input-field-icon-both"
                   placeholder="Minimum 6 characters"
                   required
                 />
@@ -239,7 +239,7 @@ export default function SignupPage() {
                   type="password"
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                  className="input-field pl-14"
+                  className="input-field input-field-icon-left"
                   placeholder="Re-enter your password"
                   required
                 />

@@ -246,6 +246,15 @@ input, textarea, select {
   transition: all 0.2s ease;
 }
 
+.input-field-icon-left {
+  padding-left: 3.75rem;
+}
+
+.input-field-icon-both {
+  padding-left: 3.75rem;
+  padding-right: 3.75rem;
+}
+
 .input-field:focus {
   border-color: rgba(29, 168, 240, 0.48);
   box-shadow: 0 0 0 4px var(--focus);
