@@ -107,13 +107,13 @@ export default function SignupPage() {
 
       <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.95fr_0.95fr] lg:items-start">
         <section className="panel-strong p-8 sm:p-10">
-          <div className="eyebrow mb-5">Performance Clinic</div>
+          <div className="eyebrow mb-5">Feel your momentum</div>
           <h1 className="text-5xl font-bold leading-[0.96] text-[var(--foreground)] sm:text-6xl">
             Start with a
             <span className="block text-[var(--brand-500)]">serious setup.</span>
           </h1>
           <p className="mt-6 max-w-xl text-lg leading-8 text-[var(--muted)]">
-            Nutrigoal is designed for people who want a system that feels considered, precise, and actually useful once they begin.
+            mealandmotion is designed for people who want a system that feels considered, precise, and genuinely easy to stay with.
           </p>
           <div className="mt-10 grid gap-4 sm:grid-cols-2">
             {[

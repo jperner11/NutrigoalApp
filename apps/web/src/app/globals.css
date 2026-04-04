@@ -290,11 +290,16 @@ input, textarea, select {
   color: var(--brand-500);
 }
 
+.brand-mark-accent {
+  color: var(--brand-500);
+}
+
 .brand-wordmark {
   font-family: var(--font-display), Arial, Helvetica, sans-serif;
-  font-size: 1.45rem;
+  font-size: 1.28rem;
   font-weight: 800;
   letter-spacing: -0.045em;
+  line-height: 1;
   color: var(--foreground);
 }
 

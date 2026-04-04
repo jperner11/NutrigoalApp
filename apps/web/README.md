@@ -1,4 +1,4 @@
-# NutriGoal - Personalized Nutrition & Fitness Tracker
+# mealandmotion - Personalized Nutrition & Fitness Tracker
 
 A modern web application for tracking nutrition, hydration, workouts, and cardio — with support for nutritionist-managed client plans.
 

@@ -55,7 +55,7 @@ export default function LoginPage() {
 
       <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.95fr_0.85fr] lg:items-center">
         <section className="panel-strong overflow-hidden p-8 sm:p-10">
-          <div className="eyebrow mb-5">Performance Clinic</div>
+          <div className="eyebrow mb-5">Feel your momentum</div>
           <h1 className="text-5xl font-bold leading-[0.96] text-[var(--foreground)] sm:text-6xl">
             Return to your
             <span className="block text-[var(--brand-500)]">precision dashboard.</span>

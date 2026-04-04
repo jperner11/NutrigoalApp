@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title desc">
+  <title id="title">mealandmotion mark</title>
+  <desc id="desc">A rounded lower-case m above a plate arc with a motion dot.</desc>
+  <defs>
+    <linearGradient id="bg" x1="14%" y1="10%" x2="86%" y2="90%">
+      <stop offset="0%" stop-color="#f8fcff"/>
+      <stop offset="100%" stop-color="#dff2ff"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="14%" y1="20%" x2="86%" y2="80%">
+      <stop offset="0%" stop-color="#1da8f0"/>
+      <stop offset="100%" stop-color="#4dc4ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="96" height="96" rx="28" fill="url(#bg)"/>
+  <rect x="0.75" y="0.75" width="94.5" height="94.5" rx="27.25" fill="none" stroke="rgba(77,196,255,0.22)"/>
+  <path d="M23 63V40.5C23 33.596 28.596 28 35.5 28C42.404 28 48 33.596 48 40.5V63" fill="none" stroke="#0d1b2a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M48 63V42.5C48 34.492 54.492 28 62.5 28C70.508 28 77 34.492 77 42.5V63" fill="none" stroke="#0d1b2a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M26 66.5C32.5 72.5 63.5 72.5 70 66.5" fill="none" stroke="url(#accent)" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="68" cy="25.5" r="5.5" fill="url(#accent)"/>
+</svg>

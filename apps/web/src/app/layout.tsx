@@ -14,10 +14,10 @@ const body = Manrope({
 })
 
 export const metadata: Metadata = {
-  title: "Nutrigoal - Performance Clinic for Nutrition and Training",
-  description: "Precision meal planning, training systems, coaching intelligence, and practitioner workflows in one sharp performance platform.",
+  title: "mealandmotion - Feel Your Momentum",
+  description: "Meal planning, training structure, coaching intelligence, and practitioner workflows in one calm, momentum-driven platform.",
   keywords: "nutrition, diet, meal planning, workout, training, cardio, hydration, nutritionist, fitness",
-  authors: [{ name: "Nutrigoal Team" }],
+  authors: [{ name: "mealandmotion Team" }],
 }
 
 export default function RootLayout({

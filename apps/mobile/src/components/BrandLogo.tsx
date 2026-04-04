@@ -9,23 +9,22 @@ interface BrandLogoProps {
 export function BrandLogo({ compact = false, light = false }: BrandLogoProps) {
   const wordColor = light ? '#ffffff' : brandColors.foreground
   const tagColor = light ? 'rgba(255,255,255,0.74)' : brandColors.textMuted
+  const strokeColor = light ? '#ffffff' : brandColors.foreground
+  const accentColor = brandColors.brand500
 
   return (
     <View style={styles.row}>
       <View style={[styles.mark, light && styles.markLight]}>
-        <View style={styles.ring} />
-        <View style={styles.core} />
-        <View style={styles.waveWrap}>
-          <View style={styles.waveOne} />
-          <View style={styles.waveTwo} />
-          <View style={styles.waveThree} />
-        </View>
+        <View style={[styles.archLeft, { borderColor: strokeColor }]} />
+        <View style={[styles.archRight, { borderColor: strokeColor }]} />
+        <View style={[styles.plate, { borderColor: accentColor }]} />
+        <View style={[styles.motionDot, { backgroundColor: accentColor }]} />
       </View>
       {!compact && (
         <View style={styles.copy}>
-          <Text style={[styles.wordmark, { color: wordColor }]}>Nutrigoal</Text>
+          <Text style={[styles.wordmark, { color: wordColor }]}>mealandmotion</Text>
           <Text style={[styles.tagline, { color: tagColor }]}>
-            Performance clinic for nutrition and training
+            feel your momentum
           </Text>
         </View>
       )}
@@ -52,62 +51,58 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.2)',
   },
-  ring: {
+  archLeft: {
     position: 'absolute',
-    width: 26,
-    height: 26,
-    borderRadius: 13,
+    left: 8,
+    bottom: 14,
+    width: 14,
+    height: 18,
     borderWidth: 3,
-    borderColor: '#ffffff',
+    borderBottomWidth: 0,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
   },
-  core: {
+  archRight: {
     position: 'absolute',
-    width: 10,
+    left: 21,
+    bottom: 14,
+    width: 16,
+    height: 20,
+    borderWidth: 3,
+    borderBottomWidth: 0,
+    borderTopLeftRadius: 11,
+    borderTopRightRadius: 11,
+  },
+  plate: {
+    position: 'absolute',
+    bottom: 10,
+    width: 24,
     height: 10,
-    borderRadius: 5,
-    backgroundColor: '#ffffff',
+    borderWidth: 3,
+    borderTopWidth: 0,
+    borderBottomLeftRadius: 14,
+    borderBottomRightRadius: 14,
   },
-  waveWrap: {
-    width: 28,
-    height: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  waveOne: {
+  motionDot: {
+    position: 'absolute',
+    top: 10,
+    right: 9,
     width: 7,
-    height: 3,
-    borderRadius: 2,
-    backgroundColor: '#ffffff',
-    marginTop: 4,
-  },
-  waveTwo: {
-    width: 9,
-    height: 3,
-    borderRadius: 2,
-    backgroundColor: '#ffffff',
-    marginBottom: 8,
-    transform: [{ rotate: '-60deg' }],
-  },
-  waveThree: {
-    width: 9,
-    height: 3,
-    borderRadius: 2,
-    backgroundColor: '#ffffff',
-    marginTop: 6,
+    height: 7,
+    borderRadius: 999,
   },
   copy: {
     flexShrink: 1,
   },
   wordmark: {
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: '800',
-    letterSpacing: -0.9,
+    letterSpacing: -0.7,
   },
   tagline: {
     marginTop: 2,
-    fontSize: 11,
-    lineHeight: 15,
+    fontSize: 10,
+    lineHeight: 14,
     letterSpacing: 0.1,
   },
 })

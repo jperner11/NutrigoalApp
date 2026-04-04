@@ -63,15 +63,15 @@ export default function LandingPage() {
           <div>
             <div className="eyebrow mb-6">
               <Sparkles className="h-4 w-4" />
-              Performance Clinic
+              Feel your momentum
             </div>
             <h1 className="max-w-4xl text-5xl font-extrabold leading-[0.94] text-[var(--foreground)] sm:text-6xl lg:text-7xl">
               Precision nutrition
               <span className="block text-[var(--brand-500)]">for how you actually train.</span>
             </h1>
             <p className="mt-7 max-w-2xl text-lg leading-8 text-[var(--muted)] sm:text-xl">
-              Nutrigoal brings meal planning, training structure, AI coaching, and practitioner workflows into one
-              sharp system that feels more like a performance clinic than another wellness app.
+              mealandmotion brings meal planning, training structure, AI coaching, and practitioner workflows into one
+              clear system built to help people feel supported, steady, and in motion.
             </p>
             <div className="mt-10 flex flex-col gap-4 sm:flex-row">
               <Link href="/signup" className="btn-primary inline-flex items-center justify-center gap-2 rounded-2xl px-7 py-4 text-base font-semibold">
