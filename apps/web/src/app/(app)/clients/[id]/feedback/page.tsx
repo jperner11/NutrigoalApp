@@ -1,17 +1,19 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
 import { ArrowLeft, Plus, Trash2, Send, CheckCircle, Clock } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import Link from 'next/link'
 import type { FeedbackRequest, FeedbackQuestion, FeedbackResponse, UserProfile } from '@/lib/supabase/types'
+import { isTrainerRole } from '@nutrigoal/shared'
 
 export default function ClientFeedbackPage() {
   const { id } = useParams<{ id: string }>()
   const { profile } = useUser()
+  const router = useRouter()
   const [client, setClient] = useState<UserProfile | null>(null)
   const [requests, setRequests] = useState<FeedbackRequest[]>([])
   const [loading, setLoading] = useState(true)
@@ -28,6 +30,7 @@ export default function ClientFeedbackPage() {
 
   useEffect(() => {
     if (!profile) return
+    if (!isTrainerRole(profile.role)) { router.push('/dashboard'); return }
     const supabase = createClient()
 
     supabase.from('user_profiles').select('*').eq('id', id).single().then(({ data }) => {
@@ -35,7 +38,7 @@ export default function ClientFeedbackPage() {
     })
 
     loadFeedback()
-  }, [profile, id])
+  }, [profile, id, router])
 
   async function loadFeedback() {
     if (!profile) return

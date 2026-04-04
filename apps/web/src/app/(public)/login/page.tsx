@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ArrowRight, Eye, EyeOff, Lock, Mail } from 'lucide-react'
 import { toast } from 'react-hot-toast'
@@ -10,10 +10,16 @@ import BrandLogo from '@/components/brand/BrandLogo'
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [nextPath, setNextPath] = useState('/dashboard')
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   })
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    setNextPath(params.get('next') || '/dashboard')
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -24,7 +30,6 @@ export default function LoginPage() {
 
     setIsLoading(true)
     const supabase = createClient()
-
     const { error } = await supabase.auth.signInWithPassword({
       email: formData.email,
       password: formData.password,
@@ -41,14 +46,14 @@ export default function LoginPage() {
     }
 
     toast.success('Welcome back!')
-    window.location.href = '/dashboard'
+    window.location.href = nextPath
   }
 
   return (
     <div className="auth-bg min-h-screen px-4 py-10 sm:px-6 lg:px-8">
       <div className="mx-auto flex max-w-7xl items-center justify-between pb-8">
         <BrandLogo href="/" />
-        <Link href="/signup" className="btn-secondary rounded-full px-5 py-3 text-sm font-semibold">
+        <Link href={`/signup${nextPath !== '/dashboard' ? `?next=${encodeURIComponent(nextPath)}` : ''}`} className="btn-secondary rounded-full px-5 py-3 text-sm font-semibold">
           Create account
         </Link>
       </div>
@@ -140,7 +145,7 @@ export default function LoginPage() {
 
           <div className="mt-8 border-t border-[var(--line)] pt-6 text-sm text-[var(--muted)]">
             Don&apos;t have an account?{' '}
-            <Link href="/signup" className="font-semibold text-[var(--foreground)] transition hover:text-[var(--brand-500)]">
+            <Link href={`/signup${nextPath !== '/dashboard' ? `?next=${encodeURIComponent(nextPath)}` : ''}`} className="font-semibold text-[var(--foreground)] transition hover:text-[var(--brand-500)]">
               Create one
             </Link>
           </div>

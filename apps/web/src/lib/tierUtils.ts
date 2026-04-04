@@ -11,8 +11,8 @@ export type GatedFeature =
   | 'full_training'
   | 'regenerate'
 
-const PAID_ROLES: UserRole[] = ['pro', 'unlimited', 'nutritionist', 'nutritionist_client']
-const AI_ROLES: UserRole[] = ['pro', 'unlimited', 'nutritionist']
+const PAID_ROLES: UserRole[] = ['pro', 'unlimited', 'nutritionist', 'nutritionist_client', 'personal_trainer', 'personal_trainer_client']
+const AI_ROLES: UserRole[] = ['pro', 'unlimited', 'nutritionist', 'personal_trainer']
 
 const FEATURE_ACCESS: Record<GatedFeature, UserRole[]> = {
   supplements: PAID_ROLES,
@@ -35,17 +35,19 @@ export function isFeatureLocked(role: UserRole, feature: GatedFeature): boolean 
 
 /**
  * Returns the regeneration cooldown in days.
- * null = cannot regenerate (free, nutritionist_client)
- * 0 = unlimited (unlimited/nutritionist)
+ * null = cannot regenerate (free, managed clients)
+ * 0 = unlimited (unlimited/trainers)
  * 7 = once per week (pro)
  */
 export function getRegenCooldownDays(role: UserRole): number | null {
   switch (role) {
     case 'free': return null
     case 'nutritionist_client': return null
+    case 'personal_trainer_client': return null
     case 'pro': return 7
     case 'unlimited':
     case 'nutritionist': return 0
+    case 'personal_trainer': return 0
     default: return null
   }
 }
@@ -60,7 +62,7 @@ export async function checkRegenEligibility(
 ): Promise<{ canRegenerate: boolean; daysRemaining: number }> {
   const cooldown = getRegenCooldownDays(role)
 
-  // Free/nutritionist_client users can never regenerate
+  // Free/managed-client users can never regenerate
   if (cooldown === null) return { canRegenerate: false, daysRemaining: -1 }
 
   // Unlimited users can always regenerate

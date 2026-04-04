@@ -11,7 +11,7 @@ import {
   MEAL_TYPES, COMMON_SUPPLEMENTS, SUPPLEMENT_FREQUENCIES, SUPPLEMENT_TIMES,
 } from '@nutrigoal/shared'
 import type {
-  DietPlan, FoodItem, MealType, UserSupplement, SupplementFrequency, SupplementTime,
+  DietPlan, DietPlanMeal, FoodItem, MealType, UserSupplement, SupplementFrequency, SupplementTime,
 } from '@nutrigoal/shared'
 import { brandColors, brandShadow } from '../../src/theme/brand'
 
@@ -23,12 +23,13 @@ interface MealEntry {
   foods: FoodItem[]
 }
 
-type Screen = 'list' | 'create' | 'log' | 'supplements'
+type Screen = 'list' | 'create' | 'log' | 'supplements' | 'detail'
 
 export default function DietScreen() {
   const { user, profile } = useAuth()
   const [screen, setScreen] = useState<Screen>('list')
   const [plans, setPlans] = useState<DietPlan[]>([])
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null)
   const [supplements, setSupplements] = useState<UserSupplement[]>([])
   const [todayLogs, setTodayLogs] = useState<string[]>([]) // supplement_ids taken today
   const [refreshing, setRefreshing] = useState(false)
@@ -68,6 +69,7 @@ export default function DietScreen() {
   if (screen === 'create') return <CreateDietPlan user={user} profile={profile} onDone={() => { setScreen('list'); fetchPlans() }} onCancel={() => setScreen('list')} />
   if (screen === 'log') return <LogMeal user={user} onDone={() => { setScreen('list') }} onCancel={() => setScreen('list')} />
   if (screen === 'supplements') return <ManageSupplements user={user} onDone={() => { setScreen('list'); fetchSupplements() }} onCancel={() => setScreen('list')} />
+  if (screen === 'detail' && selectedPlanId) return <DietPlanDetail planId={selectedPlanId} user={user} onBack={() => { setScreen('list'); fetchPlans() }} />
 
   return (
     <SafeAreaView style={s.container}>
@@ -91,7 +93,7 @@ export default function DietScreen() {
             <TouchableOpacity onPress={() => setScreen('create')}><Text style={s.emptyLink}>Create your first plan</Text></TouchableOpacity>
           </View>
         ) : plans.map((plan) => (
-          <View key={plan.id} style={s.card}>
+          <TouchableOpacity key={plan.id} style={s.card} onPress={() => { setSelectedPlanId(plan.id); setScreen('detail') }}>
             <View style={s.cardRow}>
               <View style={{ flex: 1 }}>
                 <Text style={s.cardTitle}>{plan.name}</Text>
@@ -99,8 +101,9 @@ export default function DietScreen() {
               </View>
               {plan.created_by !== user?.id && <View style={s.ptBadge}><Text style={s.ptBadgeText}>From PT</Text></View>}
               {plan.is_active && <View style={s.activeBadge}><Text style={s.badgeText}>Active</Text></View>}
+              <Ionicons name="chevron-forward" size={20} color={brandColors.textSubtle} />
             </View>
-          </View>
+          </TouchableOpacity>
         ))}
 
         {/* ─── Supplements Section ─── */}
@@ -135,6 +138,135 @@ export default function DietScreen() {
             )
           })
         )}
+      </ScrollView>
+    </SafeAreaView>
+  )
+}
+
+function DietPlanDetail({ planId, user, onBack }: { planId: string; user: { id: string } | null; onBack: () => void }) {
+  const [plan, setPlan] = useState<DietPlan | null>(null)
+  const [meals, setMeals] = useState<DietPlanMeal[]>([])
+  const [loggedMealIds, setLoggedMealIds] = useState<Set<string>>(new Set())
+  const [expandedMeal, setExpandedMeal] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  const today = new Date().toISOString().split('T')[0]
+  const dayOfWeek = (new Date().getDay() + 6) % 7
+
+  const loadPlan = async () => {
+    if (!user) return
+    const [{ data: planData }, { data: mealData }, { data: logData }] = await Promise.all([
+      supabase.from('diet_plans').select('*').eq('id', planId).single(),
+      supabase.from('diet_plan_meals').select('*').eq('diet_plan_id', planId).or(`day_of_week.eq.${dayOfWeek},day_of_week.is.null`),
+      supabase.from('meal_logs').select('diet_plan_meal_id').eq('user_id', user.id).eq('date', today).not('diet_plan_meal_id', 'is', null),
+    ])
+
+    setPlan((planData as DietPlan) ?? null)
+    setMeals((mealData as DietPlanMeal[]) ?? [])
+    setLoggedMealIds(new Set((logData ?? []).map((log: any) => log.diet_plan_meal_id)))
+    setLoading(false)
+  }
+
+  useEffect(() => {
+    loadPlan()
+  }, [planId])
+
+  const toggleMeal = async (meal: DietPlanMeal) => {
+    if (!user) return
+    const isLogged = loggedMealIds.has(meal.id)
+
+    if (isLogged) {
+      await supabase
+        .from('meal_logs')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('date', today)
+        .eq('diet_plan_meal_id', meal.id)
+
+      setLoggedMealIds((prev) => {
+        const next = new Set(prev)
+        next.delete(meal.id)
+        return next
+      })
+      return
+    }
+
+    await supabase.from('meal_logs').insert({
+      user_id: user.id,
+      date: today,
+      meal_type: meal.meal_type,
+      foods: meal.foods,
+      total_calories: meal.total_calories,
+      total_protein: meal.total_protein,
+      total_carbs: meal.total_carbs,
+      total_fat: meal.total_fat,
+      diet_plan_meal_id: meal.id,
+    })
+
+    setLoggedMealIds((prev) => new Set(prev).add(meal.id))
+  }
+
+  if (loading) {
+    return <SafeAreaView style={s.container}><ActivityIndicator style={{ marginTop: 40 }} /></SafeAreaView>
+  }
+
+  return (
+    <SafeAreaView style={s.container}>
+      <View style={s.modalHeader}>
+        <TouchableOpacity onPress={onBack}><Ionicons name="arrow-back" size={24} color={brandColors.foregroundSoft} /></TouchableOpacity>
+        <Text style={s.modalTitle}>{plan?.name ?? 'Meal Plan'}</Text>
+        <View style={{ width: 24 }} />
+      </View>
+      <ScrollView contentContainerStyle={s.modalContent}>
+        <View style={s.planSummaryCard}>
+          <Text style={s.planSummaryTitle}>Today&apos;s meals</Text>
+          <Text style={s.planSummaryText}>
+            {loggedMealIds.size}/{meals.length} completed
+          </Text>
+        </View>
+
+        {meals.map((meal) => {
+          const isLogged = loggedMealIds.has(meal.id)
+          const isExpanded = expandedMeal === meal.id
+          return (
+            <View key={meal.id} style={[s.mealTrackCard, isLogged && s.mealTrackCardDone]}>
+              <TouchableOpacity
+                style={s.mealTrackHeader}
+                onPress={() => setExpandedMeal(isExpanded ? null : meal.id)}
+              >
+                <View style={{ flex: 1 }}>
+                  <Text style={s.mealTrackName}>{meal.meal_name}</Text>
+                  <Text style={s.mealTrackMeta}>
+                    {meal.total_calories} kcal · P{meal.total_protein} C{meal.total_carbs} F{meal.total_fat}
+                  </Text>
+                </View>
+                <Ionicons name={isExpanded ? 'chevron-up' : 'chevron-down'} size={20} color={brandColors.textSubtle} />
+              </TouchableOpacity>
+
+              {isExpanded && (
+                <View style={s.mealTrackBody}>
+                  {meal.foods.map((food, index) => (
+                    <View key={`${meal.id}-${index}`} style={s.foodRow}>
+                      <View style={{ flex: 1 }}>
+                        <Text style={s.foodName}>{food.name}</Text>
+                        <Text style={s.foodMacros}>
+                          {food.amount}{food.unit} · {food.calories}kcal · P{food.protein} C{food.carbs} F{food.fat}
+                        </Text>
+                      </View>
+                    </View>
+                  ))}
+                </View>
+              )}
+
+              <TouchableOpacity style={[s.mealToggleBtn, isLogged && s.mealToggleBtnDone]} onPress={() => toggleMeal(meal)}>
+                <Ionicons name={isLogged ? 'checkmark-circle' : 'ellipse-outline'} size={20} color={isLogged ? '#fff' : brandColors.brand500} />
+                <Text style={[s.mealToggleText, isLogged && s.mealToggleTextDone]}>
+                  {isLogged ? 'Meal completed' : 'Mark as eaten'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )
+        })}
       </ScrollView>
     </SafeAreaView>
   )
@@ -714,6 +846,19 @@ const s = StyleSheet.create({
   supEmptyCard: { backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: 18, padding: 20, alignItems: 'center', gap: 8, borderWidth: 1, borderColor: brandColors.line, borderStyle: 'dashed' },
   supEmptyText: { fontSize: 14, color: brandColors.textSubtle },
   supCard: { flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 14, marginBottom: 8, alignItems: 'center', gap: 12, ...brandShadow },
+  planSummaryCard: { backgroundColor: brandColors.brand100, borderRadius: 18, borderWidth: 1, borderColor: 'rgba(77, 196, 255, 0.2)', padding: 16, marginBottom: 14 },
+  planSummaryTitle: { fontSize: 16, fontWeight: '700', color: '#0f4262' },
+  planSummaryText: { fontSize: 13, color: brandColors.textMuted, marginTop: 4 },
+  mealTrackCard: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 12, ...brandShadow },
+  mealTrackCardDone: { borderColor: 'rgba(31, 157, 115, 0.24)', backgroundColor: '#f4fcf8' },
+  mealTrackHeader: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  mealTrackName: { fontSize: 16, fontWeight: '700', color: brandColors.foregroundSoft },
+  mealTrackMeta: { fontSize: 12, color: brandColors.textMuted, marginTop: 4 },
+  mealTrackBody: { marginTop: 12, borderTopWidth: 1, borderTopColor: brandColors.line, paddingTop: 6 },
+  mealToggleBtn: { marginTop: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderRadius: 14, borderWidth: 1, borderColor: 'rgba(29, 168, 240, 0.24)', paddingVertical: 12, backgroundColor: 'rgba(255,255,255,0.82)' },
+  mealToggleBtnDone: { backgroundColor: brandColors.success, borderColor: brandColors.success },
+  mealToggleText: { fontSize: 14, fontWeight: '700', color: brandColors.brand500 },
+  mealToggleTextDone: { color: '#fff' },
   supCheck: { width: 28, height: 28, borderRadius: 14, borderWidth: 1, borderColor: brandColors.lineStrong, alignItems: 'center', justifyContent: 'center' },
   supCheckDone: { backgroundColor: brandColors.brand900, borderColor: brandColors.brand900 },
   supName: { fontSize: 15, fontWeight: '600', color: brandColors.foregroundSoft },

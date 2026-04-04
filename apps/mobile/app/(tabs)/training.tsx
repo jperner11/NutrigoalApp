@@ -31,7 +31,16 @@ interface ExerciseEntry {
 interface DayWithExercises extends TrainingPlanDay {
   exercises: (TrainingPlanExercise & { exercises: Exercise })[]
 }
-interface SessionSet { weight_kg: string; reps: string; completed: boolean }
+interface SessionSet {
+  set_number: number
+  weight_kg: string
+  reps: string
+  completed: boolean
+  suggestedWeight: number | null
+  suggestedReason: string | null
+  lastWeight: number | null
+  lastReps: number | null
+}
 
 // ─── Screens ────────────────────────────────────────────
 type Screen = 'list' | 'create' | 'detail' | 'session'
@@ -318,8 +327,27 @@ function WorkoutSession({ dayId, user, profile, onDone }: any) {
   const [currentIdx, setCurrentIdx] = useState(0)
   const [sets, setSets] = useState<SessionSet[][]>([])
   const [lastWorkout, setLastWorkout] = useState<WorkoutExerciseLog[] | null>(null)
+  const [showOverloadBanner, setShowOverloadBanner] = useState(false)
+  const [restTimerActive, setRestTimerActive] = useState(false)
+  const [restTimerSeconds, setRestTimerSeconds] = useState(0)
   const [saving, setSaving] = useState(false)
   const [startTime] = useState(new Date())
+
+  useEffect(() => {
+    if (!restTimerActive || restTimerSeconds <= 0) return
+
+    const interval = setInterval(() => {
+      setRestTimerSeconds((prev) => {
+        if (prev <= 1) {
+          setRestTimerActive(false)
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [restTimerActive, restTimerSeconds])
 
   useEffect(() => {
     const load = async () => {
@@ -327,26 +355,65 @@ function WorkoutSession({ dayId, user, profile, onDone }: any) {
       if (!exs) return
       setExercises(exs as any)
 
-      // Initialize empty sets for each exercise
-      const initSets = exs.map((e: any) => Array.from({ length: e.sets }, () => ({ weight_kg: '', reps: '', completed: false })))
-      setSets(initSets)
-
       // Load last workout for suggestions
       const { data: last } = await supabase.from('workout_logs').select('*').eq('plan_day_id', dayId).eq('user_id', user.id).order('date', { ascending: false }).limit(1)
-      if (last && last.length > 0) setLastWorkout(last[0].exercises as WorkoutExerciseLog[])
+      const lastExercises = last && last.length > 0 ? (last[0].exercises as WorkoutExerciseLog[]) : null
+      if (lastExercises) setLastWorkout(lastExercises)
+
+      let hasOverloadSuggestion = false
+      const initSets = exs.map((exercise: any) => {
+        const lastExercise = lastExercises?.find((item) => item.exercise_id === exercise.exercise_id)
+        const fallbackSuggestion = calculateSuggestion(
+          (lastExercise?.sets ?? []) as WorkoutSetLog[],
+          exercise.reps,
+          exercise.exercises.is_compound,
+        )
+        const { min: repMin } = parseRepRange(exercise.reps)
+
+        return Array.from({ length: exercise.sets }, (_, setIndex) => {
+          const lastSet = lastExercise?.sets?.[setIndex]
+          const suggestedWeight = fallbackSuggestion?.suggestedWeight ?? lastSet?.weight_kg ?? null
+          const suggestedReason = fallbackSuggestion?.reason ?? null
+
+          if (
+            typeof suggestedWeight === 'number' &&
+            typeof lastExercise?.sets?.[0]?.weight_kg === 'number' &&
+            suggestedWeight !== lastExercise.sets[0].weight_kg
+          ) {
+            hasOverloadSuggestion = true
+          }
+
+          return {
+            set_number: setIndex + 1,
+            weight_kg: suggestedWeight ? String(suggestedWeight) : '',
+            reps: String(lastSet?.reps ?? repMin),
+            completed: false,
+            suggestedWeight,
+            suggestedReason,
+            lastWeight: lastSet?.weight_kg ?? null,
+            lastReps: lastSet?.reps ?? null,
+          }
+        })
+      })
+
+      setShowOverloadBanner(hasOverloadSuggestion)
+      setSets(initSets)
     }
     load()
-  }, [dayId])
+  }, [dayId, user.id])
 
   const currentEx = exercises[currentIdx]
   const currentSets = sets[currentIdx] || []
+  const currentLastExercise = lastWorkout?.find((exercise) => exercise.exercise_id === currentEx?.exercise_id) ?? null
+  const currentSuggestion = currentSets.find((set) => set.suggestedReason)?.suggestedReason ?? null
+  const currentRestSeconds = currentEx?.rest_seconds ?? DEFAULT_REST_SECONDS
+  const restProgress = currentRestSeconds > 0 ? ((currentRestSeconds - restTimerSeconds) / currentRestSeconds) * 100 : 100
 
-  // Progressive overload suggestion
-  const suggestion = currentEx && lastWorkout ? (() => {
-    const lastEx = lastWorkout.find(e => e.exercise_id === currentEx.exercise_id)
-    if (!lastEx) return null
-    return calculateSuggestion(lastEx.sets as WorkoutSetLog[], currentEx.reps, currentEx.exercises.is_compound)
-  })() : null
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60)
+    const remaining = seconds % 60
+    return `${minutes}:${remaining.toString().padStart(2, '0')}`
+  }
 
   const updateSet = (setIdx: number, field: 'weight_kg' | 'reps', value: string) => {
     const updated = [...sets]
@@ -358,13 +425,33 @@ function WorkoutSession({ dayId, user, profile, onDone }: any) {
   const toggleComplete = (setIdx: number) => {
     const updated = [...sets]
     updated[currentIdx] = [...currentSets]
-    updated[currentIdx][setIdx] = { ...currentSets[setIdx], completed: !currentSets[setIdx].completed }
+    const wasCompleted = currentSets[setIdx].completed
+    updated[currentIdx][setIdx] = { ...currentSets[setIdx], completed: !wasCompleted }
     setSets(updated)
+
+    if (!wasCompleted) {
+      setRestTimerActive(true)
+      setRestTimerSeconds(currentRestSeconds)
+    }
   }
 
   const addSet = () => {
     const updated = [...sets]
-    updated[currentIdx] = [...currentSets, { weight_kg: '', reps: '', completed: false }]
+    const lastSet = currentSets[currentSets.length - 1]
+    const { min: repMin } = parseRepRange(currentEx.reps)
+    updated[currentIdx] = [
+      ...currentSets,
+      {
+        set_number: currentSets.length + 1,
+        weight_kg: lastSet?.weight_kg ?? '',
+        reps: lastSet?.reps ?? String(repMin),
+        completed: false,
+        suggestedWeight: null,
+        suggestedReason: null,
+        lastWeight: null,
+        lastReps: null,
+      },
+    ]
     setSets(updated)
   }
 
@@ -408,13 +495,47 @@ function WorkoutSession({ dayId, user, profile, onDone }: any) {
       </View>
 
       <ScrollView contentContainerStyle={s.modalContent}>
+        {showOverloadBanner && (
+          <View style={s.overloadBanner}>
+            <Ionicons name="sparkles" size={16} color={brandColors.warning} />
+            <Text style={s.overloadBannerText}>AI progressive overload is active for this workout</Text>
+          </View>
+        )}
+
         <Text style={s.sessionExName}>{currentEx.exercises.name}</Text>
         <Text style={s.sessionExMeta}>{currentEx.exercises.body_part} · {currentEx.exercises.equipment} · {currentEx.reps} reps</Text>
 
-        {suggestion && (
+        {currentLastExercise && (
+          <View style={s.lastSessionCard}>
+            <Text style={s.lastSessionLabel}>Last session</Text>
+            <Text style={s.lastSessionValue}>
+              {currentLastExercise.sets[0]?.weight_kg ?? 0}kg top set · {currentLastExercise.sets.length} logged sets
+            </Text>
+          </View>
+        )}
+
+        {currentSuggestion && (
           <View style={s.suggestionCard}>
             <Ionicons name="trending-up" size={18} color={brandColors.brand500} />
-            <Text style={s.suggestionText}>{suggestion.reason}</Text>
+            <Text style={s.suggestionText}>{currentSuggestion}</Text>
+          </View>
+        )}
+
+        {restTimerActive && restTimerSeconds > 0 && (
+          <View style={s.restTimerCard}>
+            <View style={s.restTimerTopRow}>
+              <View style={s.restTimerTitleRow}>
+                <Ionicons name="timer-outline" size={18} color="#fff" />
+                <Text style={s.restTimerTitle}>Rest timer</Text>
+              </View>
+              <TouchableOpacity onPress={() => { setRestTimerActive(false); setRestTimerSeconds(0) }}>
+                <Text style={s.restTimerSkip}>Skip</Text>
+              </TouchableOpacity>
+            </View>
+            <Text style={s.restTimerValue}>{formatTime(restTimerSeconds)}</Text>
+            <View style={s.restTimerTrack}>
+              <View style={[s.restTimerFill, { width: `${restProgress}%` }]} />
+            </View>
           </View>
         )}
 
@@ -433,7 +554,8 @@ function WorkoutSession({ dayId, user, profile, onDone }: any) {
               value={set.weight_kg}
               onChangeText={(v) => updateSet(si, 'weight_kg', v)}
               keyboardType="numeric"
-              placeholder={suggestion ? `${suggestion.suggestedWeight}` : '0'}
+              editable={!set.completed}
+              placeholder={set.suggestedWeight ? `${set.suggestedWeight}` : '0'}
               placeholderTextColor="#c4b5fd"
             />
             <TextInput
@@ -441,6 +563,7 @@ function WorkoutSession({ dayId, user, profile, onDone }: any) {
               value={set.reps}
               onChangeText={(v) => updateSet(si, 'reps', v)}
               keyboardType="numeric"
+              editable={!set.completed}
               placeholder={currentEx.reps.split('-').pop() || '12'}
               placeholderTextColor="#c4b5fd"
             />
@@ -465,6 +588,8 @@ function WorkoutSession({ dayId, user, profile, onDone }: any) {
         <TouchableOpacity
           style={[s.saveBtn, { flex: 2 }, saving && s.saveBtnDisabled]}
           onPress={() => {
+            setRestTimerActive(false)
+            setRestTimerSeconds(0)
             if (currentIdx < exercises.length - 1) setCurrentIdx(currentIdx + 1)
             else handleFinish()
           }}
@@ -535,6 +660,19 @@ const s = StyleSheet.create({
   sessionExMeta: { fontSize: 14, color: brandColors.textMuted, textAlign: 'center', marginTop: 4, marginBottom: 16 },
   suggestionCard: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: brandColors.brand100, borderRadius: 14, borderWidth: 1, borderColor: 'rgba(77, 196, 255, 0.2)', padding: 12, marginBottom: 16 },
   suggestionText: { fontSize: 13, color: '#0f4262', flex: 1 },
+  overloadBanner: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#fff6dd', borderRadius: 14, borderWidth: 1, borderColor: '#f3d27a', padding: 12, marginBottom: 14 },
+  overloadBannerText: { fontSize: 13, color: '#7a5813', fontWeight: '600', flex: 1 },
+  lastSessionCard: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 14, borderWidth: 1, borderColor: brandColors.line, padding: 12, marginBottom: 12 },
+  lastSessionLabel: { fontSize: 12, fontWeight: '700', color: brandColors.textMuted, textTransform: 'uppercase', letterSpacing: 0.4 },
+  lastSessionValue: { fontSize: 14, color: brandColors.foregroundSoft, marginTop: 4, fontWeight: '600' },
+  restTimerCard: { backgroundColor: brandColors.brand900, borderRadius: 18, padding: 16, marginBottom: 16 },
+  restTimerTopRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  restTimerTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  restTimerTitle: { color: '#fff', fontSize: 15, fontWeight: '700' },
+  restTimerSkip: { color: 'rgba(255,255,255,0.82)', fontSize: 13, fontWeight: '700' },
+  restTimerValue: { color: '#fff', fontSize: 34, fontWeight: '800', textAlign: 'center', marginVertical: 10 },
+  restTimerTrack: { height: 6, backgroundColor: 'rgba(255,255,255,0.18)', borderRadius: 999, overflow: 'hidden' },
+  restTimerFill: { height: '100%', backgroundColor: brandColors.brand400, borderRadius: 999 },
   setsHeader: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: brandColors.lineStrong },
   setCol: { flex: 1, fontSize: 12, fontWeight: '700', color: brandColors.textMuted, textAlign: 'center' },
   setRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 6 },

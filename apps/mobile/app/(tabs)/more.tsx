@@ -18,8 +18,8 @@ const MENU_ITEMS: MenuItem[] = [
   { icon: 'water', label: 'Water Tracking', route: '/(tabs)/water', color: brandColors.brand500 },
   { icon: 'sparkles', label: 'AI Generate Plans', route: '/(tabs)/ai-generate', color: brandColors.brand500 },
   { icon: 'sparkles', label: 'AI Suggestions', route: '/(tabs)/ai', color: brandColors.brand400 },
-  { icon: 'chatbubbles', label: 'My PT / Messages', route: '/(tabs)/my-pt', color: '#3b82f6', roles: ['free', 'pro'] },
-  { icon: 'people', label: 'Clients', route: '/(tabs)/clients', color: '#df9a2b', roles: ['nutritionist'] },
+  { icon: 'chatbubbles', label: 'My Trainer / Messages', route: '/(tabs)/my-pt', color: '#3b82f6', roles: ['free', 'pro', 'personal_trainer_client', 'nutritionist_client'] },
+  { icon: 'people', label: 'Clients', route: '/(tabs)/clients', color: '#df9a2b', roles: ['personal_trainer', 'nutritionist'] },
   { icon: 'settings-sharp', label: 'Settings', route: '/(tabs)/settings', color: brandColors.textMuted },
 ]
 

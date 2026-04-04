@@ -10,6 +10,7 @@ import {
   AlertTriangle, Stethoscope, Leaf, ThumbsDown, Activity, Weight,
 } from 'lucide-react'
 import type { UserProfile, DietPlan, TrainingPlan } from '@/lib/supabase/types'
+import { isTrainerRole } from '@nutrigoal/shared'
 
 export default function ClientDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -22,7 +23,7 @@ export default function ClientDetailPage() {
 
   useEffect(() => {
     if (!profile) return
-    if (profile.role !== 'nutritionist') { router.push('/dashboard'); return }
+    if (!isTrainerRole(profile.role)) { router.push('/dashboard'); return }
 
     const supabase = createClient()
     async function load() {

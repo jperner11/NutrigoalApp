@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { Sparkles, Dumbbell, Utensils, CheckCircle2, AlertCircle, Loader2, Pill, ArrowRight } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { checkRegenEligibility, getRegenCooldownDays } from '@/lib/tierUtils'
+import { isManagedClientRole } from '@nutrigoal/shared'
 
 type StepStatus = 'pending' | 'loading' | 'done' | 'error'
 
@@ -23,9 +24,9 @@ export default function GeneratePlansPage() {
   const { profile } = useUser()
   const startedRef = useRef(false)
 
-  // Block nutritionist_client — their plans come from the nutritionist
+  // Managed clients cannot regenerate plans directly.
   useEffect(() => {
-    if (profile?.role === 'nutritionist_client') {
+    if (isManagedClientRole(profile?.role)) {
       router.replace('/dashboard')
     }
   }, [profile, router])
@@ -61,12 +62,12 @@ export default function GeneratePlansPage() {
     if (profile.onboarding_completed) {
       const cooldown = getRegenCooldownDays(profile.role)
       if (cooldown === null) {
-        // Free or nutritionist_client: cannot regenerate at all
+        // Free or managed-client: cannot regenerate at all
         toast.error('Plan regeneration requires a Pro plan or higher.')
         router.push('/dashboard')
         return
       }
-      // Pro/Unlimited/Nutritionist: check cooldown
+      // Pro/Unlimited/Trainer: check cooldown
       const { canRegenerate, daysRemaining } = await checkRegenEligibility(profile.id, profile.role)
       if (!canRegenerate) {
         toast.error(`You can regenerate plans in ${daysRemaining} day${daysRemaining !== 1 ? 's' : ''}.`)

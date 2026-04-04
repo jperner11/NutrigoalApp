@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useUser } from '@/hooks/useUser'
 import { Sparkles, Send, Lock } from 'lucide-react'
 import { toast } from 'react-hot-toast'
+import { isManagedClientRole } from '@nutrigoal/shared'
 
 export default function AISuggestPage() {
   const { profile } = useUser()
@@ -14,7 +15,7 @@ export default function AISuggestPage() {
 
   const role = profile?.role ?? 'free'
   const isFree = role === 'free'
-  const isClient = role === 'nutritionist_client'
+  const isClient = isManagedClientRole(role)
   const canUse = !isFree && !isClient
 
   useEffect(() => {
@@ -79,7 +80,7 @@ export default function AISuggestPage() {
           <Sparkles className="h-5 w-5 text-purple-600" />
           <span className="text-sm text-gray-700">
             {isClient ? (
-              <span>AI features are managed by your nutritionist</span>
+              <span>AI features are managed by your trainer</span>
             ) : isFree ? (
               <span>AI suggestions are a <span className="font-semibold">Pro</span> feature</span>
             ) : (

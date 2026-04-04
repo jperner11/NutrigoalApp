@@ -8,6 +8,7 @@ import { ArrowLeft, Plus, Trash2, Search, Loader2 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import Link from 'next/link'
 import type { FoodItem, MealType, UserProfile } from '@/lib/supabase/types'
+import { isTrainerRole } from '@nutrigoal/shared'
 
 interface MealEntry {
   meal_type: MealType
@@ -36,7 +37,7 @@ export default function NewClientDietPlanPage() {
 
   useEffect(() => {
     if (!profile) return
-    if (profile.role !== 'nutritionist') { router.push('/dashboard'); return }
+    if (!isTrainerRole(profile.role)) { router.push('/dashboard'); return }
     const supabase = createClient()
     supabase.from('user_profiles').select('*').eq('id', id).single().then(({ data }) => {
       if (data) setClient(data as UserProfile)

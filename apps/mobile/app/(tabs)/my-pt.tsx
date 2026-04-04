@@ -101,7 +101,7 @@ export default function MyPTScreen() {
       <View style={s.empty}>
         <Ionicons name="person-outline" size={48} color={brandColors.textSubtle} />
         <Text style={s.emptyText}>No PT assigned</Text>
-        <Text style={s.emptyHint}>Ask your PT or nutritionist to invite you.</Text>
+        <Text style={s.emptyHint}>Ask your personal trainer to invite you.</Text>
       </View>
     </SafeAreaView>
   )
@@ -118,7 +118,7 @@ export default function MyPTScreen() {
             <Text style={s.ptAvatarText}>{ptName[0].toUpperCase()}</Text>
           </View>
           <Text style={s.ptName}>{ptName}</Text>
-          <Text style={s.ptLabel}>Your Personal Trainer / Nutritionist</Text>
+          <Text style={s.ptLabel}>Your personal trainer</Text>
         </View>
 
         {/* Action Cards */}

@@ -1,16 +1,18 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
 import { ArrowLeft, Send } from 'lucide-react'
 import Link from 'next/link'
 import type { Message, UserProfile } from '@/lib/supabase/types'
+import { isTrainerRole } from '@nutrigoal/shared'
 
 export default function ClientMessagesPage() {
   const { id } = useParams<{ id: string }>()
   const { profile } = useUser()
+  const router = useRouter()
   const [client, setClient] = useState<UserProfile | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [text, setText] = useState('')
@@ -44,6 +46,7 @@ export default function ClientMessagesPage() {
 
   useEffect(() => {
     if (!profile) return
+    if (!isTrainerRole(profile.role)) { router.push('/dashboard'); return }
     const supabase = createClient()
 
     // Load client info
@@ -80,7 +83,7 @@ export default function ClientMessagesPage() {
 
       return () => { supabase.removeChannel(channel) }
     })
-  }, [profile, id, getOrCreateConversation])
+  }, [profile, id, getOrCreateConversation, router])
 
   const handleSend = async () => {
     if (!text.trim() || !conversationId || !profile) return

@@ -27,6 +27,7 @@ import StreaksWidget from '@/components/dashboard/StreaksWidget'
 import TodayTrainingPreview from '@/components/dashboard/TodayTrainingPreview'
 import QuickWeightLog from '@/components/dashboard/QuickWeightLog'
 import SupplementWidget from '@/components/dashboard/SupplementWidget'
+import { isTrainerRole } from '@nutrigoal/shared'
 
 function getGreeting(): string {
   const hour = new Date().getHours()
@@ -47,6 +48,7 @@ export default function DashboardPage() {
     cardioMinutes: 0,
   })
   const [clientCount, setClientCount] = useState(0)
+  const [pendingInviteCount, setPendingInviteCount] = useState(0)
   const [weeklyStats, setWeeklyStats] = useState({
     avgGoalPct: null as number | null,
     workoutsThisWeek: 0,
@@ -207,8 +209,7 @@ export default function DashboardPage() {
         })
       }
 
-      // If nutritionist, count clients
-      if (profile!.role === 'nutritionist') {
+      if (isTrainerRole(profile!.role)) {
         const { count } = await supabase
           .from('nutritionist_clients')
           .select('*', { count: 'exact', head: true })
@@ -216,6 +217,14 @@ export default function DashboardPage() {
           .eq('status', 'active')
 
         setClientCount(count ?? 0)
+
+        const { count: pendingCount } = await supabase
+          .from('personal_trainer_invites')
+          .select('*', { count: 'exact', head: true })
+          .eq('personal_trainer_id', profile!.id)
+          .eq('status', 'pending')
+
+        setPendingInviteCount(pendingCount ?? 0)
       }
     }
 
@@ -509,21 +518,21 @@ export default function DashboardPage() {
           </Link>
         )}
 
-        {profile.role === 'nutritionist' && (
+        {isTrainerRole(profile.role) && (
           <Link href="/clients" className="group panel-strong flex items-center space-x-4 p-5">
             <div className="rounded-2xl bg-[var(--brand-100)] p-3 transition-shadow group-hover:shadow-sm">
               <Users className="h-6 w-6 text-[var(--brand-900)]" />
             </div>
             <div>
-              <h3 className="font-semibold text-[var(--foreground)]">My Clients</h3>
-              <p className="text-sm text-[var(--muted)]">{clientCount} active clients</p>
+              <h3 className="font-semibold text-[var(--foreground)]">Client Roster</h3>
+              <p className="text-sm text-[var(--muted)]">{clientCount} active · {pendingInviteCount} pending</p>
             </div>
           </Link>
         )}
       </div>
 
-      {/* Nutritionist Client Summary */}
-      {profile.role === 'nutritionist' && (
+      {/* Trainer Client Summary */}
+      {isTrainerRole(profile.role) && (
         <div className="panel-strong p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-display text-2xl font-bold text-[var(--foreground)]">Client Overview</h2>
@@ -531,13 +540,13 @@ export default function DashboardPage() {
               View All
             </Link>
           </div>
-          {clientCount === 0 ? (
+          {clientCount === 0 && pendingInviteCount === 0 ? (
             <div className="text-center py-8">
               <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-[var(--brand-100)]">
                 <Users className="h-8 w-8 text-[var(--brand-500)]" />
               </div>
               <p className="mb-1 font-medium text-[var(--muted)]">No clients yet</p>
-              <p className="mb-5 text-sm text-[var(--muted-soft)]">Start growing your practice by inviting your first client.</p>
+              <p className="mb-5 text-sm text-[var(--muted-soft)]">Start growing your roster by inviting your first client.</p>
               <Link
                 href="/clients/invite"
                 className="btn-primary inline-flex items-center space-x-2 rounded-2xl px-5 py-3 text-sm font-semibold"
@@ -547,9 +556,14 @@ export default function DashboardPage() {
               </Link>
             </div>
           ) : (
-            <p className="text-[var(--foreground)]">
-              You have <span className="font-semibold text-[var(--brand-500)]">{clientCount}</span> active client{clientCount !== 1 ? 's' : ''}.
-            </p>
+            <div className="space-y-2 text-[var(--foreground)]">
+              <p>
+                You have <span className="font-semibold text-[var(--brand-500)]">{clientCount}</span> active client{clientCount !== 1 ? 's' : ''}.
+              </p>
+              <p className="text-sm text-[var(--muted)]">
+                {pendingInviteCount} pending invite{pendingInviteCount !== 1 ? 's' : ''} still waiting for acceptance.
+              </p>
+            </div>
           )}
         </div>
       )}

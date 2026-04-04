@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ArrowRight, Eye, EyeOff, Lock, Mail, User, UserCircle, Users } from 'lucide-react'
 import { toast } from 'react-hot-toast'
@@ -10,13 +10,22 @@ import BrandLogo from '@/components/brand/BrandLogo'
 export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [nextPath, setNextPath] = useState('/onboarding')
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     password: '',
     confirmPassword: '',
-    role: 'free' as 'free' | 'nutritionist',
+    role: 'free' as 'free' | 'personal_trainer',
   })
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const next = params.get('next') || '/onboarding'
+    const email = params.get('email') || ''
+    setNextPath(next)
+    setFormData(prev => ({ ...prev, email }))
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -38,6 +47,7 @@ export default function SignupPage() {
 
     setIsLoading(true)
     const supabase = createClient()
+    const redirectBase = typeof window !== 'undefined' ? window.location.origin : ''
 
     const { error } = await supabase.auth.signUp({
       email: formData.email,
@@ -47,6 +57,7 @@ export default function SignupPage() {
           role: formData.role,
           full_name: formData.fullName.trim(),
         },
+        emailRedirectTo: `${redirectBase}/auth/callback?next=${encodeURIComponent(nextPath)}`,
       },
     })
 
@@ -80,7 +91,7 @@ export default function SignupPage() {
         .update({ role: formData.role, full_name: formData.fullName.trim() })
         .eq('id', user.id)
 
-      if (formData.role === 'nutritionist') {
+      if (formData.role === 'personal_trainer') {
         await supabase.from('nutritionist_packages').insert({
           nutritionist_id: user.id,
           max_clients: 10,
@@ -93,14 +104,14 @@ export default function SignupPage() {
     }
 
     toast.success('Account created! Please check your email to confirm.')
-    window.location.href = '/onboarding'
+    window.location.href = nextPath
   }
 
   return (
     <div className="auth-bg min-h-screen px-4 py-10 sm:px-6 lg:px-8">
       <div className="mx-auto flex max-w-7xl items-center justify-between pb-8">
         <BrandLogo href="/" />
-        <Link href="/login" className="btn-secondary rounded-full px-5 py-3 text-sm font-semibold">
+        <Link href={`/login${nextPath !== '/onboarding' ? `?next=${encodeURIComponent(nextPath)}` : ''}`} className="btn-secondary rounded-full px-5 py-3 text-sm font-semibold">
           Sign in
         </Link>
       </div>
@@ -118,7 +129,7 @@ export default function SignupPage() {
           <div className="mt-10 grid gap-4 sm:grid-cols-2">
             {[
               ['Individuals', 'Guided plan generation, structured tracking, sharper coaching'],
-              ['Nutritionists', 'Client workflows, manual planning, practitioner oversight'],
+              ['Personal trainers', 'Client workflows, manual planning, practitioner oversight'],
             ].map(([title, body]) => (
               <div key={title} className="surface-card p-5">
                 <div className="font-display text-2xl font-bold text-[var(--foreground)]">{title}</div>
@@ -155,15 +166,15 @@ export default function SignupPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setFormData(prev => ({ ...prev, role: 'nutritionist' }))}
-                  className={`rounded-[22px] border p-5 text-left transition ${formData.role === 'nutritionist'
+                  onClick={() => setFormData(prev => ({ ...prev, role: 'personal_trainer' }))}
+                  className={`rounded-[22px] border p-5 text-left transition ${formData.role === 'personal_trainer'
                     ? 'border-[rgba(29,168,240,0.34)] bg-[var(--brand-100)] shadow-[0_14px_32px_rgba(29,168,240,0.12)]'
                     : 'border-[var(--line)] bg-white/65 hover:border-[rgba(29,168,240,0.24)]'
                   }`}
                 >
-                  <Users className={`mb-3 h-7 w-7 ${formData.role === 'nutritionist' ? 'text-[var(--brand-900)]' : 'text-[var(--muted-soft)]'}`} />
-                  <div className="font-display text-xl font-bold text-[var(--foreground)]">Nutritionist</div>
-                  <div className="mt-1 text-sm text-[var(--muted)]">For client management and plan delivery.</div>
+                  <Users className={`mb-3 h-7 w-7 ${formData.role === 'personal_trainer' ? 'text-[var(--brand-900)]' : 'text-[var(--muted-soft)]'}`} />
+                  <div className="font-display text-xl font-bold text-[var(--foreground)]">Personal Trainer</div>
+                  <div className="mt-1 text-sm text-[var(--muted)]">For client management, coaching, and plan delivery.</div>
                 </button>
               </div>
             </div>
@@ -253,7 +264,7 @@ export default function SignupPage() {
 
           <div className="mt-8 border-t border-[var(--line)] pt-6 text-sm text-[var(--muted)]">
             Already have an account?{' '}
-            <Link href="/login" className="font-semibold text-[var(--foreground)] transition hover:text-[var(--brand-500)]">
+            <Link href={`/login${nextPath !== '/onboarding' ? `?next=${encodeURIComponent(nextPath)}` : ''}`} className="font-semibold text-[var(--foreground)] transition hover:text-[var(--brand-500)]">
               Sign in
             </Link>
           </div>

@@ -40,7 +40,7 @@ export const PRICING = {
     ],
   },
   nutritionist: {
-    name: 'Nutritionist',
+    name: 'Personal Trainer',
     price: 49.99,
     regenCooldownDays: 0, // unlimited
     baseClients: 10,
@@ -65,6 +65,34 @@ export const PRICING = {
       'Supplement tracking',
       'Meal notes & alternatives',
       'Plans managed by your nutritionist',
+    ],
+  },
+  personal_trainer: {
+    name: 'Personal Trainer',
+    price: 49.99,
+    regenCooldownDays: 0,
+    baseClients: 10,
+    extraClientPrice: 3.99,
+    features: [
+      'Everything in Unlimited',
+      'Client management (10 included)',
+      'Create plans for clients',
+      'Monitor client progress',
+      'Prescribe cardio sessions',
+      'Additional clients at $3.99/mo each',
+    ],
+  },
+  personal_trainer_client: {
+    name: 'Client Plan',
+    price: 0,
+    regenCooldownDays: null as number | null,
+    features: [
+      'Full meal plan access',
+      'Full training plan access',
+      'Cardio tracking',
+      'Supplement tracking',
+      'Meal notes & alternatives',
+      'Plans managed by your personal trainer',
     ],
   },
 } as const

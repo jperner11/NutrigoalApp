@@ -11,6 +11,7 @@ import { supabase } from '../../src/lib/supabase'
 import {
   BODY_PARTS, EQUIPMENT_TYPES, MEAL_TYPES,
   DEFAULT_REST_SECONDS, DEFAULT_SETS, DEFAULT_REPS,
+  isTrainerRole,
 } from '@nutrigoal/shared'
 import type {
   NutritionistClient, UserProfile, DietPlan, TrainingPlan,
@@ -24,6 +25,14 @@ const API_URL = process.env.EXPO_PUBLIC_API_URL || ''
 // ─── Types ──────────────────────────────────────────────
 interface ClientWithProfile extends NutritionistClient {
   profile?: UserProfile | null
+}
+
+interface PendingInvite {
+  id: string
+  invited_email: string
+  status: 'pending' | 'accepted' | 'expired' | 'revoked' | 'declined'
+  expires_at: string
+  created_at: string
 }
 
 type Screen = 'list' | 'detail' | 'messages' | 'feedback' | 'create-diet' | 'create-training'
@@ -46,7 +55,7 @@ interface ExerciseEntry {
 
 // ─── Main Screen ────────────────────────────────────────
 export default function ClientsScreen() {
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const router = useRouter()
   const [screen, setScreen] = useState<Screen>('list')
   const [clients, setClients] = useState<ClientWithProfile[]>([])
@@ -55,20 +64,31 @@ export default function ClientsScreen() {
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviting, setInviting] = useState(false)
   const [selectedClient, setSelectedClient] = useState<ClientWithProfile | null>(null)
+  const [pendingInvites, setPendingInvites] = useState<PendingInvite[]>([])
 
   const fetchClients = async () => {
     if (!user) return
-    const { data } = await supabase
-      .from('nutritionist_clients')
-      .select('*, user_profiles!nutritionist_clients_client_id_fkey(*)')
-      .eq('nutritionist_id', user.id)
-      .order('created_at', { ascending: false })
+    const [{ data }, { data: inviteRows }] = await Promise.all([
+      supabase
+        .from('nutritionist_clients')
+        .select('*, user_profiles!nutritionist_clients_client_id_fkey(*)')
+        .eq('nutritionist_id', user.id)
+        .eq('status', 'active')
+        .order('created_at', { ascending: false }),
+      supabase
+        .from('personal_trainer_invites')
+        .select('id, invited_email, status, expires_at, created_at')
+        .eq('personal_trainer_id', user.id)
+        .in('status', ['pending', 'expired'])
+        .order('created_at', { ascending: false }),
+    ])
     if (data) {
       setClients(data.map((c: any) => ({
         ...c,
         profile: c.user_profiles || null,
       })))
     }
+    setPendingInvites((inviteRows as PendingInvite[]) || [])
   }
 
   useEffect(() => { fetchClients() }, [user])
@@ -76,29 +96,26 @@ export default function ClientsScreen() {
 
   const handleInvite = async () => {
     if (!user || !inviteEmail.trim()) return
-    setInviting(true)
-
-    // Check if user exists
-    const { data: existingUser } = await supabase
-      .from('user_profiles')
-      .select('id')
-      .eq('email', inviteEmail.trim().toLowerCase())
-      .single()
-
-    const { error } = await supabase.from('nutritionist_clients').insert({
-      nutritionist_id: user.id,
-      client_id: existingUser?.id || null,
-      invited_email: inviteEmail.trim().toLowerCase(),
-      status: existingUser ? 'active' : 'pending',
-    })
-
-    setInviting(false)
-    if (error) {
-      if (error.code === '23505') Alert.alert('Already Added', 'This client is already in your list.')
-      else Alert.alert('Error', error.message)
+    if (!API_URL) {
+      Alert.alert('Missing API URL', 'Set EXPO_PUBLIC_API_URL so the app can send trainer invites.')
       return
     }
-    Alert.alert('Success', existingUser ? 'Client added!' : 'Invitation sent! They\'ll appear once they sign up.')
+    setInviting(true)
+
+    const response = await fetch(`${API_URL}/api/personal-trainer/invites`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: inviteEmail.trim().toLowerCase() }),
+    })
+    const payload = await response.json().catch(() => null)
+
+    setInviting(false)
+    if (!response.ok) {
+      Alert.alert('Error', payload?.error || 'Failed to send invite.')
+      return
+    }
+
+    Alert.alert('Invite sent', payload?.message || 'The client must accept before they appear as active.')
     setInviteEmail('')
     setShowInvite(false)
     await fetchClients()
@@ -130,7 +147,19 @@ export default function ClientsScreen() {
   }
 
   const activeClients = clients.filter(c => c.status === 'active')
-  const pendingClients = clients.filter(c => c.status === 'pending')
+  const pendingClients = pendingInvites
+
+  if (profile && !isTrainerRole(profile.role)) {
+    return (
+      <SafeAreaView style={st.container}>
+        <View style={st.empty}>
+          <Ionicons name="lock-closed-outline" size={48} color={brandColors.textSubtle} />
+          <Text style={st.emptyText}>Trainer access only</Text>
+          <Text style={st.clientMeta}>This area is only available for personal trainer accounts.</Text>
+        </View>
+      </SafeAreaView>
+    )
+  }
 
   return (
     <SafeAreaView style={st.container}>
@@ -175,13 +204,15 @@ export default function ClientsScreen() {
               <>
                 <Text style={st.sectionTitle}>Pending ({pendingClients.length})</Text>
                 {pendingClients.map(c => (
-                  <View key={c.id} style={[st.clientCard, { opacity: 0.6 }]}>
+                  <View key={c.id} style={[st.clientCard, { opacity: 0.7 }]}>
                     <View style={[st.avatar, { backgroundColor: '#f3f4f6' }]}>
                       <Ionicons name="hourglass-outline" size={18} color="#9ca3af" />
                     </View>
                     <View style={{ flex: 1 }}>
                       <Text style={st.clientName}>{c.invited_email}</Text>
-                      <Text style={st.clientMeta}>Awaiting signup</Text>
+                      <Text style={st.clientMeta}>
+                        {new Date(c.expires_at).getTime() < Date.now() ? 'Invite expired' : 'Awaiting acceptance'}
+                      </Text>
                     </View>
                   </View>
                 ))}
@@ -203,7 +234,7 @@ export default function ClientsScreen() {
             <Text style={st.label}>Client's email address</Text>
             <TextInput style={st.input} value={inviteEmail} onChangeText={setInviteEmail} placeholder="client@email.com" placeholderTextColor="#9ca3af"
               keyboardType="email-address" autoCapitalize="none" autoCorrect={false} />
-            <Text style={st.hint}>If they already have an account, they'll be added immediately. Otherwise they'll appear once they sign up.</Text>
+            <Text style={st.hint}>We&apos;ll send a secure invite email. They only appear as active after they accept.</Text>
             <TouchableOpacity style={[st.primaryBtn, inviting && { opacity: 0.6 }]} onPress={handleInvite} disabled={inviting || !inviteEmail.trim()}>
               {inviting ? <ActivityIndicator color="#fff" /> : <Text style={st.primaryBtnText}>Send Invite</Text>}
             </TouchableOpacity>

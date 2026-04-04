@@ -2,16 +2,17 @@
 
 import { useState } from 'react'
 import { useUser } from '@/hooks/useUser'
-import { createClient } from '@/lib/supabase/client'
 import { Mail, ArrowLeft } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { isTrainerRole } from '@nutrigoal/shared'
 
 export default function InviteClientPage() {
   const { profile } = useUser()
   const router = useRouter()
   const [email, setEmail] = useState('')
+  const [clientFirstName, setClientFirstName] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
   const handleInvite = async (e: React.FormEvent) => {
@@ -19,72 +20,29 @@ export default function InviteClientPage() {
     if (!profile || !email) return
 
     setIsLoading(true)
-    const supabase = createClient()
-
-    // Check if client already exists
-    const { data: existing } = await supabase
-      .from('nutritionist_clients')
-      .select('id')
-      .eq('nutritionist_id', profile.id)
-      .eq('invited_email', email)
-      .single()
-
-    if (existing) {
-      toast.error('This email has already been invited')
-      setIsLoading(false)
-      return
-    }
-
-    // Check client limit
-    const { count } = await supabase
-      .from('nutritionist_clients')
-      .select('*', { count: 'exact', head: true })
-      .eq('nutritionist_id', profile.id)
-      .in('status', ['active', 'pending'])
-
-    const { data: pkg } = await supabase
-      .from('nutritionist_packages')
-      .select('max_clients')
-      .eq('nutritionist_id', profile.id)
-      .single()
-
-    const maxClients = pkg?.max_clients ?? 10
-    if ((count ?? 0) >= maxClients) {
-      toast.error(`Client limit reached (${maxClients}). Upgrade your package to add more.`)
-      setIsLoading(false)
-      return
-    }
-
-    // Check if user already exists in the system
-    const { data: existingUser } = await supabase
-      .from('user_profiles')
-      .select('id')
-      .eq('email', email)
-      .single()
-
-    const { error } = await supabase.from('nutritionist_clients').insert({
-      nutritionist_id: profile.id,
-      client_id: existingUser?.id ?? null,
-      status: existingUser ? 'active' : 'pending',
-      invited_email: email,
+    const response = await fetch('/api/personal-trainer/invites', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: email.trim().toLowerCase(),
+        clientFirstName: clientFirstName.trim(),
+      }),
     })
 
-    if (error) {
-      toast.error('Failed to invite client')
+    const payload = await response.json().catch(() => null)
+
+    if (!response.ok) {
+      toast.error(payload?.error ?? 'Failed to invite client')
       setIsLoading(false)
       return
     }
 
-    // If existing user, set their role to nutritionist_client and link nutritionist
-    if (existingUser) {
-      await supabase
-        .from('user_profiles')
-        .update({ role: 'nutritionist_client', nutritionist_id: profile.id })
-        .eq('id', existingUser.id)
-    }
-
-    toast.success(`Invitation sent to ${email}`)
+    toast.success(payload?.message ?? `Invite sent to ${email}`)
     router.push('/clients')
+  }
+
+  if (profile && !isTrainerRole(profile.role)) {
+    return null
   }
 
   return (
@@ -96,10 +54,20 @@ export default function InviteClientPage() {
 
       <h1 className="text-3xl font-bold text-gray-900 mb-2">Invite Client</h1>
       <p className="text-gray-800 mb-8">
-        Send an invitation to a client&apos;s email. If they already have an account, they&apos;ll be linked automatically.
+        Send a real invite email. The client must accept before they appear as active in your roster.
       </p>
 
       <form onSubmit={handleInvite} className="card p-6">
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Client First Name</label>
+          <input
+            type="text"
+            value={clientFirstName}
+            onChange={(e) => setClientFirstName(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+            placeholder="Optional"
+          />
+        </div>
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">Client Email</label>
           <div className="relative">
@@ -117,10 +85,14 @@ export default function InviteClientPage() {
           </div>
         </div>
 
+        <div className="mb-6 rounded-2xl border border-sky-100 bg-sky-50 px-4 py-3 text-sm leading-6 text-slate-700">
+          We&apos;ll send a secure invite link. Existing members receive a join request and new clients will be asked to create their account before accepting.
+        </div>
+
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-lg font-medium hover:shadow-lg transition-all disabled:opacity-50"
+          className="w-full bg-gradient-to-r from-sky-500 to-blue-600 text-white py-3 rounded-lg font-medium hover:shadow-lg transition-all disabled:opacity-50"
         >
           {isLoading ? 'Sending...' : 'Send Invitation'}
         </button>

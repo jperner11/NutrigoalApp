@@ -28,6 +28,9 @@ export type {
   UserProfile,
   NutritionistPackage,
   NutritionistClient,
+  PersonalTrainerPackage,
+  PersonalTrainerClient,
+  PersonalTrainerInvite,
   AIUsage,
   FoodItem,
   DietPlan,
@@ -60,6 +63,7 @@ export type {
   UserTierSelection,
   ExerciseProgress,
   TrainingCheckIn,
+  InviteStatus,
 } from './types'
 
 // Nutrition
@@ -121,3 +125,11 @@ export {
   COMMON_SUPPLEMENTS,
 } from './constants'
 export type { PlanType } from './constants'
+
+// Roles
+export {
+  isTrainerRole,
+  isManagedClientRole,
+  normalizeRole,
+  getRolePlanLabel,
+} from './roles'

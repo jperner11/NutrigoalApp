@@ -9,6 +9,7 @@ import { toast } from 'react-hot-toast'
 import Link from 'next/link'
 import type { Exercise, UserProfile } from '@/lib/supabase/types'
 import { BODY_PARTS, DEFAULT_REST_SECONDS, DEFAULT_SETS, DEFAULT_REPS } from '@/lib/constants'
+import { isTrainerRole } from '@nutrigoal/shared'
 
 interface DayExercise {
   tempId: string
@@ -45,7 +46,7 @@ export default function NewClientTrainingPlanPage() {
 
   useEffect(() => {
     if (!profile) return
-    if (profile.role !== 'nutritionist') { router.push('/dashboard'); return }
+    if (!isTrainerRole(profile.role)) { router.push('/dashboard'); return }
 
     const supabase = createClient()
     Promise.all([

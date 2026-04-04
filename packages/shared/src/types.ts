@@ -1,6 +1,13 @@
 // Database types for NutriGoal v2
 
-export type UserRole = 'free' | 'pro' | 'unlimited' | 'nutritionist' | 'nutritionist_client'
+export type UserRole =
+  | 'free'
+  | 'pro'
+  | 'unlimited'
+  | 'nutritionist'
+  | 'nutritionist_client'
+  | 'personal_trainer'
+  | 'personal_trainer_client'
 export type Gender = 'male' | 'female' | 'other'
 export type ActivityLevel = 'sedentary' | 'lightly_active' | 'moderately_active' | 'very_active' | 'extremely_active'
 export type FitnessGoal = 'bulking' | 'cutting' | 'maintenance'
@@ -11,6 +18,7 @@ export type ClientStatus = 'active' | 'inactive' | 'pending'
 export type SubscriptionStatus = 'active' | 'canceled' | 'past_due' | 'trialing'
 export type AIUsageType = 'meal_suggestion' | 'workout_suggestion' | 'coaching'
 export type FeedbackStatus = 'pending' | 'completed' | 'dismissed'
+export type InviteStatus = 'pending' | 'accepted' | 'expired' | 'revoked' | 'declined'
 export type TrainingExperience = 'never' | 'beginner' | 'intermediate' | 'advanced'
 export type EquipmentAccess = 'full_gym' | 'home_basic' | 'home_full' | 'bodyweight_only' | 'outdoor'
 export type TrainingStyle = 'strength' | 'hypertrophy' | 'functional' | 'endurance' | 'mixed'
@@ -50,6 +58,7 @@ export interface UserProfile {
   avatar_url: string | null
   onboarding_completed: boolean
   nutritionist_id: string | null
+  personal_trainer_id: string | null
   // Schedule
   wake_time: string | null
   sleep_time: string | null
@@ -119,6 +128,14 @@ export interface NutritionistPackage {
   created_at: string
 }
 
+export interface PersonalTrainerPackage {
+  id: string
+  personal_trainer_id: string
+  max_clients: number
+  stripe_subscription_id: string | null
+  created_at: string
+}
+
 export interface NutritionistClient {
   id: string
   nutritionist_id: string
@@ -126,6 +143,33 @@ export interface NutritionistClient {
   status: ClientStatus
   invited_email: string | null
   created_at: string
+}
+
+export interface PersonalTrainerClient {
+  id: string
+  personal_trainer_id: string
+  client_id: string | null
+  status: ClientStatus
+  invited_email: string | null
+  created_at: string
+}
+
+export interface PersonalTrainerInvite {
+  id: string
+  personal_trainer_id: string
+  invited_email: string
+  client_first_name: string | null
+  status: InviteStatus
+  invite_token: string
+  delivery_method: 'invite' | 'magiclink'
+  invited_user_id: string | null
+  accepted_at: string | null
+  declined_at: string | null
+  revoked_at: string | null
+  expires_at: string
+  last_sent_at: string
+  created_at: string
+  updated_at: string
 }
 
 export interface AIUsage {

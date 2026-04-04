@@ -12,18 +12,21 @@ import {
   ScrollView,
 } from 'react-native'
 import { Link } from 'expo-router'
+import { Ionicons } from '@expo/vector-icons'
 import { supabase } from '../../src/lib/supabase'
 import { BrandLogo } from '../../src/components/BrandLogo'
 import { brandColors, brandShadow } from '../../src/theme/brand'
 
 export default function SignupScreen() {
+  const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [role, setRole] = useState<'free' | 'personal_trainer'>('free')
   const [loading, setLoading] = useState(false)
 
   const handleSignup = async () => {
-    if (!email || !password || !confirmPassword) {
+    if (!fullName.trim() || !email || !password || !confirmPassword) {
       Alert.alert('Error', 'Please fill in all fields')
       return
     }
@@ -39,14 +42,61 @@ export default function SignupScreen() {
     }
 
     setLoading(true)
-    const { error } = await supabase.auth.signUp({ email, password })
-    setLoading(false)
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          role,
+          full_name: fullName.trim(),
+        },
+      },
+    })
 
     if (error) {
+      setLoading(false)
       Alert.alert('Sign Up Failed', error.message)
-    } else {
-      Alert.alert('Check your email', 'We sent you a confirmation link to verify your account.')
+      return
     }
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+      let profileReady = false
+
+      for (let i = 0; i < 10; i++) {
+        const { data } = await supabase
+          .from('user_profiles')
+          .select('id')
+          .eq('id', user.id)
+          .single()
+
+        if (data) {
+          profileReady = true
+          break
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, 500))
+      }
+
+      if (profileReady) {
+        await supabase
+          .from('user_profiles')
+          .update({ role, full_name: fullName.trim() })
+          .eq('id', user.id)
+
+        if (role === 'personal_trainer') {
+          await supabase
+            .from('nutritionist_packages')
+            .upsert({
+              nutritionist_id: user.id,
+              max_clients: 10,
+            }, { onConflict: 'nutritionist_id' })
+        }
+      }
+    }
+
+    setLoading(false)
+    Alert.alert('Check your email', 'We sent you a confirmation link to verify your account.')
   }
 
   return (
@@ -71,6 +121,35 @@ export default function SignupScreen() {
           </View>
 
           <View style={styles.formCard}>
+            <Text style={styles.label}>I am joining as</Text>
+            <View style={styles.roleRow}>
+              <TouchableOpacity
+                style={[styles.roleCard, role === 'free' && styles.roleCardActive]}
+                onPress={() => setRole('free')}
+              >
+                <Ionicons name="person-outline" size={22} color={role === 'free' ? brandColors.brand900 : brandColors.textMuted} />
+                <Text style={styles.roleTitle}>Individual</Text>
+                <Text style={styles.roleBody}>Personal tracking and self-serve progress.</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.roleCard, role === 'personal_trainer' && styles.roleCardActive]}
+                onPress={() => setRole('personal_trainer')}
+              >
+                <Ionicons name="people-outline" size={22} color={role === 'personal_trainer' ? brandColors.brand900 : brandColors.textMuted} />
+                <Text style={styles.roleTitle}>Personal Trainer</Text>
+                <Text style={styles.roleBody}>Client management, coaching, and plan delivery.</Text>
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.label}>Full Name</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Your full name"
+              placeholderTextColor={brandColors.textSubtle}
+              value={fullName}
+              onChangeText={setFullName}
+            />
+
             <Text style={styles.label}>Email</Text>
             <TextInput
               style={styles.input}
@@ -205,6 +284,34 @@ const styles = StyleSheet.create({
     color: brandColors.foregroundSoft,
     marginBottom: 4,
     marginTop: 12,
+  },
+  roleRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 4,
+  },
+  roleCard: {
+    flex: 1,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: brandColors.line,
+    backgroundColor: 'rgba(255,255,255,0.72)',
+    padding: 14,
+    gap: 6,
+  },
+  roleCardActive: {
+    borderColor: 'rgba(29, 168, 240, 0.34)',
+    backgroundColor: brandColors.brand100,
+  },
+  roleTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: brandColors.foreground,
+  },
+  roleBody: {
+    fontSize: 12,
+    lineHeight: 17,
+    color: brandColors.textMuted,
   },
   input: {
     backgroundColor: brandColors.backgroundElevated,
