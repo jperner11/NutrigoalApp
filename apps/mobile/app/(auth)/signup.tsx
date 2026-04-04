@@ -17,6 +17,8 @@ import { supabase } from '../../src/lib/supabase'
 import { BrandLogo } from '../../src/components/BrandLogo'
 import { brandColors, brandShadow } from '../../src/theme/brand'
 
+const TEST_DEFAULT_INDIVIDUAL_ROLE = 'unlimited' as const
+
 export default function SignupScreen() {
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
@@ -26,6 +28,8 @@ export default function SignupScreen() {
   const [loading, setLoading] = useState(false)
 
   const handleSignup = async () => {
+    const signupRole = role === 'free' ? TEST_DEFAULT_INDIVIDUAL_ROLE : role
+
     if (!fullName.trim() || !email || !password || !confirmPassword) {
       Alert.alert('Error', 'Please fill in all fields')
       return
@@ -47,7 +51,7 @@ export default function SignupScreen() {
       password,
       options: {
         data: {
-          role,
+          role: signupRole,
           full_name: fullName.trim(),
         },
       },
@@ -81,10 +85,10 @@ export default function SignupScreen() {
       if (profileReady) {
         await supabase
           .from('user_profiles')
-          .update({ role, full_name: fullName.trim() })
+          .update({ role: signupRole, full_name: fullName.trim() })
           .eq('id', user.id)
 
-        if (role === 'personal_trainer') {
+        if (signupRole === 'personal_trainer') {
           await supabase
             .from('nutritionist_packages')
             .upsert({

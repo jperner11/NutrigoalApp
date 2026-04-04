@@ -58,11 +58,20 @@ export default function GeneratePlansPage() {
   async function generateAll() {
     if (!profile) return
 
-    // Check regeneration eligibility (skip for first-time onboarding — no existing plans)
-    if (profile.onboarding_completed) {
+    const supabase = createClient()
+
+    const { count: priorGenerations } = await supabase
+      .from('ai_usage')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', profile.id)
+      .in('type', ['meal_suggestion', 'workout_suggestion'])
+
+    const hasGeneratedBefore = (priorGenerations ?? 0) > 0
+
+    // Check regeneration eligibility only after the user's first generated plan.
+    if (hasGeneratedBefore) {
       const cooldown = getRegenCooldownDays(profile.role)
       if (cooldown === null) {
-        // Free or managed-client: cannot regenerate at all
         toast.error('Plan regeneration requires a Pro plan or higher.')
         router.push('/dashboard')
         return
@@ -115,8 +124,6 @@ export default function GeneratePlansPage() {
     // Step 4: Save to database
     updateStep(3, { status: 'loading' })
     try {
-      const supabase = createClient()
-
       if (trainingPlan) {
         await saveTrainingPlan(supabase, trainingPlan)
         setSavedTraining(true)

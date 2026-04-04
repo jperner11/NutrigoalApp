@@ -7,6 +7,8 @@ import { toast } from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 import BrandLogo from '@/components/brand/BrandLogo'
 
+const TEST_DEFAULT_INDIVIDUAL_ROLE = 'unlimited' as const
+
 export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -29,6 +31,7 @@ export default function SignupPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    const signupRole = formData.role === 'free' ? TEST_DEFAULT_INDIVIDUAL_ROLE : formData.role
 
     if (!formData.fullName.trim() || !formData.email || !formData.password) {
       toast.error('Please fill in all fields')
@@ -54,7 +57,7 @@ export default function SignupPage() {
       password: formData.password,
       options: {
         data: {
-          role: formData.role,
+          role: signupRole,
           full_name: formData.fullName.trim(),
         },
         emailRedirectTo: `${redirectBase}/auth/callback?next=${encodeURIComponent(nextPath)}`,
@@ -88,19 +91,16 @@ export default function SignupPage() {
 
       await supabase
         .from('user_profiles')
-        .update({ role: formData.role, full_name: formData.fullName.trim() })
+        .update({ role: signupRole, full_name: formData.fullName.trim() })
         .eq('id', user.id)
 
-      if (formData.role === 'personal_trainer') {
+      if (signupRole === 'personal_trainer') {
         await supabase.from('nutritionist_packages').insert({
           nutritionist_id: user.id,
           max_clients: 10,
         })
       }
 
-      if (formData.role === 'free') {
-        await fetch('/api/trial/start', { method: 'POST' })
-      }
     }
 
     toast.success('Account created! Please check your email to confirm.')
