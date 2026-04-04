@@ -34,9 +34,14 @@ export default function MoreScreen() {
   const router = useRouter()
   const { profile, signOut } = useAuth()
   const userRole = profile?.role ?? 'free'
+  const managedClient = isManagedClientRole(userRole)
   const trainerMode = isTrainerRole(userRole) && !isManagedClientRole(userRole)
 
-  const visibleItems = (trainerMode ? TRAINER_MENU_ITEMS : CLIENT_MENU_ITEMS).filter(
+  const baseItems = trainerMode
+    ? TRAINER_MENU_ITEMS
+    : CLIENT_MENU_ITEMS.filter((item) => !(managedClient && item.route === '/(tabs)/ai-generate'))
+
+  const visibleItems = baseItems.filter(
     (item) => !item.roles || item.roles.includes(userRole)
   )
 

@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { useUser } from '@/hooks/useUser'
+import { createClient } from '@/lib/supabase/client'
 import { BarChart3, Utensils, Dumbbell, Droplets, TrendingUp, TrendingDown, Minus, ChevronLeft, ChevronRight } from 'lucide-react'
 import { generateWeeklyReport } from '@/lib/reports'
 import type { WeeklyReport } from '@/lib/reports'
+import { isTrainerRole } from '@nutrigoal/shared'
 
 function getWeekRange(offset: number): { start: string; end: string; label: string } {
   const now = new Date()
@@ -76,6 +78,7 @@ export default function ReportsPage() {
   const { profile } = useUser()
   const [weekOffset, setWeekOffset] = useState(0)
   const [report, setReport] = useState<WeeklyReport | null>(null)
+  const [trainerEvents, setTrainerEvents] = useState<Array<{ event_name: string; created_at: string; metadata: Record<string, unknown> }>>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -86,6 +89,19 @@ export default function ReportsPage() {
 
   async function loadReport() {
     setLoading(true)
+    if (isTrainerRole(profile!.role)) {
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('beta_events')
+        .select('event_name, created_at, metadata')
+        .eq('user_id', profile!.id)
+        .order('created_at', { ascending: false })
+        .limit(100)
+      setTrainerEvents((data as Array<{ event_name: string; created_at: string; metadata: Record<string, unknown> }>) ?? [])
+      setLoading(false)
+      return
+    }
+
     const { start, end } = getWeekRange(weekOffset)
     const data = await generateWeeklyReport(profile!.id, start, end, {
       calories: profile!.daily_calories,
@@ -99,6 +115,61 @@ export default function ReportsPage() {
   if (!profile) return null
 
   const { label: weekLabel } = getWeekRange(weekOffset)
+
+  if (isTrainerRole(profile.role)) {
+    const getCount = (eventName: string) => trainerEvents.filter((event) => event.event_name === eventName).length
+    const recentEvents = trainerEvents.slice(0, 8)
+
+    return (
+      <div className="max-w-4xl mx-auto space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Beta Reports</h1>
+          <p className="text-gray-600 mt-1">A quick operational view of onboarding and activation during the beta.</p>
+        </div>
+
+        {loading ? (
+          <div className="text-gray-500 text-center py-12">Loading beta metrics...</div>
+        ) : (
+          <>
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+              <StatCard label="Invites sent" value={getCount('client_invite_sent')} icon={BarChart3} color="blue" />
+              <StatCard label="Invites accepted" value={getCount('client_invite_accepted')} icon={TrendingUp} color="green" />
+              <StatCard label="Diet plans assigned" value={getCount('diet_plan_assigned')} icon={Utensils} color="orange" />
+              <StatCard label="Training plans assigned" value={getCount('training_plan_assigned')} icon={Dumbbell} color="purple" />
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+              <StatCard label="First meals logged" value={getCount('first_meal_logged')} icon={Utensils} color="orange" />
+              <StatCard label="First workouts logged" value={getCount('first_workout_logged')} icon={Dumbbell} color="blue" />
+              <StatCard label="First messages sent" value={getCount('first_message_sent')} icon={BarChart3} color="purple" />
+              <StatCard label="First feedback completed" value={getCount('first_feedback_completed')} icon={TrendingUp} color="green" />
+            </div>
+
+            <div className="card p-5">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent beta activity</h2>
+              {recentEvents.length === 0 ? (
+                <p className="text-sm text-gray-500">No beta events recorded yet.</p>
+              ) : (
+                <div className="space-y-3">
+                  {recentEvents.map((event, index) => (
+                    <div key={`${event.event_name}-${event.created_at}-${index}`} className="flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50/70 px-4 py-3">
+                      <div>
+                        <div className="text-sm font-semibold text-gray-900">{event.event_name.replaceAll('_', ' ')}</div>
+                        <div className="text-xs text-gray-500">{new Date(event.created_at).toLocaleString('en-GB')}</div>
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {typeof event.metadata?.invited_email === 'string' ? event.metadata.invited_email : ''}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
+        )}
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-3xl mx-auto">

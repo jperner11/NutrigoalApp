@@ -9,6 +9,7 @@ import { toast } from 'react-hot-toast'
 import Link from 'next/link'
 import type { Exercise, BodyPart, Equipment } from '@/lib/supabase/types'
 import { BODY_PARTS, EQUIPMENT_TYPES, DEFAULT_REST_SECONDS, DEFAULT_SETS, DEFAULT_REPS } from '@/lib/constants'
+import { isManagedClientRole } from '@nutrigoal/shared'
 
 interface DayExercise {
   tempId: string
@@ -90,7 +91,13 @@ export default function NewTrainingPlanPage() {
     })
   }, [exercises, searchQuery, filterBodyPart, filterEquipment])
 
-  if (!profile) return null
+  useEffect(() => {
+    if (profile && isManagedClientRole(profile.role)) {
+      router.replace('/training')
+    }
+  }, [profile, router])
+
+  if (!profile || isManagedClientRole(profile.role)) return null
 
   function addDay() {
     setDays((prev) => [

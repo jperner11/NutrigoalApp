@@ -38,7 +38,7 @@ const tiers = [
     accent: 'border-[rgba(29,168,240,0.32)] bg-[linear-gradient(180deg,rgba(13,27,42,0.05),rgba(237,248,255,0.95))]',
     badge: 'For practitioners',
     buttonClass: 'btn-primary',
-    buttonLabel: 'Start Nutritionist',
+    buttonLabel: 'Start Personal Trainer',
   },
 ]
 
@@ -166,8 +166,8 @@ export default function PricingPage() {
                 a: 'Pro users get controlled regeneration. Unlimited users can regenerate more freely. This keeps the premium tiers meaningfully different.',
               },
               {
-                q: 'How do nutritionist plans work?',
-                a: 'The practitioner tier includes client capacity and management workflows. It is meant for professionals who need delivery, oversight, and communication in one place.',
+                q: 'How do Personal Trainer plans work?',
+                a: 'The practitioner tier includes client capacity and management workflows. It is meant for Personal Trainers who need delivery, oversight, and communication in one place.',
               },
             ].map((item) => (
               <div key={item.q} className="surface-card p-6">

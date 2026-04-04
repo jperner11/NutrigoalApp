@@ -978,7 +978,7 @@ export default function OnboardingPage() {
                 <div className="flex gap-3 bg-purple-50 border border-purple-200 rounded-2xl p-5">
                   <Sparkles className="h-5 w-5 text-purple-600 flex-shrink-0 mt-0.5" />
                   <p className="text-sm text-purple-800 leading-relaxed">
-                    Your personal AI nutritionist will use everything you&apos;ve told us to create a meal plan
+                    Your personal AI coach will use everything you&apos;ve told us to create a meal plan
                     built around your favourite foods, lifestyle and goals &mdash; no bland chicken and broccoli
                     unless you asked for it!
                   </p>

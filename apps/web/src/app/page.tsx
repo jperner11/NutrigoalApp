@@ -11,6 +11,7 @@ import {
   Users,
 } from 'lucide-react'
 import BrandLogo from '@/components/brand/BrandLogo'
+import PublicFooter from '@/components/marketing/PublicFooter'
 
 const pillars = [
   {
@@ -25,7 +26,7 @@ const pillars = [
   },
   {
     title: 'Built for individuals and practitioners',
-    body: 'Self-serve users and nutrition professionals can work from the same system instead of disconnected tools.',
+    body: 'Self-serve users and Personal Trainers can work from the same system instead of disconnected tools.',
     icon: Users,
   },
 ]
@@ -45,6 +46,12 @@ export default function LandingPage() {
           <div className="flex items-center gap-3">
             <Link href="/pricing" className="hidden rounded-full px-4 py-2 text-sm font-semibold text-[var(--muted)] transition hover:text-[var(--foreground)] sm:inline-flex">
               Pricing
+            </Link>
+            <Link href="/faq" className="hidden rounded-full px-4 py-2 text-sm font-semibold text-[var(--muted)] transition hover:text-[var(--foreground)] sm:inline-flex">
+              FAQ
+            </Link>
+            <Link href="/support" className="hidden rounded-full px-4 py-2 text-sm font-semibold text-[var(--muted)] transition hover:text-[var(--foreground)] sm:inline-flex">
+              Support
             </Link>
             <Link href="/login" className="rounded-full px-4 py-2 text-sm font-semibold text-[var(--muted)] transition hover:text-[var(--foreground)]">
               Sign in
@@ -187,10 +194,10 @@ export default function LandingPage() {
       <section className="px-4 pb-24 sm:px-6 lg:px-8">
         <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.95fr_1.05fr]">
           <div className="panel-strong p-8">
-            <div className="eyebrow mb-5">For practitioners</div>
+            <div className="eyebrow mb-5">For Personal Trainers</div>
             <h2 className="text-4xl font-bold text-[var(--foreground)]">A cleaner system for clients, plans, and follow-through.</h2>
             <p className="mt-5 text-lg leading-8 text-[var(--muted)]">
-              Nutritionists and coaches can invite clients, create meal and training plans, manage feedback, and
+              Personal Trainers can invite clients, create meal and training plans, manage feedback, and
               keep communication in one place instead of stitching together five tools.
             </p>
             <div className="mt-8 space-y-4 text-base text-[var(--foreground)]">
@@ -230,6 +237,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+      <PublicFooter />
     </div>
   )
 }

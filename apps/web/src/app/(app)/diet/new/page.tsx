@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
@@ -10,6 +10,7 @@ import Link from 'next/link'
 import { MEAL_TYPES } from '@/lib/constants'
 import type { FoodItem, MealType } from '@/lib/supabase/types'
 import { canAccess } from '@/lib/tierUtils'
+import { isManagedClientRole } from '@nutrigoal/shared'
 
 interface MealEntry {
   meal_type: MealType
@@ -47,7 +48,13 @@ export default function NewDietPlanPage() {
     snack: '',
   })
 
-  if (!profile) return null
+  useEffect(() => {
+    if (profile && isManagedClientRole(profile.role)) {
+      router.replace('/diet')
+    }
+  }, [profile, router])
+
+  if (!profile || isManagedClientRole(profile.role)) return null
 
   const targetCalories = profile.daily_calories ?? 2000
   const targetProtein = profile.daily_protein ?? 150

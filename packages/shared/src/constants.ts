@@ -1,4 +1,4 @@
-// NutriGoal v2 - App Constants
+// mealandmotion - App Constants
 
 // ─── Pricing Tiers ──────────────────────────────────────
 
@@ -64,7 +64,7 @@ export const PRICING = {
       'Cardio tracking',
       'Supplement tracking',
       'Meal notes & alternatives',
-      'Plans managed by your nutritionist',
+      'Plans managed by your personal trainer',
     ],
   },
   personal_trainer: {

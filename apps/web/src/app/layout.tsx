@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Manrope, Plus_Jakarta_Sans } from "next/font/google"
 import "./globals.css"
 import { Toaster } from "react-hot-toast"
+import { BRAND_NAME } from '@/lib/site'
 
 const display = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -14,10 +15,10 @@ const body = Manrope({
 })
 
 export const metadata: Metadata = {
-  title: "mealandmotion - Feel Your Momentum",
-  description: "Meal planning, training structure, coaching intelligence, and practitioner workflows in one calm, momentum-driven platform.",
-  keywords: "nutrition, diet, meal planning, workout, training, cardio, hydration, nutritionist, fitness",
-  authors: [{ name: "mealandmotion Team" }],
+  title: `${BRAND_NAME} - Feel Your Momentum`,
+  description: "Meal planning, training structure, coaching intelligence, and Personal Trainer workflows in one calm, momentum-driven platform.",
+  keywords: "nutrition, diet, meal planning, workout, training, cardio, hydration, personal trainer, fitness coaching",
+  authors: [{ name: `${BRAND_NAME} Team` }],
 }
 
 export default function RootLayout({

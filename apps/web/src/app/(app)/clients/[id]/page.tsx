@@ -12,6 +12,14 @@ import {
 import type { UserProfile, DietPlan, TrainingPlan } from '@/lib/supabase/types'
 import { isTrainerRole } from '@nutrigoal/shared'
 
+interface ClientOverviewState {
+  lastMealDate: string | null
+  lastWorkoutDate: string | null
+  latestWeight: number | null
+  pendingFeedbackCount: number
+  unreadMessageCount: number
+}
+
 export default function ClientDetailPage() {
   const { id } = useParams<{ id: string }>()
   const { profile } = useUser()
@@ -19,22 +27,54 @@ export default function ClientDetailPage() {
   const [client, setClient] = useState<UserProfile | null>(null)
   const [dietPlans, setDietPlans] = useState<DietPlan[]>([])
   const [trainingPlans, setTrainingPlans] = useState<TrainingPlan[]>([])
+  const [overview, setOverview] = useState<ClientOverviewState>({
+    lastMealDate: null,
+    lastWorkoutDate: null,
+    latestWeight: null,
+    pendingFeedbackCount: 0,
+    unreadMessageCount: 0,
+  })
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (!profile) return
     if (!isTrainerRole(profile.role)) { router.push('/dashboard'); return }
 
+    const trainerId = profile.id
     const supabase = createClient()
     async function load() {
-      const [clientRes, dietRes, trainingRes] = await Promise.all([
+      const [clientRes, dietRes, trainingRes, mealLogRes, workoutLogRes, weightRes, feedbackRes, conversationRes] = await Promise.all([
         supabase.from('user_profiles').select('*').eq('id', id).single(),
         supabase.from('diet_plans').select('*').eq('user_id', id).order('created_at', { ascending: false }),
         supabase.from('training_plans').select('*').eq('user_id', id).order('created_at', { ascending: false }),
+        supabase.from('meal_logs').select('date').eq('user_id', id).order('date', { ascending: false }).limit(1),
+        supabase.from('workout_logs').select('date').eq('user_id', id).order('date', { ascending: false }).limit(1),
+        supabase.from('weight_logs').select('weight_kg, date').eq('user_id', id).order('date', { ascending: false }).limit(1),
+        supabase.from('feedback_requests').select('id', { count: 'exact', head: true }).eq('nutritionist_id', trainerId).eq('client_id', id).eq('status', 'pending'),
+        supabase.from('conversations').select('id').eq('nutritionist_id', trainerId).eq('client_id', id).maybeSingle(),
       ])
       if (clientRes.data) setClient(clientRes.data as UserProfile)
       if (dietRes.data) setDietPlans(dietRes.data as DietPlan[])
       if (trainingRes.data) setTrainingPlans(trainingRes.data as TrainingPlan[])
+
+      let unreadMessageCount = 0
+      if (conversationRes.data?.id) {
+        const { count } = await supabase
+          .from('messages')
+          .select('*', { count: 'exact', head: true })
+          .eq('conversation_id', conversationRes.data.id)
+          .neq('sender_id', trainerId)
+          .is('read_at', null)
+        unreadMessageCount = count ?? 0
+      }
+
+      setOverview({
+        lastMealDate: mealLogRes.data?.[0]?.date ?? null,
+        lastWorkoutDate: workoutLogRes.data?.[0]?.date ?? null,
+        latestWeight: weightRes.data?.[0]?.weight_kg ?? null,
+        pendingFeedbackCount: feedbackRes.count ?? 0,
+        unreadMessageCount,
+      })
       setLoading(false)
     }
     load()
@@ -99,6 +139,13 @@ export default function ClientDetailPage() {
             )}
           </div>
         )}
+      </div>
+
+      <div className="grid grid-cols-2 gap-4 mb-6 lg:grid-cols-4">
+        <OverviewCard label="Last meal log" value={overview.lastMealDate ? new Date(overview.lastMealDate).toLocaleDateString('en-GB') : 'No logs yet'} tone="blue" />
+        <OverviewCard label="Last workout" value={overview.lastWorkoutDate ? new Date(overview.lastWorkoutDate).toLocaleDateString('en-GB') : 'No logs yet'} tone="purple" />
+        <OverviewCard label="Latest weight" value={overview.latestWeight ? `${overview.latestWeight}kg` : 'No data'} tone="green" />
+        <OverviewCard label="Needs response" value={`${overview.pendingFeedbackCount + overview.unreadMessageCount}`} tone="amber" />
       </div>
 
       {/* Action Buttons */}
@@ -189,6 +236,22 @@ function MacroPill({ label, value, unit, color, bg }: { label: string; value: nu
     <div className={`${bg} rounded-lg p-3 text-center`}>
       <p className={`text-lg font-bold ${color}`}>{value ?? '—'}</p>
       <p className="text-xs text-gray-500">{label}{value ? ` ${unit}` : ''}</p>
+    </div>
+  )
+}
+
+function OverviewCard({ label, value, tone }: { label: string; value: string; tone: 'blue' | 'purple' | 'green' | 'amber' }) {
+  const tones = {
+    blue: 'bg-blue-50 text-blue-700',
+    purple: 'bg-purple-50 text-purple-700',
+    green: 'bg-emerald-50 text-emerald-700',
+    amber: 'bg-amber-50 text-amber-700',
+  }
+
+  return (
+    <div className="card p-4">
+      <div className="text-xs font-semibold uppercase tracking-[0.12em] text-gray-500">{label}</div>
+      <div className={`mt-3 inline-flex rounded-full px-3 py-1 text-sm font-semibold ${tones[tone]}`}>{value}</div>
     </div>
   )
 }

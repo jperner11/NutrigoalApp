@@ -5,6 +5,7 @@ import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
 import { Settings, User, Crown, Target, Calendar, HeartPulse, Dumbbell, Utensils, Activity, Lock, Trash2, AlertTriangle, Loader2, ExternalLink } from 'lucide-react'
 import { toast } from 'react-hot-toast'
+import Link from 'next/link'
 import {
   PRICING,
   ACTIVITY_LEVELS,
@@ -26,6 +27,7 @@ import {
 } from '@/lib/constants'
 import { calculateNutritionTargets } from '@/lib/nutrition'
 import type { ActivityLevel, FitnessGoal, Gender } from '@/lib/supabase/types'
+import { SUPPORT_EMAIL } from '@/lib/site'
 
 const TABS = [
   { key: 'profile', label: 'Profile', icon: User },
@@ -97,6 +99,14 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false)
   const [activeTab, setActiveTab] = useState<TabKey>('profile')
   const [initialized, setInitialized] = useState(false)
+  const [supportHistory, setSupportHistory] = useState<Array<{
+    id: string
+    category: string
+    subject: string
+    status: string
+    created_at: string
+  }>>([])
+  const [loadingSupportHistory, setLoadingSupportHistory] = useState(false)
 
   // Form state
   const [form, setForm] = useState({
@@ -184,8 +194,31 @@ export default function SettingsPage() {
     }
   }, [profile, initialized])
 
+  useEffect(() => {
+    async function loadSupportHistory() {
+      if (!profile) return
+      setLoadingSupportHistory(true)
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('support_requests')
+        .select('id, category, subject, status, created_at')
+        .eq('user_id', profile.id)
+        .order('created_at', { ascending: false })
+        .limit(5)
+
+      setSupportHistory(data ?? [])
+      setLoadingSupportHistory(false)
+    }
+
+    loadSupportHistory()
+  }, [profile])
+
   // Subscription management state
   const [managingSubscription, setManagingSubscription] = useState(false)
+  const [supportCategory, setSupportCategory] = useState('bug')
+  const [supportSubject, setSupportSubject] = useState('')
+  const [supportMessage, setSupportMessage] = useState('')
+  const [submittingSupport, setSubmittingSupport] = useState(false)
 
   async function handleManageSubscription() {
     setManagingSubscription(true)
@@ -253,6 +286,45 @@ export default function SettingsPage() {
     // Sign out and redirect
     await supabase.auth.signOut()
     window.location.href = '/login'
+  }
+
+  async function handleSupportRequest() {
+    if (!profile || !supportSubject.trim() || !supportMessage.trim()) {
+      toast.error('Please add a subject and message.')
+      return
+    }
+
+    setSubmittingSupport(true)
+    const supabase = createClient()
+    const { error } = await supabase.from('support_requests').insert({
+      user_id: profile.id,
+      email: profile.email,
+      account_role: profile.role,
+      platform: 'web',
+      category: supportCategory,
+      subject: supportSubject.trim(),
+      message: supportMessage.trim(),
+    })
+
+    if (error) {
+      toast.error('Failed to submit support request.')
+    } else {
+      toast.success('Support request submitted.')
+      setSupportCategory('bug')
+      setSupportSubject('')
+      setSupportMessage('')
+      setSupportHistory((prev) => [
+        {
+          id: crypto.randomUUID(),
+          category: supportCategory,
+          subject: supportSubject.trim(),
+          status: 'open',
+          created_at: new Date().toISOString(),
+        },
+        ...prev,
+      ].slice(0, 5))
+    }
+    setSubmittingSupport(false)
   }
 
   const handleSave = async (e: React.FormEvent) => {
@@ -342,6 +414,11 @@ export default function SettingsPage() {
 
   const inputClass = "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
   const selectClass = inputClass
+  const statusTone: Record<string, string> = {
+    open: 'bg-amber-50 text-amber-700 border-amber-200',
+    in_progress: 'bg-sky-50 text-sky-700 border-sky-200',
+    resolved: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  }
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -682,6 +759,126 @@ export default function SettingsPage() {
         {/* Account Tab */}
         {activeTab === 'account' && (
           <div className="space-y-8">
+            <div className="rounded-2xl border border-sky-100 bg-sky-50/80 p-5">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h3 className="text-base font-semibold text-gray-900">Beta support</h3>
+                  <p className="mt-2 text-sm leading-6 text-gray-600">
+                    Need help with onboarding, invites, trainer-client linking, or a broken workflow? Contact support or review the public beta guidance.
+                  </p>
+                </div>
+                <AlertTriangle className="h-5 w-5 text-sky-600" />
+              </div>
+              <div className="mt-4 flex flex-wrap gap-3">
+                <a
+                  href={`mailto:${SUPPORT_EMAIL}?subject=mealandmotion%20beta%20support`}
+                  className="inline-flex items-center gap-2 rounded-xl bg-[var(--brand-900)] px-4 py-2.5 text-sm font-semibold text-white"
+                >
+                  Email support
+                  <ExternalLink className="h-4 w-4" />
+                </a>
+                <Link
+                  href="/support"
+                  className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700"
+                >
+                  Support page
+                </Link>
+                <Link
+                  href="/faq"
+                  className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700"
+                >
+                  Beta FAQ
+                </Link>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-gray-200 bg-white p-5">
+              <h3 className="text-base font-semibold text-gray-900">Report an issue</h3>
+              <p className="mt-2 text-sm leading-6 text-gray-600">
+                Send bugs, onboarding issues, and workflow blockers directly into the beta support queue.
+              </p>
+              <div className="mt-4 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                  <select value={supportCategory} onChange={(e) => setSupportCategory(e.target.value)} className={selectClass}>
+                    <option value="bug">Bug</option>
+                    <option value="invite">Invite / onboarding</option>
+                    <option value="billing">Billing</option>
+                    <option value="feedback">Product feedback</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                  <input
+                    type="text"
+                    value={supportSubject}
+                    onChange={(e) => setSupportSubject(e.target.value)}
+                    className={inputClass}
+                    placeholder="Short summary of the issue"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Message</label>
+                  <textarea
+                    value={supportMessage}
+                    onChange={(e) => setSupportMessage(e.target.value)}
+                    className={`${inputClass} min-h-[120px]`}
+                    placeholder="What happened, what you expected, and how we can reproduce it"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={handleSupportRequest}
+                  disabled={submittingSupport || !supportSubject.trim() || !supportMessage.trim()}
+                  className="inline-flex items-center gap-2 rounded-xl bg-[var(--brand-900)] px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  <span>{submittingSupport ? 'Sending...' : 'Submit report'}</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-gray-200 bg-white p-5">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-base font-semibold text-gray-900">Recent support requests</h3>
+                  <p className="mt-2 text-sm leading-6 text-gray-600">
+                    Track the most recent issues you have already sent to the beta support queue.
+                  </p>
+                </div>
+              </div>
+
+              {loadingSupportHistory ? (
+                <div className="mt-4 text-sm text-gray-500">Loading support history...</div>
+              ) : supportHistory.length === 0 ? (
+                <div className="mt-4 rounded-xl border border-dashed border-gray-200 bg-gray-50 px-4 py-5 text-sm text-gray-500">
+                  No support requests yet. Use the form above if you hit a blocker or want to share product feedback.
+                </div>
+              ) : (
+                <div className="mt-4 space-y-3">
+                  {supportHistory.map((request) => (
+                    <div key={request.id} className="rounded-xl border border-gray-200 bg-gray-50/70 p-4">
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                          <div className="text-sm font-semibold text-gray-900">{request.subject}</div>
+                          <div className="mt-1 text-xs uppercase tracking-[0.12em] text-gray-500">
+                            {request.category} · {new Date(request.created_at).toLocaleDateString('en-GB', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric',
+                            })}
+                          </div>
+                        </div>
+                        <span className={`rounded-full border px-3 py-1 text-xs font-semibold capitalize ${statusTone[request.status] ?? 'bg-gray-100 text-gray-700 border-gray-200'}`}>
+                          {request.status.replace('_', ' ')}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* Change Password */}
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">

@@ -14,6 +14,8 @@ interface ActiveClientRow {
   status: string
   invited_email: string | null
   created_at: string
+  hasDietPlan?: boolean
+  hasTrainingPlan?: boolean
   client: {
     id: string
     full_name: string | null
@@ -72,7 +74,29 @@ export default function ClientsPage() {
           .order('created_at', { ascending: false }),
       ])
 
-      setActiveClients((clientRows as unknown as ActiveClientRow[]) ?? [])
+      const activeRows = (clientRows as unknown as ActiveClientRow[]) ?? []
+      const clientIds = activeRows.map((row) => row.client?.id).filter(Boolean) as string[]
+
+      let activeDietSet = new Set<string>()
+      let activeTrainingSet = new Set<string>()
+
+      if (clientIds.length > 0) {
+        const [{ data: dietRows }, { data: trainingRows }] = await Promise.all([
+          supabase.from('diet_plans').select('user_id').in('user_id', clientIds).eq('is_active', true),
+          supabase.from('training_plans').select('user_id').in('user_id', clientIds).eq('is_active', true),
+        ])
+
+        activeDietSet = new Set((dietRows ?? []).map((row) => row.user_id))
+        activeTrainingSet = new Set((trainingRows ?? []).map((row) => row.user_id))
+      }
+
+      setActiveClients(
+        activeRows.map((row) => ({
+          ...row,
+          hasDietPlan: row.client?.id ? activeDietSet.has(row.client.id) : false,
+          hasTrainingPlan: row.client?.id ? activeTrainingSet.has(row.client.id) : false,
+        }))
+      )
       setPendingInvites((inviteRows as PendingInviteRow[]) ?? [])
       setLoading(false)
     }
@@ -133,6 +157,8 @@ export default function ClientsPage() {
   if (loading) return <div className="text-gray-500">Loading clients...</div>
 
   const needsAttentionCount = pendingInvites.filter((invite) => new Date(invite.expires_at).getTime() < Date.now()).length
+  const missingPlanClients = activeClients.filter((client) => !client.hasDietPlan || !client.hasTrainingPlan)
+  const totalNeedsAttention = needsAttentionCount + missingPlanClients.length
 
   return (
     <div className="space-y-8">
@@ -140,7 +166,7 @@ export default function ClientsPage() {
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Client Roster</h1>
           <p className="text-gray-700 mt-1">
-            {activeClients.length} active · {pendingInvites.length} pending · {needsAttentionCount} need attention
+            {activeClients.length} active · {pendingInvites.length} pending · {totalNeedsAttention} need attention
           </p>
         </div>
         <Link
@@ -156,7 +182,7 @@ export default function ClientsPage() {
         {[
           ['Active clients', activeClients.length, 'Clients currently linked and manageable now.'],
           ['Pending invites', pendingInvites.length, 'People who still need to accept their invite.'],
-          ['Needs attention', needsAttentionCount, 'Expired or stalled invites that may need a resend.'],
+          ['Needs attention', totalNeedsAttention, 'Expired invites and active clients who still need plans assigned.'],
         ].map(([label, value, body]) => (
           <div key={label} className="glass-card rounded-[28px] p-6">
             <div className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--muted-soft)]">{label}</div>
@@ -165,6 +191,72 @@ export default function ClientsPage() {
           </div>
         ))}
       </div>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="text-xl font-bold text-gray-900">Needs attention</h2>
+          <p className="text-sm text-gray-600">The fastest way to unblock activation and client follow-through.</p>
+        </div>
+
+        {totalNeedsAttention === 0 ? (
+          <div className="card p-10 text-center text-gray-500">
+            No urgent roster actions right now.
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {missingPlanClients.map((row) => (
+              <Link
+                key={`missing-plan-${row.id}`}
+                href={row.client ? `/clients/${row.client.id}` : '#'}
+                className="card flex items-center justify-between gap-4 p-5 hover:shadow-md transition-shadow"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="rounded-full bg-amber-100 p-2">
+                    <AlertCircle className="h-5 w-5 text-amber-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">{row.client?.full_name ?? row.invited_email ?? 'Client'}</h3>
+                    <p className="mt-1 text-sm text-gray-600">
+                      {!row.hasDietPlan && !row.hasTrainingPlan
+                        ? 'No active diet or training plan assigned yet.'
+                        : !row.hasDietPlan
+                          ? 'Diet plan still needs assigning.'
+                          : 'Training plan still needs assigning.'}
+                    </p>
+                  </div>
+                </div>
+                <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">
+                  Needs plan
+                </span>
+              </Link>
+            ))}
+
+            {pendingInvites
+              .filter((invite) => new Date(invite.expires_at).getTime() < Date.now())
+              .map((invite) => (
+                <div key={`expired-${invite.id}`} className="card flex items-center justify-between gap-4 p-5">
+                  <div className="flex items-start gap-4">
+                    <div className="rounded-full bg-amber-100 p-2">
+                      <Clock3 className="h-5 w-5 text-amber-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900">{invite.client_first_name || invite.invited_email}</h3>
+                      <p className="mt-1 text-sm text-gray-600">Invite expired. Resend to restart onboarding.</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => resendInvite(invite.id)}
+                    disabled={workingId === invite.id}
+                    className="inline-flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-700"
+                  >
+                    <Send className="h-4 w-4" />
+                    Resend
+                  </button>
+                </div>
+              ))}
+          </div>
+        )}
+      </section>
 
       <section className="space-y-4">
         <div className="flex items-center justify-between">
@@ -206,6 +298,14 @@ export default function ClientsPage() {
                     <p className="text-sm text-gray-500">
                       {row.client?.email ?? row.invited_email}
                     </p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${row.hasDietPlan ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                        {row.hasDietPlan ? 'Diet assigned' : 'Diet needed'}
+                      </span>
+                      <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${row.hasTrainingPlan ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                        {row.hasTrainingPlan ? 'Training assigned' : 'Training needed'}
+                      </span>
+                    </div>
                   </div>
                 </div>
                 <span className="text-xs font-medium px-3 py-1 rounded-full bg-sky-100 text-sky-700">
