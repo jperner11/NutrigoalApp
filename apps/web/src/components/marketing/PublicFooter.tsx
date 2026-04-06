@@ -19,7 +19,7 @@ export default function PublicFooter() {
             <BrandLogo href="/" />
             <p className="mt-4 text-sm leading-7 text-[var(--muted)]">
               {BRAND_NAME} brings self-serve AI planning, coach-led delivery, and coach discovery into one calm
-              nutrition and training platform.
+              nutrition and training platform, with Discover Coaches available across every individual plan.
             </p>
           </div>
 

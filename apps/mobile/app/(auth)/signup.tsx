@@ -17,8 +17,6 @@ import { supabase } from '../../src/lib/supabase'
 import { BrandLogo } from '../../src/components/BrandLogo'
 import { brandColors, brandShadow } from '../../src/theme/brand'
 
-const TEST_DEFAULT_INDIVIDUAL_ROLE = 'unlimited' as const
-
 export default function SignupScreen() {
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
@@ -28,7 +26,7 @@ export default function SignupScreen() {
   const [loading, setLoading] = useState(false)
 
   const handleSignup = async () => {
-    const signupRole = role === 'free' ? TEST_DEFAULT_INDIVIDUAL_ROLE : role
+    const signupRole = role
 
     if (!fullName.trim() || !email || !password || !confirmPassword) {
       Alert.alert('Error', 'Please fill in all fields')
@@ -120,7 +118,7 @@ export default function SignupScreen() {
             </View>
             <Text style={styles.title}>Create your account and start the clinic setup.</Text>
             <Text style={styles.subtitle}>
-              We&apos;ll use your profile to shape nutrition targets, training guidance, and AI-generated plans.
+              We&apos;ll use your profile to shape nutrition targets, training guidance, and coach discovery around the right path for you.
             </Text>
           </View>
 
@@ -133,15 +131,15 @@ export default function SignupScreen() {
               >
                 <Ionicons name="person-outline" size={22} color={role === 'free' ? brandColors.brand900 : brandColors.textMuted} />
                 <Text style={styles.roleTitle}>Individual</Text>
-                <Text style={styles.roleBody}>Personal tracking and self-serve progress.</Text>
+                <Text style={styles.roleBody}>Self-serve progress with Discover Coaches included.</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.roleCard, role === 'personal_trainer' && styles.roleCardActive]}
                 onPress={() => setRole('personal_trainer')}
               >
                 <Ionicons name="people-outline" size={22} color={role === 'personal_trainer' ? brandColors.brand900 : brandColors.textMuted} />
-                <Text style={styles.roleTitle}>Personal Trainer</Text>
-                <Text style={styles.roleBody}>Client management, coaching, and plan delivery.</Text>
+                <Text style={styles.roleTitle}>Coach / PT</Text>
+                <Text style={styles.roleBody}>Client management, coaching, and marketplace visibility.</Text>
               </TouchableOpacity>
             </View>
 

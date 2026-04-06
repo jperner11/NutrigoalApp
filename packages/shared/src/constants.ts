@@ -8,7 +8,9 @@ export const PRICING = {
     price: 0,
     regenCooldownDays: null as number | null, // no regeneration
     features: [
-      'AI-generated meal & training plan',
+      'Discover Coaches included',
+      'Browse coach profiles and send coaching requests',
+      'AI-generated meal & training plan preview',
       'View 1 meal of your choice',
       'View 1 training day of your choice',
       'Water intake tracking',
@@ -20,6 +22,8 @@ export const PRICING = {
     price: 4.99,
     regenCooldownDays: 7, // 1x per week rolling
     features: [
+      'Everything in Free',
+      'Discover Coaches included',
       'Full meal plan access',
       'Full training plan access',
       'Regenerate plans 1×/week',
@@ -35,28 +39,30 @@ export const PRICING = {
     regenCooldownDays: 0, // unlimited
     features: [
       'Everything in Pro',
+      'Discover Coaches included',
       'Unlimited plan regeneration',
       'Priority AI generation',
     ],
   },
   nutritionist: {
-    name: 'Personal Trainer',
+    name: 'Coach Pro',
     price: 49.99,
     regenCooldownDays: 0, // unlimited
     baseClients: 10,
     extraClientPrice: 3.99,
     features: [
       'Everything in Unlimited',
-      'Client management (10 included)',
-      'Create plans for clients',
-      'Monitor client progress',
-      'Prescribe cardio sessions',
-      'Public coach listing profile (beta rollout)',
+      'Manage up to 10 active clients',
+      'Coach onboarding and custom intake',
+      'Create plans and monitor client progress',
+      'Leads inbox and coaching request pipeline',
+      'Marketplace profile, offers, and pricing',
+      'Public coach listing in Discover (beta)',
       'Additional clients at $3.99/mo each',
     ],
   },
   nutritionist_client: {
-    name: 'Client Plan',
+    name: 'Managed Client',
     price: 0,
     regenCooldownDays: null as number | null,
     features: [
@@ -69,23 +75,24 @@ export const PRICING = {
     ],
   },
   personal_trainer: {
-    name: 'Personal Trainer',
+    name: 'Coach Pro',
     price: 49.99,
     regenCooldownDays: 0,
     baseClients: 10,
     extraClientPrice: 3.99,
     features: [
       'Everything in Unlimited',
-      'Client management (10 included)',
-      'Create plans for clients',
-      'Monitor client progress',
-      'Prescribe cardio sessions',
-      'Public coach listing profile (beta rollout)',
+      'Manage up to 10 active clients',
+      'Coach onboarding and custom intake',
+      'Create plans and monitor client progress',
+      'Leads inbox and coaching request pipeline',
+      'Marketplace profile, offers, and pricing',
+      'Public coach listing in Discover (beta)',
       'Additional clients at $3.99/mo each',
     ],
   },
   personal_trainer_client: {
-    name: 'Client Plan',
+    name: 'Managed Client',
     price: 0,
     regenCooldownDays: null as number | null,
     features: [

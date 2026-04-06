@@ -19,7 +19,9 @@ export function normalizeRole(role: UserRole | null | undefined): UserRole {
 }
 
 export function getRolePlanLabel(role: UserRole | null | undefined): string {
-  if (isManagedClientRole(role)) return 'Client Plan'
-  if (isTrainerRole(role)) return 'Personal Trainer Plan'
-  return `${normalizeRole(role)} plan`
+  if (isManagedClientRole(role)) return 'Managed Client'
+  if (isTrainerRole(role)) return 'Coach Plan'
+  if (role === 'pro') return 'Pro'
+  if (role === 'unlimited') return 'Unlimited'
+  return 'Free'
 }

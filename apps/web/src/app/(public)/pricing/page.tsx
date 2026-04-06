@@ -2,48 +2,74 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Check, Crown, Loader2, Sparkles, Users, Zap } from 'lucide-react'
+import { ArrowRight, Check, Compass, Crown, Loader2, Sparkles, Users, Zap } from 'lucide-react'
 import { PRICING } from '@/lib/constants'
 import { toast } from 'react-hot-toast'
 import BrandLogo from '@/components/brand/BrandLogo'
 
-const tiers = [
+const individualTiers = [
   {
     key: 'free' as const,
-    strap: 'Entry',
+    strap: 'Start here',
+    badge: 'Discover included',
     accent: 'border-[var(--line)] bg-white/75',
-    badge: null,
     buttonClass: 'btn-secondary',
     buttonLabel: 'Start free',
   },
   {
     key: 'pro' as const,
     strap: 'Most chosen',
+    badge: 'Best self-serve value',
     accent: 'border-[rgba(29,168,240,0.32)] bg-[linear-gradient(180deg,rgba(237,248,255,0.95),rgba(255,255,255,0.95))]',
-    badge: 'Most Popular',
     buttonClass: 'btn-primary',
     buttonLabel: 'Start Pro',
   },
   {
     key: 'unlimited' as const,
-    strap: 'Full access',
+    strap: 'Full self-serve access',
+    badge: 'Heavy AI usage',
     accent: 'border-[rgba(13,27,42,0.2)] bg-[linear-gradient(180deg,rgba(13,27,42,0.96),rgba(24,44,66,0.96))] text-white',
-    badge: 'Best for power users',
     buttonClass: 'btn-accent',
     buttonLabel: 'Go Unlimited',
   },
+]
+
+const coachRoadmap = [
   {
-    key: 'nutritionist' as const,
-    strap: 'Professional',
-    accent: 'border-[rgba(29,168,240,0.32)] bg-[linear-gradient(180deg,rgba(13,27,42,0.05),rgba(237,248,255,0.95))]',
-    badge: 'For practitioners',
-    buttonClass: 'btn-primary',
-    buttonLabel: 'Start Personal Trainer',
+    title: 'Launch with one coach plan',
+    body: 'V1 keeps coach billing simple: one paid workspace that includes delivery tools, discovery, and lead management.',
+  },
+  {
+    title: 'Expand into seat-based tiers next',
+    body: 'As usage grows, the coach side can evolve into Starter, Growth, and Studio-style seat tiers without changing the product story.',
+  },
+  {
+    title: 'Keep marketplace access bundled',
+    body: 'During beta, coaches should not pay per lead. Paid coach plans should include visibility, offers, and pipeline tools by default.',
+  },
+]
+
+const pricingPrinciples = [
+  {
+    title: 'Discover belongs to everyone',
+    body: 'Every individual plan, including Free, can browse coaches, compare offers, and send structured coaching requests.',
+    icon: Compass,
+  },
+  {
+    title: 'AI depth is what scales upward',
+    body: 'The main difference between Free, Pro, and Unlimited is how much self-serve AI depth, plan access, and regeneration freedom the user gets.',
+    icon: Zap,
+  },
+  {
+    title: 'Coaches pay for the workspace',
+    body: 'The paid coach subscription covers client delivery, intake, lead flow, and public marketplace visibility in one system.',
+    icon: Users,
   },
 ]
 
 export default function PricingPage() {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null)
+  const coachPlan = PRICING.personal_trainer
 
   async function handleCheckout(plan: string) {
     setLoadingPlan(plan)
@@ -87,106 +113,183 @@ export default function PricingPage() {
         <section className="panel-strong p-8 text-center sm:p-12">
           <div className="eyebrow mb-5">Pricing</div>
           <h1 className="text-5xl font-bold leading-[0.96] text-[var(--foreground)] sm:text-6xl">
-            Straightforward access
-            <span className="block text-[var(--brand-500)]">for serious progression.</span>
+            Simple pricing for
+            <span className="block text-[var(--brand-500)]">individuals and coaches.</span>
           </h1>
           <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-[var(--muted)]">
-            Start free, upgrade when the system becomes part of your routine. Meal & Motion supports self-serve users,
-            Personal Trainers, and an upcoming coach discovery marketplace layer without forcing everyone into the same path.
+            Meal & Motion now has two clear tracks. Individuals choose how much self-serve AI support they want, and coaches pay for the workspace that powers delivery, discovery, and lead management.
           </p>
-        </section>
-
-        <section className="mt-10 panel-strong p-6 sm:p-8">
-          <div className="grid gap-4 lg:grid-cols-3">
-            {[
-              ['Self-serve users', 'Use AI-powered nutrition and training plans without needing a coach relationship.'],
-              ['Coach workspace', 'Manage existing clients, deliver plans, and run communication from one operating system.'],
-              ['Coach discovery', 'Public coach listings and lead capture are rolling out as a marketplace extension for PT plans.'],
-            ].map(([title, body]) => (
-              <div key={title} className="surface-card p-5">
-                <div className="font-display text-2xl font-bold text-[var(--foreground)]">{title}</div>
-                <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{body}</p>
-              </div>
-            ))}
+          <div className="mt-8 inline-flex items-center gap-2 rounded-full bg-[var(--brand-100)] px-5 py-3 text-sm font-semibold text-[var(--brand-900)]">
+            <Compass className="h-4 w-4" />
+            Discover Coaches is included on every individual plan, including Free.
           </div>
         </section>
 
-        <section className="mt-10 grid gap-6 xl:grid-cols-4">
-          {tiers.map((tier) => {
-            const plan = PRICING[tier.key]
-            const isDark = tier.key === 'unlimited'
+        <section className="mt-10 grid gap-4 lg:grid-cols-3">
+          {pricingPrinciples.map((item) => {
+            const Icon = item.icon
             return (
-              <div key={tier.key} className={`relative overflow-hidden rounded-[30px] border p-8 shadow-[0_20px_48px_rgba(13,27,42,0.08)] ${tier.accent}`}>
-                {tier.badge && (
-                  <div className={`mb-6 inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] ${isDark ? 'bg-white/12 text-sky-100' : 'bg-[var(--brand-100)] text-[#0f4262]'}`}>
-                    {tier.key === 'pro' && <Zap className="h-3.5 w-3.5" />}
-                    {tier.key === 'unlimited' && <Sparkles className="h-3.5 w-3.5" />}
-                    {tier.key === 'nutritionist' && <Users className="h-3.5 w-3.5" />}
-                    {tier.badge}
-                  </div>
-                )}
-
-                <div className={`text-xs font-bold uppercase tracking-[0.18em] ${isDark ? 'text-sky-100/70' : 'text-[var(--muted-soft)]'}`}>{tier.strap}</div>
-                <h2 className={`mt-4 font-display text-3xl font-bold ${isDark ? 'text-white' : 'text-[var(--foreground)]'}`}>{plan.name}</h2>
-                <div className="mt-5 flex items-end gap-2">
-                  <span className={`font-display text-6xl font-bold ${isDark ? 'text-white' : 'text-[var(--foreground)]'}`}>${plan.price}</span>
-                  {plan.price > 0 && <span className={`${isDark ? 'text-sky-100/70' : 'text-[var(--muted)]'} mb-2 text-sm font-semibold`}>/month</span>}
+              <div key={item.title} className="panel-strong p-6">
+                <div className="inline-flex rounded-2xl bg-[var(--brand-100)] p-3 text-[var(--brand-900)]">
+                  <Icon className="h-5 w-5" />
                 </div>
-
-                <ul className="mt-8 space-y-4">
-                  {plan.features.map((feature: string) => (
-                    <li key={feature} className="flex items-start gap-3">
-                      <div className={`mt-0.5 rounded-full p-1 ${isDark ? 'bg-white/10 text-white' : 'bg-[var(--brand-100)] text-[var(--brand-900)]'}`}>
-                        <Check className="h-3.5 w-3.5" />
-                      </div>
-                      <span className={`text-sm leading-6 ${isDark ? 'text-sky-50/88' : 'text-[var(--muted)]'}`}>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="mt-10">
-                  {tier.key === 'free' ? (
-                    <Link href="/signup" className={`flex w-full items-center justify-center rounded-2xl px-5 py-4 text-base font-semibold ${tier.buttonClass}`}>
-                      {tier.buttonLabel}
-                    </Link>
-                  ) : (
-                    <button
-                      onClick={() => handleCheckout(tier.key)}
-                      disabled={loadingPlan !== null}
-                      className={`flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-4 text-base font-semibold disabled:opacity-50 ${tier.buttonClass}`}
-                    >
-                      {loadingPlan === tier.key ? <Loader2 className="h-5 w-5 animate-spin" /> : <Crown className="h-4 w-4" />}
-                      <span>{loadingPlan === tier.key ? 'Redirecting...' : tier.buttonLabel}</span>
-                    </button>
-                  )}
-                </div>
+                <h2 className="mt-5 font-display text-2xl font-bold text-[var(--foreground)]">{item.title}</h2>
+                <p className="mt-3 text-sm leading-7 text-[var(--muted)]">{item.body}</p>
               </div>
             )
           })}
+        </section>
+
+        <section className="mt-12">
+          <div className="mb-8 max-w-3xl">
+            <div className="eyebrow mb-4">Individuals</div>
+            <h2 className="text-4xl font-bold text-[var(--foreground)]">Choose how deep you want the self-serve system to go.</h2>
+            <p className="mt-4 text-base leading-7 text-[var(--muted)]">
+              Every individual plan can discover coaches, compare offers, and send requests. The upgrade path is about more AI depth and more control over your own planning loop, not about hiding discovery behind a paywall.
+            </p>
+          </div>
+
+          <div className="grid gap-6 xl:grid-cols-3">
+            {individualTiers.map((tier) => {
+              const plan = PRICING[tier.key]
+              const isDark = tier.key === 'unlimited'
+
+              return (
+                <div key={tier.key} className={`relative overflow-hidden rounded-[30px] border p-8 shadow-[0_20px_48px_rgba(13,27,42,0.08)] ${tier.accent}`}>
+                  <div className={`mb-6 inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] ${isDark ? 'bg-white/12 text-sky-100' : 'bg-[var(--brand-100)] text-[#0f4262]'}`}>
+                    {tier.key === 'pro' && <Zap className="h-3.5 w-3.5" />}
+                    {tier.key === 'unlimited' && <Sparkles className="h-3.5 w-3.5" />}
+                    {tier.key === 'free' && <Compass className="h-3.5 w-3.5" />}
+                    {tier.badge}
+                  </div>
+
+                  <div className={`text-xs font-bold uppercase tracking-[0.18em] ${isDark ? 'text-sky-100/70' : 'text-[var(--muted-soft)]'}`}>{tier.strap}</div>
+                  <h3 className={`mt-4 font-display text-3xl font-bold ${isDark ? 'text-white' : 'text-[var(--foreground)]'}`}>{plan.name}</h3>
+                  <div className="mt-5 flex items-end gap-2">
+                    <span className={`font-display text-6xl font-bold ${isDark ? 'text-white' : 'text-[var(--foreground)]'}`}>${plan.price}</span>
+                    {plan.price > 0 && <span className={`${isDark ? 'text-sky-100/70' : 'text-[var(--muted)]'} mb-2 text-sm font-semibold`}>/month</span>}
+                  </div>
+
+                  <ul className="mt-8 space-y-4">
+                    {plan.features.map((feature) => (
+                      <li key={feature} className="flex items-start gap-3">
+                        <div className={`mt-0.5 rounded-full p-1 ${isDark ? 'bg-white/10 text-white' : 'bg-[var(--brand-100)] text-[var(--brand-900)]'}`}>
+                          <Check className="h-3.5 w-3.5" />
+                        </div>
+                        <span className={`text-sm leading-6 ${isDark ? 'text-sky-50/88' : 'text-[var(--muted)]'}`}>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <div className="mt-10">
+                    {tier.key === 'free' ? (
+                      <Link href="/signup" className={`flex w-full items-center justify-center rounded-2xl px-5 py-4 text-base font-semibold ${tier.buttonClass}`}>
+                        {tier.buttonLabel}
+                      </Link>
+                    ) : (
+                      <button
+                        onClick={() => handleCheckout(tier.key)}
+                        disabled={loadingPlan !== null}
+                        className={`flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-4 text-base font-semibold disabled:opacity-50 ${tier.buttonClass}`}
+                      >
+                        {loadingPlan === tier.key ? <Loader2 className="h-5 w-5 animate-spin" /> : <Crown className="h-4 w-4" />}
+                        <span>{loadingPlan === tier.key ? 'Redirecting...' : tier.buttonLabel}</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </section>
+
+        <section className="mt-14">
+          <div className="mb-8 max-w-3xl">
+            <div className="eyebrow mb-4">Coaches</div>
+            <h2 className="text-4xl font-bold text-[var(--foreground)]">V1 launches with one paid coach workspace.</h2>
+            <p className="mt-4 text-base leading-7 text-[var(--muted)]">
+              This is the cleanest version of the Trainerize-style model for launch: one coach plan that covers client delivery, coach onboarding, public marketplace visibility, and inbound lead management. Seat-based expansion can come after we validate conversion and demand.
+            </p>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+            <div className="relative overflow-hidden rounded-[30px] border border-[rgba(29,168,240,0.32)] bg-[linear-gradient(180deg,rgba(13,27,42,0.05),rgba(237,248,255,0.95))] p-8 shadow-[0_20px_48px_rgba(13,27,42,0.08)]">
+              <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-[var(--brand-100)] px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-[#0f4262]">
+                <Users className="h-3.5 w-3.5" />
+                Coach workspace
+              </div>
+              <div className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--muted-soft)]">Live in v1</div>
+              <h3 className="mt-4 font-display text-3xl font-bold text-[var(--foreground)]">{coachPlan.name}</h3>
+              <div className="mt-5 flex items-end gap-2">
+                <span className="font-display text-6xl font-bold text-[var(--foreground)]">${coachPlan.price}</span>
+                <span className="mb-2 text-sm font-semibold text-[var(--muted)]">/month</span>
+              </div>
+              <p className="mt-4 text-sm leading-7 text-[var(--muted)]">
+                Built for Personal Trainers and coaches who want to manage clients they already have, get discovered by new ones, and run both flows inside the same product.
+              </p>
+
+              <ul className="mt-8 space-y-4">
+                {coachPlan.features.map((feature) => (
+                  <li key={feature} className="flex items-start gap-3">
+                    <div className="mt-0.5 rounded-full bg-[var(--brand-100)] p-1 text-[var(--brand-900)]">
+                      <Check className="h-3.5 w-3.5" />
+                    </div>
+                    <span className="text-sm leading-6 text-[var(--muted)]">{feature}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-10">
+                <button
+                  onClick={() => handleCheckout('personal_trainer')}
+                  disabled={loadingPlan !== null}
+                  className="btn-primary flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-4 text-base font-semibold disabled:opacity-50"
+                >
+                  {loadingPlan === 'personal_trainer' ? <Loader2 className="h-5 w-5 animate-spin" /> : <Crown className="h-4 w-4" />}
+                  <span>{loadingPlan === 'personal_trainer' ? 'Redirecting...' : 'Start Coach Pro'}</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <div className="panel-strong p-6">
+                <div className="eyebrow mb-4">Pricing logic</div>
+                <h3 className="font-display text-2xl font-bold text-[var(--foreground)]">Why this structure works for launch</h3>
+                <p className="mt-3 text-sm leading-7 text-[var(--muted)]">
+                  Discovery stays open to every individual, so coaches can actually receive demand. The coach subscription then monetizes the operating system: intake, delivery, pipeline, and visibility.
+                </p>
+              </div>
+
+              <div className="grid gap-4">
+                {coachRoadmap.map((item) => (
+                  <div key={item.title} className="surface-card p-5">
+                    <div className="font-display text-2xl font-bold text-[var(--foreground)]">{item.title}</div>
+                    <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{item.body}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </section>
 
         <section className="mt-12 panel-strong p-8 sm:p-10">
           <div className="grid gap-6 lg:grid-cols-2">
             {[
               {
-                q: 'Can I switch plans later?',
-                a: 'Yes. You can upgrade or downgrade whenever you need to. Billing changes apply on the next cycle unless Stripe updates immediately for that product.',
+                q: 'Is Discover Coaches available on Free?',
+                a: 'Yes. Discover Coaches is available across all individual plans, including Free. Users can browse profiles, compare offers, and send structured coaching requests without upgrading first.',
               },
               {
-                q: 'What does free actually include?',
-                a: 'Free is designed to let users experience the system without unlocking the full adaptive loop. It gives real value, but not the full engine.',
+                q: 'What changes when an individual upgrades?',
+                a: 'The upgrade is about self-serve depth: more plan access, stronger regeneration, richer AI support, and a more complete tracking loop. Discovery itself stays open.',
               },
               {
-                q: 'How does regeneration work?',
-                a: 'Pro users get controlled regeneration. Unlimited users can regenerate more freely. This keeps the premium tiers meaningfully different.',
+                q: 'Why is there only one coach plan in v1?',
+                a: 'Because the clearest launch move is to keep the coach business model simple while we validate lead flow, activation, and coach conversion. The next step is seat-based expansion, not immediate pricing complexity.',
               },
               {
-                q: 'How do Personal Trainer plans work?',
-                a: 'The practitioner tier includes client capacity, management workflows, and the foundation for public coach discovery. It is meant for Personal Trainers who need delivery, oversight, communication, and marketplace visibility in one place.',
-              },
-              {
-                q: 'Is coach discovery already live?',
-                a: 'Not fully yet. We are positioning Meal & Motion around three paths now: self-serve, coach-led delivery, and coach discovery. Public coach listings will roll out in beta phases so the marketplace launches with better trust and profile quality.',
+                q: 'Will coach pricing become more Trainerize-like later?',
+                a: 'Yes. The long-term direction is a clearer seat-based ladder for coaches as demand grows. For v1, one paid coach workspace keeps the launch clean while still matching the Trainerize-style operating model.',
               },
             ].map((item) => (
               <div key={item.q} className="surface-card p-6">
@@ -194,6 +297,25 @@ export default function PricingPage() {
                 <p className="mt-4 text-base leading-7 text-[var(--muted)]">{item.a}</p>
               </div>
             ))}
+          </div>
+        </section>
+
+        <section className="mt-12 panel-strong flex flex-col gap-6 p-8 sm:flex-row sm:items-center sm:justify-between sm:p-10">
+          <div className="max-w-2xl">
+            <div className="eyebrow mb-4">Next step</div>
+            <h2 className="font-display text-3xl font-bold text-[var(--foreground)]">Pick your side of the platform and get moving.</h2>
+            <p className="mt-4 text-sm leading-7 text-[var(--muted)]">
+              Join as an individual if you want self-serve AI and coach discovery, or as a coach if you want the client workspace plus inbound lead flow in one product.
+            </p>
+          </div>
+          <div className="flex flex-col gap-3 sm:min-w-[240px]">
+            <Link href="/signup" className="btn-primary flex items-center justify-center gap-2 rounded-2xl px-5 py-4 text-base font-semibold">
+              Create account
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link href="/faq" className="btn-secondary flex items-center justify-center rounded-2xl px-5 py-4 text-base font-semibold">
+              Read the FAQ
+            </Link>
           </div>
         </section>
       </div>

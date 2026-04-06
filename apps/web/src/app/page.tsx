@@ -27,7 +27,7 @@ const pillars = [
   },
   {
     title: 'Built for self-serve users and coaches',
-    body: 'Users can run solo with AI or work with a coach, while Personal Trainers manage delivery from the same system.',
+    body: 'Users can run solo with AI or work with a coach, while Personal Trainers manage delivery and discovery from the same system.',
     icon: Users,
   },
 ]
@@ -78,8 +78,8 @@ export default function LandingPage() {
               <span className="block text-[var(--brand-500)]">or find the right coach.</span>
             </h1>
             <p className="mt-7 max-w-2xl text-lg leading-8 text-[var(--muted)] sm:text-xl">
-              Meal & Motion brings AI planning, coach-led delivery, and an upcoming coach discovery marketplace into
-              one clear nutrition and training system built to help people feel supported, steady, and in motion.
+              Meal & Motion brings AI planning, coach-led delivery, and coach discovery into one clear nutrition and
+              training system built to help people feel supported, steady, and in motion.
             </p>
             <div className="mt-10 flex flex-col gap-4 sm:flex-row">
               <Link href="/signup" className="btn-primary inline-flex items-center justify-center gap-2 rounded-2xl px-7 py-4 text-base font-semibold">
@@ -157,7 +157,7 @@ export default function LandingPage() {
                   </div>
                   <div className="eyebrow">
                     <Compass className="h-4 w-4" />
-                    Coach discovery soon
+                    Coach discovery beta
                   </div>
                   <div className="eyebrow">
                     <Dumbbell className="h-4 w-4" />
@@ -203,15 +203,15 @@ export default function LandingPage() {
             <h2 className="text-4xl font-bold text-[var(--foreground)]">A cleaner system for clients, plans, and follow-through.</h2>
             <p className="mt-5 text-lg leading-8 text-[var(--muted)]">
               Personal Trainers can invite clients, create meal and training plans, manage feedback, and
-              keep communication in one place instead of stitching together five tools. Public discovery is the next
-              layer, so coaches can eventually manage clients they bring in and leads they earn inside the same product.
+              keep communication in one place instead of stitching together five tools. Discover visibility, offers,
+              and lead capture now sit beside client delivery so coaches can run both sides of the business in one product.
             </p>
             <div className="mt-8 space-y-4 text-base text-[var(--foreground)]">
               {[
                 'Invite and manage clients from one roster',
                 'Build structured meal and training plans inside the app',
                 'Use AI and check-ins to keep the plan adaptive',
-                'Prepare for public coach listings and lead capture',
+                'Show up in Discover and manage inbound leads',
               ].map((item) => (
                 <div key={item} className="flex items-start gap-3">
                   <div className="mt-1 h-2.5 w-2.5 rounded-full bg-[var(--brand-500)]" />
@@ -227,7 +227,7 @@ export default function LandingPage() {
             <p className="mt-5 text-lg leading-8 text-[var(--muted)]">
               The platform gathers the kind of context most apps ignore: injuries, schedule, training background,
               food dislikes, and recovery signals. That means self-serve plans feel believable instead of templated,
-              and coached plans begin with better context.
+              and every individual plan can still discover the right coach if self-serve is not enough.
             </p>
             <div className="mt-8 grid gap-4 sm:grid-cols-2">
               {[
@@ -245,11 +245,11 @@ export default function LandingPage() {
           </div>
 
           <div className="panel-strong p-8">
-            <div className="eyebrow mb-5">Coming soon</div>
+            <div className="eyebrow mb-5">Discover coaches</div>
             <h2 className="text-4xl font-bold text-[var(--foreground)]">Discover coaches who match the way you want to train.</h2>
             <p className="mt-5 text-lg leading-8 text-[var(--muted)]">
-              We’re adding a marketplace layer where users can browse Personal Trainers by focus, coaching style,
-              format, and pricing, then request coaching inside Meal & Motion without leaving the product.
+              Users can browse Personal Trainers by focus, coaching style, format, and pricing, then request coaching
+              inside Meal & Motion without leaving the product. Discover is available across all individual plans, including Free.
             </p>
             <div className="mt-8 space-y-4 text-base text-[var(--foreground)]">
               {[

@@ -59,6 +59,21 @@ Role of each area:
 - My Coach: private relationship after a coach accepts a lead or invites a client.
 - Existing nutrition, training, AI, and client-management workflows stay intact.
 
+## Pricing Strategy For V1
+
+Meal & Motion should price this as two connected tracks:
+
+- Individuals: Free, Pro, and Unlimited.
+- Coaches: one paid coach workspace in v1.
+
+Key pricing rules:
+
+- Discover Coaches should be available on every individual plan, including Free.
+- Individual upgrades should monetize self-serve AI depth, plan access, and regeneration flexibility.
+- The paid coach plan should monetize the operating system: client delivery, intake, marketplace visibility, and lead management.
+- Marketplace discovery should be included in the paid coach plan during beta, not sold as a separate pay-per-lead product.
+- Seat-based coach pricing can come later after conversion, activation, and demand are validated.
+
 ## MVP Goal
 
 Help a user find a relevant coach and allow that coach to convert them into a managed client inside the existing Meal & Motion workflow.

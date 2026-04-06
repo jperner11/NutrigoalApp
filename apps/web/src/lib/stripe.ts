@@ -18,4 +18,5 @@ export const PRICE_IDS: Record<string, string | undefined> = {
   pro: process.env.STRIPE_PRICE_PRO,
   unlimited: process.env.STRIPE_PRICE_UNLIMITED,
   nutritionist: process.env.STRIPE_PRICE_NUTRITIONIST,
+  personal_trainer: process.env.STRIPE_PRICE_PERSONAL_TRAINER ?? process.env.STRIPE_PRICE_NUTRITIONIST,
 }

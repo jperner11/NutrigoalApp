@@ -8,11 +8,11 @@ const faqSections = [
     items: [
       {
         q: 'Who is Meal & Motion for?',
-        a: 'Meal & Motion is built for three connected use cases: individual users who want AI-powered plans, Personal Trainers who want one system for client onboarding and delivery, and users who want to discover a coach who matches their goals as the marketplace rolls out.',
+        a: 'Meal & Motion is built for three connected use cases: individual users who want AI-powered plans, coaches who want one system for client onboarding and delivery, and users who want to discover a coach who matches their goals.',
       },
       {
         q: 'Is this a consumer fitness app or a coaching platform?',
-        a: 'It is both a self-serve performance app and a coaching platform. Users can run solo with AI-powered plans, work with a Personal Trainer through a managed relationship, and over time use Meal & Motion to discover coaches through a structured marketplace rather than a social feed.',
+        a: 'It is both a self-serve performance app and a coaching platform. Users can run solo with AI-powered plans, work with a Personal Trainer through a managed relationship, or use Meal & Motion to discover coaches through a structured marketplace rather than a social feed.',
       },
       {
         q: 'What makes this different from other coaching tools?',
@@ -37,7 +37,7 @@ const faqSections = [
       },
       {
         q: 'Will trainers be able to get discovered inside the product?',
-        a: 'Yes, that is the planned next layer. Trainers will be able to opt into a public marketplace profile so users can browse coaches by goals, format, and pricing. Discovery is being rolled out separately from private client management so the trust model stays clear.',
+        a: 'Yes. Coaches can now opt into a public marketplace profile in beta so users can browse by goals, format, style, and pricing. Discovery is kept separate from private client management so the trust model stays clear.',
       },
       {
         q: 'What happens after a client accepts?',
@@ -63,6 +63,23 @@ const faqSections = [
       {
         q: 'What if a client has accepted the invite but no plan is assigned yet?',
         a: 'They should see a clear connected state explaining that the relationship is active and that the trainer still needs to assign the programme. That prevents confusion and sets the right expectation during onboarding.',
+      },
+    ],
+  },
+  {
+    title: 'Pricing and access',
+    items: [
+      {
+        q: 'Is Discover Coaches available on Free?',
+        a: 'Yes. Discover Coaches is available across all individual plans, including Free. Users can browse profiles, compare offers, and send structured requests without upgrading first.',
+      },
+      {
+        q: 'What do paid individual plans unlock?',
+        a: 'Paid individual plans unlock more self-serve depth: fuller plan access, stronger regeneration, richer AI support, and a more complete tracking loop. The upgrade is not about hiding coach discovery.',
+      },
+      {
+        q: 'How does coach pricing work in v1?',
+        a: 'V1 keeps coach pricing intentionally simple with one paid coach workspace. That subscription covers client delivery, intake, public marketplace visibility, and lead management. Seat-based coach tiers can come later as the business grows.',
       },
     ],
   },
@@ -103,7 +120,7 @@ export default function FAQPage() {
     <PublicPageShell
       eyebrow="FAQ"
       title="Answers for users, coaches, and early beta testers"
-      intro="This page answers the practical questions people ask before trusting Meal & Motion: who it is for, how self-serve and coach-led flows work, how coach discovery is being introduced, and where to get help."
+      intro="This page answers the practical questions people ask before trusting Meal & Motion: who it is for, how self-serve and coach-led flows work, how coach discovery works in beta, and where to get help."
     >
       <section className="panel-strong p-8 sm:p-10">
         <div className="grid gap-4 sm:grid-cols-3">
@@ -117,7 +134,7 @@ export default function FAQPage() {
           </div>
           <div className="surface-card p-5">
             <div className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--muted-soft)]">Coach discovery</div>
-            <div className="mt-2 text-sm leading-7 text-[var(--muted)]">Marketplace discovery is being introduced in phases so profile quality, lead flow, and trust stay strong from day one.</div>
+            <div className="mt-2 text-sm leading-7 text-[var(--muted)]">Marketplace discovery is live in beta, with profile quality and lead flow still being refined so trust stays strong from day one.</div>
           </div>
         </div>
       </section>
@@ -141,7 +158,7 @@ export default function FAQPage() {
       <section className="panel-strong p-8 sm:p-10">
         <h2 className="font-display text-3xl font-bold text-[var(--foreground)]">Still unsure?</h2>
         <p className="mt-4 max-w-3xl text-sm leading-7 text-[var(--muted)]">
-          If you are deciding whether the beta fits your workflow, the best next step is to create an account, test either the self-serve flow or the trainer invite flow, and watch for coach discovery updates as the marketplace rolls out.
+          If you are deciding whether the beta fits your workflow, the best next step is to create an account, test either the self-serve flow, the Discover Coaches flow, or the trainer invite flow, and see which side of the platform fits you best.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Link href="/support" className="btn-primary rounded-2xl px-5 py-3 text-sm font-semibold">

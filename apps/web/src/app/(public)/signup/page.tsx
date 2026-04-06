@@ -6,7 +6,6 @@ import { ArrowRight, Eye, EyeOff, Lock, Mail, User, UserCircle, Users } from 'lu
 import { toast } from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 import BrandLogo from '@/components/brand/BrandLogo'
-const TEST_DEFAULT_INDIVIDUAL_ROLE = 'unlimited' as const
 
 export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -30,7 +29,7 @@ export default function SignupPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const signupRole = formData.role === 'free' ? TEST_DEFAULT_INDIVIDUAL_ROLE : formData.role
+    const signupRole = formData.role
     const postSignupNextPath = nextPath === '/dashboard' ? '/dashboard' : '/onboarding'
 
     if (!formData.fullName.trim() || !formData.email || !formData.password) {
@@ -132,8 +131,8 @@ export default function SignupPage() {
           </p>
           <div className="mt-10 grid gap-4 sm:grid-cols-2">
             {[
-              ['Individuals', 'AI-powered plan generation now, coach discovery marketplace rolling in next'],
-              ['Personal trainers', 'Client workflows now, public discovery and lead capture coming as a new growth layer'],
+              ['Individuals', 'Self-serve AI plus Discover Coaches on every individual plan, including Free'],
+              ['Coaches', 'Client workflows, public profiles, offers, and lead capture in one paid workspace'],
             ].map(([title, body]) => (
               <div key={title} className="surface-card p-5">
                 <div className="font-display text-2xl font-bold text-[var(--foreground)]">{title}</div>
@@ -148,7 +147,7 @@ export default function SignupPage() {
             <div className="eyebrow mb-4">Create account</div>
             <h2 className="text-4xl font-bold text-[var(--foreground)]">Choose your setup</h2>
             <p className="mt-3 text-base leading-7 text-[var(--muted)]">
-              Start as an individual or practitioner. You can refine everything once you&apos;re inside, and discovery features will layer onto the same account system as they roll out.
+              Start as an individual or coach. Discovery runs on the same account system, so there is no separate marketplace signup.
             </p>
           </div>
 
@@ -166,7 +165,7 @@ export default function SignupPage() {
                 >
                   <User className={`mb-3 h-7 w-7 ${formData.role === 'free' ? 'text-[var(--brand-900)]' : 'text-[var(--muted-soft)]'}`} />
                   <div className="font-display text-xl font-bold text-[var(--foreground)]">Individual</div>
-                  <div className="mt-1 text-sm text-[var(--muted)]">For self-serve plans, tracking, and eventually discovering the right coach.</div>
+                  <div className="mt-1 text-sm text-[var(--muted)]">For self-serve plans, tracking, and Discover Coaches across every individual plan.</div>
                 </button>
                 <button
                   type="button"
@@ -177,8 +176,8 @@ export default function SignupPage() {
                   }`}
                 >
                   <Users className={`mb-3 h-7 w-7 ${formData.role === 'personal_trainer' ? 'text-[var(--brand-900)]' : 'text-[var(--muted-soft)]'}`} />
-                  <div className="font-display text-xl font-bold text-[var(--foreground)]">Personal Trainer</div>
-                  <div className="mt-1 text-sm text-[var(--muted)]">For client management, coaching, plan delivery, and future marketplace discovery.</div>
+                  <div className="font-display text-xl font-bold text-[var(--foreground)]">Coach / Personal Trainer</div>
+                  <div className="mt-1 text-sm text-[var(--muted)]">For client management, coaching, public marketplace visibility, and inbound lead flow.</div>
                 </button>
               </div>
             </div>
