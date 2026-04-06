@@ -90,6 +90,7 @@ export async function POST(
       role: 'personal_trainer_client',
       personal_trainer_id: invite.personal_trainer_id,
       nutritionist_id: invite.personal_trainer_id,
+      onboarding_completed: false,
     })
     .eq('id', user.id)
 

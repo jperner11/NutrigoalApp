@@ -4,6 +4,7 @@ import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
 import { AuthProvider, useAuth } from '../src/contexts/AuthContext'
 import { brandColors } from '../src/theme/brand'
+import { requiresOnboardingQuestionnaire } from '@nutrigoal/shared'
 
 export { ErrorBoundary } from 'expo-router'
 
@@ -24,7 +25,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
     if (!session && !inAuthGroup) {
       router.replace('/(auth)/login')
     } else if (session && inAuthGroup) {
-      if (profile && !profile.onboarding_completed) {
+      if (profile && requiresOnboardingQuestionnaire(profile.role) && !profile.onboarding_completed) {
         router.replace('/(tabs)/onboarding')
       } else {
         router.replace('/(tabs)')

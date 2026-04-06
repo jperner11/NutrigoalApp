@@ -96,8 +96,8 @@ export default function AcceptInvitePage() {
       return
     }
 
-    toast.success(action === 'accept' ? 'Trainer connected.' : 'Invite declined.')
-    router.push(action === 'accept' ? '/dashboard' : '/login')
+    toast.success(action === 'accept' ? 'Trainer connected. Let’s finish your intake.' : 'Invite declined.')
+    router.push(action === 'accept' ? '/onboarding' : '/login')
     router.refresh()
   }
 

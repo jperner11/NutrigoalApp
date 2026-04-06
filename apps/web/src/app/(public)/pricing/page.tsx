@@ -91,9 +91,24 @@ export default function PricingPage() {
             <span className="block text-[var(--brand-500)]">for serious progression.</span>
           </h1>
           <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-[var(--muted)]">
-            Start free, upgrade when the system becomes part of your routine. Every tier is designed to feel clear,
-            useful, and worth paying for.
+            Start free, upgrade when the system becomes part of your routine. Meal & Motion supports self-serve users,
+            Personal Trainers, and an upcoming coach discovery marketplace layer without forcing everyone into the same path.
           </p>
+        </section>
+
+        <section className="mt-10 panel-strong p-6 sm:p-8">
+          <div className="grid gap-4 lg:grid-cols-3">
+            {[
+              ['Self-serve users', 'Use AI-powered nutrition and training plans without needing a coach relationship.'],
+              ['Coach workspace', 'Manage existing clients, deliver plans, and run communication from one operating system.'],
+              ['Coach discovery', 'Public coach listings and lead capture are rolling out as a marketplace extension for PT plans.'],
+            ].map(([title, body]) => (
+              <div key={title} className="surface-card p-5">
+                <div className="font-display text-2xl font-bold text-[var(--foreground)]">{title}</div>
+                <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{body}</p>
+              </div>
+            ))}
+          </div>
         </section>
 
         <section className="mt-10 grid gap-6 xl:grid-cols-4">
@@ -167,7 +182,11 @@ export default function PricingPage() {
               },
               {
                 q: 'How do Personal Trainer plans work?',
-                a: 'The practitioner tier includes client capacity and management workflows. It is meant for Personal Trainers who need delivery, oversight, and communication in one place.',
+                a: 'The practitioner tier includes client capacity, management workflows, and the foundation for public coach discovery. It is meant for Personal Trainers who need delivery, oversight, communication, and marketplace visibility in one place.',
+              },
+              {
+                q: 'Is coach discovery already live?',
+                a: 'Not fully yet. We are positioning Meal & Motion around three paths now: self-serve, coach-led delivery, and coach discovery. Public coach listings will roll out in beta phases so the marketplace launches with better trust and profile quality.',
               },
             ].map((item) => (
               <div key={item.q} className="surface-card p-6">

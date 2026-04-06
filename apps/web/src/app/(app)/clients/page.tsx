@@ -20,6 +20,7 @@ interface ActiveClientRow {
     id: string
     full_name: string | null
     email: string
+    onboarding_completed: boolean
   } | null
 }
 
@@ -62,7 +63,7 @@ export default function ClientsPage() {
       const [{ data: clientRows }, { data: inviteRows }] = await Promise.all([
         supabase
           .from('nutritionist_clients')
-          .select('id, status, invited_email, created_at, client:client_id(id, full_name, email)')
+          .select('id, status, invited_email, created_at, client:client_id(id, full_name, email, onboarding_completed)')
           .eq('nutritionist_id', trainerId)
           .eq('status', 'active')
           .order('created_at', { ascending: false }),
@@ -158,7 +159,8 @@ export default function ClientsPage() {
 
   const needsAttentionCount = pendingInvites.filter((invite) => new Date(invite.expires_at).getTime() < Date.now()).length
   const missingPlanClients = activeClients.filter((client) => !client.hasDietPlan || !client.hasTrainingPlan)
-  const totalNeedsAttention = needsAttentionCount + missingPlanClients.length
+  const intakePendingClients = activeClients.filter((client) => client.client && !client.client.onboarding_completed)
+  const totalNeedsAttention = needsAttentionCount + missingPlanClients.length + intakePendingClients.length
 
   return (
     <div className="space-y-8">
@@ -204,6 +206,29 @@ export default function ClientsPage() {
           </div>
         ) : (
           <div className="space-y-3">
+            {intakePendingClients.map((row) => (
+              <Link
+                key={`intake-pending-${row.id}`}
+                href={row.client ? `/clients/${row.client.id}` : '#'}
+                className="card flex items-center justify-between gap-4 p-5 hover:shadow-md transition-shadow"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="rounded-full bg-sky-100 p-2">
+                    <AlertCircle className="h-5 w-5 text-sky-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">{row.client?.full_name ?? row.invited_email ?? 'Client'}</h3>
+                    <p className="mt-1 text-sm text-gray-600">
+                      Invite accepted, but the coach intake is still incomplete.
+                    </p>
+                  </div>
+                </div>
+                <span className="rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700">
+                  Intake pending
+                </span>
+              </Link>
+            ))}
+
             {missingPlanClients.map((row) => (
               <Link
                 key={`missing-plan-${row.id}`}

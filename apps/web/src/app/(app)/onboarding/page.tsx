@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import {
   ArrowRight, ArrowLeft, User, Utensils,
-  Calculator, Heart, Dumbbell, Briefcase, Calendar, Sparkles,
+  Calculator, Heart, Dumbbell, Briefcase, Calendar, Sparkles, Users, ClipboardList, MessageSquare,
   Cookie,
 } from 'lucide-react'
 import {
@@ -16,12 +16,20 @@ import {
   PLAN_PREFERENCES, HARDER_DAYS_OPTIONS, EATING_OUT_FREQUENCIES,
   calculateNutritionTargets,
 } from '@nutrigoal/shared'
-import type { UserMetrics } from '@nutrigoal/shared'
+import type { UserMetrics, PersonalTrainerCustomIntakeQuestion } from '@nutrigoal/shared'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'react-hot-toast'
+import { isManagedClientRole, isTrainerRole } from '@nutrigoal/shared'
 
-const STEPS = ['My Stats', 'Lifestyle', 'Food Preferences', 'Snack Habits', 'Health', 'Training', 'Goals', 'Schedule', 'Review']
+const CLIENT_STEPS = ['My Stats', 'Lifestyle', 'Food Preferences', 'Snack Habits', 'Health', 'Training', 'Goals', 'Schedule', 'Review']
+const MANAGED_CLIENT_STEPS = ['My Stats', 'Lifestyle', 'Food Preferences', 'Snack Habits', 'Health', 'Training', 'Goals', 'Schedule', 'Coach Questions', 'Review']
+const TRAINER_STEPS = ['Coach Profile', 'Ideal Clients', 'Coaching Style', 'Workflow']
+const COACH_SPECIALTY_OPTIONS = ['Fat loss', 'Muscle gain', 'General fitness', 'Lifestyle nutrition', 'Strength training', 'Online coaching']
+const COACH_SERVICE_OPTIONS = ['Training plans', 'Nutrition guidance', 'Habit coaching', 'Check-ins', 'Messaging support', 'Progress reviews']
+const COACH_FORMAT_OPTIONS = ['Online', 'In person', 'Hybrid']
+const COACH_INTAKE_REQUIREMENT_OPTIONS = ['Goals', 'Injuries', 'Medical conditions', 'Food preferences', 'Schedule', 'Progress photos', 'Measurements']
+type IntakeAnswerValue = string | string[]
 const TIME_OPTIONS = Array.from({ length: 48 }, (_, i) => {
   const h = Math.floor(i / 2).toString().padStart(2, '0')
   const m = i % 2 === 0 ? '00' : '30'
@@ -38,10 +46,70 @@ export default function OnboardingPage() {
   const { profile } = useUser()
   const [step, setStep] = useState(0)
   const [saving, setSaving] = useState(false)
+  const isTrainer = isTrainerRole(profile?.role)
+  const isManagedClient = isManagedClientRole(profile?.role)
+  const [coachCustomQuestions, setCoachCustomQuestions] = useState<PersonalTrainerCustomIntakeQuestion[]>([])
+  const [coachQuestionAnswers, setCoachQuestionAnswers] = useState<Record<string, IntakeAnswerValue>>({})
+  const steps = isTrainer ? TRAINER_STEPS : isManagedClient && coachCustomQuestions.length > 0 ? MANAGED_CLIENT_STEPS : CLIENT_STEPS
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [step])
+
+  useEffect(() => {
+    if (profile?.onboarding_completed) {
+      window.location.href = '/dashboard'
+    }
+  }, [profile])
+
+  useEffect(() => {
+    async function loadCoachQuestions() {
+      if (!profile || !isManagedClient) return
+      const trainerId = profile.personal_trainer_id ?? profile.nutritionist_id
+      if (!trainerId) return
+
+      const supabase = createClient()
+      const { data: questions } = await supabase
+        .from('personal_trainer_custom_intake_questions')
+        .select('*')
+        .eq('trainer_id', trainerId)
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true })
+        .order('created_at', { ascending: true })
+
+      const customQuestions = (questions as PersonalTrainerCustomIntakeQuestion[] | null) ?? []
+      setCoachCustomQuestions(customQuestions)
+
+      if (customQuestions.length === 0) return
+
+      const { data: existingResponses } = await supabase
+        .from('personal_trainer_custom_intake_responses')
+        .select('question_id, response_text, response_json')
+        .eq('client_id', profile.id)
+        .eq('trainer_id', trainerId)
+
+      if (!existingResponses) return
+
+      const mapped = Object.fromEntries(existingResponses.map((response) => [
+        response.question_id,
+        Array.isArray(response.response_json) ? response.response_json : response.response_text ?? '',
+      ]))
+      setCoachQuestionAnswers(mapped)
+    }
+
+    loadCoachQuestions()
+  }, [profile, isManagedClient])
+
+  // ── Trainer Setup ──
+  const [coachSpecialties, setCoachSpecialties] = useState<string[]>(profile?.coach_specialties ?? [])
+  const [coachIdealClient, setCoachIdealClient] = useState(profile?.coach_ideal_client ?? '')
+  const [coachServices, setCoachServices] = useState<string[]>(profile?.coach_services ?? [])
+  const [coachFormats, setCoachFormats] = useState<string[]>(profile?.coach_formats ?? [])
+  const [coachCheckInFrequency, setCoachCheckInFrequency] = useState(profile?.coach_check_in_frequency ?? 'weekly')
+  const [coachStyle, setCoachStyle] = useState(profile?.coach_style ?? 'balanced')
+  const [coachIntakeRequirements, setCoachIntakeRequirements] = useState<string[]>(profile?.coach_intake_requirements ?? [])
+  const [coachPostIntakeAction, setCoachPostIntakeAction] = useState(profile?.coach_post_intake_action ?? 'review_and_plan')
+  const [coachAppFocus, setCoachAppFocus] = useState(profile?.coach_app_focus ?? 'client_management')
 
   // ── Step 0: My Stats ──
   const [fullName, setFullName] = useState(profile?.full_name ?? '')
@@ -127,7 +195,39 @@ export default function OnboardingPage() {
     setArr(arr.includes(val) ? arr.filter(v => v !== val) : [...arr, val])
   }
 
+  const updateCoachQuestionAnswer = (questionId: string, value: IntakeAnswerValue) => {
+    setCoachQuestionAnswers((prev) => ({ ...prev, [questionId]: value }))
+  }
+
+  const toggleCoachMultiSelect = (questionId: string, option: string) => {
+    const current = Array.isArray(coachQuestionAnswers[questionId]) ? coachQuestionAnswers[questionId] as string[] : []
+    updateCoachQuestionAnswer(
+      questionId,
+      current.includes(option) ? current.filter((item) => item !== option) : [...current, option]
+    )
+  }
+
+  const customQuestionStep = isManagedClient && coachCustomQuestions.length > 0 ? steps.length - 2 : -1
+  const reviewStep = steps.length - 1
+
   const canContinue = () => {
+    if (isTrainer) {
+      switch (step) {
+        case 0: return fullName.trim().length > 0 && coachSpecialties.length > 0 && coachFormats.length > 0
+        case 1: return coachIdealClient.trim().length > 0 && coachServices.length > 0
+        case 2: return coachIntakeRequirements.length > 0
+        default: return true
+      }
+    }
+
+    if (step === customQuestionStep) {
+      return coachCustomQuestions.every((question) => {
+        if (!question.required) return true
+        const answer = coachQuestionAnswers[question.id]
+        return Array.isArray(answer) ? answer.length > 0 : String(answer ?? '').trim().length > 0
+      })
+    }
+
     switch (step) {
       case 0: return fullName.trim().length > 0 && age && height && weight
       default: return true
@@ -145,6 +245,38 @@ export default function OnboardingPage() {
       goal,
     }
     return calculateNutritionTargets(metrics)
+  }
+
+  const handleTrainerFinish = async () => {
+    if (!profile) return
+    setSaving(true)
+
+    const supabase = createClient()
+    const { error } = await supabase
+      .from('user_profiles')
+      .update({
+        full_name: fullName.trim(),
+        coach_specialties: coachSpecialties,
+        coach_ideal_client: coachIdealClient.trim(),
+        coach_services: coachServices,
+        coach_formats: coachFormats,
+        coach_check_in_frequency: coachCheckInFrequency,
+        coach_style: coachStyle,
+        coach_intake_requirements: coachIntakeRequirements,
+        coach_post_intake_action: coachPostIntakeAction,
+        coach_app_focus: coachAppFocus,
+        onboarding_completed: true,
+      })
+      .eq('id', profile.id)
+
+    if (error) {
+      toast.error('Failed to save coach setup: ' + error.message)
+      setSaving(false)
+      return
+    }
+
+    toast.success('Coach setup complete!')
+    window.location.href = '/dashboard'
   }
 
   const handleFinish = async (navigateTo: 'dashboard' | 'ai-generate') => {
@@ -248,23 +380,368 @@ export default function OnboardingPage() {
       return
     }
 
+    if (isManagedClient && coachCustomQuestions.length > 0) {
+      const trainerId = profile.personal_trainer_id ?? profile.nutritionist_id
+      if (trainerId) {
+        const responsePayload = coachCustomQuestions
+          .map((question) => {
+            const answer = coachQuestionAnswers[question.id]
+            const hasAnswer = Array.isArray(answer) ? answer.length > 0 : String(answer ?? '').trim().length > 0
+            if (!hasAnswer) return null
+            return {
+              question_id: question.id,
+              trainer_id: trainerId,
+              client_id: profile.id,
+              response_text: Array.isArray(answer) ? null : String(answer).trim(),
+              response_json: Array.isArray(answer) ? answer : null,
+            }
+          })
+          .filter(Boolean)
+
+        if (responsePayload.length > 0) {
+          const { error: responseError } = await supabase
+            .from('personal_trainer_custom_intake_responses')
+            .upsert(responsePayload, { onConflict: 'question_id,client_id' })
+
+          if (responseError) {
+            toast.error('Your profile saved, but custom intake answers failed to save.')
+            setSaving(false)
+            return
+          }
+        }
+      }
+    }
+
     toast.success('Profile setup complete!')
     window.location.href = navigateTo === 'ai-generate' ? '/generate-plans' : '/dashboard'
   }
 
-  const renderStep = () => {
+  const renderTrainerStep = () => {
     switch (step) {
+      case 0:
+        return (
+          <div className="space-y-6">
+            <StepHeader
+              icon={<User className="h-12 w-12 text-purple-600" />}
+              title="Set up your coaching profile"
+              subtitle="This tells Nutrigoal who you coach, how you work, and how to frame client intake around your process."
+            />
+            <div className="flex items-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 -mt-2">
+              <span className="text-sm font-medium text-indigo-600">Clients will see this reflected in their coach-led intake and dashboard journey.</span>
+            </div>
+            <div>
+              <Label>Display name</Label>
+              <input
+                type="text"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                placeholder="Your name"
+              />
+            </div>
+            <div>
+              <Label>Primary specialties</Label>
+              <p className="text-sm text-gray-500 mb-3">Pick the outcomes you want to be known for.</p>
+              <ChipGrid
+                items={COACH_SPECIALTY_OPTIONS.map((item) => ({ value: item, label: item }))}
+                selected={coachSpecialties}
+                onToggle={(val) => toggleArray(coachSpecialties, setCoachSpecialties, val)}
+              />
+            </div>
+            <div>
+              <Label>How do you coach?</Label>
+              <div className="flex flex-wrap gap-3">
+                {COACH_FORMAT_OPTIONS.map((format) => (
+                  <button
+                    key={format}
+                    type="button"
+                    onClick={() => toggleArray(coachFormats, setCoachFormats, format)}
+                    className={`px-4 py-3 rounded-xl border-2 font-semibold text-sm transition-all ${
+                      coachFormats.includes(format)
+                        ? 'border-purple-500 bg-purple-50 text-purple-700'
+                        : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                    }`}
+                  >
+                    {format}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )
+      case 1:
+        return (
+          <div className="space-y-6">
+            <StepHeader
+              icon={<Users className="h-12 w-12 text-indigo-500" />}
+              title="Who do you work best with?"
+              subtitle="We’ll use this to shape the trainer dashboard and the way client intake is framed after an invite is accepted."
+            />
+            <div>
+              <Label>Ideal client summary</Label>
+              <textarea
+                value={coachIdealClient}
+                onChange={(e) => setCoachIdealClient(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
+                rows={4}
+                placeholder="e.g. busy professionals who want fat loss, strength, and simple nutrition they can sustain"
+              />
+            </div>
+            <div>
+              <Label>Services you offer</Label>
+              <ChipGrid
+                items={COACH_SERVICE_OPTIONS.map((item) => ({ value: item, label: item }))}
+                selected={coachServices}
+                onToggle={(val) => toggleArray(coachServices, setCoachServices, val)}
+              />
+            </div>
+            <div>
+              <Label>Main reason you&apos;re using the app</Label>
+              <div className="space-y-2">
+                {[
+                  ['client_management', 'Client management', 'Use Nutrigoal mainly to onboard, review, and coach existing clients.'],
+                  ['prospecting', 'Prospecting', 'Use Nutrigoal mainly to capture and qualify new leads.'],
+                  ['both', 'Both', 'Use Nutrigoal for both delivery and growth.'],
+                ].map(([value, title, description]) => (
+                  <OptionCard
+                    key={value}
+                    title={title}
+                    description={description}
+                    selected={coachAppFocus === value}
+                    onClick={() => setCoachAppFocus(value as typeof coachAppFocus)}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        )
+      case 2:
+        return (
+          <div className="space-y-6">
+            <StepHeader
+              icon={<ClipboardList className="h-12 w-12 text-amber-500" />}
+              title="How do you run accountability?"
+              subtitle="These answers shape what the app highlights to you once client responses start coming in."
+            />
+            <div>
+              <Label>Coaching style</Label>
+              <div className="space-y-2">
+                {[
+                  ['structured', 'Structured', 'Tighter guardrails, more precise plans, more direct accountability.'],
+                  ['balanced', 'Balanced', 'Clear structure with practical flexibility for real life.'],
+                  ['flexible', 'Flexible', 'Outcome-focused coaching with more room for autonomy and adaptation.'],
+                ].map(([value, title, description]) => (
+                  <OptionCard
+                    key={value}
+                    title={title}
+                    description={description}
+                    selected={coachStyle === value}
+                    onClick={() => setCoachStyle(value as typeof coachStyle)}
+                  />
+                ))}
+              </div>
+            </div>
+            <div>
+              <Label>Check-in frequency</Label>
+              <div className="flex flex-wrap gap-3">
+                {[
+                  ['weekly', 'Weekly'],
+                  ['biweekly', 'Bi-weekly'],
+                  ['monthly', 'Monthly'],
+                  ['as_needed', 'As needed'],
+                ].map(([value, label]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setCoachCheckInFrequency(value as typeof coachCheckInFrequency)}
+                    className={`py-2.5 px-4 rounded-xl border-2 font-semibold text-sm transition-all ${
+                      coachCheckInFrequency === value
+                        ? 'border-purple-500 bg-purple-50 text-purple-700'
+                        : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <Label>What must every client answer before coaching starts?</Label>
+              <ChipGrid
+                items={COACH_INTAKE_REQUIREMENT_OPTIONS.map((item) => ({ value: item, label: item }))}
+                selected={coachIntakeRequirements}
+                onToggle={(val) => toggleArray(coachIntakeRequirements, setCoachIntakeRequirements, val)}
+              />
+            </div>
+          </div>
+        )
+      case 3:
+        return (
+          <div className="space-y-6">
+            <StepHeader
+              icon={<MessageSquare className="h-12 w-12 text-indigo-500" />}
+              title="What happens after intake?"
+              subtitle="Choose the default next step once a client accepts your invite and finishes their questionnaire."
+            />
+            <div>
+              <Label>Default post-intake action</Label>
+              <div className="space-y-2">
+                {[
+                  ['review_and_plan', 'Review and build a plan', 'Best when you want the questionnaire to flow straight into programming.'],
+                  ['message_first', 'Message first', 'Best when you want to welcome the client and clarify a few details before planning.'],
+                  ['book_consult', 'Book a consult', 'Best when you use intake to qualify for a call or onboarding session.'],
+                  ['send_assessment', 'Send assessment first', 'Best when you still need a movement screen, photos, or deeper assessment.'],
+                ].map(([value, title, description]) => (
+                  <OptionCard
+                    key={value}
+                    title={title}
+                    description={description}
+                    selected={coachPostIntakeAction === value}
+                    onClick={() => setCoachPostIntakeAction(value as typeof coachPostIntakeAction)}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl p-6 border border-gray-200">
+              <h3 className="text-sm font-bold text-purple-700 uppercase tracking-wider mb-4">Setup summary</h3>
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                <ReviewRow label="Display name" value={fullName || 'Not set'} />
+                <ReviewRow label="Specialties" value={coachSpecialties.join(', ') || 'Not set'} />
+                <ReviewRow label="Formats" value={coachFormats.join(', ') || 'Not set'} />
+                <ReviewRow label="Ideal client" value={coachIdealClient || 'Not set'} />
+                <ReviewRow label="Services" value={coachServices.join(', ') || 'Not set'} />
+                <ReviewRow label="Style" value={coachStyle.replace(/_/g, ' ')} />
+                <ReviewRow label="Check-ins" value={coachCheckInFrequency.replace(/_/g, ' ')} />
+                <ReviewRow label="Required intake" value={coachIntakeRequirements.join(', ') || 'Not set'} />
+              </div>
+            </div>
+
+            <div className="flex gap-3 bg-purple-50 border border-purple-200 rounded-2xl p-5">
+              <Sparkles className="h-5 w-5 text-purple-600 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-purple-800 leading-relaxed">
+                Clients will be guided through a coach-led intake after they accept your invite, and your dashboard will flag who is still pending versus ready for review.
+              </p>
+            </div>
+
+            <button
+              onClick={handleTrainerFinish}
+              disabled={saving}
+              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-4 rounded-xl text-base font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+            >
+              <span>{saving ? 'Saving...' : 'Finish coach setup'}</span>
+              <ArrowRight className="h-5 w-5" />
+            </button>
+          </div>
+        )
+      default:
+        return null
+    }
+  }
+
+  const renderStep = () => {
+    if (step === customQuestionStep) {
+      return (
+        <div className="space-y-6">
+          <StepHeader
+            icon={<ClipboardList className="h-12 w-12 text-indigo-500" />}
+            title="Coach-specific questions"
+            subtitle="These extra answers go straight into your coach&apos;s dashboard so they can tailor your next step more precisely."
+          />
+
+          {coachCustomQuestions.map((question) => (
+            <div key={question.id} className="rounded-2xl border border-gray-200 bg-white p-5">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <Label>{question.label}{question.required ? ' *' : ''}</Label>
+                  {question.help_text && <p className="mb-3 text-sm text-gray-500">{question.help_text}</p>}
+                </div>
+              </div>
+
+              {question.type === 'short_text' && (
+                <input
+                  type="text"
+                  value={Array.isArray(coachQuestionAnswers[question.id]) ? '' : String(coachQuestionAnswers[question.id] ?? '')}
+                  onChange={(e) => updateCoachQuestionAnswer(question.id, e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  placeholder="Type your answer"
+                />
+              )}
+
+              {question.type === 'long_text' && (
+                <textarea
+                  value={Array.isArray(coachQuestionAnswers[question.id]) ? '' : String(coachQuestionAnswers[question.id] ?? '')}
+                  onChange={(e) => updateCoachQuestionAnswer(question.id, e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
+                  rows={4}
+                  placeholder="Type your answer"
+                />
+              )}
+
+              {question.type === 'yes_no' && (
+                <div className="grid grid-cols-2 gap-3">
+                  {['Yes', 'No'].map((option) => (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => updateCoachQuestionAnswer(question.id, option)}
+                      className={`py-3 px-4 rounded-xl border-2 font-semibold transition-all ${
+                        coachQuestionAnswers[question.id] === option
+                          ? 'border-purple-500 bg-purple-50 text-purple-700'
+                          : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                      }`}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {question.type === 'single_select' && (
+                <div className="space-y-2">
+                  {question.options.map((option) => (
+                    <OptionCard
+                      key={option}
+                      title={option}
+                      description=""
+                      selected={coachQuestionAnswers[question.id] === option}
+                      onClick={() => updateCoachQuestionAnswer(question.id, option)}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {question.type === 'multi_select' && (
+                <ChipGrid
+                  items={question.options.map((option) => ({ value: option, label: option }))}
+                  selected={Array.isArray(coachQuestionAnswers[question.id]) ? coachQuestionAnswers[question.id] as string[] : []}
+                  onToggle={(value) => toggleCoachMultiSelect(question.id, value)}
+                />
+              )}
+            </div>
+          ))}
+        </div>
+      )
+    }
+
+    switch (step === reviewStep ? 8 : step) {
       /* ── Step 0: My Stats ──────────────────────────── */
       case 0:
         return (
           <div className="space-y-6">
             <StepHeader
               icon={<User className="h-12 w-12 text-purple-600" />}
-              title="Let's Get to Know You"
-              subtitle="Your stats give us the baseline for calories, macros, hydration, and realistic rate of progress."
+              title={isManagedClient ? 'Your coach needs a quick intake' : "Let's Get to Know You"}
+              subtitle={isManagedClient
+                ? 'These details give your coach the baseline for planning, progress review, and realistic expectations.'
+                : 'Your stats give us the baseline for calories, macros, hydration, and realistic rate of progress.'}
             />
             <div className="flex items-center gap-2 bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-3 -mt-2">
-              <span className="text-indigo-600 text-sm font-medium">This questionnaire takes about 5–10 minutes and helps us build plans tailored specifically to you.</span>
+              <span className="text-indigo-600 text-sm font-medium">
+                {isManagedClient
+                  ? 'This takes about 5–10 minutes and helps your coach understand your goals, constraints, and what kind of support you need.'
+                  : 'This questionnaire takes about 5–10 minutes and helps us build plans tailored specifically to you.'}
+              </span>
             </div>
             <div>
               <Label>Full Name</Label>
@@ -819,8 +1296,10 @@ export default function OnboardingPage() {
           <div className="space-y-6">
             <StepHeader
               icon={<Sparkles className="h-12 w-12 text-indigo-500" />}
-              title="Your Goals"
-              subtitle="This helps us set the right pace and keep the plan aligned with what actually matters to you."
+              title={isManagedClient ? 'What success looks like for you' : 'Your Goals'}
+              subtitle={isManagedClient
+                ? 'Your coach will use this to understand your motivation, expectations, and what usually gets in the way.'
+                : 'This helps us set the right pace and keep the plan aligned with what actually matters to you.'}
             />
             <div>
               <Label>What motivates you?</Label>
@@ -961,7 +1440,9 @@ export default function OnboardingPage() {
             <StepHeader
               icon={<Calculator className="h-12 w-12 text-purple-600" />}
               title="Your Profile Summary"
-              subtitle="Review the full intake your nutritionist and training logic will use."
+              subtitle={isManagedClient
+                ? 'Review the intake your coach will use to assess your case and build your plan.'
+                : 'Review the full intake your nutritionist and training logic will use.'}
             />
 
             {targets && (
@@ -1053,32 +1534,51 @@ export default function OnboardingPage() {
                   </div>
                 </div>
 
+                {isManagedClient && coachCustomQuestions.length > 0 && (
+                  <div className="bg-white rounded-2xl p-6 border border-gray-200">
+                    <h3 className="text-sm font-bold text-purple-700 uppercase tracking-wider mb-4">Coach questions</h3>
+                    <div className="grid grid-cols-1 gap-3">
+                      {coachCustomQuestions.map((question) => {
+                        const answer = coachQuestionAnswers[question.id]
+                        const value = Array.isArray(answer) ? answer.join(', ') : String(answer ?? '').trim()
+                        return value ? <ReviewRow key={question.id} label={question.label} value={value} /> : null
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 {/* AI Note */}
                 <div className="flex gap-3 bg-purple-50 border border-purple-200 rounded-2xl p-5">
                   <Sparkles className="h-5 w-5 text-purple-600 flex-shrink-0 mt-0.5" />
                   <p className="text-sm text-purple-800 leading-relaxed">
-                    Your personal AI coach will use everything you&apos;ve told us to create a meal plan
-                    and training structure that actually fit your life: favourite meals, snack habits, training level,
-                    schedule, recovery, and pace of progress. No bland template plans unless that&apos;s what you asked for.
+                    {isManagedClient
+                      ? 'Your coach will see this intake in their dashboard, including your goals, restrictions, schedule, and main obstacles, so they can review your case and decide the right next step.'
+                      : 'Your personal AI coach will use everything you&apos;ve told us to create a meal plan and training structure that actually fit your life: favourite meals, snack habits, training level, schedule, recovery, and pace of progress. No bland template plans unless that&apos;s what you asked for.'}
                   </p>
                 </div>
 
                 {/* Action Buttons */}
                 <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                  <button
-                    onClick={() => handleFinish('ai-generate')}
-                    disabled={saving}
-                    className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-4 rounded-xl text-base font-semibold hover:shadow-lg transition-all disabled:opacity-50"
-                  >
-                    <Sparkles className="h-5 w-5" />
-                    <span>{saving ? 'Saving...' : 'Generate AI Plans'}</span>
-                  </button>
+                  {!isManagedClient && (
+                    <button
+                      onClick={() => handleFinish('ai-generate')}
+                      disabled={saving}
+                      className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-4 rounded-xl text-base font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+                    >
+                      <Sparkles className="h-5 w-5" />
+                      <span>{saving ? 'Saving...' : 'Generate AI Plans'}</span>
+                    </button>
+                  )}
                   <button
                     onClick={() => handleFinish('dashboard')}
                     disabled={saving}
-                    className="flex-1 flex items-center justify-center gap-2 border-2 border-gray-200 text-gray-700 px-6 py-4 rounded-xl text-base font-semibold hover:bg-gray-50 transition-all disabled:opacity-50"
+                    className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-xl text-base font-semibold transition-all disabled:opacity-50 ${
+                      isManagedClient
+                        ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:shadow-lg'
+                        : 'border-2 border-gray-200 text-gray-700 hover:bg-gray-50'
+                    }`}
                   >
-                    <span>{saving ? 'Saving...' : 'Go to Dashboard'}</span>
+                    <span>{saving ? 'Saving...' : isManagedClient ? 'Submit intake to coach' : 'Go to Dashboard'}</span>
                     <ArrowRight className="h-5 w-5" />
                   </button>
                 </div>
@@ -1095,18 +1595,18 @@ export default function OnboardingPage() {
       {/* Progress Bar */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-3">
-          <span className="text-sm font-medium text-gray-600">Step {step + 1} of {STEPS.length}</span>
-          <span className="text-sm font-medium text-gray-600">{Math.round(((step + 1) / STEPS.length) * 100)}%</span>
+          <span className="text-sm font-medium text-gray-600">Step {step + 1} of {steps.length}</span>
+          <span className="text-sm font-medium text-gray-600">{Math.round(((step + 1) / steps.length) * 100)}%</span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div
             className="bg-gradient-to-r from-purple-600 to-indigo-600 h-2 rounded-full transition-all duration-500 ease-out"
-            style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
+            style={{ width: `${((step + 1) / steps.length) * 100}%` }}
           />
         </div>
         {/* Step dots */}
         <div className="flex justify-center gap-1.5 mt-3">
-          {STEPS.map((s, i) => (
+          {steps.map((s, i) => (
             <div
               key={s}
               className={`h-1.5 rounded-full transition-all duration-300 ${
@@ -1115,17 +1615,17 @@ export default function OnboardingPage() {
             />
           ))}
         </div>
-        <p className="text-center text-xs text-gray-500 mt-2">{STEPS[step]}</p>
+        <p className="text-center text-xs text-gray-500 mt-2">{steps[step]}</p>
       </div>
 
       {/* Card */}
       <div className="card p-6 md:p-8">
         <div key={step} className="animate-fade-in">
-          {renderStep()}
+          {isTrainer ? renderTrainerStep() : renderStep()}
         </div>
 
         {/* Navigation (not shown on Review step which has its own buttons) */}
-        {step < STEPS.length - 1 && (
+        {step < steps.length - 1 && (
           <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-100">
             <button
               onClick={() => setStep(step - 1)}

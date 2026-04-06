@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
-import { Settings, User, Crown, Target, Calendar, HeartPulse, Dumbbell, Utensils, Activity, Lock, Trash2, AlertTriangle, Loader2, ExternalLink } from 'lucide-react'
+import { Settings, User, Crown, Target, Calendar, HeartPulse, Dumbbell, Utensils, Activity, Lock, Trash2, AlertTriangle, Loader2, ExternalLink, Compass } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import Link from 'next/link'
 import {
@@ -26,8 +26,10 @@ import {
   MOTIVATIONS,
 } from '@/lib/constants'
 import { calculateNutritionTargets } from '@/lib/nutrition'
-import type { ActivityLevel, FitnessGoal, Gender } from '@/lib/supabase/types'
+import type { ActivityLevel, FitnessGoal, Gender, PersonalTrainerCustomIntakeQuestion, CustomIntakeQuestionType, CoachPublicProfile, CoachOffer, CoachOfferBillingPeriod } from '@/lib/supabase/types'
 import { SUPPORT_EMAIL } from '@/lib/site'
+import { COACH_MARKETPLACE_CURRENCIES, COACH_OFFER_BILLING_PERIODS, buildCoachProfileSlug, formatCoachPriceRange, formatOfferPrice } from '@/lib/coachMarketplace'
+import { isTrainerRole } from '@nutrigoal/shared'
 
 const TABS = [
   { key: 'profile', label: 'Profile', icon: User },
@@ -40,7 +42,16 @@ const TABS = [
   { key: 'account', label: 'Account', icon: Lock },
 ] as const
 
-type TabKey = typeof TABS[number]['key']
+type TabKey = typeof TABS[number]['key'] | 'trainer_intake' | 'trainer_marketplace'
+type TrainerQuestionDraft = PersonalTrainerCustomIntakeQuestion & { localKey: string }
+type TrainerOfferDraft = CoachOffer & { localKey: string }
+const QUESTION_TYPE_OPTIONS: Array<{ value: CustomIntakeQuestionType; label: string }> = [
+  { value: 'short_text', label: 'Short text' },
+  { value: 'long_text', label: 'Long text' },
+  { value: 'single_select', label: 'Single select' },
+  { value: 'multi_select', label: 'Multi select' },
+  { value: 'yes_no', label: 'Yes / No' },
+]
 
 function TimeSelect({ value, onChange, label }: { value: string; onChange: (v: string) => void; label: string }) {
   const times: string[] = []
@@ -99,6 +110,7 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false)
   const [activeTab, setActiveTab] = useState<TabKey>('profile')
   const [initialized, setInitialized] = useState(false)
+  const isTrainer = isTrainerRole(profile?.role)
   const [supportHistory, setSupportHistory] = useState<Array<{
     id: string
     category: string
@@ -107,6 +119,32 @@ export default function SettingsPage() {
     created_at: string
   }>>([])
   const [loadingSupportHistory, setLoadingSupportHistory] = useState(false)
+  const [trainerQuestions, setTrainerQuestions] = useState<TrainerQuestionDraft[]>([])
+  const [loadingTrainerQuestions, setLoadingTrainerQuestions] = useState(false)
+  const [savingTrainerQuestions, setSavingTrainerQuestions] = useState(false)
+  const [trainerQuestionInitialized, setTrainerQuestionInitialized] = useState(false)
+  const [marketplaceProfile, setMarketplaceProfile] = useState<CoachPublicProfile>({
+    coach_id: '',
+    slug: '',
+    is_public: false,
+    headline: '',
+    bio: '',
+    location_label: '',
+    consultation_url: '',
+    price_from: null,
+    price_to: null,
+    currency: 'GBP',
+    accepting_new_clients: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  })
+  const [loadingMarketplaceProfile, setLoadingMarketplaceProfile] = useState(false)
+  const [savingMarketplaceProfile, setSavingMarketplaceProfile] = useState(false)
+  const [marketplaceInitialized, setMarketplaceInitialized] = useState(false)
+  const [coachOffers, setCoachOffers] = useState<TrainerOfferDraft[]>([])
+  const [loadingCoachOffers, setLoadingCoachOffers] = useState(false)
+  const [savingCoachOffers, setSavingCoachOffers] = useState(false)
+  const [coachOffersInitialized, setCoachOffersInitialized] = useState(false)
 
   // Form state
   const [form, setForm] = useState({
@@ -213,12 +251,99 @@ export default function SettingsPage() {
     loadSupportHistory()
   }, [profile])
 
+  useEffect(() => {
+    async function loadTrainerQuestions() {
+      if (!profile || !isTrainer || trainerQuestionInitialized) return
+      setLoadingTrainerQuestions(true)
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('personal_trainer_custom_intake_questions')
+        .select('*')
+        .eq('trainer_id', profile.id)
+        .order('sort_order', { ascending: true })
+        .order('created_at', { ascending: true })
+
+      setTrainerQuestions(((data as PersonalTrainerCustomIntakeQuestion[] | null) ?? []).map((question) => ({
+        ...question,
+        localKey: question.id,
+      })))
+      setTrainerQuestionInitialized(true)
+      setLoadingTrainerQuestions(false)
+    }
+
+    loadTrainerQuestions()
+  }, [profile, isTrainer, trainerQuestionInitialized])
+
   // Subscription management state
   const [managingSubscription, setManagingSubscription] = useState(false)
   const [supportCategory, setSupportCategory] = useState('bug')
   const [supportSubject, setSupportSubject] = useState('')
   const [supportMessage, setSupportMessage] = useState('')
   const [submittingSupport, setSubmittingSupport] = useState(false)
+  const visibleTabs = isTrainer
+    ? [...TABS.slice(0, 7), { key: 'trainer_intake' as const, label: 'Coach Intake', icon: Settings }, { key: 'trainer_marketplace' as const, label: 'Marketplace', icon: Compass }, TABS[7]]
+    : TABS
+
+  useEffect(() => {
+    async function loadMarketplaceProfile() {
+      if (!profile || !isTrainer || marketplaceInitialized) return
+
+      setLoadingMarketplaceProfile(true)
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('coach_public_profiles')
+        .select('*')
+        .eq('coach_id', profile.id)
+        .maybeSingle()
+
+      const fallbackSlug = buildCoachProfileSlug(profile.full_name || profile.email || 'coach', profile.id)
+      const row = data as CoachPublicProfile | null
+
+      setMarketplaceProfile({
+        coach_id: profile.id,
+        slug: row?.slug ?? fallbackSlug,
+        is_public: row?.is_public ?? false,
+        headline: row?.headline ?? '',
+        bio: row?.bio ?? '',
+        location_label: row?.location_label ?? '',
+        consultation_url: row?.consultation_url ?? '',
+        price_from: row?.price_from ?? null,
+        price_to: row?.price_to ?? null,
+        currency: row?.currency ?? 'GBP',
+        accepting_new_clients: row?.accepting_new_clients ?? true,
+        created_at: row?.created_at ?? new Date().toISOString(),
+        updated_at: row?.updated_at ?? new Date().toISOString(),
+      })
+      setMarketplaceInitialized(true)
+      setLoadingMarketplaceProfile(false)
+    }
+
+    loadMarketplaceProfile()
+  }, [profile, isTrainer, marketplaceInitialized])
+
+  useEffect(() => {
+    async function loadCoachOffers() {
+      if (!profile || !isTrainer || coachOffersInitialized) return
+
+      setLoadingCoachOffers(true)
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('coach_offers')
+        .select('*')
+        .eq('coach_id', profile.id)
+        .order('sort_order', { ascending: true })
+        .order('created_at', { ascending: true })
+
+      setCoachOffers(((data as CoachOffer[] | null) ?? []).map((offer) => ({
+        ...offer,
+        localKey: offer.id,
+      })))
+      setCoachOffersInitialized(true)
+      setLoadingCoachOffers(false)
+    }
+
+    loadCoachOffers()
+  }, [profile, isTrainer, coachOffersInitialized])
 
   async function handleManageSubscription() {
     setManagingSubscription(true)
@@ -327,6 +452,277 @@ export default function SettingsPage() {
     setSubmittingSupport(false)
   }
 
+  function addTrainerQuestion() {
+    const activeCount = trainerQuestions.filter((question) => question.is_active).length
+    if (activeCount >= 5) {
+      toast.error('You can have up to 5 active custom intake questions.')
+      return
+    }
+
+    setTrainerQuestions((prev) => [
+      ...prev,
+      {
+        id: `draft-${crypto.randomUUID()}`,
+        localKey: crypto.randomUUID(),
+        trainer_id: profile?.id ?? '',
+        label: '',
+        help_text: '',
+        type: 'short_text',
+        options: [],
+        required: false,
+        sort_order: prev.length,
+        is_active: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+    ])
+  }
+
+  function updateTrainerQuestion(localKey: string, patch: Partial<TrainerQuestionDraft>) {
+    setTrainerQuestions((prev) => prev.map((question) => question.localKey === localKey ? { ...question, ...patch } : question))
+  }
+
+  function moveTrainerQuestion(localKey: string, direction: -1 | 1) {
+    setTrainerQuestions((prev) => {
+      const index = prev.findIndex((question) => question.localKey === localKey)
+      const target = index + direction
+      if (index < 0 || target < 0 || target >= prev.length) return prev
+      const next = [...prev]
+      const [question] = next.splice(index, 1)
+      next.splice(target, 0, question)
+      return next.map((item, order) => ({ ...item, sort_order: order }))
+    })
+  }
+
+  function archiveTrainerQuestion(localKey: string) {
+    setTrainerQuestions((prev) => prev.map((question) => (
+      question.localKey === localKey
+        ? { ...question, is_active: false }
+        : question
+    )))
+  }
+
+  async function saveTrainerQuestions() {
+    if (!profile || !isTrainer) return
+
+    const activeQuestions = trainerQuestions.filter((question) => question.is_active)
+    if (activeQuestions.length > 5) {
+      toast.error('You can have up to 5 active custom intake questions.')
+      return
+    }
+
+    for (const question of activeQuestions) {
+      if (!question.label.trim()) {
+        toast.error('Every active custom question needs a label.')
+        return
+      }
+      if ((question.type === 'single_select' || question.type === 'multi_select') && question.options.length < 2) {
+        toast.error('Select questions need at least 2 options.')
+        return
+      }
+    }
+
+    setSavingTrainerQuestions(true)
+    const supabase = createClient()
+    const { error } = await supabase
+      .from('personal_trainer_custom_intake_questions')
+      .upsert(
+        trainerQuestions
+          .filter((question) => question.is_active || !question.id.startsWith('draft-'))
+          .map((question, index) => ({
+          id: question.id.startsWith('draft-') ? undefined : question.id,
+          trainer_id: profile.id,
+          label: question.label.trim(),
+          help_text: question.help_text?.trim() || null,
+          type: question.type,
+          options: question.type === 'single_select' || question.type === 'multi_select' ? question.options : [],
+          required: question.required,
+          sort_order: index,
+          is_active: question.is_active,
+          })),
+        { onConflict: 'id' }
+      )
+
+    if (error) {
+      toast.error('Failed to save custom intake questions.')
+      setSavingTrainerQuestions(false)
+      return
+    }
+
+    const { data: refreshed } = await supabase
+      .from('personal_trainer_custom_intake_questions')
+      .select('*')
+      .eq('trainer_id', profile.id)
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: true })
+
+    setTrainerQuestions(((refreshed as PersonalTrainerCustomIntakeQuestion[] | null) ?? []).map((question) => ({
+      ...question,
+      localKey: question.id,
+    })))
+    toast.success('Custom intake questions saved.')
+    setSavingTrainerQuestions(false)
+  }
+
+  function setMarketplaceField<K extends keyof CoachPublicProfile>(key: K, value: CoachPublicProfile[K]) {
+    setMarketplaceProfile((prev) => ({ ...prev, [key]: value }))
+  }
+
+  async function saveMarketplaceProfile() {
+    if (!profile || !isTrainer) return
+
+    const slug = buildCoachProfileSlug(form.full_name || profile.full_name || profile.email || 'coach', profile.id)
+    if (marketplaceProfile.is_public) {
+      if (!marketplaceProfile.headline?.trim()) {
+        toast.error('Add a headline before making your profile public.')
+        return
+      }
+      if (!marketplaceProfile.bio?.trim()) {
+        toast.error('Add a short bio before making your profile public.')
+        return
+      }
+    }
+
+    setSavingMarketplaceProfile(true)
+    const supabase = createClient()
+    const payload = {
+      coach_id: profile.id,
+      slug,
+      is_public: marketplaceProfile.is_public,
+      headline: marketplaceProfile.headline?.trim() || null,
+      bio: marketplaceProfile.bio?.trim() || null,
+      location_label: marketplaceProfile.location_label?.trim() || null,
+      consultation_url: marketplaceProfile.consultation_url?.trim() || null,
+      price_from: marketplaceProfile.price_from ?? null,
+      price_to: marketplaceProfile.price_to ?? null,
+      currency: marketplaceProfile.currency || 'GBP',
+      accepting_new_clients: marketplaceProfile.accepting_new_clients,
+    }
+
+    const { data, error } = await supabase
+      .from('coach_public_profiles')
+      .upsert(payload, { onConflict: 'coach_id' })
+      .select('*')
+      .single()
+
+    if (error) {
+      toast.error('Failed to save marketplace profile.')
+      setSavingMarketplaceProfile(false)
+      return
+    }
+
+    setMarketplaceProfile(data as CoachPublicProfile)
+    toast.success(marketplaceProfile.is_public ? 'Marketplace profile updated and visible in Discover.' : 'Marketplace profile saved.')
+    setSavingMarketplaceProfile(false)
+  }
+
+  function addCoachOffer() {
+    if ((coachOffers.filter((offer) => offer.is_active).length) >= 3) {
+      toast.error('Keep marketplace offers focused. You can have up to 3 active offers.')
+      return
+    }
+
+    setCoachOffers((prev) => [
+      ...prev,
+      {
+        id: `draft-${crypto.randomUUID()}`,
+        localKey: crypto.randomUUID(),
+        coach_id: profile?.id ?? '',
+        title: '',
+        description: '',
+        price: 0,
+        billing_period: 'monthly',
+        cta_label: 'Apply for coaching',
+        is_active: true,
+        sort_order: prev.length,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+    ])
+  }
+
+  function updateCoachOffer(localKey: string, patch: Partial<TrainerOfferDraft>) {
+    setCoachOffers((prev) => prev.map((offer) => offer.localKey === localKey ? { ...offer, ...patch } : offer))
+  }
+
+  function moveCoachOffer(localKey: string, direction: -1 | 1) {
+    setCoachOffers((prev) => {
+      const index = prev.findIndex((offer) => offer.localKey === localKey)
+      const target = index + direction
+      if (index < 0 || target < 0 || target >= prev.length) return prev
+      const next = [...prev]
+      const [offer] = next.splice(index, 1)
+      next.splice(target, 0, offer)
+      return next.map((item, order) => ({ ...item, sort_order: order }))
+    })
+  }
+
+  function archiveCoachOffer(localKey: string) {
+    setCoachOffers((prev) => prev.map((offer) => offer.localKey === localKey ? { ...offer, is_active: false } : offer))
+  }
+
+  async function saveCoachOffers() {
+    if (!profile || !isTrainer) return
+
+    const activeOffers = coachOffers.filter((offer) => offer.is_active)
+    if (activeOffers.length > 3) {
+      toast.error('You can have up to 3 active offers.')
+      return
+    }
+
+    for (const offer of activeOffers) {
+      if (!offer.title.trim()) {
+        toast.error('Each active offer needs a title.')
+        return
+      }
+      if (offer.price <= 0) {
+        toast.error('Each active offer needs a price greater than zero.')
+        return
+      }
+    }
+
+    setSavingCoachOffers(true)
+    const supabase = createClient()
+    const { error } = await supabase
+      .from('coach_offers')
+      .upsert(
+        coachOffers
+          .filter((offer) => offer.is_active || !offer.id.startsWith('draft-'))
+          .map((offer, index) => ({
+            id: offer.id.startsWith('draft-') ? undefined : offer.id,
+            coach_id: profile.id,
+            title: offer.title.trim(),
+            description: offer.description?.trim() || null,
+            price: offer.price,
+            billing_period: offer.billing_period,
+            cta_label: offer.cta_label.trim() || 'Apply for coaching',
+            is_active: offer.is_active,
+            sort_order: index,
+          })),
+        { onConflict: 'id' }
+      )
+
+    if (error) {
+      toast.error('Failed to save coach offers.')
+      setSavingCoachOffers(false)
+      return
+    }
+
+    const { data: refreshed } = await supabase
+      .from('coach_offers')
+      .select('*')
+      .eq('coach_id', profile.id)
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: true })
+
+    setCoachOffers(((refreshed as CoachOffer[] | null) ?? []).map((offer) => ({
+      ...offer,
+      localKey: offer.id,
+    })))
+    toast.success('Coach offers saved.')
+    setSavingCoachOffers(false)
+  }
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!profile) return
@@ -414,6 +810,12 @@ export default function SettingsPage() {
 
   const inputClass = "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
   const selectClass = inputClass
+  const marketplaceReadySignals = [
+    profile.coach_specialties?.length ? `${profile.coach_specialties.length} specialties` : null,
+    profile.coach_formats?.length ? profile.coach_formats.join(', ') : null,
+    profile.coach_services?.length ? `${profile.coach_services.length} listed services` : null,
+    profile.coach_style ? `Style: ${profile.coach_style.replace(/_/g, ' ')}` : null,
+  ].filter(Boolean) as string[]
   const statusTone: Record<string, string> = {
     open: 'bg-amber-50 text-amber-700 border-amber-200',
     in_progress: 'bg-sky-50 text-sky-700 border-sky-200',
@@ -462,7 +864,7 @@ export default function SettingsPage() {
 
       {/* Tabs */}
       <div className="flex overflow-x-auto gap-1 mb-6 bg-gray-100 rounded-xl p-1">
-        {TABS.map(tab => {
+        {visibleTabs.map(tab => {
           const Icon = tab.icon
           return (
             <button
@@ -756,6 +1158,442 @@ export default function SettingsPage() {
           </div>
         )}
 
+        {activeTab === 'trainer_intake' && (
+          <div className="space-y-6">
+            <div className="rounded-2xl border border-indigo-100 bg-indigo-50/80 p-5">
+              <h3 className="text-base font-semibold text-gray-900">Coach custom intake questions</h3>
+              <p className="mt-2 text-sm leading-6 text-gray-600">
+                Add up to 5 extra questions after the standard client intake. These are best for your coaching preferences, equipment checks, and prospect qualification.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-between rounded-2xl border border-gray-200 bg-white p-4">
+              <div>
+                <div className="text-sm font-semibold text-gray-900">Active questions</div>
+                <div className="mt-1 text-sm text-gray-500">{trainerQuestions.filter((question) => question.is_active).length} of 5 in use</div>
+              </div>
+              <button
+                type="button"
+                onClick={addTrainerQuestion}
+                disabled={trainerQuestions.filter((question) => question.is_active).length >= 5}
+                className="rounded-xl bg-[var(--brand-900)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+              >
+                Add question
+              </button>
+            </div>
+
+            {loadingTrainerQuestions ? (
+              <div className="text-sm text-gray-500">Loading custom intake questions...</div>
+            ) : trainerQuestions.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50 px-4 py-8 text-sm text-gray-500">
+                No custom questions yet. Add one if you want clients to answer coach-specific questions after the standard intake.
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {trainerQuestions.map((question, index) => (
+                  <div key={question.localKey} className={`rounded-2xl border p-5 ${question.is_active ? 'border-gray-200 bg-white' : 'border-gray-200 bg-gray-50/80 opacity-80'}`}>
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <div className="text-sm font-semibold text-gray-900">
+                          Question {index + 1} {question.is_active ? '' : '(Archived)'}
+                        </div>
+                        <div className="mt-1 text-xs uppercase tracking-[0.12em] text-gray-500">{QUESTION_TYPE_OPTIONS.find((option) => option.value === question.type)?.label}</div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button type="button" onClick={() => moveTrainerQuestion(question.localKey, -1)} disabled={index === 0} className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 disabled:opacity-40">Up</button>
+                        <button type="button" onClick={() => moveTrainerQuestion(question.localKey, 1)} disabled={index === trainerQuestions.length - 1} className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 disabled:opacity-40">Down</button>
+                        {question.is_active && (
+                          <button type="button" onClick={() => archiveTrainerQuestion(question.localKey)} className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600">
+                            Archive
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="mt-4 space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Question label</label>
+                        <input
+                          type="text"
+                          value={question.label}
+                          onChange={(e) => updateTrainerQuestion(question.localKey, { label: e.target.value })}
+                          className={inputClass}
+                          placeholder="e.g. Are you willing to track macros?"
+                          disabled={!question.is_active}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Help text</label>
+                        <input
+                          type="text"
+                          value={question.help_text ?? ''}
+                          onChange={(e) => updateTrainerQuestion(question.localKey, { help_text: e.target.value })}
+                          className={inputClass}
+                          placeholder="Optional guidance shown under the question"
+                          disabled={!question.is_active}
+                        />
+                      </div>
+                      <div className="grid gap-4 md:grid-cols-[1fr_auto]">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Answer type</label>
+                          <select
+                            value={question.type}
+                            onChange={(e) => updateTrainerQuestion(question.localKey, { type: e.target.value as CustomIntakeQuestionType, options: e.target.value === 'single_select' || e.target.value === 'multi_select' ? question.options : [] })}
+                            className={selectClass}
+                            disabled={!question.is_active}
+                          >
+                            {QUESTION_TYPE_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+                          </select>
+                        </div>
+                        <label className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-gray-700">
+                          <input
+                            type="checkbox"
+                            checked={question.required}
+                            onChange={(e) => updateTrainerQuestion(question.localKey, { required: e.target.checked })}
+                            disabled={!question.is_active}
+                          />
+                          Required
+                        </label>
+                      </div>
+                      {(question.type === 'single_select' || question.type === 'multi_select') && (
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Options</label>
+                          <input
+                            type="text"
+                            value={question.options.join(', ')}
+                            onChange={(e) => updateTrainerQuestion(question.localKey, {
+                              options: e.target.value.split(',').map((item) => item.trim()).filter(Boolean).slice(0, 6),
+                            })}
+                            className={inputClass}
+                            placeholder="Comma separated options, max 6"
+                            disabled={!question.is_active}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="flex justify-end border-t border-gray-100 pt-4">
+              <button
+                type="button"
+                onClick={saveTrainerQuestions}
+                disabled={savingTrainerQuestions || loadingTrainerQuestions}
+                className="rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+              >
+                {savingTrainerQuestions ? 'Saving...' : 'Save custom intake questions'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'trainer_marketplace' && (
+          <div className="space-y-6">
+            <div className="rounded-2xl border border-sky-100 bg-sky-50/80 p-5">
+              <h3 className="text-base font-semibold text-gray-900">Coach marketplace profile</h3>
+              <p className="mt-2 text-sm leading-6 text-gray-600">
+                This powers the Discover Coaches experience. Your coach specialties, formats, and services from onboarding are reused as trust signals, while this tab controls your public listing, pricing, and lead intake status.
+              </p>
+            </div>
+
+            {loadingMarketplaceProfile ? (
+              <div className="text-sm text-gray-500">Loading marketplace profile...</div>
+            ) : (
+              <>
+                <div className="rounded-2xl border border-gray-200 bg-white p-5">
+                  <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                    <div>
+                      <div className="text-sm font-semibold text-gray-900">Discovery visibility</div>
+                      <p className="mt-1 text-sm leading-6 text-gray-500">
+                        Turn this on when your headline, bio, pricing, and coach setup are ready for public discovery.
+                      </p>
+                    </div>
+                    <label className="inline-flex items-center gap-3 text-sm font-medium text-gray-700">
+                      <input
+                        type="checkbox"
+                        checked={marketplaceProfile.is_public}
+                        onChange={(e) => setMarketplaceField('is_public', e.target.checked)}
+                      />
+                      Show me in Discover
+                    </label>
+                  </div>
+
+                  <div className="mt-4 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                    <div>
+                      <div className="text-sm font-semibold text-gray-900">Lead availability</div>
+                      <p className="mt-1 text-sm leading-6 text-gray-500">
+                        If you are at capacity, keep your listing visible but pause new inbound requests.
+                      </p>
+                    </div>
+                    <label className="inline-flex items-center gap-3 text-sm font-medium text-gray-700">
+                      <input
+                        type="checkbox"
+                        checked={marketplaceProfile.accepting_new_clients}
+                        onChange={(e) => setMarketplaceField('accepting_new_clients', e.target.checked)}
+                      />
+                      Accepting new clients
+                    </label>
+                  </div>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Profile slug</label>
+                    <input
+                      type="text"
+                      value={marketplaceProfile.slug}
+                      disabled
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500"
+                    />
+                    <p className="mt-1 text-xs text-gray-500">Generated from your name. We can make this editable later if needed.</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                    <input
+                      type="text"
+                      value={marketplaceProfile.location_label ?? ''}
+                      onChange={(e) => setMarketplaceField('location_label', e.target.value)}
+                      className={inputClass}
+                      placeholder="e.g. London, UK or Online only"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Headline</label>
+                  <input
+                    type="text"
+                    value={marketplaceProfile.headline ?? ''}
+                    onChange={(e) => setMarketplaceField('headline', e.target.value)}
+                    className={inputClass}
+                    placeholder="e.g. Helping busy professionals lose fat without training 6 days a week"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Short bio</label>
+                  <textarea
+                    value={marketplaceProfile.bio ?? ''}
+                    onChange={(e) => setMarketplaceField('bio', e.target.value)}
+                    className={`${inputClass} min-h-[140px]`}
+                    placeholder="What kind of clients you help, how you coach, and what makes your approach a strong fit."
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Consultation link</label>
+                  <input
+                    type="url"
+                    value={marketplaceProfile.consultation_url ?? ''}
+                    onChange={(e) => setMarketplaceField('consultation_url', e.target.value)}
+                    className={inputClass}
+                    placeholder="https://cal.com/your-name/intro-call"
+                  />
+                  <p className="mt-1 text-xs text-gray-500">Optional. Add this if you want discovery to feel more like a Trainerize-style consult flow.</p>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Price from</label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={marketplaceProfile.price_from ?? ''}
+                      onChange={(e) => setMarketplaceField('price_from', e.target.value ? Number(e.target.value) : null)}
+                      className={inputClass}
+                      placeholder="120"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Price to</label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={marketplaceProfile.price_to ?? ''}
+                      onChange={(e) => setMarketplaceField('price_to', e.target.value ? Number(e.target.value) : null)}
+                      className={inputClass}
+                      placeholder="250"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Currency</label>
+                    <select
+                      value={marketplaceProfile.currency}
+                      onChange={(e) => setMarketplaceField('currency', e.target.value)}
+                      className={selectClass}
+                    >
+                      {COACH_MARKETPLACE_CURRENCIES.map((code) => (
+                        <option key={code} value={code}>{code}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-gray-200 bg-white p-5">
+                  <div className="text-sm font-semibold text-gray-900">Public discovery preview</div>
+                  <div className="mt-4 space-y-3">
+                    <div className="text-lg font-semibold text-gray-900">{form.full_name || profile.full_name || 'Coach profile'}</div>
+                    <div className="text-sm text-gray-600">{marketplaceProfile.headline || 'Add a headline to explain the kind of coaching you offer.'}</div>
+                    <div className="flex flex-wrap gap-2">
+                      {marketplaceReadySignals.length > 0 ? marketplaceReadySignals.map((item) => (
+                        <span key={item} className="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700">
+                          {item}
+                        </span>
+                      )) : (
+                        <span className="text-sm text-amber-700">Complete your coach onboarding to improve how your listing appears in discovery.</span>
+                      )}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      {formatCoachPriceRange(marketplaceProfile.price_from, marketplaceProfile.price_to, marketplaceProfile.currency)}
+                      {marketplaceProfile.location_label ? ` · ${marketplaceProfile.location_label}` : ''}
+                    </div>
+                    {marketplaceProfile.consultation_url && (
+                      <div className="text-sm text-sky-700">Consult link ready</div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex justify-end border-t border-gray-100 pt-4">
+                  <button
+                    type="button"
+                    onClick={saveMarketplaceProfile}
+                    disabled={savingMarketplaceProfile}
+                    className="rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+                  >
+                    {savingMarketplaceProfile ? 'Saving...' : 'Save marketplace profile'}
+                  </button>
+                </div>
+
+                <div className="rounded-2xl border border-gray-200 bg-white p-5">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <div className="text-sm font-semibold text-gray-900">Coaching offers</div>
+                      <p className="mt-1 text-sm leading-6 text-gray-500">
+                        Define up to 3 public packages so leads can apply for a specific offer instead of sending a vague message.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={addCoachOffer}
+                      disabled={coachOffers.filter((offer) => offer.is_active).length >= 3}
+                      className="rounded-xl bg-[var(--brand-900)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                    >
+                      Add offer
+                    </button>
+                  </div>
+
+                  {loadingCoachOffers ? (
+                    <div className="mt-4 text-sm text-gray-500">Loading offers...</div>
+                  ) : coachOffers.length === 0 ? (
+                    <div className="mt-4 rounded-2xl border border-dashed border-gray-200 bg-gray-50 px-4 py-8 text-sm text-gray-500">
+                      No public offers yet. Add a focused monthly, weekly, or one-off package to help prospects self-qualify.
+                    </div>
+                  ) : (
+                    <div className="mt-4 space-y-4">
+                      {coachOffers.map((offer, index) => (
+                        <div key={offer.localKey} className={`rounded-2xl border p-5 ${offer.is_active ? 'border-gray-200 bg-white' : 'border-gray-200 bg-gray-50/80 opacity-80'}`}>
+                          <div className="flex items-start justify-between gap-4">
+                            <div>
+                              <div className="text-sm font-semibold text-gray-900">
+                                Offer {index + 1} {offer.is_active ? '' : '(Archived)'}
+                              </div>
+                              <div className="mt-1 text-xs uppercase tracking-[0.12em] text-gray-500">
+                                {formatOfferPrice(offer.price || 0, marketplaceProfile.currency, offer.billing_period)}
+                              </div>
+                            </div>
+                            <div className="flex gap-2">
+                              <button type="button" onClick={() => moveCoachOffer(offer.localKey, -1)} disabled={index === 0} className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 disabled:opacity-40">Up</button>
+                              <button type="button" onClick={() => moveCoachOffer(offer.localKey, 1)} disabled={index === coachOffers.length - 1} className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 disabled:opacity-40">Down</button>
+                              {offer.is_active && (
+                                <button type="button" onClick={() => archiveCoachOffer(offer.localKey)} className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600">
+                                  Archive
+                                </button>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="mt-4 grid gap-4 md:grid-cols-2">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Offer title</label>
+                              <input
+                                type="text"
+                                value={offer.title}
+                                onChange={(e) => updateCoachOffer(offer.localKey, { title: e.target.value })}
+                                className={inputClass}
+                                placeholder="e.g. Premium monthly coaching"
+                                disabled={!offer.is_active}
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">CTA label</label>
+                              <input
+                                type="text"
+                                value={offer.cta_label}
+                                onChange={(e) => updateCoachOffer(offer.localKey, { cta_label: e.target.value })}
+                                className={inputClass}
+                                placeholder="Apply for coaching"
+                                disabled={!offer.is_active}
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Price</label>
+                              <input
+                                type="number"
+                                min={1}
+                                value={offer.price}
+                                onChange={(e) => updateCoachOffer(offer.localKey, { price: Number(e.target.value) || 0 })}
+                                className={inputClass}
+                                disabled={!offer.is_active}
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Billing period</label>
+                              <select
+                                value={offer.billing_period}
+                                onChange={(e) => updateCoachOffer(offer.localKey, { billing_period: e.target.value as CoachOfferBillingPeriod })}
+                                className={selectClass}
+                                disabled={!offer.is_active}
+                              >
+                                {COACH_OFFER_BILLING_PERIODS.map((period) => (
+                                  <option key={period} value={period}>{period.replace('_', ' ')}</option>
+                                ))}
+                              </select>
+                            </div>
+                          </div>
+
+                          <div className="mt-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Offer description</label>
+                            <textarea
+                              value={offer.description ?? ''}
+                              onChange={(e) => updateCoachOffer(offer.localKey, { description: e.target.value })}
+                              className={`${inputClass} min-h-[110px]`}
+                              placeholder="Describe what is included, who it is for, and what the first month looks like."
+                              disabled={!offer.is_active}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="mt-4 flex justify-end border-t border-gray-100 pt-4">
+                    <button
+                      type="button"
+                      onClick={saveCoachOffers}
+                      disabled={savingCoachOffers || loadingCoachOffers}
+                      className="rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+                    >
+                      {savingCoachOffers ? 'Saving...' : 'Save coaching offers'}
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
         {/* Account Tab */}
         {activeTab === 'account' && (
           <div className="space-y-8">
@@ -976,7 +1814,7 @@ export default function SettingsPage() {
         </div>{/* end animate-fade-in */}
 
         {/* Save Button — hide on account tab since it has its own actions */}
-        {activeTab !== 'account' && (
+        {activeTab !== 'account' && activeTab !== 'trainer_intake' && activeTab !== 'trainer_marketplace' && (
           <div className="flex justify-end mt-6 pt-4 border-t border-gray-100">
             <button
               type="submit"

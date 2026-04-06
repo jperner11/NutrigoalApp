@@ -8,6 +8,10 @@ export function isManagedClientRole(role: UserRole | null | undefined): boolean 
   return role === 'personal_trainer_client' || role === 'nutritionist_client'
 }
 
+export function requiresOnboardingQuestionnaire(role: UserRole | null | undefined): boolean {
+  return !isTrainerRole(role)
+}
+
 export function normalizeRole(role: UserRole | null | undefined): UserRole {
   if (role === 'nutritionist') return 'personal_trainer'
   if (role === 'nutritionist_client') return 'personal_trainer_client'

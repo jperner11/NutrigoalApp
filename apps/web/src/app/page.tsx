@@ -3,6 +3,7 @@ import {
   ArrowRight,
   Brain,
   CheckCircle2,
+  Compass,
   Dumbbell,
   HeartPulse,
   Sparkles,
@@ -25,15 +26,15 @@ const pillars = [
     icon: Dumbbell,
   },
   {
-    title: 'Built for individuals and practitioners',
-    body: 'Self-serve users and Personal Trainers can work from the same system instead of disconnected tools.',
+    title: 'Built for self-serve users and coaches',
+    body: 'Users can run solo with AI or work with a coach, while Personal Trainers manage delivery from the same system.',
     icon: Users,
   },
 ]
 
 const metrics = [
   { label: 'Profile depth', value: '60+' },
-  { label: 'Guided onboarding steps', value: '8' },
+  { label: 'Ways to use the platform', value: '3' },
   { label: 'Core systems unified', value: '4' },
 ]
 
@@ -73,12 +74,12 @@ export default function LandingPage() {
               Feel your momentum
             </div>
             <h1 className="max-w-4xl text-5xl font-extrabold leading-[0.94] text-[var(--foreground)] sm:text-6xl lg:text-7xl">
-              Precision nutrition
-              <span className="block text-[var(--brand-500)]">for how you actually train.</span>
+              One place to build your plan
+              <span className="block text-[var(--brand-500)]">or find the right coach.</span>
             </h1>
             <p className="mt-7 max-w-2xl text-lg leading-8 text-[var(--muted)] sm:text-xl">
-              mealandmotion brings meal planning, training structure, AI coaching, and practitioner workflows into one
-              clear system built to help people feel supported, steady, and in motion.
+              Meal & Motion brings AI planning, coach-led delivery, and an upcoming coach discovery marketplace into
+              one clear nutrition and training system built to help people feel supported, steady, and in motion.
             </p>
             <div className="mt-10 flex flex-col gap-4 sm:flex-row">
               <Link href="/signup" className="btn-primary inline-flex items-center justify-center gap-2 rounded-2xl px-7 py-4 text-base font-semibold">
@@ -155,6 +156,10 @@ export default function LandingPage() {
                     Practitioner-ready
                   </div>
                   <div className="eyebrow">
+                    <Compass className="h-4 w-4" />
+                    Coach discovery soon
+                  </div>
+                  <div className="eyebrow">
                     <Dumbbell className="h-4 w-4" />
                     Training intelligence
                   </div>
@@ -192,19 +197,21 @@ export default function LandingPage() {
       </section>
 
       <section className="px-4 pb-24 sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.95fr_1.05fr]">
+        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-3">
           <div className="panel-strong p-8">
             <div className="eyebrow mb-5">For Personal Trainers</div>
             <h2 className="text-4xl font-bold text-[var(--foreground)]">A cleaner system for clients, plans, and follow-through.</h2>
             <p className="mt-5 text-lg leading-8 text-[var(--muted)]">
               Personal Trainers can invite clients, create meal and training plans, manage feedback, and
-              keep communication in one place instead of stitching together five tools.
+              keep communication in one place instead of stitching together five tools. Public discovery is the next
+              layer, so coaches can eventually manage clients they bring in and leads they earn inside the same product.
             </p>
             <div className="mt-8 space-y-4 text-base text-[var(--foreground)]">
               {[
                 'Invite and manage clients from one roster',
                 'Build structured meal and training plans inside the app',
                 'Use AI and check-ins to keep the plan adaptive',
+                'Prepare for public coach listings and lead capture',
               ].map((item) => (
                 <div key={item} className="flex items-start gap-3">
                   <div className="mt-1 h-2.5 w-2.5 rounded-full bg-[var(--brand-500)]" />
@@ -219,7 +226,8 @@ export default function LandingPage() {
             <h2 className="text-4xl font-bold text-[var(--foreground)]">An onboarding flow that actually powers the plan.</h2>
             <p className="mt-5 text-lg leading-8 text-[var(--muted)]">
               The platform gathers the kind of context most apps ignore: injuries, schedule, training background,
-              food dislikes, and recovery signals. That means the plan feels believable instead of templated.
+              food dislikes, and recovery signals. That means self-serve plans feel believable instead of templated,
+              and coached plans begin with better context.
             </p>
             <div className="mt-8 grid gap-4 sm:grid-cols-2">
               {[
@@ -231,6 +239,28 @@ export default function LandingPage() {
                 <div key={item} className="surface-card p-5">
                   <div className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--muted-soft)]">System</div>
                   <div className="mt-2 font-display text-2xl font-bold text-[var(--foreground)]">{item}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="panel-strong p-8">
+            <div className="eyebrow mb-5">Coming soon</div>
+            <h2 className="text-4xl font-bold text-[var(--foreground)]">Discover coaches who match the way you want to train.</h2>
+            <p className="mt-5 text-lg leading-8 text-[var(--muted)]">
+              We’re adding a marketplace layer where users can browse Personal Trainers by focus, coaching style,
+              format, and pricing, then request coaching inside Meal & Motion without leaving the product.
+            </p>
+            <div className="mt-8 space-y-4 text-base text-[var(--foreground)]">
+              {[
+                'Browse coaches by goal, format, and price range',
+                'Compare specialties, style, and availability',
+                'Send structured coaching requests instead of cold DMs',
+                'Move accepted leads into the existing My Coach workflow',
+              ].map((item) => (
+                <div key={item} className="flex items-start gap-3">
+                  <div className="mt-1 h-2.5 w-2.5 rounded-full bg-[var(--brand-500)]" />
+                  <span>{item}</span>
                 </div>
               ))}
             </div>

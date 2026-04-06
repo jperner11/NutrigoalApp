@@ -18,8 +18,8 @@ export default function PublicFooter() {
           <div className="max-w-xl">
             <BrandLogo href="/" />
             <p className="mt-4 text-sm leading-7 text-[var(--muted)]">
-              {BRAND_NAME} helps personal trainers and their clients run nutrition, training, communication, and
-              accountability in one calm, coach-led workflow.
+              {BRAND_NAME} brings self-serve AI planning, coach-led delivery, and coach discovery into one calm
+              nutrition and training platform.
             </p>
           </div>
 
@@ -44,7 +44,7 @@ export default function PublicFooter() {
                 <a href={`mailto:${SUPPORT_EMAIL}`} className="transition hover:text-[var(--foreground)]">
                   {SUPPORT_EMAIL}
                 </a>
-                <p>Personal Trainer beta support is handled directly by the founding team.</p>
+                <p>Coach workspace and marketplace beta support is handled directly by the founding team.</p>
               </div>
             </div>
           </div>
@@ -57,4 +57,3 @@ export default function PublicFooter() {
     </footer>
   )
 }
-

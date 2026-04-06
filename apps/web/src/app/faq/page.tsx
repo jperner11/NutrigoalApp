@@ -7,16 +7,20 @@ const faqSections = [
     title: 'Product and positioning',
     items: [
       {
-        q: 'Who is mealandmotion for?',
-        a: 'mealandmotion is built for Personal Trainers who want one system for client onboarding, plan delivery, messaging, accountability, and day-to-day oversight. Clients then use the app to follow assigned plans, log meals and training, respond to feedback, and stay connected to their trainer.',
+        q: 'Who is Meal & Motion for?',
+        a: 'Meal & Motion is built for three connected use cases: individual users who want AI-powered plans, Personal Trainers who want one system for client onboarding and delivery, and users who want to discover a coach who matches their goals as the marketplace rolls out.',
       },
       {
         q: 'Is this a consumer fitness app or a coaching platform?',
-        a: 'The beta is intentionally coaching-led. Individual users can still use the product directly, but the strongest differentiation is the Personal Trainer workflow: invite a client, get explicit acceptance, assign plans, track adherence, and manage the relationship over time.',
+        a: 'It is both a self-serve performance app and a coaching platform. Users can run solo with AI-powered plans, work with a Personal Trainer through a managed relationship, and over time use Meal & Motion to discover coaches through a structured marketplace rather than a social feed.',
       },
       {
         q: 'What makes this different from other coaching tools?',
-        a: 'The goal is to keep training, nutrition, adherence, and communication together in a calmer, more connected system. Instead of bolting coaching onto a generic tracker, the product is moving toward a real coach-client operating system where onboarding, plan delivery, progress visibility, and feedback all sit in one place.',
+        a: 'The goal is to keep training, nutrition, adherence, communication, and coach discovery together in a calmer, more connected system. Instead of bolting coaching onto a generic tracker, the product is moving toward a real operating system where self-serve planning, coach-led delivery, progress visibility, and coach matching sit in one place.',
+      },
+      {
+        q: 'Is Meal & Motion becoming a social media app?',
+        a: 'No. The direction is a coach discovery marketplace, not an Instagram-style social network. The focus is helping users compare coaches by specialties, pricing, format, and coaching style, then move into a real coaching relationship inside the product.',
       },
     ],
   },
@@ -30,6 +34,10 @@ const faqSections = [
       {
         q: 'How does inviting a client work?',
         a: 'A Personal Trainer sends an invite by email from the clients area. The invite appears as pending until the client accepts. If the person already has an account, they must still explicitly approve the relationship before anything is linked. That acceptance step is deliberate and is part of the trust model for beta.',
+      },
+      {
+        q: 'Will trainers be able to get discovered inside the product?',
+        a: 'Yes, that is the planned next layer. Trainers will be able to opt into a public marketplace profile so users can browse coaches by goals, format, and pricing. Discovery is being rolled out separately from private client management so the trust model stays clear.',
       },
       {
         q: 'What happens after a client accepts?',
@@ -67,7 +75,7 @@ const faqSections = [
       },
       {
         q: 'Is this medical advice or a medical device?',
-        a: 'No. mealandmotion supports training, nutrition, and accountability workflows. It is not a medical device and does not provide diagnosis, treatment, or emergency care. Users should seek qualified medical advice where appropriate, especially for injuries, medical conditions, eating disorders, pregnancy, or anything requiring clinical supervision.',
+        a: 'No. Meal & Motion supports training, nutrition, and accountability workflows. It is not a medical device and does not provide diagnosis, treatment, or emergency care. Users should seek qualified medical advice where appropriate, especially for injuries, medical conditions, eating disorders, pregnancy, or anything requiring clinical supervision.',
       },
       {
         q: 'How is personal data handled in beta?',
@@ -94,22 +102,22 @@ export default function FAQPage() {
   return (
     <PublicPageShell
       eyebrow="FAQ"
-      title="Answers for trainers, clients, and early beta testers"
-      intro="This page is designed to answer the practical questions people ask before trusting a new coaching platform: who it is for, how the trainer-client flow works, what the current beta supports, and where to get help."
+      title="Answers for users, coaches, and early beta testers"
+      intro="This page answers the practical questions people ask before trusting Meal & Motion: who it is for, how self-serve and coach-led flows work, how coach discovery is being introduced, and where to get help."
     >
       <section className="panel-strong p-8 sm:p-10">
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="surface-card p-5">
-            <div className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--muted-soft)]">Trainer beta</div>
+            <div className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--muted-soft)]">Coach workspace</div>
             <div className="mt-2 text-sm leading-7 text-[var(--muted)]">Best experience on web for roster management, invites, reporting, and day-to-day oversight.</div>
           </div>
           <div className="surface-card p-5">
-            <div className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--muted-soft)]">Client beta</div>
-            <div className="mt-2 text-sm leading-7 text-[var(--muted)]">Best experience on mobile for following plans, logging progress, and staying connected to the trainer.</div>
+            <div className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--muted-soft)]">Self-serve users</div>
+            <div className="mt-2 text-sm leading-7 text-[var(--muted)]">Best experience on mobile for following plans, logging progress, and using the AI-powered nutrition and training flow.</div>
           </div>
           <div className="surface-card p-5">
-            <div className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--muted-soft)]">Need help?</div>
-            <div className="mt-2 text-sm leading-7 text-[var(--muted)]">If something blocks onboarding or trust, go straight to support so we can fix it quickly.</div>
+            <div className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--muted-soft)]">Coach discovery</div>
+            <div className="mt-2 text-sm leading-7 text-[var(--muted)]">Marketplace discovery is being introduced in phases so profile quality, lead flow, and trust stay strong from day one.</div>
           </div>
         </div>
       </section>
@@ -133,7 +141,7 @@ export default function FAQPage() {
       <section className="panel-strong p-8 sm:p-10">
         <h2 className="font-display text-3xl font-bold text-[var(--foreground)]">Still unsure?</h2>
         <p className="mt-4 max-w-3xl text-sm leading-7 text-[var(--muted)]">
-          If you are deciding whether the beta fits your workflow, the best next step is to review support expectations or create an account and test the invite flow with one trainer and one client.
+          If you are deciding whether the beta fits your workflow, the best next step is to create an account, test either the self-serve flow or the trainer invite flow, and watch for coach discovery updates as the marketplace rolls out.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Link href="/support" className="btn-primary rounded-2xl px-5 py-3 text-sm font-semibold">

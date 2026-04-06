@@ -19,6 +19,9 @@ export type SubscriptionStatus = 'active' | 'canceled' | 'past_due' | 'trialing'
 export type AIUsageType = 'meal_suggestion' | 'workout_suggestion' | 'coaching'
 export type FeedbackStatus = 'pending' | 'completed' | 'dismissed'
 export type InviteStatus = 'pending' | 'accepted' | 'expired' | 'revoked' | 'declined'
+export type CoachLeadStatus = 'pending' | 'accepted' | 'declined' | 'archived'
+export type CoachLeadStage = 'new' | 'contacted' | 'consult_booked' | 'won' | 'lost'
+export type CoachOfferBillingPeriod = 'one_time' | 'weekly' | 'monthly'
 export type TrainingExperience = 'never' | 'beginner' | 'intermediate' | 'advanced'
 export type EquipmentAccess = 'full_gym' | 'home_basic' | 'home_full' | 'bodyweight_only' | 'outdoor'
 export type TrainingStyle = 'strength' | 'hypertrophy' | 'functional' | 'endurance' | 'mixed'
@@ -37,6 +40,11 @@ export type HarderDays = 'weekdays' | 'weekends' | 'both'
 export type EatingOutFrequency = 'rarely' | 'sometimes' | 'often' | 'very_often'
 export type SupplementFrequency = 'daily' | 'twice_daily' | 'three_times' | 'weekly' | 'as_needed'
 export type SupplementTime = 'morning' | 'afternoon' | 'evening' | 'with_meals' | 'pre_workout' | 'post_workout' | 'bedtime'
+export type CoachCheckInFrequency = 'weekly' | 'biweekly' | 'monthly' | 'as_needed'
+export type CoachStyle = 'structured' | 'balanced' | 'flexible'
+export type CoachPostIntakeAction = 'review_and_plan' | 'message_first' | 'book_consult' | 'send_assessment'
+export type CoachAppFocus = 'client_management' | 'prospecting' | 'both'
+export type CustomIntakeQuestionType = 'short_text' | 'long_text' | 'single_select' | 'multi_select' | 'yes_no'
 
 // ─── Core Tables ────────────────────────────────────────
 
@@ -124,6 +132,16 @@ export interface UserProfile {
   plan_preference: PlanPreference | null
   harder_days: HarderDays | null
   eating_out_frequency: EatingOutFrequency | null
+  // Trainer onboarding
+  coach_specialties: string[]
+  coach_ideal_client: string | null
+  coach_services: string[]
+  coach_formats: string[]
+  coach_check_in_frequency: CoachCheckInFrequency | null
+  coach_style: CoachStyle | null
+  coach_intake_requirements: string[]
+  coach_post_intake_action: CoachPostIntakeAction | null
+  coach_app_focus: CoachAppFocus | null
   trial_ends_at: string | null
   created_at: string
   updated_at: string
@@ -189,6 +207,79 @@ export interface AIUsage {
   response: string
   tokens_used: number
   created_at: string
+}
+
+export interface PersonalTrainerCustomIntakeQuestion {
+  id: string
+  trainer_id: string
+  label: string
+  help_text: string | null
+  type: CustomIntakeQuestionType
+  options: string[]
+  required: boolean
+  sort_order: number
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface PersonalTrainerCustomIntakeResponse {
+  id: string
+  question_id: string
+  trainer_id: string
+  client_id: string
+  response_text: string | null
+  response_json: string[] | boolean | null
+  created_at: string
+  updated_at: string
+}
+
+export interface CoachPublicProfile {
+  coach_id: string
+  slug: string
+  is_public: boolean
+  headline: string | null
+  bio: string | null
+  location_label: string | null
+  consultation_url: string | null
+  price_from: number | null
+  price_to: number | null
+  currency: string
+  accepting_new_clients: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface CoachOffer {
+  id: string
+  coach_id: string
+  title: string
+  description: string | null
+  price: number
+  billing_period: CoachOfferBillingPeriod
+  cta_label: string
+  is_active: boolean
+  sort_order: number
+  created_at: string
+  updated_at: string
+}
+
+export interface CoachLead {
+  id: string
+  coach_id: string
+  user_id: string
+  status: CoachLeadStatus
+  stage: CoachLeadStage
+  goal_summary: string
+  message: string | null
+  budget_label: string | null
+  preferred_format: string | null
+  experience_level: TrainingExperience | null
+  selected_offer_id: string | null
+  selected_offer_title: string | null
+  responded_at: string | null
+  created_at: string
+  updated_at: string
 }
 
 // ─── Diet Tables ────────────────────────────────────────

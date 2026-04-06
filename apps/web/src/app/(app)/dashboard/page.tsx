@@ -259,6 +259,22 @@ export default function DashboardPage() {
 
   if (!profile) return null
   if (isTrainerRole(profile.role)) {
+    if (!profile.onboarding_completed) {
+      return (
+        <div className="panel-strong p-8">
+          <h1 className="font-display text-3xl font-bold text-[var(--foreground)]">Complete your coach setup</h1>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--muted)]">
+            Tell us how you coach, who you work with, and what information you need from clients before programming.
+          </p>
+          <Link
+            href="/onboarding"
+            className="btn-primary mt-6 inline-flex items-center space-x-2 rounded-2xl px-5 py-3 text-sm font-semibold"
+          >
+            <span>Finish coach setup</span>
+          </Link>
+        </div>
+      )
+    }
     return <TrainerDashboard trainerId={profile.id} trainerName={profile.full_name?.split(' ')[0] || profile.email || 'Coach'} />
   }
 
@@ -298,9 +314,13 @@ export default function DashboardPage() {
       {/* Onboarding prompt */}
       {!profile.onboarding_completed && (
         <div className="panel-strong mb-6 animate-[fadeIn_0.5s_ease-out_forwards] p-6">
-          <h3 className="font-display text-2xl font-bold text-[var(--foreground)] mb-2">Complete your profile</h3>
+          <h3 className="font-display text-2xl font-bold text-[var(--foreground)] mb-2">
+            {isManagedClientRole(profile.role) ? 'Complete your coach intake' : 'Complete your profile'}
+          </h3>
           <p className="text-sm text-[var(--muted)] mb-4">
-            Set up your metrics and goals to get personalized nutrition targets.
+            {isManagedClientRole(profile.role)
+              ? 'Your trainer needs a few details before they can review your case and assign your first plan.'
+              : 'Set up your metrics and goals to get personalized nutrition targets.'}
           </p>
           <Link
             href="/onboarding"

@@ -29,6 +29,7 @@ interface ClientRow {
     id: string
     full_name: string | null
     email: string
+    onboarding_completed: boolean
   } | null
 }
 
@@ -42,6 +43,7 @@ interface ClientRowQuery {
     id: string
     full_name: string | null
     email: string
+    onboarding_completed: boolean
   }> | null
 }
 
@@ -57,6 +59,7 @@ interface DashboardState {
   activeClients: ClientRow[]
   pendingInvites: InviteRow[]
   noPlanClients: ClientRow[]
+  intakePendingClients: ClientRow[]
   unreadMessages: number
   overdueFeedback: number
   recentActivity: Array<{
@@ -71,6 +74,7 @@ const initialState: DashboardState = {
   activeClients: [],
   pendingInvites: [],
   noPlanClients: [],
+  intakePendingClients: [],
   unreadMessages: 0,
   overdueFeedback: 0,
   recentActivity: [],
@@ -98,7 +102,7 @@ export default function TrainerDashboard({ trainerId, trainerName }: TrainerDash
     async function load() {
       const { data: clientRows } = await supabase
         .from('nutritionist_clients')
-        .select('id, client_id, invited_email, status, created_at, client:client_id(id, full_name, email)')
+        .select('id, client_id, invited_email, status, created_at, client:client_id(id, full_name, email, onboarding_completed)')
         .eq('nutritionist_id', trainerId)
         .eq('status', 'active')
         .order('created_at', { ascending: false })
@@ -150,6 +154,7 @@ export default function TrainerDashboard({ trainerId, trainerName }: TrainerDash
         if (!row.client_id) return false
         return !activeDietSet.has(row.client_id) || !activeTrainingSet.has(row.client_id)
       })
+      const intakePendingClients = activeClients.filter((row) => row.client && !row.client.onboarding_completed)
 
       const conversationRows = conversations ?? []
       const conversationIds = conversationRows.map((conversation) => conversation.id)
@@ -194,6 +199,7 @@ export default function TrainerDashboard({ trainerId, trainerName }: TrainerDash
         activeClients,
         pendingInvites: pendingInvites ?? [],
         noPlanClients,
+        intakePendingClients,
         unreadMessages,
         overdueFeedback,
         recentActivity,
@@ -206,6 +212,12 @@ export default function TrainerDashboard({ trainerId, trainerName }: TrainerDash
 
   const attentionItems = useMemo(() => {
     return [
+      {
+        label: 'Intake pending',
+        value: state.intakePendingClients.length,
+        body: 'Accepted clients who still need to complete their coach intake.',
+        href: '/clients',
+      },
       {
         label: 'Pending invites',
         value: state.pendingInvites.length,
@@ -296,6 +308,7 @@ export default function TrainerDashboard({ trainerId, trainerName }: TrainerDash
             <div className="space-y-3">
               {state.activeClients.slice(0, 5).map((client) => {
                 const needsPlans = state.noPlanClients.some((row) => row.id === client.id)
+                const intakePending = Boolean(client.client && !client.client.onboarding_completed)
                 return (
                   <Link
                     key={client.id}
@@ -305,11 +318,11 @@ export default function TrainerDashboard({ trainerId, trainerName }: TrainerDash
                     <div>
                       <div className="font-semibold text-[var(--foreground)]">{client.client?.full_name || client.client?.email || client.invited_email}</div>
                       <div className="mt-1 text-sm text-[var(--muted)]">
-                        {needsPlans ? 'Needs plan assignment' : 'Plans in place'}
+                        {intakePending ? 'Intake pending' : needsPlans ? 'Needs plan assignment' : 'Plans in place'}
                       </div>
                     </div>
                     <div className="flex items-center gap-2 text-sm font-semibold text-[var(--brand-500)]">
-                      {needsPlans ? <AlertCircle className="h-4 w-4" /> : <Sparkles className="h-4 w-4" />}
+                      {intakePending || needsPlans ? <AlertCircle className="h-4 w-4" /> : <Sparkles className="h-4 w-4" />}
                       <ArrowRight className="h-4 w-4" />
                     </div>
                   </Link>
@@ -326,6 +339,7 @@ export default function TrainerDashboard({ trainerId, trainerName }: TrainerDash
               <h2 className="font-display text-2xl font-bold text-[var(--foreground)]">Today&apos;s tasks</h2>
             </div>
             <div className="space-y-3 text-sm text-[var(--muted)]">
+              <TaskRow label="Chase incomplete intakes" value={state.intakePendingClients.length} />
               <TaskRow label="Review pending invites" value={state.pendingInvites.length} />
               <TaskRow label="Reply to unread client messages" value={state.unreadMessages} />
               <TaskRow label="Send overdue feedback follow-ups" value={state.overdueFeedback} />

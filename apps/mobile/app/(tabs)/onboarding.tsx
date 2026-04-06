@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
   ScrollView, Alert, ActivityIndicator,
@@ -17,6 +17,7 @@ import {
   ALCOHOL_FREQUENCIES, SNACK_MOTIVATIONS, SNACK_PREFERENCES,
   PLAN_PREFERENCES, HARDER_DAYS_OPTIONS, EATING_OUT_FREQUENCIES,
   calculateNutritionTargets,
+  requiresOnboardingQuestionnaire,
 } from '@nutrigoal/shared'
 import type { UserMetrics } from '@nutrigoal/shared'
 import { BrandLogo } from '../../src/components/BrandLogo'
@@ -40,10 +41,16 @@ function fmt12(t: string) {
 }
 
 export default function OnboardingScreen() {
-  const { user, refreshProfile } = useAuth()
+  const { user, profile, refreshProfile } = useAuth()
   const router = useRouter()
   const [step, setStep] = useState(0)
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (profile && !requiresOnboardingQuestionnaire(profile.role)) {
+      router.replace('/(tabs)')
+    }
+  }, [profile, router])
 
   // Step 0: Basics
   const [fullName, setFullName] = useState('')

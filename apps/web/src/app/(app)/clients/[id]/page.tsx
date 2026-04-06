@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import {
   ArrowLeft, MessageSquare, ClipboardList, Plus, Utensils, Dumbbell,
-  AlertTriangle, Stethoscope, Leaf, ThumbsDown, Activity, Weight,
+  AlertTriangle, Stethoscope, Leaf, ThumbsDown, Activity, Weight, Target,
 } from 'lucide-react'
 import type { UserProfile, DietPlan, TrainingPlan } from '@/lib/supabase/types'
 import { isTrainerRole } from '@nutrigoal/shared'
@@ -18,6 +18,15 @@ interface ClientOverviewState {
   latestWeight: number | null
   pendingFeedbackCount: number
   unreadMessageCount: number
+}
+
+interface CustomIntakeResponseRow {
+  id: string
+  response_text: string | null
+  response_json: string[] | boolean | null
+  question: {
+    label: string
+  } | null
 }
 
 export default function ClientDetailPage() {
@@ -34,6 +43,7 @@ export default function ClientDetailPage() {
     pendingFeedbackCount: 0,
     unreadMessageCount: 0,
   })
+  const [customResponses, setCustomResponses] = useState<CustomIntakeResponseRow[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -43,7 +53,7 @@ export default function ClientDetailPage() {
     const trainerId = profile.id
     const supabase = createClient()
     async function load() {
-      const [clientRes, dietRes, trainingRes, mealLogRes, workoutLogRes, weightRes, feedbackRes, conversationRes] = await Promise.all([
+      const [clientRes, dietRes, trainingRes, mealLogRes, workoutLogRes, weightRes, feedbackRes, conversationRes, customResponseRes] = await Promise.all([
         supabase.from('user_profiles').select('*').eq('id', id).single(),
         supabase.from('diet_plans').select('*').eq('user_id', id).order('created_at', { ascending: false }),
         supabase.from('training_plans').select('*').eq('user_id', id).order('created_at', { ascending: false }),
@@ -52,10 +62,12 @@ export default function ClientDetailPage() {
         supabase.from('weight_logs').select('weight_kg, date').eq('user_id', id).order('date', { ascending: false }).limit(1),
         supabase.from('feedback_requests').select('id', { count: 'exact', head: true }).eq('nutritionist_id', trainerId).eq('client_id', id).eq('status', 'pending'),
         supabase.from('conversations').select('id').eq('nutritionist_id', trainerId).eq('client_id', id).maybeSingle(),
+        supabase.from('personal_trainer_custom_intake_responses').select('id, response_text, response_json, question:question_id(label)').eq('trainer_id', trainerId).eq('client_id', id),
       ])
       if (clientRes.data) setClient(clientRes.data as UserProfile)
       if (dietRes.data) setDietPlans(dietRes.data as DietPlan[])
       if (trainingRes.data) setTrainingPlans(trainingRes.data as TrainingPlan[])
+      setCustomResponses((customResponseRes.data as CustomIntakeResponseRow[] | null) ?? [])
 
       let unreadMessageCount = 0
       if (conversationRes.data?.id) {
@@ -106,6 +118,13 @@ export default function ClientDetailPage() {
               </p>
             </div>
           </div>
+          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${
+            client.onboarding_completed
+              ? 'bg-emerald-100 text-emerald-700'
+              : 'bg-sky-100 text-sky-700'
+          }`}>
+            {client.onboarding_completed ? 'Intake complete' : 'Intake pending'}
+          </span>
         </div>
 
         {/* Macro Targets */}
@@ -137,6 +156,43 @@ export default function ClientDetailPage() {
             {client.equipment_access && (
               <AnamnesisRow icon={<Weight className="h-4 w-4 text-indigo-500" />} label="Equipment" value={client.equipment_access.replace(/_/g, ' ')} />
             )}
+          </div>
+        )}
+
+        <div className="border-t border-gray-100 mt-6 pt-4">
+          <h2 className="text-sm font-bold uppercase tracking-[0.16em] text-gray-500 mb-3">Coach intake summary</h2>
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            {client.desired_outcome && <AnamnesisRow icon={<Target className="h-4 w-4 text-blue-500" />} label="Desired outcome" value={client.desired_outcome} />}
+            {client.past_dieting_challenges && <AnamnesisRow icon={<AlertTriangle className="h-4 w-4 text-amber-500" />} label="Past challenges" value={client.past_dieting_challenges} />}
+            {client.weekly_derailers && <AnamnesisRow icon={<ClipboardList className="h-4 w-4 text-rose-500" />} label="Derailers" value={client.weekly_derailers} />}
+            {client.equipment_access && <AnamnesisRow icon={<Weight className="h-4 w-4 text-indigo-500" />} label="Equipment" value={client.equipment_access.replace(/_/g, ' ')} />}
+            {client.workout_days_per_week && <AnamnesisRow icon={<Dumbbell className="h-4 w-4 text-purple-500" />} label="Training availability" value={`${client.workout_days_per_week} days / week`} />}
+            {client.max_session_minutes && <AnamnesisRow icon={<Activity className="h-4 w-4 text-emerald-500" />} label="Session length" value={`${client.max_session_minutes} min`} />}
+            {client.plan_preference && <AnamnesisRow icon={<ClipboardList className="h-4 w-4 text-cyan-500" />} label="Plan style" value={client.plan_preference.replace(/_/g, ' ')} />}
+            {client.sleep_quality && <AnamnesisRow icon={<Stethoscope className="h-4 w-4 text-slate-500" />} label="Recovery context" value={`${client.sleep_quality}${client.stress_level ? ` · stress ${client.stress_level}` : ''}`} />}
+          </div>
+        </div>
+
+        {customResponses.length > 0 && (
+          <div className="border-t border-gray-100 mt-6 pt-4">
+            <h2 className="text-sm font-bold uppercase tracking-[0.16em] text-gray-500 mb-3">Custom intake answers</h2>
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+              {customResponses.map((response) => {
+                const value = Array.isArray(response.response_json)
+                  ? response.response_json.join(', ')
+                  : typeof response.response_json === 'boolean'
+                    ? response.response_json ? 'Yes' : 'No'
+                    : response.response_text ?? ''
+                return (
+                  <AnamnesisRow
+                    key={response.id}
+                    icon={<ClipboardList className="h-4 w-4 text-violet-500" />}
+                    label={response.question?.label ?? 'Custom question'}
+                    value={value}
+                  />
+                )
+              })}
+            </div>
           </div>
         )}
       </div>
