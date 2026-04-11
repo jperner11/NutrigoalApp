@@ -25,7 +25,8 @@ export function createInviteToken() {
 }
 
 export function getAppOrigin(origin?: string | null) {
-  return origin || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  // Always prefer the configured app URL for external-facing links (invites, emails)
+  return process.env.NEXT_PUBLIC_APP_URL || origin || 'http://localhost:3000'
 }
 
 export function getInviteNextPath(token: string) {
