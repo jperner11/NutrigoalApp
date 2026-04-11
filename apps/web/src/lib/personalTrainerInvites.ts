@@ -32,7 +32,8 @@ export function getInviteNextPath(token: string) {
   return `/invite/accept?token=${encodeURIComponent(token)}`
 }
 
-export function getInviteRedirectUrl(origin: string, _token: string) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function getInviteRedirectUrl(origin: string, token: string) {
   // Don't include the token in the redirect URL — Supabase's redirect
   // chain can corrupt long query params. The accept page will look up
   // the pending invite by the authenticated user's email instead.
