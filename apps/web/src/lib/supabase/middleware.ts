@@ -39,6 +39,8 @@ export async function updateSession(request: NextRequest) {
   const publicRoutes = [
     '/',
     '/find-coach',
+    '/api/coach-match',
+    '/api/coach-waitlist',
     '/login',
     '/signup',
     '/pricing',
