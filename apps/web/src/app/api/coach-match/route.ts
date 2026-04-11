@@ -93,7 +93,16 @@ export async function GET(request: Request) {
   const offersByCoachId = new Map<string, CoachMatchOffer[]>()
   for (const offer of (offers as CoachOfferRow[] | null) ?? []) {
     const current = offersByCoachId.get(offer.coach_id) ?? []
-    const { coach_id: _coachId, created_at: _createdAt, updated_at: _updatedAt, ...nextOffer } = offer
+    const nextOffer: CoachMatchOffer = {
+      id: offer.id,
+      title: offer.title,
+      description: offer.description,
+      price: offer.price,
+      billing_period: offer.billing_period,
+      cta_label: offer.cta_label,
+      is_active: offer.is_active,
+      sort_order: offer.sort_order,
+    }
     current.push(nextOffer)
     offersByCoachId.set(offer.coach_id, current)
   }
