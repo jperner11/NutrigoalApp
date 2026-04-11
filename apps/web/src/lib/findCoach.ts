@@ -16,6 +16,50 @@ export interface CoachWizardAnswers {
   additional_notes: string
 }
 
+export interface CoachMatchOffer {
+  id: string
+  title: string
+  description: string | null
+  price: number
+  billing_period: string
+  cta_label: string
+  is_active?: boolean
+  sort_order?: number
+}
+
+export interface CoachMatchProfile {
+  coach_id: string
+  slug: string
+  is_public?: boolean
+  headline: string | null
+  bio: string | null
+  location_label: string | null
+  consultation_url: string | null
+  price_from: number | null
+  price_to: number | null
+  currency: string
+  accepting_new_clients: boolean
+  coach: {
+    id: string
+    full_name: string | null
+    email: string
+    avatar_url: string | null
+    role?: string
+    coach_specialties: string[]
+    coach_formats: string[]
+    coach_services: string[]
+    coach_style: string | null
+    coach_check_in_frequency: string | null
+    coach_ideal_client: string | null
+  }
+  offers: CoachMatchOffer[]
+}
+
+export interface MatchedCoachResult extends CoachMatchProfile {
+  score: number
+  reasons: string[]
+}
+
 export const WIZARD_GOALS = [
   'Fat loss',
   'Muscle gain',
@@ -121,13 +165,53 @@ export const DEFAULT_COACH_WIZARD_ANSWERS: CoachWizardAnswers = {
   preferred_languages: [],
   preferred_days: [],
   preferred_times: [],
-  budget_min: null,
-  budget_max: null,
+  budget_min: 40,
+  budget_max: 160,
   budget_period: 'monthly',
   additional_notes: '',
 }
 
 const COACH_WIZARD_STORAGE_KEY = 'nutrigoal.find-coach.answers'
+
+export function normalizeCoachWizardAnswers(
+  answers?: Partial<CoachWizardAnswers> | null
+): CoachWizardAnswers {
+  const parsed = answers ?? {}
+
+  return {
+    ...DEFAULT_COACH_WIZARD_ANSWERS,
+    ...parsed,
+    goal: typeof parsed.goal === 'string' ? parsed.goal : null,
+    timeline: typeof parsed.timeline === 'string' ? parsed.timeline : null,
+    experience_level: typeof parsed.experience_level === 'string' ? parsed.experience_level : null,
+    preferred_location: typeof parsed.preferred_location === 'string' ? parsed.preferred_location : null,
+    skills_needed: Array.isArray(parsed.skills_needed) ? parsed.skills_needed : [],
+    focus_areas: Array.isArray(parsed.focus_areas) ? parsed.focus_areas : [],
+    coaching_style_prefs: Array.isArray(parsed.coaching_style_prefs) ? parsed.coaching_style_prefs : [],
+    preferred_languages: Array.isArray(parsed.preferred_languages) ? parsed.preferred_languages : [],
+    preferred_days: Array.isArray(parsed.preferred_days) ? parsed.preferred_days : [],
+    preferred_times: Array.isArray(parsed.preferred_times) ? parsed.preferred_times : [],
+    budget_min: typeof parsed.budget_min === 'number' ? parsed.budget_min : DEFAULT_COACH_WIZARD_ANSWERS.budget_min,
+    budget_max: typeof parsed.budget_max === 'number' ? parsed.budget_max : DEFAULT_COACH_WIZARD_ANSWERS.budget_max,
+    budget_period: parsed.budget_period === 'one_time' || parsed.budget_period === 'weekly' || parsed.budget_period === 'monthly'
+      ? parsed.budget_period
+      : DEFAULT_COACH_WIZARD_ANSWERS.budget_period,
+    context_text: typeof parsed.context_text === 'string' ? parsed.context_text : '',
+    additional_notes: typeof parsed.additional_notes === 'string' ? parsed.additional_notes : '',
+  }
+}
+
+export function buildWizardBudgetLabel(answers: CoachWizardAnswers) {
+  const formatter = new Intl.NumberFormat('en-GB', {
+    style: 'currency',
+    currency: 'GBP',
+    maximumFractionDigits: 0,
+  })
+
+  return `${formatter.format(answers.budget_min ?? DEFAULT_COACH_WIZARD_ANSWERS.budget_min ?? 40)}-${formatter.format(
+    answers.budget_max ?? DEFAULT_COACH_WIZARD_ANSWERS.budget_max ?? 160
+  )}/${answers.budget_period === 'one_time' ? 'session' : answers.budget_period === 'weekly' ? 'week' : 'month'}`
+}
 
 export function saveWizardAnswers(answers: CoachWizardAnswers) {
   if (typeof window === 'undefined') return
@@ -141,19 +225,7 @@ export function loadWizardAnswers(): CoachWizardAnswers | null {
   if (!raw) return null
 
   try {
-    const parsed = JSON.parse(raw) as Partial<CoachWizardAnswers>
-    return {
-      ...DEFAULT_COACH_WIZARD_ANSWERS,
-      ...parsed,
-      skills_needed: Array.isArray(parsed.skills_needed) ? parsed.skills_needed : [],
-      focus_areas: Array.isArray(parsed.focus_areas) ? parsed.focus_areas : [],
-      coaching_style_prefs: Array.isArray(parsed.coaching_style_prefs) ? parsed.coaching_style_prefs : [],
-      preferred_languages: Array.isArray(parsed.preferred_languages) ? parsed.preferred_languages : [],
-      preferred_days: Array.isArray(parsed.preferred_days) ? parsed.preferred_days : [],
-      preferred_times: Array.isArray(parsed.preferred_times) ? parsed.preferred_times : [],
-      context_text: typeof parsed.context_text === 'string' ? parsed.context_text : '',
-      additional_notes: typeof parsed.additional_notes === 'string' ? parsed.additional_notes : '',
-    }
+    return normalizeCoachWizardAnswers(JSON.parse(raw) as Partial<CoachWizardAnswers>)
   } catch {
     return null
   }

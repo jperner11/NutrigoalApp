@@ -20,11 +20,14 @@ import {
 } from 'lucide-react'
 import {
   clearWizardAnswers,
+  normalizeCoachWizardAnswers,
   DEFAULT_COACH_WIZARD_ANSWERS,
   loadWizardAnswers,
   saveWizardAnswers,
+  type MatchedCoachResult,
   type CoachWizardAnswers,
 } from '@/lib/findCoach'
+import CoachResults from './CoachResults'
 import WizardProgress from './WizardProgress'
 import WizardShell from './WizardShell'
 import GoalStep from './steps/GoalStep'
@@ -163,20 +166,15 @@ const steps: WizardStepDefinition[] = [
 export default function CoachWizard() {
   const [answers, setAnswers] = useState<CoachWizardAnswers>(DEFAULT_COACH_WIZARD_ANSWERS)
   const [stepIndex, setStepIndex] = useState(0)
-  const [phase, setPhase] = useState<'questions' | 'loading'>('questions')
+  const [phase, setPhase] = useState<'questions' | 'loading' | 'results'>('questions')
   const [statusMessage, setStatusMessage] = useState<string | null>(null)
+  const [matches, setMatches] = useState<MatchedCoachResult[]>([])
 
   useEffect(() => {
     const storedAnswers = loadWizardAnswers()
     if (!storedAnswers) return
 
-    setAnswers({
-      ...DEFAULT_COACH_WIZARD_ANSWERS,
-      ...storedAnswers,
-      budget_min: storedAnswers.budget_min ?? 40,
-      budget_max: storedAnswers.budget_max ?? 160,
-      budget_period: storedAnswers.budget_period ?? 'monthly',
-    })
+    setAnswers(normalizeCoachWizardAnswers(storedAnswers))
   }, [])
 
   useEffect(() => {
@@ -204,12 +202,33 @@ export default function CoachWizard() {
     return lines
   }, [answers])
 
+  function encodeAnswers(value: CoachWizardAnswers) {
+    const json = JSON.stringify(value)
+    const bytes = new TextEncoder().encode(json)
+    let binary = ''
+    bytes.forEach((byte) => {
+      binary += String.fromCharCode(byte)
+    })
+
+    return window.btoa(binary)
+  }
+
   async function handleSubmit() {
     setPhase('loading')
     setStatusMessage(null)
-    await new Promise((resolve) => window.setTimeout(resolve, 1800))
-    setPhase('questions')
-    setStatusMessage('The questionnaire flow is now in place. The next feature slice wires in coach scoring, ranked results, and waitlist handling.')
+    setMatches([])
+
+    const response = await fetch(`/api/coach-match?q=${encodeURIComponent(encodeAnswers(answers))}`)
+    const payload = await response.json().catch(() => null)
+
+    if (!response.ok) {
+      setPhase('questions')
+      setStatusMessage(payload?.error ?? 'We could not match coaches right now. Please try again.')
+      return
+    }
+
+    setMatches((payload?.matches as MatchedCoachResult[]) ?? [])
+    setPhase('results')
   }
 
   function handleContinue() {
@@ -226,18 +245,32 @@ export default function CoachWizard() {
 
   function handleBack() {
     if (phase === 'loading') return
+    if (phase === 'results') {
+      setPhase('questions')
+      return
+    }
     setStatusMessage(null)
     setStepIndex((index) => Math.max(index - 1, 0))
   }
 
-  const Icon = currentStep.icon
+  const resultsMode = phase === 'results'
+  const activeStep = resultsMode
+    ? {
+      badge: 'Results',
+      title: 'Here are the coaches most likely to fit',
+      description: 'These matches are ranked from your answers, so you can start with the most relevant profiles instead of browsing blind.',
+      icon: Sparkles,
+    }
+    : currentStep
+
+  const Icon = activeStep.icon
   const isCurrentStepComplete = currentStep.canContinue(answers)
 
   return (
     <WizardShell
-      stepLabel={currentStep.badge}
-      title={currentStep.title}
-      description={currentStep.description}
+      stepLabel={activeStep.badge}
+      title={activeStep.title}
+      description={activeStep.description}
       aside={
         <div>
           <div className="inline-flex rounded-full bg-white/12 p-4 text-sky-50">
@@ -257,13 +290,10 @@ export default function CoachWizard() {
             type="button"
             onClick={() => {
               clearWizardAnswers()
-              setAnswers({
-                ...DEFAULT_COACH_WIZARD_ANSWERS,
-                budget_min: 40,
-                budget_max: 160,
-                budget_period: 'monthly',
-              })
+              setAnswers(DEFAULT_COACH_WIZARD_ANSWERS)
               setStepIndex(0)
+              setMatches([])
+              setPhase('questions')
               setStatusMessage(null)
             }}
             className="mt-6 text-sm font-semibold text-sky-100/88 underline-offset-4 hover:underline"
@@ -272,41 +302,60 @@ export default function CoachWizard() {
           </button>
         </div>
       }
-      progress={<WizardProgress currentStep={Math.min(stepIndex + 1, steps.length)} totalSteps={steps.length} />}
+      progress={<WizardProgress currentStep={resultsMode ? steps.length : Math.min(stepIndex + 1, steps.length)} totalSteps={steps.length} />}
       footer={
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <button
             type="button"
             onClick={handleBack}
-            disabled={stepIndex === 0 || phase === 'loading'}
+            disabled={(stepIndex === 0 && phase === 'questions') || phase === 'loading'}
             className="btn-secondary inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back
+            {resultsMode ? 'Edit answers' : 'Back'}
           </button>
-          <button
-            type="button"
-            onClick={handleContinue}
-            disabled={!isCurrentStepComplete || phase === 'loading'}
-            className="btn-primary inline-flex items-center justify-center gap-2 rounded-2xl px-6 py-3 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {phase === 'loading' ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Matching
-              </>
-            ) : (
-              <>
-                {isLastStep ? 'Find coaches' : 'Continue'}
-                <ArrowRight className="h-4 w-4" />
-              </>
-            )}
-          </button>
+          {resultsMode ? (
+            <button
+              type="button"
+              onClick={() => {
+                clearWizardAnswers()
+                setAnswers(DEFAULT_COACH_WIZARD_ANSWERS)
+                setStepIndex(0)
+                setMatches([])
+                setPhase('questions')
+              }}
+              className="btn-primary inline-flex items-center justify-center gap-2 rounded-2xl px-6 py-3 text-sm font-semibold"
+            >
+              Start over
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleContinue}
+              disabled={!isCurrentStepComplete || phase === 'loading'}
+              className="btn-primary inline-flex items-center justify-center gap-2 rounded-2xl px-6 py-3 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {phase === 'loading' ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Matching
+                </>
+              ) : (
+                <>
+                  {isLastStep ? 'Find coaches' : 'Continue'}
+                  <ArrowRight className="h-4 w-4" />
+                </>
+              )}
+            </button>
+          )}
         </div>
       }
     >
       {phase === 'loading' ? (
         <LoadingStep answers={answers} />
+      ) : phase === 'results' ? (
+        <CoachResults answers={answers} matches={matches} />
       ) : (
         <currentStep.Component answers={answers} updateAnswers={updateAnswers} statusMessage={statusMessage} />
       )}
