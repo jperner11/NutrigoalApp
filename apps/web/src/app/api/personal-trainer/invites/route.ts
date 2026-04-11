@@ -151,9 +151,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: message }, { status: 400 })
     }
 
+    const deliveryMethodFinal = existingUser?.id ? 'magiclink' : 'invite'
+
     return NextResponse.json({
       invite: {
         ...invite,
+        delivery_method: deliveryMethodFinal,
         share_url: getShareableInviteUrl(appOrigin, token),
         personal_trainer_name: profile?.full_name ?? null,
       },

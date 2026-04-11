@@ -15,6 +15,8 @@ export default function InviteClientPage() {
   const [clientFirstName, setClientFirstName] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
+  const [shareUrl, setShareUrl] = useState<string | null>(null)
+
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!profile || !email) return
@@ -37,8 +39,21 @@ export default function InviteClientPage() {
       return
     }
 
-    toast.success(payload?.message ?? `Invite sent to ${email}`)
-    router.push('/clients')
+    if (payload?.invite?.share_url && payload?.invite?.delivery_method === 'magiclink') {
+      setShareUrl(payload.invite.share_url)
+      toast.success('Invite created! Share the link below with your client.')
+    } else {
+      toast.success(payload?.message ?? `Invite sent to ${email}`)
+      router.push('/clients')
+    }
+    setIsLoading(false)
+  }
+
+  const handleCopyLink = () => {
+    if (shareUrl) {
+      navigator.clipboard.writeText(shareUrl)
+      toast.success('Link copied!')
+    }
   }
 
   if (profile && !isTrainerRole(profile.role)) {
@@ -97,6 +112,35 @@ export default function InviteClientPage() {
           {isLoading ? 'Sending...' : 'Send Invitation'}
         </button>
       </form>
+
+      {shareUrl && (
+        <div className="card p-6 mt-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Share this link with your client</h3>
+          <p className="text-sm text-gray-600 mb-4">
+            This client already has an account. Send them the link below so they can accept your invitation.
+          </p>
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              readOnly
+              value={shareUrl}
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-sm text-gray-700"
+            />
+            <button
+              onClick={handleCopyLink}
+              className="px-4 py-2 bg-sky-500 text-white rounded-lg text-sm font-medium hover:bg-sky-600 transition-colors"
+            >
+              Copy
+            </button>
+          </div>
+          <Link
+            href="/clients"
+            className="inline-block mt-4 text-sm text-sky-600 hover:text-sky-700"
+          >
+            ← Back to Clients
+          </Link>
+        </div>
+      )}
     </div>
   )
 }
