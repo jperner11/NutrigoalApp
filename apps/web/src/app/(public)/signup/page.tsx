@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { ArrowRight, Eye, EyeOff, Lock, Mail, User, UserCircle, Users } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
+import { sanitizeNextPath } from '@/lib/authRedirect'
 import BrandLogo from '@/components/brand/BrandLogo'
 
 export default function SignupPage() {
@@ -21,7 +22,7 @@ export default function SignupPage() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
-    const next = params.get('next') || '/onboarding'
+    const next = sanitizeNextPath(params.get('next'), '/onboarding')
     const email = params.get('email') || ''
     setNextPath(next)
     setFormData(prev => ({ ...prev, email }))
@@ -30,7 +31,7 @@ export default function SignupPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const signupRole = formData.role
-    const postSignupNextPath = nextPath === '/dashboard' ? '/dashboard' : '/onboarding'
+    const postSignupNextPath = sanitizeNextPath(nextPath, '/onboarding')
 
     if (!formData.fullName.trim() || !formData.email || !formData.password) {
       toast.error('Please fill in all fields')

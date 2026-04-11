@@ -32,12 +32,15 @@ export function getInviteNextPath(token: string) {
   return `/invite/accept?token=${encodeURIComponent(token)}`
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function getInviteRedirectUrl(origin: string, token: string) {
-  // Don't include the token in the redirect URL — Supabase's redirect
-  // chain can corrupt long query params. The accept page will look up
-  // the pending invite by the authenticated user's email instead.
-  return `${origin}/invite/accept`
+export function getInviteRedirectPath(inviteId: string) {
+  return `/invite/accept?inviteId=${encodeURIComponent(inviteId)}`
+}
+
+export function getInviteRedirectUrl(origin: string, inviteId: string) {
+  // Keep the redirect identifier short and stable so the invite page can
+  // recover gracefully even if Supabase's one-time auth link is expired or
+  // consumed before the client opens it.
+  return `${origin}${getInviteRedirectPath(inviteId)}`
 }
 
 export function getShareableInviteUrl(origin: string, token: string) {

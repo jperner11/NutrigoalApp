@@ -3,12 +3,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Mail, UserCheck, XCircle } from 'lucide-react'
+import { AlertCircle, Mail, UserCheck, XCircle } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import BrandLogo from '@/components/brand/BrandLogo'
 import { createClient } from '@/lib/supabase/client'
 
 interface InvitePayload {
+  token?: string
   invite: {
     id: string
     invited_email: string
@@ -31,38 +32,103 @@ interface InvitePayload {
   } | null
 }
 
+interface InviteErrorPayload {
+  error?: string
+}
+
+interface InviteAuthError {
+  code: string
+  description: string
+}
+
+function buildInvitePath(token?: string | null, inviteId?: string | null) {
+  const params = new URLSearchParams()
+
+  if (token) {
+    params.set('token', token)
+  } else if (inviteId) {
+    params.set('inviteId', inviteId)
+  }
+
+  const query = params.toString()
+  return query ? `/invite/accept?${query}` : '/invite/accept'
+}
+
 export default function AcceptInvitePage() {
   const router = useRouter()
   const [token, setToken] = useState('')
-  const nextParam = useMemo(
-    () => token ? `/invite/accept?token=${encodeURIComponent(token)}` : '/invite/accept',
-    [token]
-  )
-
+  const [inviteId, setInviteId] = useState('')
   const [data, setData] = useState<InvitePayload | null>(null)
   const [loading, setLoading] = useState(true)
   const [sessionReady, setSessionReady] = useState(false)
   const [submitting, setSubmitting] = useState<'accept' | 'decline' | null>(null)
+  const [authError, setAuthError] = useState<InviteAuthError | null>(null)
+
+  const nextParam = useMemo(
+    () => buildInvitePath(token, inviteId),
+    [inviteId, token]
+  )
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     setToken(params.get('token') ?? '')
+    setInviteId(params.get('inviteId') ?? '')
 
-    // If there's a hash fragment with access_token, let Supabase process it
     const hash = window.location.hash
-    if (hash && hash.includes('access_token')) {
-      const supabase = createClient()
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-        if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
-          subscription.unsubscribe()
-          // Clear the hash
-          window.history.replaceState(null, '', window.location.pathname + window.location.search)
-          setSessionReady(true)
-        }
-      })
-      return () => subscription.unsubscribe()
-    } else {
+    if (!hash) {
       setSessionReady(true)
+      return
+    }
+
+    const hashParams = new URLSearchParams(hash.slice(1))
+    const errorCode = hashParams.get('error_code') ?? hashParams.get('error')
+    const errorDescription = hashParams.get('error_description')
+
+    if (errorCode || errorDescription) {
+      setAuthError({
+        code: errorCode ?? 'invite_error',
+        description: errorDescription ?? 'This email sign-in link is no longer valid.',
+      })
+      window.history.replaceState(null, '', window.location.pathname + window.location.search)
+    }
+
+    if (!hash.includes('access_token')) {
+      setSessionReady(true)
+      return
+    }
+
+    const supabase = createClient()
+    let finished = false
+
+    const finishSessionInit = () => {
+      if (finished) return
+      finished = true
+      window.history.replaceState(null, '', window.location.pathname + window.location.search)
+      setSessionReady(true)
+    }
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+        subscription.unsubscribe()
+        finishSessionInit()
+      }
+    })
+
+    void supabase.auth.getSession().then(({ data: sessionData }) => {
+      if (sessionData.session) {
+        subscription.unsubscribe()
+        finishSessionInit()
+      }
+    })
+
+    const timeoutId = window.setTimeout(() => {
+      subscription.unsubscribe()
+      finishSessionInit()
+    }, 1500)
+
+    return () => {
+      window.clearTimeout(timeoutId)
+      subscription.unsubscribe()
     }
   }, [])
 
@@ -73,11 +139,18 @@ export default function AcceptInvitePage() {
 
     async function loadInvite() {
       let resolvedToken = token
+      let resolvedInviteId = inviteId
       const supabase = createClient()
+      let response: Response | null = null
+      let payload: InvitePayload | InviteErrorPayload | null = null
 
-      // If no token in URL, look up pending invite using client-side session
-      // (server API won't work here because cookies haven't synced yet)
-      if (!resolvedToken) {
+      if (resolvedToken) {
+        response = await fetch(`/api/personal-trainer/invites/token/${encodeURIComponent(resolvedToken)}`)
+        payload = await response.json().catch(() => null)
+      } else if (resolvedInviteId) {
+        response = await fetch(`/api/personal-trainer/invites/id/${encodeURIComponent(resolvedInviteId)}`)
+        payload = await response.json().catch(() => null)
+      } else {
         const { data: { user } } = await supabase.auth.getUser()
         if (!user?.email) {
           if (mounted) setLoading(false)
@@ -86,30 +159,38 @@ export default function AcceptInvitePage() {
 
         const { data: invite } = await supabase
           .from('personal_trainer_invites')
-          .select('invite_token')
+          .select('id, invite_token')
           .ilike('invited_email', user.email)
           .eq('status', 'pending')
           .order('created_at', { ascending: false })
           .limit(1)
           .maybeSingle()
 
-        if (invite?.invite_token) {
-          resolvedToken = invite.invite_token
-          setToken(resolvedToken)
-        } else {
+        if (!invite?.invite_token) {
           if (mounted) setLoading(false)
           return
         }
+
+        resolvedToken = invite.invite_token
+        resolvedInviteId = invite.id
+        setToken(invite.invite_token)
+        setInviteId(invite.id)
+
+        response = await fetch(`/api/personal-trainer/invites/token/${encodeURIComponent(invite.invite_token)}`)
+        payload = await response.json().catch(() => null)
       }
 
-      // Fetch invite details — try server API first, fall back to client query
-      const response = await fetch(`/api/personal-trainer/invites/token/${encodeURIComponent(resolvedToken)}`)
-      const payload = await response.json().catch(() => null)
+      if (!mounted || !response) return
 
-      if (!mounted) return
+      if (response.ok && payload && 'invite' in payload) {
+        if (payload.token && payload.token !== resolvedToken) {
+          setToken(payload.token)
+        }
 
-      if (response.ok && payload) {
-        // If server returned no currentUser but we have a client session, enrich it
+        if (payload.invite?.id && payload.invite.id !== resolvedInviteId) {
+          setInviteId(payload.invite.id)
+        }
+
         if (!payload.currentUser) {
           const { data: { user } } = await supabase.auth.getUser()
           if (user) {
@@ -122,30 +203,37 @@ export default function AcceptInvitePage() {
             if (profile && payload.invite) {
               const emailMatches = profile.email?.toLowerCase() === payload.invite.invited_email.toLowerCase()
               const assignedTrainerId = profile.personal_trainer_id ?? profile.nutritionist_id ?? null
+              const inviteTrainerId = payload.invite.trainer?.id ?? null
+
               payload.currentUser = {
                 id: profile.id,
                 email: profile.email,
                 role: profile.role,
                 emailMatches,
-                alreadyAssignedToOtherTrainer: Boolean(assignedTrainerId && assignedTrainerId !== payload.invite.id),
+                alreadyAssignedToOtherTrainer: Boolean(
+                  assignedTrainerId && inviteTrainerId && assignedTrainerId !== inviteTrainerId
+                ),
               }
             }
           }
         }
+
         setData(payload)
         setLoading(false)
-      } else {
-        toast.error(payload?.error ?? 'Could not load invite.')
-        setLoading(false)
+        return
       }
+
+      const errorMessage = payload && 'error' in payload ? payload.error : null
+      toast.error(errorMessage ?? 'Could not load invite.')
+      setLoading(false)
     }
 
-    loadInvite()
+    void loadInvite()
 
     return () => {
       mounted = false
     }
-  }, [token, sessionReady])
+  }, [inviteId, sessionReady, token])
 
   async function respond(action: 'accept' | 'decline') {
     if (!token) return
@@ -173,6 +261,9 @@ export default function AcceptInvitePage() {
   const invite = data?.invite
   const currentUser = data?.currentUser
   const trainerName = invite?.trainer?.full_name || 'your personal trainer'
+  const inviteRecoveryMessage = authError?.code === 'otp_expired'
+    ? 'This email link has already expired or was opened before you clicked it. You can still continue below with the invited email address.'
+    : authError?.description || null
 
   return (
     <div className="auth-bg min-h-screen px-4 py-10 sm:px-6">
@@ -193,7 +284,9 @@ export default function AcceptInvitePage() {
             <div className="mt-8 text-[var(--muted)]">Loading invite details...</div>
           ) : !invite ? (
             <div className="mt-8 rounded-[24px] border border-[var(--line)] bg-white/80 p-6 text-[var(--muted)]">
-              We couldn&apos;t find this invite. Ask your trainer to resend it.
+              {inviteRecoveryMessage
+                ? `${inviteRecoveryMessage} If this keeps happening, ask your trainer to resend the invite.`
+                : 'We couldn\'t find this invite. Ask your trainer to resend it.'}
             </div>
           ) : (
             <>
@@ -215,6 +308,20 @@ export default function AcceptInvitePage() {
                 </div>
               </div>
 
+              {inviteRecoveryMessage && invite.status === 'pending' && !currentUser && (
+                <div className="mt-8 rounded-[24px] border border-amber-200 bg-amber-50/90 p-6">
+                  <div className="flex items-start gap-3">
+                    <AlertCircle className="mt-0.5 h-5 w-5 text-amber-700" />
+                    <div>
+                      <div className="text-sm font-semibold uppercase tracking-[0.14em] text-amber-700">Continue manually</div>
+                      <p className="mt-2 text-sm leading-6 text-amber-800">
+                        {inviteRecoveryMessage}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {!currentUser && invite.status === 'pending' && (
                 <div className="mt-8 rounded-[24px] border border-[var(--line)] bg-[var(--brand-100)] p-6">
                   <div className="text-lg font-semibold text-[var(--foreground)]">Sign in or create an account to continue</div>
@@ -222,7 +329,7 @@ export default function AcceptInvitePage() {
                     Use the invited email address so we can match the join request correctly.
                   </p>
                   <div className="mt-5 flex flex-wrap gap-3">
-                    <Link href={`/login?next=${encodeURIComponent(nextParam)}`} className="btn-primary rounded-2xl px-5 py-3 text-sm font-semibold">
+                    <Link href={`/login?next=${encodeURIComponent(nextParam)}&email=${encodeURIComponent(invite.invited_email)}`} className="btn-primary rounded-2xl px-5 py-3 text-sm font-semibold">
                       Sign in
                     </Link>
                     <Link href={`/signup?next=${encodeURIComponent(nextParam)}&email=${encodeURIComponent(invite.invited_email)}`} className="btn-secondary rounded-2xl px-5 py-3 text-sm font-semibold">

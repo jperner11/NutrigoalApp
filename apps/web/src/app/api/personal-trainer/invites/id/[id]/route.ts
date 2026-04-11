@@ -5,9 +5,9 @@ import { getInviteState } from '@/lib/personalTrainerInvites'
 
 export async function GET(
   _request: Request,
-  { params }: { params: Promise<{ token: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { token } = await params
+  const { id } = await params
   const admin = createAdminClient()
   const supabase = await createClient()
   const {
@@ -24,7 +24,7 @@ export async function GET(
         email
       )
     `)
-    .eq('invite_token', token)
+    .eq('id', id)
     .single()
 
   if (!invite) {

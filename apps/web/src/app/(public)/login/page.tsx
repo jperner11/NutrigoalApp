@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { ArrowRight, Eye, EyeOff, Lock, Mail } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
+import { sanitizeNextPath } from '@/lib/authRedirect'
 import BrandLogo from '@/components/brand/BrandLogo'
 
 export default function LoginPage() {
@@ -18,7 +19,11 @@ export default function LoginPage() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
-    setNextPath(params.get('next') || '/dashboard')
+    setNextPath(sanitizeNextPath(params.get('next'), '/dashboard'))
+    setFormData((prev) => ({
+      ...prev,
+      email: params.get('email') || prev.email,
+    }))
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
