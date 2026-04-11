@@ -41,6 +41,7 @@ export async function updateSession(request: NextRequest) {
     '/api/coach-match',
     '/api/coach-waitlist',
     '/login',
+    '/reset-password',
     '/signup',
     '/pricing',
     '/faq',

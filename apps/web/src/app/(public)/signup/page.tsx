@@ -32,6 +32,7 @@ export default function SignupPage() {
     e.preventDefault()
     const signupRole = formData.role
     const postSignupNextPath = sanitizeNextPath(nextPath, '/onboarding')
+    const isInviteSignup = postSignupNextPath.startsWith('/invite/accept')
 
     if (!formData.fullName.trim() || !formData.email || !formData.password) {
       toast.error('Please fill in all fields')
@@ -65,6 +66,23 @@ export default function SignupPage() {
     })
 
     if (error) {
+      const alreadyRegistered = error.message.toLowerCase().includes('already registered')
+
+      if (alreadyRegistered && isInviteSignup) {
+        const { error: resetError } = await supabase.auth.resetPasswordForEmail(formData.email, {
+          redirectTo: `${redirectBase}/reset-password?next=${encodeURIComponent(postSignupNextPath)}`,
+        })
+
+        if (resetError) {
+          toast.error('This invite already created an account, but we could not send a password setup email. Please ask your trainer to resend the invite.')
+        } else {
+          toast.success('This invite already created your account. Check your email for a password setup link.')
+        }
+
+        setIsLoading(false)
+        return
+      }
+
       toast.error(error.message)
       setIsLoading(false)
       return
