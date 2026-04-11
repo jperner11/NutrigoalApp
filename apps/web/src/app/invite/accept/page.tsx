@@ -73,13 +73,28 @@ export default function AcceptInvitePage() {
 
     async function loadInvite() {
       let resolvedToken = token
+      const supabase = createClient()
 
-      // If no token in URL, look up pending invite by authenticated user's email
+      // If no token in URL, look up pending invite using client-side session
+      // (server API won't work here because cookies haven't synced yet)
       if (!resolvedToken) {
-        const res = await fetch('/api/personal-trainer/invites/pending-for-user')
-        const result = await res.json().catch(() => null)
-        if (result?.token) {
-          resolvedToken = result.token
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user?.email) {
+          if (mounted) setLoading(false)
+          return
+        }
+
+        const { data: invite } = await supabase
+          .from('personal_trainer_invites')
+          .select('invite_token')
+          .ilike('invited_email', user.email)
+          .eq('status', 'pending')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+
+        if (invite?.invite_token) {
+          resolvedToken = invite.invite_token
           setToken(resolvedToken)
         } else {
           if (mounted) setLoading(false)
@@ -87,19 +102,42 @@ export default function AcceptInvitePage() {
         }
       }
 
+      // Fetch invite details — try server API first, fall back to client query
       const response = await fetch(`/api/personal-trainer/invites/token/${encodeURIComponent(resolvedToken)}`)
       const payload = await response.json().catch(() => null)
 
       if (!mounted) return
 
-      if (!response.ok) {
+      if (response.ok && payload) {
+        // If server returned no currentUser but we have a client session, enrich it
+        if (!payload.currentUser) {
+          const { data: { user } } = await supabase.auth.getUser()
+          if (user) {
+            const { data: profile } = await supabase
+              .from('user_profiles')
+              .select('id, email, role, personal_trainer_id, nutritionist_id')
+              .eq('id', user.id)
+              .single()
+
+            if (profile && payload.invite) {
+              const emailMatches = profile.email?.toLowerCase() === payload.invite.invited_email.toLowerCase()
+              const assignedTrainerId = profile.personal_trainer_id ?? profile.nutritionist_id ?? null
+              payload.currentUser = {
+                id: profile.id,
+                email: profile.email,
+                role: profile.role,
+                emailMatches,
+                alreadyAssignedToOtherTrainer: Boolean(assignedTrainerId && assignedTrainerId !== payload.invite.id),
+              }
+            }
+          }
+        }
+        setData(payload)
+        setLoading(false)
+      } else {
         toast.error(payload?.error ?? 'Could not load invite.')
         setLoading(false)
-        return
       }
-
-      setData(payload)
-      setLoading(false)
     }
 
     loadInvite()
