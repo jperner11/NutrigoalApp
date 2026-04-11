@@ -6,11 +6,19 @@ export const metadata: Metadata = {
   description: 'Answer a few questions and get matched with coaches who fit your goals, preferences, and budget.',
 }
 
-export default function FindCoachPage() {
+export default async function FindCoachPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>
+}) {
+  const resolvedSearchParams = searchParams ? await searchParams : undefined
+  const goalParam = resolvedSearchParams?.goal
+  const initialGoal = Array.isArray(goalParam) ? goalParam[0] : goalParam
+
   return (
     <section className="px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
       <div className="mx-auto max-w-7xl">
-        <CoachWizard />
+        <CoachWizard initialGoal={initialGoal ?? null} />
       </div>
     </section>
   )

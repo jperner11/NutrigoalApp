@@ -1,7 +1,6 @@
 'use client'
 
 import { type ComponentType, useEffect, useMemo, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
 import type { LucideIcon } from 'lucide-react'
 import {
   ArrowLeft,
@@ -165,8 +164,7 @@ const steps: WizardStepDefinition[] = [
   },
 ]
 
-export default function CoachWizard() {
-  const searchParams = useSearchParams()
+export default function CoachWizard({ initialGoal = null }: { initialGoal?: string | null }) {
   const [answers, setAnswers] = useState<CoachWizardAnswers>(DEFAULT_COACH_WIZARD_ANSWERS)
   const [stepIndex, setStepIndex] = useState(0)
   const [phase, setPhase] = useState<'questions' | 'loading' | 'results'>('questions')
@@ -175,8 +173,7 @@ export default function CoachWizard() {
 
   useEffect(() => {
     const storedAnswers = loadWizardAnswers()
-    const queryGoal = searchParams.get('goal')
-    const normalizedQueryGoal = WIZARD_GOALS.find((goal) => goal === queryGoal) ?? null
+    const normalizedQueryGoal = WIZARD_GOALS.find((goal) => goal === initialGoal) ?? null
 
     if (!storedAnswers && !normalizedQueryGoal) return
 
@@ -184,7 +181,7 @@ export default function CoachWizard() {
       ...storedAnswers,
       goal: storedAnswers?.goal ?? normalizedQueryGoal,
     }))
-  }, [searchParams])
+  }, [initialGoal])
 
   useEffect(() => {
     saveWizardAnswers(answers)
