@@ -5,7 +5,6 @@ import {
   createInviteToken,
   ensureTrainerAccess,
   getAppOrigin,
-  getInviteRedirectUrl,
   getShareableInviteUrl,
   resolveExistingUser,
   sendInviteEmail,
@@ -133,15 +132,20 @@ export async function POST(request: Request) {
     }
 
     const appOrigin = getAppOrigin(request.headers.get('origin'))
-    const redirectTo = getInviteRedirectUrl(appOrigin, invite.id)
+    const inviteUrl = getShareableInviteUrl(appOrigin, token)
 
     try {
-      const deliveryMethod = await sendInviteEmail(email, redirectTo, existingUser?.id)
+      await sendInviteEmail(
+        email,
+        inviteUrl,
+        profile?.full_name ?? '',
+        clientFirstName,
+      )
 
       await admin
         .from('personal_trainer_invites')
         .update({
-          delivery_method: deliveryMethod,
+          delivery_method: 'invite',
           last_sent_at: new Date().toISOString(),
         })
         .eq('id', invite.id)
@@ -151,18 +155,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: message }, { status: 400 })
     }
 
-    const deliveryMethodFinal = existingUser?.id ? 'magiclink' : 'invite'
-
     return NextResponse.json({
       invite: {
         ...invite,
-        delivery_method: deliveryMethodFinal,
-        share_url: getShareableInviteUrl(appOrigin, token),
+        delivery_method: 'invite',
+        share_url: inviteUrl,
         personal_trainer_name: profile?.full_name ?? null,
       },
-      message: existingUser?.id
-        ? 'Join request sent. The client must accept before they become active.'
-        : 'Invite sent. The client must accept before they appear as active.',
+      message: 'Invite sent. The client must accept before they appear as active.',
     })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to create invite.'

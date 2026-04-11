@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { AlertCircle, Mail, UserCheck, XCircle } from 'lucide-react'
+import { Mail, UserCheck, XCircle } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import BrandLogo from '@/components/brand/BrandLogo'
 import { createClient } from '@/lib/supabase/client'
@@ -36,11 +36,6 @@ interface InviteErrorPayload {
   error?: string
 }
 
-interface InviteAuthError {
-  code: string
-  description: string
-}
-
 function buildInvitePath(token?: string | null, inviteId?: string | null) {
   const params = new URLSearchParams()
 
@@ -62,7 +57,6 @@ export default function AcceptInvitePage() {
   const [loading, setLoading] = useState(true)
   const [sessionReady, setSessionReady] = useState(false)
   const [submitting, setSubmitting] = useState<'accept' | 'decline' | null>(null)
-  const [authError, setAuthError] = useState<InviteAuthError | null>(null)
 
   const nextParam = useMemo(
     () => buildInvitePath(token, inviteId),
@@ -73,63 +67,7 @@ export default function AcceptInvitePage() {
     const params = new URLSearchParams(window.location.search)
     setToken(params.get('token') ?? '')
     setInviteId(params.get('inviteId') ?? '')
-
-    const hash = window.location.hash
-    if (!hash) {
-      setSessionReady(true)
-      return
-    }
-
-    const hashParams = new URLSearchParams(hash.slice(1))
-    const errorCode = hashParams.get('error_code') ?? hashParams.get('error')
-    const errorDescription = hashParams.get('error_description')
-
-    if (errorCode || errorDescription) {
-      setAuthError({
-        code: errorCode ?? 'invite_error',
-        description: errorDescription ?? 'This email sign-in link is no longer valid.',
-      })
-      window.history.replaceState(null, '', window.location.pathname + window.location.search)
-    }
-
-    if (!hash.includes('access_token')) {
-      setSessionReady(true)
-      return
-    }
-
-    const supabase = createClient()
-    let finished = false
-
-    const finishSessionInit = () => {
-      if (finished) return
-      finished = true
-      window.history.replaceState(null, '', window.location.pathname + window.location.search)
-      setSessionReady(true)
-    }
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
-        subscription.unsubscribe()
-        finishSessionInit()
-      }
-    })
-
-    void supabase.auth.getSession().then(({ data: sessionData }) => {
-      if (sessionData.session) {
-        subscription.unsubscribe()
-        finishSessionInit()
-      }
-    })
-
-    const timeoutId = window.setTimeout(() => {
-      subscription.unsubscribe()
-      finishSessionInit()
-    }, 1500)
-
-    return () => {
-      window.clearTimeout(timeoutId)
-      subscription.unsubscribe()
-    }
+    setSessionReady(true)
   }, [])
 
   useEffect(() => {
@@ -261,9 +199,6 @@ export default function AcceptInvitePage() {
   const invite = data?.invite
   const currentUser = data?.currentUser
   const trainerName = invite?.trainer?.full_name || 'your personal trainer'
-  const inviteRecoveryMessage = authError?.code === 'otp_expired'
-    ? 'This email link has already expired or was opened before you clicked it. You can still continue below with the invited email address.'
-    : authError?.description || null
 
   return (
     <div className="auth-bg min-h-screen px-4 py-10 sm:px-6">
@@ -284,9 +219,7 @@ export default function AcceptInvitePage() {
             <div className="mt-8 text-[var(--muted)]">Loading invite details...</div>
           ) : !invite ? (
             <div className="mt-8 rounded-[24px] border border-[var(--line)] bg-white/80 p-6 text-[var(--muted)]">
-              {inviteRecoveryMessage
-                ? `${inviteRecoveryMessage} If this keeps happening, ask your trainer to resend the invite.`
-                : 'We couldn\'t find this invite. Ask your trainer to resend it.'}
+              We couldn&apos;t find this invite. Ask your trainer to resend it.
             </div>
           ) : (
             <>
@@ -308,32 +241,18 @@ export default function AcceptInvitePage() {
                 </div>
               </div>
 
-              {inviteRecoveryMessage && invite.status === 'pending' && !currentUser && (
-                <div className="mt-8 rounded-[24px] border border-amber-200 bg-amber-50/90 p-6">
-                  <div className="flex items-start gap-3">
-                    <AlertCircle className="mt-0.5 h-5 w-5 text-amber-700" />
-                    <div>
-                      <div className="text-sm font-semibold uppercase tracking-[0.14em] text-amber-700">Continue manually</div>
-                      <p className="mt-2 text-sm leading-6 text-amber-800">
-                        {inviteRecoveryMessage}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
               {!currentUser && invite.status === 'pending' && (
                 <div className="mt-8 rounded-[24px] border border-[var(--line)] bg-[var(--brand-100)] p-6">
-                  <div className="text-lg font-semibold text-[var(--foreground)]">Sign in or create an account to continue</div>
+                  <div className="text-lg font-semibold text-[var(--foreground)]">Create your account to get started</div>
                   <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-                    Use the invited email address so we can match the join request correctly.
+                    Set up your account with the invited email address, then you&apos;ll be able to accept the invite.
                   </p>
                   <div className="mt-5 flex flex-wrap gap-3">
-                    <Link href={`/login?next=${encodeURIComponent(nextParam)}&email=${encodeURIComponent(invite.invited_email)}`} className="btn-primary rounded-2xl px-5 py-3 text-sm font-semibold">
-                      Sign in
-                    </Link>
-                    <Link href={`/signup?next=${encodeURIComponent(nextParam)}&email=${encodeURIComponent(invite.invited_email)}`} className="btn-secondary rounded-2xl px-5 py-3 text-sm font-semibold">
+                    <Link href={`/signup?next=${encodeURIComponent(nextParam)}&email=${encodeURIComponent(invite.invited_email)}&role=free`} className="btn-primary rounded-2xl px-5 py-3 text-sm font-semibold">
                       Create account
+                    </Link>
+                    <Link href={`/login?next=${encodeURIComponent(nextParam)}&email=${encodeURIComponent(invite.invited_email)}`} className="text-sm font-medium text-[var(--muted)] hover:text-[var(--foreground)] rounded-2xl px-5 py-3">
+                      Already have an account? Sign in
                     </Link>
                   </div>
                 </div>

@@ -32,17 +32,6 @@ export function getInviteNextPath(token: string) {
   return `/invite/accept?token=${encodeURIComponent(token)}`
 }
 
-export function getInviteRedirectPath(inviteId: string) {
-  return `/invite/accept?inviteId=${encodeURIComponent(inviteId)}`
-}
-
-export function getInviteRedirectUrl(origin: string, inviteId: string) {
-  // Keep the redirect identifier short and stable so the invite page can
-  // recover gracefully even if Supabase's one-time auth link is expired or
-  // consumed before the client opens it.
-  return `${origin}${getInviteRedirectPath(inviteId)}`
-}
-
 export function getShareableInviteUrl(origin: string, token: string) {
   return `${origin}${getInviteNextPath(token)}`
 }
@@ -79,21 +68,55 @@ export async function resolveExistingUser(email: string) {
   return data
 }
 
-export async function sendInviteEmail(email: string, redirectTo: string, existingUserId?: string | null) {
-  const normalizedEmail = email.trim().toLowerCase()
-  const admin = createAdminClient()
+export async function sendInviteEmail(
+  email: string,
+  inviteUrl: string,
+  trainerName: string,
+  clientFirstName?: string | null,
+) {
+  const resendKey = process.env.RESEND_API_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!resendKey) throw new Error('Email sending is not configured.')
 
-  if (existingUserId) {
-    // Existing users don't need a Supabase invite or magic link.
-    // They'll log in normally and accept via the invite token URL.
-    return 'magiclink' as const
-  }
+  const greeting = clientFirstName || 'there'
+  const coachLabel = trainerName || 'A coach'
 
-  const { error } = await admin.auth.admin.inviteUserByEmail(normalizedEmail, {
-    redirectTo,
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${resendKey}`,
+    },
+    body: JSON.stringify({
+      from: process.env.RESEND_FROM_EMAIL || 'Meal & Motion <noreply@mealandmotion.com>',
+      to: [email.trim().toLowerCase()],
+      subject: `${coachLabel} invited you to Meal & Motion`,
+      html: `
+        <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px 0">
+          <h2 style="margin:0 0 16px">You've been invited!</h2>
+          <p style="color:#444;line-height:1.6">
+            Hi ${greeting}, <strong>${coachLabel}</strong> has invited you to join their roster on Meal &amp; Motion.
+          </p>
+          <p style="color:#444;line-height:1.6">
+            Click the button below to create your account and get started.
+          </p>
+          <a href="${inviteUrl}"
+             style="display:inline-block;margin:24px 0;padding:14px 28px;background:#0ea5e9;color:#fff;text-decoration:none;border-radius:10px;font-weight:600">
+            Accept Invitation
+          </a>
+          <p style="color:#999;font-size:13px;line-height:1.5">
+            If you didn't expect this invitation, you can safely ignore this email.
+          </p>
+          <p style="color:#999;font-size:13px">— The Meal &amp; Motion Team</p>
+        </div>
+      `,
+    }),
   })
 
-  if (error) throw error
+  if (!res.ok) {
+    const body = await res.json().catch(() => null)
+    throw new Error(body?.message || 'Failed to send invite email.')
+  }
+
   return 'invite' as const
 }
 

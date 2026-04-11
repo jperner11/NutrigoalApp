@@ -4,7 +4,6 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import {
   ensureTrainerAccess,
   getAppOrigin,
-  getInviteRedirectUrl,
   getShareableInviteUrl,
   sendInviteEmail,
 } from '@/lib/personalTrainerInvites'
@@ -26,7 +25,7 @@ export async function POST(
   const admin = createAdminClient()
   const { data: profile } = await admin
     .from('user_profiles')
-    .select('role')
+    .select('role, full_name')
     .eq('id', user.id)
     .single()
 
@@ -48,15 +47,20 @@ export async function POST(
   }
 
   const appOrigin = getAppOrigin(request.headers.get('origin'))
-  const redirectTo = getInviteRedirectUrl(appOrigin, invite.id)
+  const inviteUrl = getShareableInviteUrl(appOrigin, invite.invite_token)
 
   try {
-    const deliveryMethod = await sendInviteEmail(invite.invited_email, redirectTo, invite.invited_user_id)
+    await sendInviteEmail(
+      invite.invited_email,
+      inviteUrl,
+      profile?.full_name ?? '',
+      invite.client_first_name,
+    )
 
     await admin
       .from('personal_trainer_invites')
       .update({
-        delivery_method: deliveryMethod,
+        delivery_method: 'invite',
         last_sent_at: new Date().toISOString(),
       })
       .eq('id', invite.id)
@@ -67,6 +71,6 @@ export async function POST(
 
   return NextResponse.json({
     success: true,
-    share_url: getShareableInviteUrl(appOrigin, invite.invite_token),
+    share_url: inviteUrl,
   })
 }

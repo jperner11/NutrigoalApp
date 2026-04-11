@@ -3,7 +3,6 @@ import { Manrope, Plus_Jakarta_Sans } from "next/font/google"
 import "./globals.css"
 import { Toaster } from "react-hot-toast"
 import { BRAND_NAME } from '@/lib/site'
-import InviteRedirectHandler from '@/components/InviteRedirectHandler'
 
 const display = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -33,7 +32,6 @@ export default function RootLayout({
         <div className="min-h-screen bg-[var(--background)]">
           {children}
         </div>
-        <InviteRedirectHandler />
         <Toaster
           position="top-center"
           reverseOrder={false}
