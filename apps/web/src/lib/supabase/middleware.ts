@@ -35,8 +35,7 @@ export async function updateSession(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
-  // Public routes that don't require auth
-  const publicRoutes = [
+  const publicRoutes = new Set([
     '/',
     '/find-coach',
     '/api/coach-match',
@@ -50,11 +49,18 @@ export async function updateSession(request: NextRequest) {
     '/terms',
     '/health-disclaimer',
     '/auth/callback',
-    '/invite',
-  ]
-  const isPublicRoute = publicRoutes.some(route =>
-    pathname === route || pathname.startsWith('/auth/') || pathname.startsWith('/invite/')
-  )
+  ])
+
+  const isInvitePublicApi =
+    pathname.startsWith('/api/personal-trainer/invites/id/') ||
+    (pathname.startsWith('/api/personal-trainer/invites/token/') &&
+      !pathname.endsWith('/respond'))
+
+  const isPublicRoute =
+    publicRoutes.has(pathname) ||
+    pathname.startsWith('/auth/') ||
+    pathname.startsWith('/invite/') ||
+    isInvitePublicApi
 
   // If not authenticated and trying to access protected route, redirect to login
   if (!user && !isPublicRoute) {
