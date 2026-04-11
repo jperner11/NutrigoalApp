@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { Mail, UserCheck, XCircle } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import BrandLogo from '@/components/brand/BrandLogo'
+import { createClient } from '@/lib/supabase/client'
 
 interface InvitePayload {
   invite: {
@@ -40,14 +41,33 @@ export default function AcceptInvitePage() {
 
   const [data, setData] = useState<InvitePayload | null>(null)
   const [loading, setLoading] = useState(true)
+  const [sessionReady, setSessionReady] = useState(false)
   const [submitting, setSubmitting] = useState<'accept' | 'decline' | null>(null)
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     setToken(params.get('token') ?? '')
+
+    // If there's a hash fragment with access_token, let Supabase process it
+    const hash = window.location.hash
+    if (hash && hash.includes('access_token')) {
+      const supabase = createClient()
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+        if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+          subscription.unsubscribe()
+          // Clear the hash
+          window.history.replaceState(null, '', window.location.pathname + window.location.search)
+          setSessionReady(true)
+        }
+      })
+      return () => subscription.unsubscribe()
+    } else {
+      setSessionReady(true)
+    }
   }, [])
 
   useEffect(() => {
+    if (!sessionReady) return
     if (!token) {
       setLoading(false)
       return
@@ -76,7 +96,7 @@ export default function AcceptInvitePage() {
     return () => {
       mounted = false
     }
-  }, [token])
+  }, [token, sessionReady])
 
   async function respond(action: 'accept' | 'decline') {
     if (!token) return

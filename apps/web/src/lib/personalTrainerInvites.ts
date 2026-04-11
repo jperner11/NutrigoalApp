@@ -33,8 +33,7 @@ export function getInviteNextPath(token: string) {
 }
 
 export function getInviteRedirectUrl(origin: string, token: string) {
-  const next = getInviteNextPath(token)
-  return `${origin}/auth/callback?next=${encodeURIComponent(next)}`
+  return `${origin}/invite/accept?token=${encodeURIComponent(token)}`
 }
 
 export function getShareableInviteUrl(origin: string, token: string) {
