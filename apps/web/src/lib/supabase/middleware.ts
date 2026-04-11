@@ -38,6 +38,7 @@ export async function updateSession(request: NextRequest) {
   // Public routes that don't require auth
   const publicRoutes = [
     '/',
+    '/find-coach',
     '/login',
     '/signup',
     '/pricing',
