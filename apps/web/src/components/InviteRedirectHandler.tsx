@@ -9,20 +9,29 @@ export default function InviteRedirectHandler() {
     if (!hash || !hash.includes('type=invite')) return
 
     const supabase = createClient()
+    let handled = false
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event !== 'SIGNED_IN') return
-      if (!session?.user?.email) return
+    const redirectToPasswordSetup = () => {
+      const storedNext = window.localStorage.getItem('pending-password-setup-next')
+      if (!storedNext) return false
 
-      // Unsubscribe immediately to prevent multiple redirects
+      const next = storedNext.startsWith('/') ? storedNext : '/dashboard'
+      window.location.href = `/reset-password?next=${encodeURIComponent(next)}${window.location.hash}`
+      return true
+    }
+
+    const redirectForInviteSession = async (email: string) => {
+      if (handled) return
+      handled = true
+
+      if (redirectToPasswordSetup()) {
+        subscription.unsubscribe()
+        return
+      }
+
       subscription.unsubscribe()
-
-      // Clear the hash so this doesn't re-trigger
       window.history.replaceState(null, '', window.location.pathname)
 
-      const email = session.user.email
-
-      // Query pending invite directly using the client-side session
       const { data: invite } = await supabase
         .from('personal_trainer_invites')
         .select('invite_token')
@@ -38,6 +47,18 @@ export default function InviteRedirectHandler() {
         // New user with no pending invite record — go to onboarding
         window.location.href = '/onboarding'
       }
+    }
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event !== 'SIGNED_IN' && event !== 'INITIAL_SESSION') return
+      if (!session?.user?.email) return
+
+      await redirectForInviteSession(session.user.email)
+    })
+
+    void supabase.auth.getSession().then(async ({ data: sessionData }) => {
+      if (!sessionData.session?.user?.email) return
+      await redirectForInviteSession(sessionData.session.user.email)
     })
 
     return () => subscription.unsubscribe()

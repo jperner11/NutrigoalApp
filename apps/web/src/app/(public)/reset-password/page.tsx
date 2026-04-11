@@ -37,6 +37,8 @@ export default function ResetPasswordPage() {
         toast.error('This password setup link is invalid or has expired.')
       }
 
+      window.localStorage.removeItem('pending-password-setup-next')
+      window.localStorage.removeItem('pending-password-setup-email')
       window.history.replaceState(null, '', window.location.pathname + window.location.search)
       setSessionReady(Boolean(session))
       setSessionChecked(true)

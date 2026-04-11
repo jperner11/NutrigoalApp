@@ -69,11 +69,16 @@ export default function SignupPage() {
       const alreadyRegistered = error.message.toLowerCase().includes('already registered')
 
       if (alreadyRegistered && isInviteSignup) {
+        window.localStorage.setItem('pending-password-setup-next', postSignupNextPath)
+        window.localStorage.setItem('pending-password-setup-email', formData.email.trim().toLowerCase())
+
         const { error: resetError } = await supabase.auth.resetPasswordForEmail(formData.email, {
           redirectTo: `${redirectBase}/reset-password?next=${encodeURIComponent(postSignupNextPath)}`,
         })
 
         if (resetError) {
+          window.localStorage.removeItem('pending-password-setup-next')
+          window.localStorage.removeItem('pending-password-setup-email')
           toast.error('This invite already created an account, but we could not send a password setup email. Please ask your trainer to resend the invite.')
         } else {
           toast.success('This invite already created your account. Check your email for a password setup link.')
