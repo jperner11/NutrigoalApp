@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { normalizeCoachWizardAnswers } from '@/lib/findCoach'
 import { isTrainerRole } from '@nutrigoal/shared'
 
 export async function GET() {
@@ -81,6 +82,9 @@ export async function POST(request: Request) {
   const budgetLabel = String(body?.budget_label ?? '').trim()
   const preferredFormat = String(body?.preferred_format ?? '').trim()
   const selectedOfferId = body?.selected_offer_id ? String(body.selected_offer_id).trim() : null
+  const wizardPreferences = body?.wizard_preferences
+    ? normalizeCoachWizardAnswers(body.wizard_preferences)
+    : null
 
   if (!coachId || !goalSummary) {
     return NextResponse.json({ error: 'Coach and goal summary are required.' }, { status: 400 })
@@ -160,6 +164,7 @@ export async function POST(request: Request) {
       experience_level: profile.training_experience ?? null,
       selected_offer_id: selectedOfferId,
       selected_offer_title: selectedOfferTitle,
+      wizard_preferences: wizardPreferences,
     })
     .select('*')
     .single()

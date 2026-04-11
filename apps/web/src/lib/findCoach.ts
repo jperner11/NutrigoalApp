@@ -172,6 +172,7 @@ export const DEFAULT_COACH_WIZARD_ANSWERS: CoachWizardAnswers = {
 }
 
 const COACH_WIZARD_STORAGE_KEY = 'nutrigoal.find-coach.answers'
+const COACH_WIZARD_LEAD_STORAGE_KEY = 'nutrigoal.find-coach.lead-preferences'
 
 export function normalizeCoachWizardAnswers(
   answers?: Partial<CoachWizardAnswers> | null
@@ -213,6 +214,18 @@ export function buildWizardBudgetLabel(answers: CoachWizardAnswers) {
   )}/${answers.budget_period === 'one_time' ? 'session' : answers.budget_period === 'weekly' ? 'week' : 'month'}`
 }
 
+export function buildWizardGoalSummary(answers: CoachWizardAnswers) {
+  const detail = answers.context_text.trim()
+  if (detail) return detail
+
+  const focus = answers.focus_areas.filter((item) => item !== 'No preference').slice(0, 2)
+  if (answers.goal && focus.length > 0) {
+    return `${answers.goal} with a focus on ${focus.join(' and ')}`
+  }
+
+  return answers.goal ?? ''
+}
+
 export function saveWizardAnswers(answers: CoachWizardAnswers) {
   if (typeof window === 'undefined') return
   window.localStorage.setItem(COACH_WIZARD_STORAGE_KEY, JSON.stringify(answers))
@@ -234,4 +247,27 @@ export function loadWizardAnswers(): CoachWizardAnswers | null {
 export function clearWizardAnswers() {
   if (typeof window === 'undefined') return
   window.localStorage.removeItem(COACH_WIZARD_STORAGE_KEY)
+}
+
+export function saveLeadWizardPreferences(answers: CoachWizardAnswers) {
+  if (typeof window === 'undefined') return
+  window.localStorage.setItem(COACH_WIZARD_LEAD_STORAGE_KEY, JSON.stringify(answers))
+}
+
+export function loadLeadWizardPreferences(): CoachWizardAnswers | null {
+  if (typeof window === 'undefined') return null
+
+  const raw = window.localStorage.getItem(COACH_WIZARD_LEAD_STORAGE_KEY)
+  if (!raw) return null
+
+  try {
+    return normalizeCoachWizardAnswers(JSON.parse(raw) as Partial<CoachWizardAnswers>)
+  } catch {
+    return null
+  }
+}
+
+export function clearLeadWizardPreferences() {
+  if (typeof window === 'undefined') return
+  window.localStorage.removeItem(COACH_WIZARD_LEAD_STORAGE_KEY)
 }

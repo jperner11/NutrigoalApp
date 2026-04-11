@@ -7,6 +7,12 @@ import { Compass, ExternalLink, Loader2, MapPin, MessageSquare, Search, SlidersH
 import { toast } from 'react-hot-toast'
 import { useUser } from '@/hooks/useUser'
 import { formatCoachPriceRange, formatOfferPrice } from '@/lib/coachMarketplace'
+import {
+  buildWizardBudgetLabel,
+  buildWizardGoalSummary,
+  clearLeadWizardPreferences,
+  loadLeadWizardPreferences,
+} from '@/lib/findCoach'
 import { isManagedClientRole, isTrainerRole } from '@nutrigoal/shared'
 
 interface DiscoverCoach {
@@ -50,6 +56,7 @@ export default function DiscoverPage() {
   const [search, setSearch] = useState('')
   const [formatFilter, setFormatFilter] = useState('all')
   const [selectedCoach, setSelectedCoach] = useState<DiscoverCoach | null>(null)
+  const [leadWizardPreferences, setLeadWizardPreferences] = useState(loadLeadWizardPreferences())
   const [submitting, setSubmitting] = useState(false)
   const [leadForm, setLeadForm] = useState({
     goal_summary: '',
@@ -124,6 +131,7 @@ export default function DiscoverPage() {
         budget_label: leadForm.budget_label,
         message: leadForm.message,
         selected_offer_id: leadForm.selected_offer_id || null,
+        wizard_preferences: leadWizardPreferences,
       }),
     })
 
@@ -136,6 +144,10 @@ export default function DiscoverPage() {
     }
 
     toast.success('Coaching request sent.')
+    if (leadWizardPreferences) {
+      clearLeadWizardPreferences()
+      setLeadWizardPreferences(null)
+    }
     setSelectedCoach(null)
     setLeadForm({ goal_summary: '', preferred_format: '', budget_label: '', message: '', selected_offer_id: '' })
   }
@@ -278,7 +290,13 @@ export default function DiscoverPage() {
                     type="button"
                     onClick={() => {
                       setSelectedCoach(coach)
-                      setLeadForm((prev) => ({ ...prev, selected_offer_id: '' }))
+                      setLeadForm((prev) => ({
+                        ...prev,
+                        selected_offer_id: '',
+                        goal_summary: prev.goal_summary || (leadWizardPreferences ? buildWizardGoalSummary(leadWizardPreferences) : ''),
+                        budget_label: prev.budget_label || (leadWizardPreferences ? buildWizardBudgetLabel(leadWizardPreferences) : ''),
+                        message: prev.message || leadWizardPreferences?.additional_notes || '',
+                      }))
                     }}
                     disabled={!canRequestCoach || !coach.accepting_new_clients}
                     className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 px-4 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"

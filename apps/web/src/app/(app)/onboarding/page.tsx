@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   ArrowRight, ArrowLeft, User, Utensils,
   Calculator, Heart, Dumbbell, Briefcase, Calendar, Sparkles, Users, ClipboardList, MessageSquare,
@@ -19,6 +19,12 @@ import {
 import type { UserMetrics, PersonalTrainerCustomIntakeQuestion } from '@nutrigoal/shared'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
+import {
+  clearWizardAnswers,
+  loadWizardAnswers,
+  saveLeadWizardPreferences,
+  type CoachWizardAnswers,
+} from '@/lib/findCoach'
 import { toast } from 'react-hot-toast'
 import { isManagedClientRole, isTrainerRole } from '@nutrigoal/shared'
 
@@ -42,8 +48,44 @@ function fmt12(t: string) {
   return `${h === 0 ? 12 : h > 12 ? h - 12 : h}:${m.toString().padStart(2, '0')} ${ampm}`
 }
 
+function mapWizardGoal(goal: string | null): UserMetrics['goal'] | null {
+  if (goal === 'Fat loss') return 'cutting'
+  if (goal === 'Muscle gain') return 'bulking'
+  if (goal === 'Body recomp') return 'maintenance'
+  if (goal === 'General fitness' || goal === 'Lifestyle/wellness' || goal === 'Sport-specific') return 'maintenance'
+  return null
+}
+
+function mapWizardTimeline(timeline: string | null) {
+  if (timeline === '1-4 weeks') return '4_weeks'
+  if (timeline === '1-3 months') return '12_weeks'
+  if (timeline === '3-6 months') return '6_months'
+  if (timeline === 'As long as it takes') return 'steady'
+  if (timeline === 'I just need one session') return '4_weeks'
+  return null
+}
+
+function mapWizardExperience(experience: string | null) {
+  if (experience === 'Complete beginner') return 'beginner'
+  if (experience === 'Some experience') return 'beginner'
+  if (experience === 'Intermediate') return 'intermediate'
+  if (experience === 'Advanced') return 'advanced'
+  return null
+}
+
+function mapWizardFocusAreas(focusAreas: string[]) {
+  return Array.from(new Set(focusAreas.flatMap((area) => {
+    if (area === 'Weight training') return ['strength']
+    if (area === 'Cardio' || area === 'HIIT' || area === 'Sport performance') return ['endurance']
+    if (area === 'Mobility') return ['functional']
+    return []
+  })))
+}
+
 export default function OnboardingPage() {
   const { profile } = useUser()
+  const wizardPrefillApplied = useRef(false)
+  const wizardAnswersRef = useRef<CoachWizardAnswers | null>(null)
   const [step, setStep] = useState(0)
   const [saving, setSaving] = useState(false)
   const isTrainer = isTrainerRole(profile?.role)
@@ -61,6 +103,27 @@ export default function OnboardingPage() {
       window.location.href = '/dashboard'
     }
   }, [profile])
+
+  useEffect(() => {
+    if (!profile || isTrainer || wizardPrefillApplied.current) return
+
+    const wizardAnswers = loadWizardAnswers()
+    if (!wizardAnswers) return
+
+    wizardAnswersRef.current = wizardAnswers
+    wizardPrefillApplied.current = true
+
+    const mappedGoal = mapWizardGoal(wizardAnswers.goal)
+    const mappedTimeline = mapWizardTimeline(wizardAnswers.timeline)
+    const mappedExperience = mapWizardExperience(wizardAnswers.experience_level)
+    const mappedTrainingStyles = mapWizardFocusAreas(wizardAnswers.focus_areas)
+
+    if (mappedGoal) setGoal(mappedGoal)
+    if (mappedTimeline) setGoalTimeline(mappedTimeline)
+    if (mappedExperience) setExperience(mappedExperience)
+    if (mappedTrainingStyles.length > 0) setTrainingStyles(mappedTrainingStyles)
+    if (wizardAnswers.context_text.trim()) setDesiredOutcome(wizardAnswers.context_text.trim())
+  }, [profile, isTrainer])
 
   useEffect(() => {
     async function loadCoachQuestions() {
@@ -410,6 +473,11 @@ export default function OnboardingPage() {
           }
         }
       }
+    }
+
+    if (wizardAnswersRef.current) {
+      saveLeadWizardPreferences(wizardAnswersRef.current)
+      clearWizardAnswers()
     }
 
     toast.success('Profile setup complete!')

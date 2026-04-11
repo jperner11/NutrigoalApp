@@ -12,6 +12,7 @@ import {
   Users,
 } from 'lucide-react'
 import BrandLogo from '@/components/brand/BrandLogo'
+import LandingCoachCta from '@/components/marketing/LandingCoachCta'
 import PublicFooter from '@/components/marketing/PublicFooter'
 
 const pillars = [
@@ -81,13 +82,16 @@ export default function LandingPage() {
               Meal & Motion brings AI planning, coach-led delivery, and coach discovery into one clear nutrition and
               training system built to help people feel supported, steady, and in motion.
             </p>
+            <div className="mt-8 max-w-2xl">
+              <LandingCoachCta />
+            </div>
             <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-              <Link href="/signup" className="btn-primary inline-flex items-center justify-center gap-2 rounded-2xl px-7 py-4 text-base font-semibold">
-                Start your performance setup
+              <Link href="/find-coach" className="btn-primary inline-flex items-center justify-center gap-2 rounded-2xl px-7 py-4 text-base font-semibold">
+                Find your coach
                 <ArrowRight className="h-5 w-5" />
               </Link>
-              <Link href="/pricing" className="btn-secondary inline-flex items-center justify-center rounded-2xl px-7 py-4 text-base font-semibold">
-                Explore plans
+              <Link href="/signup" className="btn-secondary inline-flex items-center justify-center rounded-2xl px-7 py-4 text-base font-semibold">
+                Start your performance setup
               </Link>
             </div>
             <div className="mt-10 grid max-w-2xl grid-cols-3 gap-4">
