@@ -35,7 +35,7 @@ export default function AcceptInvitePage() {
   const router = useRouter()
   const [token, setToken] = useState('')
   const nextParam = useMemo(
-    () => `/invite/accept?token=${encodeURIComponent(token)}`,
+    () => token ? `/invite/accept?token=${encodeURIComponent(token)}` : '/invite/accept',
     [token]
   )
 
@@ -68,15 +68,26 @@ export default function AcceptInvitePage() {
 
   useEffect(() => {
     if (!sessionReady) return
-    if (!token) {
-      setLoading(false)
-      return
-    }
 
     let mounted = true
 
     async function loadInvite() {
-      const response = await fetch(`/api/personal-trainer/invites/token/${encodeURIComponent(token)}`)
+      let resolvedToken = token
+
+      // If no token in URL, look up pending invite by authenticated user's email
+      if (!resolvedToken) {
+        const res = await fetch('/api/personal-trainer/invites/pending-for-user')
+        const result = await res.json().catch(() => null)
+        if (result?.token) {
+          resolvedToken = result.token
+          setToken(resolvedToken)
+        } else {
+          if (mounted) setLoading(false)
+          return
+        }
+      }
+
+      const response = await fetch(`/api/personal-trainer/invites/token/${encodeURIComponent(resolvedToken)}`)
       const payload = await response.json().catch(() => null)
 
       if (!mounted) return
@@ -119,20 +130,6 @@ export default function AcceptInvitePage() {
     toast.success(action === 'accept' ? 'Trainer connected. Let’s finish your intake.' : 'Invite declined.')
     router.push(action === 'accept' ? '/onboarding' : '/login')
     router.refresh()
-  }
-
-  if (!token) {
-    return (
-      <div className="auth-bg min-h-screen px-4 py-10">
-        <div className="mx-auto max-w-2xl">
-          <BrandLogo href="/" />
-          <div className="glass-card mt-10 rounded-[32px] p-8 text-center">
-            <h1 className="text-3xl font-bold text-[var(--foreground)]">Invite link missing</h1>
-            <p className="mt-3 text-[var(--muted)]">This invite link is incomplete. Ask your trainer to resend it.</p>
-          </div>
-        </div>
-      </div>
-    )
   }
 
   const invite = data?.invite
