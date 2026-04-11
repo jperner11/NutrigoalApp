@@ -48,7 +48,7 @@ export async function POST(
   }
 
   const appOrigin = getAppOrigin(request.headers.get('origin'))
-  const redirectTo = getInviteRedirectUrl(appOrigin, invite.invite_token)
+  const redirectTo = getInviteRedirectUrl(appOrigin, invite.id)
 
   try {
     const deliveryMethod = await sendInviteEmail(invite.invited_email, redirectTo, invite.invited_user_id)
