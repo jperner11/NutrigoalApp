@@ -91,7 +91,7 @@ export default function SignupScreen() {
             .from('nutritionist_packages')
             .upsert({
               nutritionist_id: user.id,
-              max_clients: 10,
+              max_clients: 15,
             }, { onConflict: 'nutritionist_id' })
         }
       }
