@@ -36,17 +36,40 @@ const individualTiers = [
 
 const coachRoadmap = [
   {
-    title: 'Launch with one coach plan',
-    body: 'Coach Pro is the complete launch workspace: delivery, intake, discovery visibility, and lead management in one paid system.',
+    title: 'Included now',
+    body: 'Coach Pro already covers client delivery, messaging, intake, progress tracking, AI planning, and marketplace visibility for up to 15 clients.',
   },
   {
-    title: 'Coach offers stay separate',
-    body: 'Platform billing pays for the coach workspace. The prices coaches show to prospects belong in their marketplace offers.',
+    title: 'Coming next',
+    body: 'The next SLC upgrades are master templates, automated program delivery, coach video uploads, and better compliance reporting.',
   },
   {
-    title: 'Delay billing complexity on purpose',
-    body: 'Seat tiers, overages, and annual billing can wait until conversion patterns are real. V1 should stay simple, lovable, and complete.',
+    title: 'Expand later',
+    body: 'Payments, Zapier, health integrations, and bigger studio-style tiers should only come after real coach feedback and usage data.',
   },
+]
+
+const coachIncludedNow = [
+  'Up to 15 active clients',
+  'Workout and nutrition plan delivery',
+  '1:1 coach-client messaging',
+  'Progress photos, measurements, and workout tracking',
+  'AI plan generation and suggestions',
+  'Custom intake, leads inbox, and public offers',
+]
+
+const coachComingNext = [
+  'Master workouts and reusable templates',
+  'Automated program delivery',
+  'Coach video uploads inside client plans',
+  'Coach compliance dashboard',
+]
+
+const coachFutureAddOns = [
+  'Stripe-integrated coach payments',
+  'Zapier and workflow automations',
+  'Apple Health / Health Connect',
+  'Fitbit, Garmin, Withings, MyFitnessPal',
 ]
 
 const pricingPrinciples = [
@@ -246,9 +269,9 @@ export default function PricingPage() {
         <section className="mt-14">
           <div className="mb-8 max-w-3xl">
             <div className="eyebrow mb-4">Coaches</div>
-            <h2 className="text-4xl font-bold text-[var(--foreground)]">V1 launches with one paid coach workspace.</h2>
+            <h2 className="text-4xl font-bold text-[var(--foreground)]">Coach Pro is the first SLC offer to test with real PTs.</h2>
             <p className="mt-4 text-base leading-7 text-[var(--muted)]">
-              This is the cleanest launch model: one coach plan that covers client delivery, coach onboarding, public marketplace visibility, and inbound lead management. More complex billing can come later, after we validate conversion and demand.
+              This version is intentionally simple, lovable, and complete enough to put in front of coaches now. It combines the most useful lower-tier Trainerize-style value into one early coach offer without pretending we already ship every advanced add-on.
             </p>
           </div>
 
@@ -256,13 +279,16 @@ export default function PricingPage() {
             <div className="relative overflow-hidden rounded-[30px] border border-[rgba(29,168,240,0.32)] bg-[linear-gradient(180deg,rgba(13,27,42,0.05),rgba(237,248,255,0.95))] p-8 shadow-[0_20px_48px_rgba(13,27,42,0.08)]">
               <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-[var(--brand-100)] px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-[#0f4262]">
                 <Users className="h-3.5 w-3.5" />
-                Coach workspace
+                Early coach offer
               </div>
               <div className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--muted-soft)]">Live in v1</div>
               <h3 className="mt-4 font-display text-3xl font-bold text-[var(--foreground)]">{coachPlan.name}</h3>
               <div className="mt-5 flex items-end gap-2">
                 <span className="font-display text-6xl font-bold text-[var(--foreground)]">${coachPlan.price}</span>
                 <span className="mb-2 text-sm font-semibold text-[var(--muted)]">/month</span>
+              </div>
+              <div className="mt-3 inline-flex rounded-full bg-[var(--brand-100)] px-4 py-2 text-sm font-semibold text-[var(--brand-900)]">
+                Grow with us pricing for the first wave of PTs
               </div>
               <p className="mt-4 text-sm leading-7 text-[var(--muted)]">
                 Built for Personal Trainers and coaches who want to manage clients they already have, get discovered by new ones, and run both flows inside the same product.
@@ -297,9 +323,9 @@ export default function PricingPage() {
             <div className="space-y-6">
               <div className="panel-strong p-6">
                 <div className="eyebrow mb-4">Pricing logic</div>
-                <h3 className="font-display text-2xl font-bold text-[var(--foreground)]">Why this structure works for launch</h3>
+                <h3 className="font-display text-2xl font-bold text-[var(--foreground)]">Why this is the right first coach package</h3>
                 <p className="mt-3 text-sm leading-7 text-[var(--muted)]">
-                  Discovery stays open to every individual, so coaches can actually receive demand. The coach subscription then monetizes the operating system: intake, delivery, pipeline, and visibility.
+                  Discovery stays open to every individual, so coaches can actually receive demand. Coach Pro then monetizes the software layer: intake, delivery, pipeline, and visibility, while coaches keep pricing their own service separately.
                 </p>
               </div>
 
@@ -311,6 +337,50 @@ export default function PricingPage() {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+
+          <div className="mt-6 grid gap-4 lg:grid-cols-3">
+            <div className="surface-card p-5">
+              <div className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--muted-soft)]">Included now</div>
+              <ul className="mt-4 space-y-3">
+                {coachIncludedNow.map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-sm leading-6 text-[var(--muted)]">
+                    <div className="mt-0.5 rounded-full bg-[var(--brand-100)] p-1 text-[var(--brand-900)]">
+                      <Check className="h-3.5 w-3.5" />
+                    </div>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="surface-card p-5">
+              <div className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--muted-soft)]">Coming next</div>
+              <ul className="mt-4 space-y-3">
+                {coachComingNext.map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-sm leading-6 text-[var(--muted)]">
+                    <div className="mt-0.5 rounded-full bg-[rgba(29,168,240,0.12)] p-1 text-[var(--brand-900)]">
+                      <Sparkles className="h-3.5 w-3.5" />
+                    </div>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="surface-card p-5">
+              <div className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--muted-soft)]">Future add-ons</div>
+              <ul className="mt-4 space-y-3">
+                {coachFutureAddOns.map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-sm leading-6 text-[var(--muted)]">
+                    <div className="mt-0.5 rounded-full bg-slate-100 p-1 text-slate-700">
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </div>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </section>

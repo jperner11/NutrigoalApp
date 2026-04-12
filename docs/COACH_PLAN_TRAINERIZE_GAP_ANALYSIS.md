@@ -10,6 +10,26 @@ Date: 2026-04-12
 - Positioning: a grow-with-us launch offer that is still useful for coaches with a real roster
 - Packaging intent: merge the spirit of lower-end `Basic`, `Grow`, and `Pro` coach value into one simple launch plan
 
+### SLC tester version
+
+- Included now:
+  - plan delivery
+  - coach-client messaging
+  - progress tracking
+  - AI planning
+  - intake, leads, marketplace visibility
+
+- Coming next:
+  - templates
+  - automated delivery
+  - coach video uploads
+  - compliance dashboards
+
+- Future add-ons:
+  - payments
+  - automations
+  - health integrations
+
 ### How to think about the business model
 
 - The platform subscription should sell the coach workspace, not the coach's service itself.
