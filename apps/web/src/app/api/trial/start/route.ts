@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getStripe, PRICE_IDS } from '@/lib/stripe'
+import { ensureBillingProfile } from '@/lib/billing'
 
 const TRIAL_DAYS = 7
 
@@ -13,12 +14,7 @@ export async function POST() {
   }
 
   const admin = createAdminClient()
-
-  const { data: profile } = await admin
-    .from('user_profiles')
-    .select('role, trial_ends_at, email')
-    .eq('id', user.id)
-    .single()
+  const profile = await ensureBillingProfile(admin, user)
 
   if (!profile) {
     return NextResponse.json({ message: 'Profile not found' }, { status: 404 })

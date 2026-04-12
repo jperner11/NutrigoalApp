@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getStripe, PRICE_IDS } from '@/lib/stripe'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { ensureBillingProfile } from '@/lib/billing'
 
 export async function POST(request: Request) {
   const supabase = await createClient()
@@ -13,13 +14,23 @@ export async function POST(request: Request) {
 
   const { plan } = await request.json()
 
-  if (!plan || !PRICE_IDS[plan]) {
+  if (!plan) {
     return NextResponse.json({ message: 'Invalid plan' }, { status: 400 })
+  }
+
+  const adminSupabase = createAdminClient()
+  await ensureBillingProfile(adminSupabase, user)
+
+  if (!PRICE_IDS[plan]) {
+    return NextResponse.json({
+      message: 'Checkout for this plan is not configured yet.',
+      code: 'checkout_not_configured',
+      fallbackPath: '/support',
+    }, { status: 503 })
   }
 
   const priceId = PRICE_IDS[plan]!
   const origin = request.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-  const adminSupabase = createAdminClient()
 
   // Look up existing Stripe customer ID
   const { data: existingSub } = await adminSupabase

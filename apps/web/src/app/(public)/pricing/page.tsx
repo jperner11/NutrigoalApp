@@ -98,6 +98,13 @@ export default function PricingPage() {
     return plan === 'personal_trainer' ? '/signup?role=personal_trainer' : '/signup?role=free'
   }
 
+  function handleCheckoutFallback(data: { message?: string; fallbackPath?: string } | null | undefined) {
+    toast.error(data?.message || 'Checkout is not available right now')
+    if (data?.fallbackPath) {
+      window.location.href = data.fallbackPath
+    }
+  }
+
   async function handleCheckout(plan: string) {
     setLoadingPlan(plan)
     try {
@@ -109,6 +116,10 @@ export default function PricingPage() {
       const data = await res.json()
       if (res.status === 401) {
         window.location.href = getSignupHref(plan)
+        return
+      }
+      if (res.status === 503) {
+        handleCheckoutFallback(data)
         return
       }
       if (data.url) {

@@ -19,6 +19,13 @@ export default function UpgradeModal({ isOpen, onClose, feature }: UpgradeModalP
 
   if (!isOpen) return null
 
+  function handleCheckoutFallback(data: { message?: string; fallbackPath?: string } | null | undefined) {
+    toast.error(data?.message || 'Checkout is not available right now')
+    if (data?.fallbackPath) {
+      window.location.href = data.fallbackPath
+    }
+  }
+
   async function handleUpgrade(plan: string) {
     setLoadingPlan(plan)
     try {
@@ -30,6 +37,10 @@ export default function UpgradeModal({ isOpen, onClose, feature }: UpgradeModalP
       const data = await res.json()
       if (res.status === 401) {
         window.location.href = plan === 'personal_trainer' ? '/signup?role=personal_trainer' : '/signup?role=free'
+        return
+      }
+      if (res.status === 503) {
+        handleCheckoutFallback(data)
         return
       }
       if (data.url) {
