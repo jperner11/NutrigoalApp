@@ -27,6 +27,7 @@ import {
 } from '@/lib/constants'
 import { calculateNutritionTargets } from '@/lib/nutrition'
 import type { ActivityLevel, FitnessGoal, Gender, PersonalTrainerCustomIntakeQuestion, CustomIntakeQuestionType, CoachPublicProfile, CoachOffer, CoachOfferBillingPeriod } from '@/lib/supabase/types'
+import { BaseClientIntakePreview } from '@/components/onboarding/BaseClientIntakePreview'
 import { SUPPORT_EMAIL } from '@/lib/site'
 import { COACH_MARKETPLACE_CURRENCIES, COACH_OFFER_BILLING_PERIODS, buildCoachProfileSlug, formatCoachPriceRange, formatOfferPrice } from '@/lib/coachMarketplace'
 import { isTrainerRole } from '@nutrigoal/shared'
@@ -1166,6 +1167,8 @@ export default function SettingsPage() {
                 Add up to 5 extra questions after the standard client intake. These are best for your coaching preferences, equipment checks, and prospect qualification.
               </p>
             </div>
+
+            <BaseClientIntakePreview />
 
             <div className="flex items-center justify-between rounded-2xl border border-gray-200 bg-white p-4">
               <div>

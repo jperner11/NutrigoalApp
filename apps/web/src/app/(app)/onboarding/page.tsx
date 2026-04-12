@@ -27,10 +27,16 @@ import {
 } from '@/lib/findCoach'
 import { toast } from 'react-hot-toast'
 import { isManagedClientRole, isTrainerRole } from '@nutrigoal/shared'
+import { BaseClientIntakePreview } from '@/components/onboarding/BaseClientIntakePreview'
+import {
+  TrainerCustomQuestionsEditor,
+  createDraftCustomQuestion,
+  type DraftCustomQuestion,
+} from '@/components/onboarding/TrainerCustomQuestionsEditor'
 
 const CLIENT_STEPS = ['My Stats', 'Lifestyle', 'Food Preferences', 'Snack Habits', 'Health', 'Training', 'Goals', 'Schedule', 'Review']
 const MANAGED_CLIENT_STEPS = ['My Stats', 'Lifestyle', 'Food Preferences', 'Snack Habits', 'Health', 'Training', 'Goals', 'Schedule', 'Coach Questions', 'Review']
-const TRAINER_STEPS = ['Coach Profile', 'Ideal Clients', 'Coaching Style', 'Workflow']
+const TRAINER_STEPS = ['Coach Profile', 'Ideal Clients', 'Coaching Style', 'Client Intake', 'Workflow']
 const COACH_SPECIALTY_OPTIONS = ['Fat loss', 'Muscle gain', 'General fitness', 'Lifestyle nutrition', 'Strength training', 'Online coaching']
 const COACH_SERVICE_OPTIONS = ['Training plans', 'Nutrition guidance', 'Habit coaching', 'Check-ins', 'Messaging support', 'Progress reviews']
 const COACH_FORMAT_OPTIONS = ['Online', 'In person', 'Hybrid']
@@ -173,6 +179,40 @@ export default function OnboardingPage() {
   const [coachIntakeRequirements, setCoachIntakeRequirements] = useState<string[]>(profile?.coach_intake_requirements ?? [])
   const [coachPostIntakeAction, setCoachPostIntakeAction] = useState(profile?.coach_post_intake_action ?? 'review_and_plan')
   const [coachAppFocus, setCoachAppFocus] = useState(profile?.coach_app_focus ?? 'client_management')
+  const [trainerDraftQuestions, setTrainerDraftQuestions] = useState<DraftCustomQuestion[]>([])
+  const initialTrainerQuestionIdsRef = useRef<string[]>([])
+
+  useEffect(() => {
+    if (!profile || !isTrainer) return
+    const supabase = createClient()
+    let cancelled = false
+    supabase
+      .from('personal_trainer_custom_intake_questions')
+      .select('*')
+      .eq('trainer_id', profile.id)
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: true })
+      .then(({ data }) => {
+        if (cancelled || !data) return
+        const rows = data as PersonalTrainerCustomIntakeQuestion[]
+        initialTrainerQuestionIdsRef.current = rows.map((r) => r.id)
+        setTrainerDraftQuestions(
+          rows.map((q) =>
+            createDraftCustomQuestion({
+              localId: q.id,
+              label: q.label,
+              help_text: q.help_text ?? '',
+              type: q.type,
+              options: q.options ?? [],
+              required: q.required,
+            })
+          )
+        )
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [profile, isTrainer])
 
   // ── Step 0: My Stats ──
   const [fullName, setFullName] = useState(profile?.full_name ?? '')
@@ -336,6 +376,70 @@ export default function OnboardingPage() {
       toast.error('Failed to save coach setup: ' + error.message)
       setSaving(false)
       return
+    }
+
+    // Persist custom intake questions the coach drafted during onboarding.
+    const validDrafts = trainerDraftQuestions.filter((q) => q.label.trim().length > 0)
+    const existingDrafts = validDrafts.filter((q) => !q.localId.startsWith('tmp-'))
+    const newDrafts = validDrafts.filter((q) => q.localId.startsWith('tmp-'))
+    const keptIds = new Set(existingDrafts.map((q) => q.localId))
+    const toDeleteIds = initialTrainerQuestionIdsRef.current.filter((id) => !keptIds.has(id))
+
+    if (toDeleteIds.length > 0) {
+      const { error: deleteError } = await supabase
+        .from('personal_trainer_custom_intake_questions')
+        .delete()
+        .in('id', toDeleteIds)
+      if (deleteError) {
+        toast.error('Failed to remove old questions: ' + deleteError.message)
+        setSaving(false)
+        return
+      }
+    }
+
+    if (existingDrafts.length > 0) {
+      const { error: upsertError } = await supabase
+        .from('personal_trainer_custom_intake_questions')
+        .upsert(
+          existingDrafts.map((q, i) => ({
+            id: q.localId,
+            trainer_id: profile.id,
+            label: q.label.trim(),
+            help_text: q.help_text.trim() || null,
+            type: q.type,
+            options: q.options,
+            required: q.required,
+            sort_order: i,
+            is_active: true,
+          }))
+        )
+      if (upsertError) {
+        toast.error('Failed to save questions: ' + upsertError.message)
+        setSaving(false)
+        return
+      }
+    }
+
+    if (newDrafts.length > 0) {
+      const { error: insertError } = await supabase
+        .from('personal_trainer_custom_intake_questions')
+        .insert(
+          newDrafts.map((q, idx) => ({
+            trainer_id: profile.id,
+            label: q.label.trim(),
+            help_text: q.help_text.trim() || null,
+            type: q.type,
+            options: q.options,
+            required: q.required,
+            sort_order: existingDrafts.length + idx,
+            is_active: true,
+          }))
+        )
+      if (insertError) {
+        toast.error('Failed to add new questions: ' + insertError.message)
+        setSaving(false)
+        return
+      }
     }
 
     toast.success('Coach setup complete!')
@@ -644,6 +748,24 @@ export default function OnboardingPage() {
           </div>
         )
       case 3:
+        return (
+          <div className="space-y-6">
+            <StepHeader
+              icon={<ClipboardList className="h-12 w-12 text-purple-600" />}
+              title="Your custom client intake"
+              subtitle="Add questions your clients must answer after the base onboarding. Check what we already collect first so you don't duplicate it."
+            />
+            <BaseClientIntakePreview />
+            <TrainerCustomQuestionsEditor
+              value={trainerDraftQuestions}
+              onChange={setTrainerDraftQuestions}
+            />
+            <p className="text-xs text-gray-500">
+              You can edit these anytime from <span className="font-semibold">Settings → Coach Intake</span>.
+            </p>
+          </div>
+        )
+      case 4:
         return (
           <div className="space-y-6">
             <StepHeader
