@@ -11,8 +11,7 @@ export const PRICING = {
       'Discover Coaches included',
       'Browse coach profiles and send coaching requests',
       'AI-generated meal & training plan preview',
-      'View 1 meal of your choice',
-      'View 1 training day of your choice',
+      'View 1 meal and 1 training day',
       'Water intake tracking',
       'Weight logging',
     ],
@@ -23,7 +22,6 @@ export const PRICING = {
     regenCooldownDays: 7, // 1x per week rolling
     features: [
       'Everything in Free',
-      'Discover Coaches included',
       'Full meal plan access',
       'Full training plan access',
       'Regenerate plans 1×/week',
@@ -42,6 +40,7 @@ export const PRICING = {
       'Discover Coaches included',
       'Unlimited plan regeneration',
       'Priority AI generation',
+      'Best for heavier self-serve usage',
     ],
   },
   nutritionist: {
@@ -52,13 +51,12 @@ export const PRICING = {
     extraClientPrice: 3.99,
     features: [
       'Everything in Unlimited',
-      'Manage up to 10 active clients',
+      'Manage up to 10 active clients in v1',
       'Coach onboarding and custom intake',
       'Create plans and monitor client progress',
       'Leads inbox and coaching request pipeline',
-      'Marketplace profile, offers, and pricing',
+      'Marketplace profile, public offers, and visibility',
       'Public coach listing in Discover (beta)',
-      'Additional clients at $3.99/mo each',
     ],
   },
   nutritionist_client: {
@@ -82,13 +80,12 @@ export const PRICING = {
     extraClientPrice: 3.99,
     features: [
       'Everything in Unlimited',
-      'Manage up to 10 active clients',
+      'Manage up to 10 active clients in v1',
       'Coach onboarding and custom intake',
       'Create plans and monitor client progress',
       'Leads inbox and coaching request pipeline',
-      'Marketplace profile, offers, and pricing',
+      'Marketplace profile, public offers, and visibility',
       'Public coach listing in Discover (beta)',
-      'Additional clients at $3.99/mo each',
     ],
   },
   personal_trainer_client: {

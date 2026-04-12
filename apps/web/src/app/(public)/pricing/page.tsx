@@ -18,15 +18,15 @@ const individualTiers = [
   },
   {
     key: 'pro' as const,
-    strap: 'Most chosen',
-    badge: 'Best self-serve value',
+    strap: 'Main plan',
+    badge: '7-day trial available',
     accent: 'border-[rgba(29,168,240,0.32)] bg-[linear-gradient(180deg,rgba(237,248,255,0.95),rgba(255,255,255,0.95))]',
     buttonClass: 'btn-primary',
-    buttonLabel: 'Start Pro',
+    buttonLabel: 'Start 7-day Pro trial',
   },
   {
     key: 'unlimited' as const,
-    strap: 'Full self-serve access',
+    strap: 'Power users',
     badge: 'Heavy AI usage',
     accent: 'border-[rgba(13,27,42,0.2)] bg-[linear-gradient(180deg,rgba(13,27,42,0.96),rgba(24,44,66,0.96))] text-white',
     buttonClass: 'btn-accent',
@@ -37,15 +37,15 @@ const individualTiers = [
 const coachRoadmap = [
   {
     title: 'Launch with one coach plan',
-    body: 'V1 keeps coach billing simple: one paid workspace that includes delivery tools, discovery, and lead management.',
+    body: 'Coach Pro is the complete launch workspace: delivery, intake, discovery visibility, and lead management in one paid system.',
   },
   {
-    title: 'Expand into seat-based tiers next',
-    body: 'As usage grows, the coach side can evolve into Starter, Growth, and Studio-style seat tiers without changing the product story.',
+    title: 'Coach offers stay separate',
+    body: 'Platform billing pays for the coach workspace. The prices coaches show to prospects belong in their marketplace offers.',
   },
   {
-    title: 'Keep marketplace access bundled',
-    body: 'During beta, coaches should not pay per lead. Paid coach plans should include visibility, offers, and pipeline tools by default.',
+    title: 'Delay billing complexity on purpose',
+    body: 'Seat tiers, overages, and annual billing can wait until conversion patterns are real. V1 should stay simple, lovable, and complete.',
   },
 ]
 
@@ -62,7 +62,7 @@ const pricingPrinciples = [
   },
   {
     title: 'Coaches pay for the workspace',
-    body: 'The paid coach subscription covers client delivery, intake, lead flow, and public marketplace visibility in one system.',
+    body: 'The paid coach subscription covers client delivery, intake, lead flow, and public marketplace visibility in one complete system.',
     icon: Users,
   },
 ]
@@ -70,6 +70,10 @@ const pricingPrinciples = [
 export default function PricingPage() {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null)
   const coachPlan = PRICING.personal_trainer
+
+  function getSignupHref(plan: string) {
+    return plan === 'personal_trainer' ? '/signup?role=personal_trainer' : '/signup?role=free'
+  }
 
   async function handleCheckout(plan: string) {
     setLoadingPlan(plan)
@@ -81,7 +85,7 @@ export default function PricingPage() {
       })
       const data = await res.json()
       if (res.status === 401) {
-        window.location.href = '/signup'
+        window.location.href = getSignupHref(plan)
         return
       }
       if (data.url) {
@@ -92,6 +96,37 @@ export default function PricingPage() {
     } catch {
       toast.error('Something went wrong')
     }
+    setLoadingPlan(null)
+  }
+
+  async function handleStartTrial() {
+    setLoadingPlan('pro')
+    try {
+      const res = await fetch('/api/trial/start', { method: 'POST' })
+      const data = await res.json().catch(() => ({}))
+
+      if (res.status === 401) {
+        window.location.href = getSignupHref('free')
+        return
+      }
+
+      if (res.ok) {
+        toast.success('Your 7-day Pro trial is live.')
+        window.location.href = '/dashboard'
+        return
+      }
+
+      if (res.status === 400 && data.message === 'Trial not applicable') {
+        setLoadingPlan(null)
+        await handleCheckout('pro')
+        return
+      }
+
+      toast.error(data.message || 'Failed to start trial')
+    } catch {
+      toast.error('Something went wrong')
+    }
+
     setLoadingPlan(null)
   }
 
@@ -169,6 +204,11 @@ export default function PricingPage() {
                     <span className={`font-display text-6xl font-bold ${isDark ? 'text-white' : 'text-[var(--foreground)]'}`}>${plan.price}</span>
                     {plan.price > 0 && <span className={`${isDark ? 'text-sky-100/70' : 'text-[var(--muted)]'} mb-2 text-sm font-semibold`}>/month</span>}
                   </div>
+                  {tier.key === 'pro' && (
+                    <p className="mt-3 text-sm font-semibold text-[var(--brand-900)]">
+                      Start with the 7-day trial, then continue on Pro if it fits.
+                    </p>
+                  )}
 
                   <ul className="mt-8 space-y-4">
                     {plan.features.map((feature) => (
@@ -183,12 +223,12 @@ export default function PricingPage() {
 
                   <div className="mt-10">
                     {tier.key === 'free' ? (
-                      <Link href="/signup" className={`flex w-full items-center justify-center rounded-2xl px-5 py-4 text-base font-semibold ${tier.buttonClass}`}>
+                      <Link href={getSignupHref('free')} className={`flex w-full items-center justify-center rounded-2xl px-5 py-4 text-base font-semibold ${tier.buttonClass}`}>
                         {tier.buttonLabel}
                       </Link>
                     ) : (
                       <button
-                        onClick={() => handleCheckout(tier.key)}
+                        onClick={() => tier.key === 'pro' ? handleStartTrial() : handleCheckout(tier.key)}
                         disabled={loadingPlan !== null}
                         className={`flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-4 text-base font-semibold disabled:opacity-50 ${tier.buttonClass}`}
                       >
@@ -208,7 +248,7 @@ export default function PricingPage() {
             <div className="eyebrow mb-4">Coaches</div>
             <h2 className="text-4xl font-bold text-[var(--foreground)]">V1 launches with one paid coach workspace.</h2>
             <p className="mt-4 text-base leading-7 text-[var(--muted)]">
-              This is the cleanest version of the Trainerize-style model for launch: one coach plan that covers client delivery, coach onboarding, public marketplace visibility, and inbound lead management. Seat-based expansion can come after we validate conversion and demand.
+              This is the cleanest launch model: one coach plan that covers client delivery, coach onboarding, public marketplace visibility, and inbound lead management. More complex billing can come later, after we validate conversion and demand.
             </p>
           </div>
 
@@ -226,6 +266,9 @@ export default function PricingPage() {
               </div>
               <p className="mt-4 text-sm leading-7 text-[var(--muted)]">
                 Built for Personal Trainers and coaches who want to manage clients they already have, get discovered by new ones, and run both flows inside the same product.
+              </p>
+              <p className="mt-3 text-sm leading-7 text-[var(--muted)]">
+                Public coaching package prices are handled separately through marketplace offers, so the platform subscription stays clean and predictable.
               </p>
 
               <ul className="mt-8 space-y-4">
@@ -285,11 +328,11 @@ export default function PricingPage() {
               },
               {
                 q: 'Why is there only one coach plan in v1?',
-                a: 'Because the clearest launch move is to keep the coach business model simple while we validate lead flow, activation, and coach conversion. The next step is seat-based expansion, not immediate pricing complexity.',
+                a: 'Because the clearest launch move is to keep the coach business model simple while we validate lead flow, activation, and coach conversion. The next step is better evidence, not immediate pricing complexity.',
               },
               {
-                q: 'Will coach pricing become more Trainerize-like later?',
-                a: 'Yes. The long-term direction is a clearer seat-based ladder for coaches as demand grows. For v1, one paid coach workspace keeps the launch clean while still matching the Trainerize-style operating model.',
+                q: 'How does coach pricing relate to coach offers?',
+                a: 'They are separate. Coach Pro pays for the workspace and tools inside Meal & Motion, while each coach can publish their own public offer prices for prospects in the marketplace.',
               },
             ].map((item) => (
               <div key={item.q} className="surface-card p-6">

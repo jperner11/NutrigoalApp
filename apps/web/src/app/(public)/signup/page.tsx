@@ -24,8 +24,13 @@ export default function SignupPage() {
     const params = new URLSearchParams(window.location.search)
     const next = sanitizeNextPath(params.get('next'), '/onboarding')
     const email = params.get('email') || ''
+    const role = params.get('role')
     setNextPath(next)
-    setFormData(prev => ({ ...prev, email }))
+    setFormData(prev => ({
+      ...prev,
+      email,
+      ...(role === 'free' || role === 'personal_trainer' ? { role } : {}),
+    }))
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { X, Sparkles, Loader2 } from 'lucide-react'
 import { PRICING } from '@/lib/constants'
 import { toast } from 'react-hot-toast'
+import { useUser } from '@/hooks/useUser'
 
 interface UpgradeModalProps {
   isOpen: boolean
@@ -13,6 +14,8 @@ interface UpgradeModalProps {
 
 export default function UpgradeModal({ isOpen, onClose, feature }: UpgradeModalProps) {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null)
+  const { profile } = useUser()
+  const role = profile?.role ?? 'free'
 
   if (!isOpen) return null
 
@@ -25,6 +28,10 @@ export default function UpgradeModal({ isOpen, onClose, feature }: UpgradeModalP
         body: JSON.stringify({ plan }),
       })
       const data = await res.json()
+      if (res.status === 401) {
+        window.location.href = plan === 'personal_trainer' ? '/signup?role=personal_trainer' : '/signup?role=free'
+        return
+      }
       if (data.url) {
         window.location.href = data.url
       } else {
@@ -33,6 +40,37 @@ export default function UpgradeModal({ isOpen, onClose, feature }: UpgradeModalP
     } catch {
       toast.error('Something went wrong')
     }
+    setLoadingPlan(null)
+  }
+
+  async function handleProAction() {
+    if (role !== 'free') {
+      await handleUpgrade('pro')
+      return
+    }
+
+    setLoadingPlan('pro')
+    try {
+      const res = await fetch('/api/trial/start', { method: 'POST' })
+      const data = await res.json().catch(() => ({}))
+
+      if (res.ok) {
+        toast.success('Your 7-day Pro trial is live.')
+        window.location.href = '/dashboard'
+        return
+      }
+
+      if (res.status === 400 && data.message === 'Trial not applicable') {
+        setLoadingPlan(null)
+        await handleUpgrade('pro')
+        return
+      }
+
+      toast.error(data.message || 'Failed to start trial')
+    } catch {
+      toast.error('Something went wrong')
+    }
+
     setLoadingPlan(null)
   }
 
@@ -78,7 +116,7 @@ export default function UpgradeModal({ isOpen, onClose, feature }: UpgradeModalP
                 ))}
               </ul>
               <button
-                onClick={() => handleUpgrade(tier)}
+                onClick={() => tier === 'pro' ? handleProAction() : handleUpgrade(tier)}
                 disabled={loadingPlan !== null}
                 className={`w-full py-2 rounded-lg text-sm font-semibold transition-all disabled:opacity-50 flex items-center justify-center gap-2 ${
                   tier === 'pro'
@@ -87,7 +125,7 @@ export default function UpgradeModal({ isOpen, onClose, feature }: UpgradeModalP
                 }`}
               >
                 {loadingPlan === tier && <Loader2 className="h-4 w-4 animate-spin" />}
-                {loadingPlan === tier ? 'Redirecting...' : `Upgrade to ${PRICING[tier].name}`}
+                {loadingPlan === tier ? 'Redirecting...' : tier === 'pro' && role === 'free' ? 'Start 7-day Pro trial' : `Upgrade to ${PRICING[tier].name}`}
               </button>
             </div>
           ))}
