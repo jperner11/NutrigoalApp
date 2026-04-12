@@ -129,7 +129,7 @@ export default function SignupPage() {
       if (signupRole === 'personal_trainer') {
         await supabase.from('nutritionist_packages').insert({
           nutritionist_id: user.id,
-          max_clients: 10,
+          max_clients: 15,
         })
       }
 

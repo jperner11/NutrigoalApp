@@ -21,6 +21,13 @@ Ship a pricing model that is simple to understand, lovable in the public story, 
 - Lead with the simplest believable promise: Free includes discovery and limited self-serve access, Pro is the main paid plan for most individuals, Unlimited is for heavier self-serve AI usage, and Coach Pro is the operating system for client delivery plus marketplace visibility.
 - Do not promise billing complexity we have not implemented: no public claim about per-client overage billing yet, no public claim about seat-based coach plans yet, and no annual billing story yet.
 
+### Coach launch offer
+
+- Coach Pro is priced at `$24.99/month`
+- Coach Pro includes up to `15 active clients` in v1
+- This is a founder-style grow-with-us offer designed to be attractive for early coaches while still feeling credible for coaches with an existing roster
+- Marketplace package pricing remains separate from the platform subscription
+
 ### Product messaging rules
 
 - Discover Coaches stays available on every individual plan, including Free
@@ -34,7 +41,13 @@ Ship a pricing model that is simple to understand, lovable in the public story, 
 - Refresh the public pricing page around the SLC story
 - Add a real Pro trial CTA instead of only talking about upgrades
 - Update in-app upgrade prompts so free users can start the trial with less friction
+- Keep coach signup and invite-cap logic in sync with the public coach offer
 - Log the change in the running progress note
+
+### Operational note
+
+- Updating the displayed coach price in code does not automatically change the amount charged in Stripe checkout.
+- To make live billing match the product copy, the hosted environment must point `STRIPE_PRICE_PERSONAL_TRAINER` at a Stripe recurring price configured for `$24.99/month`.
 
 ### Explicitly deferred
 

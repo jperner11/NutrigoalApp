@@ -93,7 +93,7 @@ export async function POST(request: Request) {
       .eq('personal_trainer_id', user.id)
       .eq('status', 'pending')
 
-    const maxClients = packageRow?.max_clients ?? 10
+    const maxClients = packageRow?.max_clients ?? 15
     const totalCount = (activeClientCount ?? 0) + (pendingInviteCount ?? 0)
 
     if (totalCount >= maxClients) {
