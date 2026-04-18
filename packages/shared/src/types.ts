@@ -284,8 +284,12 @@ export interface CoachLead {
 
 // ─── Diet Tables ────────────────────────────────────────
 
+export type FoodSource = 'spoonacular' | 'openfoodfacts' | 'custom' | 'ai_parsed'
+
 export interface FoodItem {
-  spoonacular_id: number
+  spoonacular_id?: number
+  food_id?: string
+  source?: FoodSource
   name: string
   amount: number
   unit: string

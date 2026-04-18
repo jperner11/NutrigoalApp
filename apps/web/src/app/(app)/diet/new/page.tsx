@@ -33,7 +33,7 @@ export default function NewDietPlanPage() {
   const [generating, setGenerating] = useState(false)
   const [saving, setSaving] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
-  const [searchResults, setSearchResults] = useState<Array<{ id: number; name: string; image: string }>>([])
+  const [searchResults, setSearchResults] = useState<Array<{ id: string; name: string; source: string; external_id?: string; calories_per_100g?: number; protein_per_100g?: number; carbs_per_100g?: number; fat_per_100g?: number; default_amount?: number; default_unit?: string }>>([])
   const [searching, setSearching] = useState(false)
   const [selectedMealIndex, setSelectedMealIndex] = useState<number | null>(null)
   const [loadingNutrition, setLoadingNutrition] = useState(false)
@@ -81,21 +81,32 @@ export default function NewDietPlanPage() {
     setSearching(false)
   }
 
-  async function addFoodToMeal(mealIndex: number, food: { id: number; name: string }) {
+  async function addFoodToMeal(mealIndex: number, food: { id: string; name: string; source: string; external_id?: string; calories_per_100g?: number; protein_per_100g?: number; carbs_per_100g?: number; fat_per_100g?: number; default_amount?: number; default_unit?: string }) {
     setLoadingNutrition(true)
     try {
-      const res = await fetch(`/api/food/nutrition?id=${food.id}&amount=${foodAmount}&unit=g`)
-      const data = await res.json()
+      const amt = food.default_amount ?? foodAmount
+      let foodItem: FoodItem
 
-      const foodItem: FoodItem = {
-        spoonacular_id: food.id,
-        name: data.name || food.name,
-        amount: foodAmount,
-        unit: 'g',
-        calories: data.calories,
-        protein: data.protein,
-        carbs: data.carbs,
-        fat: data.fat,
+      if (food.source === 'local' && food.calories_per_100g !== undefined) {
+        const scale = amt / 100
+        foodItem = {
+          food_id: food.id, source: 'custom', name: food.name, amount: amt, unit: food.default_unit ?? 'g',
+          calories: Math.round((food.calories_per_100g ?? 0) * scale),
+          protein: Math.round((food.protein_per_100g ?? 0) * scale * 10) / 10,
+          carbs: Math.round((food.carbs_per_100g ?? 0) * scale * 10) / 10,
+          fat: Math.round((food.fat_per_100g ?? 0) * scale * 10) / 10,
+        }
+      } else {
+        const sourceParam = food.source === 'openfoodfacts' ? 'openfoodfacts' : 'spoonacular'
+        const idParam = food.external_id ?? food.id
+        const res = await fetch(`/api/food/nutrition?id=${idParam}&amount=${amt}&unit=g&source=${sourceParam}`)
+        const data = await res.json()
+        foodItem = {
+          spoonacular_id: data.spoonacular_id, food_id: data.food_id,
+          source: food.source === 'openfoodfacts' ? 'openfoodfacts' : 'spoonacular',
+          name: data.name || food.name, amount: amt, unit: 'g',
+          calories: data.calories, protein: data.protein, carbs: data.carbs, fat: data.fat,
+        }
       }
 
       setMeals(prev => {
@@ -166,7 +177,7 @@ export default function NewDietPlanPage() {
 
   function apiMealToEntry(meal: APIMeal, slot: { type: MealType; label: string }): MealEntry {
     const foods: FoodItem[] = meal.ingredients.map((ing: APIIngredient) => ({
-      spoonacular_id: 0,
+      source: 'ai_parsed' as const,
       name: ing.name,
       amount: ing.amount,
       unit: ing.unit || 'g',
@@ -666,7 +677,13 @@ export default function NewDietPlanPage() {
                           ) : (
                             <Plus className="h-3 w-3 text-purple-600" />
                           )}
-                          {result.name}
+                          <span>{result.name}</span>
+                          {result.calories_per_100g !== undefined && (
+                            <span className="text-xs text-gray-400">{result.calories_per_100g}kcal/100g</span>
+                          )}
+                          <span className="text-xs text-gray-300">
+                            {result.source === 'local' ? '★' : result.source === 'openfoodfacts' ? 'OFF' : 'SP'}
+                          </span>
                         </button>
                       ))}
                     </div>

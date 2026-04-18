@@ -579,7 +579,7 @@ interface SavedSupplementRecommendation {
             notes: meal.notes || '',
           },
           items: meal.ingredients.map(ing => ({
-            spoonacular_id: 0,
+            source: 'ai_parsed' as const,
             name: ing.name,
             amount: ing.amount,
             unit: ing.unit || 'g',

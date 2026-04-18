@@ -48,6 +48,7 @@ export type {
   CoachOffer,
   CoachLead,
   AIUsage,
+  FoodSource,
   FoodItem,
   DietPlan,
   DietPlanMeal,

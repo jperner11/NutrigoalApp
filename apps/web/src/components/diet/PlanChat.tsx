@@ -125,7 +125,7 @@ export default function PlanChat({ planId, meals, targets, userProfile, dayOfWee
             notes: (meal.notes as string) || '',
           },
           items: ingredients.map((ing: Record<string, unknown>) => ({
-            spoonacular_id: 0,
+            source: 'ai_parsed' as const,
             name: ing.name,
             amount: ing.amount,
             unit: ing.unit || 'g',
