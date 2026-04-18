@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import {
   ArrowRight, ArrowLeft, User, Utensils,
   Calculator, Heart, Dumbbell, Briefcase, Calendar, Sparkles, Users, ClipboardList, MessageSquare,
-  Cookie,
+  Cookie, Camera, Loader2, Globe,
 } from 'lucide-react'
 import {
   ACTIVITY_LEVELS, FITNESS_GOALS, TRAINING_EXPERIENCE, EQUIPMENT_ACCESS,
@@ -25,6 +25,7 @@ import {
   saveLeadWizardPreferences,
   type CoachWizardAnswers,
 } from '@/lib/findCoach'
+import { buildCoachProfileSlug, COACH_MARKETPLACE_CURRENCIES } from '@/lib/coachMarketplace'
 import { toast } from 'react-hot-toast'
 import { isManagedClientRole, isTrainerRole } from '@nutrigoal/shared'
 import { BaseClientIntakePreview } from '@/components/onboarding/BaseClientIntakePreview'
@@ -36,7 +37,7 @@ import {
 
 const CLIENT_STEPS = ['My Stats', 'Lifestyle', 'Food Preferences', 'Snack Habits', 'Health', 'Training', 'Goals', 'Schedule', 'Review']
 const MANAGED_CLIENT_STEPS = ['My Stats', 'Lifestyle', 'Food Preferences', 'Snack Habits', 'Health', 'Training', 'Goals', 'Schedule', 'Coach Questions', 'Review']
-const TRAINER_STEPS = ['Coach Profile', 'Ideal Clients', 'Coaching Style', 'Client Intake', 'Workflow']
+const TRAINER_STEPS = ['Coach Profile', 'Your Public Profile', 'Ideal Clients', 'Coaching Style', 'Client Intake', 'Workflow']
 const COACH_SPECIALTY_OPTIONS = ['Fat loss', 'Muscle gain', 'General fitness', 'Lifestyle nutrition', 'Strength training', 'Online coaching']
 const COACH_SERVICE_OPTIONS = ['Training plans', 'Nutrition guidance', 'Habit coaching', 'Check-ins', 'Messaging support', 'Progress reviews']
 const COACH_FORMAT_OPTIONS = ['Online', 'In person', 'Hybrid']
@@ -182,6 +183,16 @@ export default function OnboardingPage() {
   const [trainerDraftQuestions, setTrainerDraftQuestions] = useState<DraftCustomQuestion[]>([])
   const initialTrainerQuestionIdsRef = useRef<string[]>([])
 
+  // ── Public Profile step state ──
+  const [profileHeadline, setProfileHeadline] = useState('')
+  const [profileBio, setProfileBio] = useState('')
+  const [profilePriceFrom, setProfilePriceFrom] = useState('')
+  const [profilePriceTo, setProfilePriceTo] = useState('')
+  const [profileCurrency, setProfileCurrency] = useState('USD')
+  const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(profile?.avatar_url ?? null)
+  const [uploadingAvatar, setUploadingAvatar] = useState(false)
+
   useEffect(() => {
     if (!profile || !isTrainer) return
     const supabase = createClient()
@@ -317,8 +328,9 @@ export default function OnboardingPage() {
     if (isTrainer) {
       switch (step) {
         case 0: return fullName.trim().length > 0 && coachSpecialties.length > 0 && coachFormats.length > 0
-        case 1: return coachIdealClient.trim().length > 0 && coachServices.length > 0
-        case 2: return coachIntakeRequirements.length > 0
+        case 1: return profileHeadline.trim().length > 0
+        case 2: return coachIdealClient.trim().length > 0 && coachServices.length > 0
+        case 3: return coachIntakeRequirements.length > 0
         default: return true
       }
     }
@@ -355,10 +367,29 @@ export default function OnboardingPage() {
     setSaving(true)
 
     const supabase = createClient()
+
+    // Upload avatar if selected
+    let avatarUrl = profile.avatar_url ?? null
+    if (avatarFile) {
+      const ext = avatarFile.name.split('.').pop() ?? 'jpg'
+      const path = `${profile.id}/avatar.${ext}`
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(path, avatarFile, { upsert: true })
+      if (uploadError) {
+        toast.error('Failed to upload profile picture: ' + uploadError.message)
+        setSaving(false)
+        return
+      }
+      const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(path)
+      avatarUrl = urlData.publicUrl
+    }
+
     const { error } = await supabase
       .from('user_profiles')
       .update({
         full_name: fullName.trim(),
+        avatar_url: avatarUrl,
         coach_specialties: coachSpecialties,
         coach_ideal_client: coachIdealClient.trim(),
         coach_services: coachServices,
@@ -376,6 +407,26 @@ export default function OnboardingPage() {
       toast.error('Failed to save coach setup: ' + error.message)
       setSaving(false)
       return
+    }
+
+    // Upsert coach public profile
+    const slug = buildCoachProfileSlug(fullName.trim(), profile.id)
+    const { error: profileError } = await supabase
+      .from('coach_public_profiles')
+      .upsert({
+        coach_id: profile.id,
+        slug,
+        is_public: true,
+        headline: profileHeadline.trim() || null,
+        bio: profileBio.trim() || null,
+        price_from: profilePriceFrom ? parseInt(profilePriceFrom) : null,
+        price_to: profilePriceTo ? parseInt(profilePriceTo) : null,
+        currency: profileCurrency,
+        accepting_new_clients: true,
+      }, { onConflict: 'coach_id' })
+
+    if (profileError) {
+      toast.error('Profile saved but marketplace listing failed: ' + profileError.message)
     }
 
     // Persist custom intake questions the coach drafted during onboarding.
@@ -645,9 +696,118 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-6">
             <StepHeader
+              icon={<Globe className="h-12 w-12 text-sky-500" />}
+              title="Set up your public profile"
+              subtitle="This is what potential clients see in the coach directory. You can update it anytime from Settings."
+            />
+
+            <div className="flex flex-col items-center gap-4">
+              <div className="relative">
+                {avatarPreview ? (
+                  <img
+                    src={avatarPreview}
+                    alt="Profile"
+                    className="h-24 w-24 rounded-full object-cover border-4 border-purple-100"
+                  />
+                ) : (
+                  <div className="h-24 w-24 rounded-full bg-gray-100 flex items-center justify-center border-4 border-purple-100">
+                    <Camera className="h-8 w-8 text-gray-400" />
+                  </div>
+                )}
+                <label className="absolute -bottom-1 -right-1 cursor-pointer rounded-full bg-purple-600 p-2 text-white shadow-lg hover:bg-purple-700 transition-colors">
+                  <Camera className="h-4 w-4" />
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      if (!file) return
+                      if (file.size > 5 * 1024 * 1024) {
+                        toast.error('Image must be under 5MB')
+                        return
+                      }
+                      setAvatarFile(file)
+                      setAvatarPreview(URL.createObjectURL(file))
+                    }}
+                  />
+                </label>
+              </div>
+              <p className="text-sm text-gray-500">Upload a profile picture (optional, max 5MB)</p>
+            </div>
+
+            <div>
+              <Label>Headline *</Label>
+              <p className="text-sm text-gray-500 mb-2">One line that explains what you do.</p>
+              <input
+                type="text"
+                value={profileHeadline}
+                onChange={(e) => setProfileHeadline(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                placeholder="e.g. Online fat loss and strength coach for busy professionals"
+                maxLength={120}
+              />
+              <p className="text-xs text-gray-400 mt-1">{profileHeadline.length}/120</p>
+            </div>
+
+            <div>
+              <Label>Short bio</Label>
+              <textarea
+                value={profileBio}
+                onChange={(e) => setProfileBio(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
+                rows={4}
+                placeholder="Tell potential clients about your experience and approach..."
+                maxLength={500}
+              />
+              <p className="text-xs text-gray-400 mt-1">{profileBio.length}/500</p>
+            </div>
+
+            <div>
+              <Label>Price range (optional)</Label>
+              <p className="text-sm text-gray-500 mb-2">Give clients an idea of your rates. You can add exact offers later in Settings.</p>
+              <div className="grid grid-cols-[1fr_auto_1fr_auto] gap-3 items-center">
+                <input
+                  type="number"
+                  value={profilePriceFrom}
+                  onChange={(e) => setProfilePriceFrom(e.target.value)}
+                  className="px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  placeholder="From"
+                  min={0}
+                />
+                <span className="text-gray-400">–</span>
+                <input
+                  type="number"
+                  value={profilePriceTo}
+                  onChange={(e) => setProfilePriceTo(e.target.value)}
+                  className="px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  placeholder="To"
+                  min={0}
+                />
+                <select
+                  value={profileCurrency}
+                  onChange={(e) => setProfileCurrency(e.target.value)}
+                  className="px-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                >
+                  {COACH_MARKETPLACE_CURRENCIES.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3">
+              <span className="text-sm font-medium text-green-700">Your profile will be published to the coach directory when you finish setup.</span>
+            </div>
+          </div>
+        )
+      case 2:
+        return (
+          <div className="space-y-6">
+            <StepHeader
               icon={<Users className="h-12 w-12 text-indigo-500" />}
               title="Who do you work best with?"
-              subtitle="We’ll use this to shape the trainer dashboard and the way client intake is framed after an invite is accepted."
+              subtitle="We'll use this to shape the trainer dashboard and the way client intake is framed after an invite is accepted."
             />
             <div>
               <Label>Ideal client summary</Label>
@@ -687,7 +847,7 @@ export default function OnboardingPage() {
             </div>
           </div>
         )
-      case 2:
+      case 3:
         return (
           <div className="space-y-6">
             <StepHeader
@@ -747,7 +907,7 @@ export default function OnboardingPage() {
             </div>
           </div>
         )
-      case 3:
+      case 4:
         return (
           <div className="space-y-6">
             <StepHeader
@@ -765,7 +925,7 @@ export default function OnboardingPage() {
             </p>
           </div>
         )
-      case 4:
+      case 5:
         return (
           <div className="space-y-6">
             <StepHeader
@@ -797,10 +957,13 @@ export default function OnboardingPage() {
               <h3 className="text-sm font-bold text-purple-700 uppercase tracking-wider mb-4">Setup summary</h3>
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <ReviewRow label="Display name" value={fullName || 'Not set'} />
+                <ReviewRow label="Headline" value={profileHeadline || 'Not set'} />
+                <ReviewRow label="Avatar" value={avatarPreview ? 'Uploaded' : 'Not set'} />
                 <ReviewRow label="Specialties" value={coachSpecialties.join(', ') || 'Not set'} />
                 <ReviewRow label="Formats" value={coachFormats.join(', ') || 'Not set'} />
                 <ReviewRow label="Ideal client" value={coachIdealClient || 'Not set'} />
                 <ReviewRow label="Services" value={coachServices.join(', ') || 'Not set'} />
+                <ReviewRow label="Price range" value={profilePriceFrom || profilePriceTo ? `${profilePriceFrom || '?'} – ${profilePriceTo || '?'} ${profileCurrency}` : 'On request'} />
                 <ReviewRow label="Style" value={coachStyle.replace(/_/g, ' ')} />
                 <ReviewRow label="Check-ins" value={coachCheckInFrequency.replace(/_/g, ' ')} />
                 <ReviewRow label="Required intake" value={coachIntakeRequirements.join(', ') || 'Not set'} />
