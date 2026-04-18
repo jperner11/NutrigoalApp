@@ -7,6 +7,7 @@ import { toast } from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 import { sanitizeNextPath } from '@/lib/authRedirect'
 import BrandLogo from '@/components/brand/BrandLogo'
+import { signupCopy } from '@/lib/copy/signup'
 
 export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -144,25 +145,22 @@ export default function SignupPage() {
       <div className="mx-auto flex max-w-7xl items-center justify-between pb-8">
         <BrandLogo href="/" />
         <Link href={`/login${nextPath !== '/onboarding' ? `?next=${encodeURIComponent(nextPath)}` : ''}`} className="btn-secondary rounded-full px-5 py-3 text-sm font-semibold">
-          Sign in
+          {signupCopy.nav.signIn}
         </Link>
       </div>
 
       <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.95fr_0.95fr] lg:items-start">
         <section className="panel-strong p-8 sm:p-10">
-          <div className="eyebrow mb-5">Feel your momentum</div>
+          <div className="eyebrow mb-5">{signupCopy.intro.eyebrow}</div>
           <h1 className="text-5xl font-bold leading-[0.96] text-[var(--foreground)] sm:text-6xl">
-            Start with a
-            <span className="block text-[var(--brand-500)]">serious setup.</span>
+            {signupCopy.intro.titleLine1}
+            <span className="block text-[var(--brand-500)]">{signupCopy.intro.titleLine2}</span>
           </h1>
           <p className="mt-6 max-w-xl text-lg leading-8 text-[var(--muted)]">
-            Meal & Motion is designed for people who want a system that feels considered, precise, and genuinely easy to stay with, whether they plan to go self-serve or coach-led.
+            {signupCopy.intro.subtitle}
           </p>
           <div className="mt-10 grid gap-4 sm:grid-cols-2">
-            {[
-              ['Individuals', 'Self-serve AI plus Discover Coaches on every individual plan, including Free'],
-              ['Coaches', 'Client workflows, public profiles, offers, and lead capture in one paid workspace'],
-            ].map(([title, body]) => (
+            {signupCopy.intro.highlights.map(([title, body]) => (
               <div key={title} className="surface-card p-5">
                 <div className="font-display text-2xl font-bold text-[var(--foreground)]">{title}</div>
                 <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{body}</p>
@@ -173,16 +171,16 @@ export default function SignupPage() {
 
         <section className="glass-card rounded-[32px] p-8 sm:p-10">
           <div className="mb-8">
-            <div className="eyebrow mb-4">Create account</div>
-            <h2 className="text-4xl font-bold text-[var(--foreground)]">Choose your setup</h2>
+            <div className="eyebrow mb-4">{signupCopy.form.eyebrow}</div>
+            <h2 className="text-4xl font-bold text-[var(--foreground)]">{signupCopy.form.title}</h2>
             <p className="mt-3 text-base leading-7 text-[var(--muted)]">
-              Start as an individual or coach. Discovery runs on the same account system, so there is no separate marketplace signup.
+              {signupCopy.form.subtitle}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="mb-3 block text-sm font-semibold text-[var(--foreground)]">I am joining as</label>
+              <label className="mb-3 block text-sm font-semibold text-[var(--foreground)]">{signupCopy.form.roleLabel}</label>
               <div className="grid grid-cols-2 gap-3">
                 <button
                   type="button"
@@ -193,8 +191,8 @@ export default function SignupPage() {
                   }`}
                 >
                   <User className={`mb-3 h-7 w-7 ${formData.role === 'free' ? 'text-[var(--brand-900)]' : 'text-[var(--muted-soft)]'}`} />
-                  <div className="font-display text-xl font-bold text-[var(--foreground)]">Individual</div>
-                  <div className="mt-1 text-sm text-[var(--muted)]">For self-serve plans, tracking, and Discover Coaches across every individual plan.</div>
+                  <div className="font-display text-xl font-bold text-[var(--foreground)]">{signupCopy.form.roleIndividual.title}</div>
+                  <div className="mt-1 text-sm text-[var(--muted)]">{signupCopy.form.roleIndividual.body}</div>
                 </button>
                 <button
                   type="button"
@@ -205,14 +203,14 @@ export default function SignupPage() {
                   }`}
                 >
                   <Users className={`mb-3 h-7 w-7 ${formData.role === 'personal_trainer' ? 'text-[var(--brand-900)]' : 'text-[var(--muted-soft)]'}`} />
-                  <div className="font-display text-xl font-bold text-[var(--foreground)]">Coach / Personal Trainer</div>
-                  <div className="mt-1 text-sm text-[var(--muted)]">For client management, coaching, public marketplace visibility, and inbound lead flow.</div>
+                  <div className="font-display text-xl font-bold text-[var(--foreground)]">{signupCopy.form.roleCoach.title}</div>
+                  <div className="mt-1 text-sm text-[var(--muted)]">{signupCopy.form.roleCoach.body}</div>
                 </button>
               </div>
             </div>
 
             <div>
-              <label htmlFor="fullName" className="mb-2 block text-sm font-semibold text-[var(--foreground)]">Full name</label>
+              <label htmlFor="fullName" className="mb-2 block text-sm font-semibold text-[var(--foreground)]">{signupCopy.form.fullNameLabel}</label>
               <div className="relative">
                 <UserCircle className="pointer-events-none absolute left-5 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-[var(--muted-soft)]" />
                 <input
@@ -228,7 +226,7 @@ export default function SignupPage() {
             </div>
 
             <div>
-              <label htmlFor="email" className="mb-2 block text-sm font-semibold text-[var(--foreground)]">Email</label>
+              <label htmlFor="email" className="mb-2 block text-sm font-semibold text-[var(--foreground)]">{signupCopy.form.emailLabel}</label>
               <div className="relative">
                 <Mail className="pointer-events-none absolute left-5 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-[var(--muted-soft)]" />
                 <input
@@ -244,7 +242,7 @@ export default function SignupPage() {
             </div>
 
             <div>
-              <label htmlFor="password" className="mb-2 block text-sm font-semibold text-[var(--foreground)]">Password</label>
+              <label htmlFor="password" className="mb-2 block text-sm font-semibold text-[var(--foreground)]">{signupCopy.form.passwordLabel}</label>
               <div className="relative">
                 <Lock className="pointer-events-none absolute left-5 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-[var(--muted-soft)]" />
                 <input
@@ -263,7 +261,7 @@ export default function SignupPage() {
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="mb-2 block text-sm font-semibold text-[var(--foreground)]">Confirm password</label>
+              <label htmlFor="confirmPassword" className="mb-2 block text-sm font-semibold text-[var(--foreground)]">{signupCopy.form.confirmPasswordLabel}</label>
               <div className="relative">
                 <Lock className="pointer-events-none absolute left-5 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-[var(--muted-soft)]" />
                 <input
@@ -287,7 +285,7 @@ export default function SignupPage() {
                 <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
               ) : (
                 <>
-                  <span>Create account</span>
+                  <span>{signupCopy.form.submit}</span>
                   <ArrowRight className="h-4 w-4" />
                 </>
               )}
@@ -295,9 +293,9 @@ export default function SignupPage() {
           </form>
 
           <div className="mt-8 border-t border-[var(--line)] pt-6 text-sm text-[var(--muted)]">
-            Already have an account?{' '}
+            {signupCopy.form.alreadyHave}{' '}
             <Link href={`/login${nextPath !== '/onboarding' ? `?next=${encodeURIComponent(nextPath)}` : ''}`} className="font-semibold text-[var(--foreground)] transition hover:text-[var(--brand-500)]">
-              Sign in
+              {signupCopy.form.signInLink}
             </Link>
           </div>
         </section>

@@ -1,14 +1,7 @@
 import Link from 'next/link'
 import BrandLogo from '@/components/brand/BrandLogo'
-import { BRAND_NAME, COMPANY_NAME, SUPPORT_EMAIL } from '@/lib/site'
-
-const footerLinks = [
-  { href: '/faq', label: 'FAQ' },
-  { href: '/support', label: 'Support' },
-  { href: '/privacy', label: 'Privacy Policy' },
-  { href: '/terms', label: 'Terms of Service' },
-  { href: '/health-disclaimer', label: 'Health Disclaimer' },
-]
+import { COMPANY_NAME, SUPPORT_EMAIL } from '@/lib/site'
+import { footerCopy } from '@/lib/copy/footer'
 
 export default function PublicFooter() {
   return (
@@ -18,16 +11,15 @@ export default function PublicFooter() {
           <div className="max-w-xl">
             <BrandLogo href="/" />
             <p className="mt-4 text-sm leading-7 text-[var(--muted)]">
-              {BRAND_NAME} brings self-serve AI planning, coach-led delivery, and coach discovery into one calm
-              nutrition and training platform, with Discover Coaches available across every individual plan.
+              {footerCopy.tagline}
             </p>
           </div>
 
           <div className="grid gap-8 sm:grid-cols-2">
             <div>
-              <div className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--muted-soft)]">Company</div>
+              <div className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--muted-soft)]">{footerCopy.companyHeading}</div>
               <div className="mt-4 space-y-3 text-sm text-[var(--muted)]">
-                {footerLinks.map((link) => (
+                {footerCopy.links.map((link) => (
                   <div key={link.href}>
                     <Link href={link.href} className="transition hover:text-[var(--foreground)]">
                       {link.label}
@@ -38,20 +30,19 @@ export default function PublicFooter() {
             </div>
 
             <div>
-              <div className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--muted-soft)]">Beta Support</div>
+              <div className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--muted-soft)]">{footerCopy.supportHeading}</div>
               <div className="mt-4 space-y-3 text-sm text-[var(--muted)]">
                 <p>{COMPANY_NAME}</p>
                 <a href={`mailto:${SUPPORT_EMAIL}`} className="transition hover:text-[var(--foreground)]">
                   {SUPPORT_EMAIL}
                 </a>
-                <p>Coach workspace and marketplace beta support is handled directly by the founding team.</p>
               </div>
             </div>
           </div>
         </div>
 
         <div className="border-t border-[var(--line)] pt-6 text-sm text-[var(--muted)]">
-          © 2026 {COMPANY_NAME}. All rights reserved.
+          © 2026 {COMPANY_NAME}. {footerCopy.rights}
         </div>
       </div>
     </footer>

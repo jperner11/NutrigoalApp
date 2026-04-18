@@ -12,7 +12,7 @@ export default function LandingCoachCta() {
   return (
     <div className="rounded-[28px] border border-[var(--line)] bg-[rgba(255,255,255,0.82)] p-4 shadow-[0_18px_36px_rgba(13,27,42,0.06)] sm:p-5">
       <div className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-soft)]">
-        Guided coach matching
+        Find a coach
       </div>
       <div className="mt-3 flex flex-col gap-3 sm:flex-row">
         <div className="flex-1">
