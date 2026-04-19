@@ -8,7 +8,9 @@ import Link from 'next/link'
 import {
   ArrowLeft, MessageSquare, ClipboardList, Plus, Utensils, Dumbbell,
   AlertTriangle, Stethoscope, Leaf, ThumbsDown, Activity, Weight, Target,
+  Pencil, Loader2, Check, X,
 } from 'lucide-react'
+import { toast } from 'react-hot-toast'
 import type { UserProfile, DietPlan, TrainingPlan } from '@/lib/supabase/types'
 import { isTrainerRole } from '@nutrigoal/shared'
 
@@ -128,12 +130,7 @@ export default function ClientDetailPage() {
         </div>
 
         {/* Macro Targets */}
-        <div className="grid grid-cols-4 gap-4 mt-6">
-          <MacroPill label="Calories" value={client.daily_calories} unit="kcal" color="text-green-600" bg="bg-green-50" />
-          <MacroPill label="Protein" value={client.daily_protein} unit="g" color="text-blue-600" bg="bg-blue-50" />
-          <MacroPill label="Carbs" value={client.daily_carbs} unit="g" color="text-amber-600" bg="bg-amber-50" />
-          <MacroPill label="Fat" value={client.daily_fat} unit="g" color="text-red-600" bg="bg-red-50" />
-        </div>
+        <EditableMacros client={client} onUpdated={(updated) => setClient(updated)} />
 
         {/* Anamnesis Summary */}
         {(client.injuries?.length > 0 || client.medical_conditions?.length > 0 || client.dietary_restrictions?.length > 0 || client.food_dislikes?.length > 0) && (
@@ -214,7 +211,7 @@ export default function ClientDetailPage() {
         <Link href={`/clients/${id}/feedback`}
           className="flex items-center justify-center space-x-2 card p-4 hover:shadow-md transition-shadow">
           <ClipboardList className="h-5 w-5 text-purple-600" />
-          <span className="font-medium text-gray-900">Feedback</span>
+          <span className="font-medium text-gray-900">Check-ins</span>
         </Link>
       </div>
 
@@ -282,6 +279,114 @@ export default function ClientDetailPage() {
             ))}
           </div>
         )}
+      </div>
+    </div>
+  )
+}
+
+function EditableMacros({ client, onUpdated }: { client: UserProfile; onUpdated: (c: UserProfile) => void }) {
+  const [editing, setEditing] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [calories, setCalories] = useState(client.daily_calories?.toString() ?? '')
+  const [protein, setProtein] = useState(client.daily_protein?.toString() ?? '')
+  const [carbs, setCarbs] = useState(client.daily_carbs?.toString() ?? '')
+  const [fat, setFat] = useState(client.daily_fat?.toString() ?? '')
+
+  function reset() {
+    setCalories(client.daily_calories?.toString() ?? '')
+    setProtein(client.daily_protein?.toString() ?? '')
+    setCarbs(client.daily_carbs?.toString() ?? '')
+    setFat(client.daily_fat?.toString() ?? '')
+    setEditing(false)
+  }
+
+  async function handleSave() {
+    setSaving(true)
+    const supabase = createClient()
+    const updates = {
+      daily_calories: calories ? parseInt(calories) : null,
+      daily_protein: protein ? parseInt(protein) : null,
+      daily_carbs: carbs ? parseInt(carbs) : null,
+      daily_fat: fat ? parseInt(fat) : null,
+    }
+    const { error } = await supabase
+      .from('user_profiles')
+      .update(updates)
+      .eq('id', client.id)
+    setSaving(false)
+    if (error) { toast.error('Failed to update macros'); return }
+    toast.success('Macro targets updated')
+    onUpdated({ ...client, ...updates })
+    setEditing(false)
+  }
+
+  if (!editing) {
+    return (
+      <div className="mt-6">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-xs font-semibold uppercase tracking-[0.12em] text-gray-500">Macro targets</span>
+          <button onClick={() => setEditing(true)}
+            className="flex items-center gap-1 text-xs font-medium text-purple-600 hover:text-purple-700">
+            <Pencil className="h-3 w-3" />
+            Edit
+          </button>
+        </div>
+        <div className="grid grid-cols-4 gap-4">
+          <MacroPill label="Calories" value={client.daily_calories} unit="kcal" color="text-green-600" bg="bg-green-50" />
+          <MacroPill label="Protein" value={client.daily_protein} unit="g" color="text-blue-600" bg="bg-blue-50" />
+          <MacroPill label="Carbs" value={client.daily_carbs} unit="g" color="text-amber-600" bg="bg-amber-50" />
+          <MacroPill label="Fat" value={client.daily_fat} unit="g" color="text-red-600" bg="bg-red-50" />
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="mt-6 rounded-xl border-2 border-purple-200 bg-purple-50/50 p-4">
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-xs font-semibold uppercase tracking-[0.12em] text-purple-700">Edit macro targets</span>
+        <div className="flex items-center gap-2">
+          <button onClick={reset} className="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-white">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+      <div className="grid grid-cols-4 gap-3">
+        <div>
+          <label className="block text-xs font-medium text-gray-600 mb-1">Calories</label>
+          <input type="number" value={calories} onChange={e => setCalories(e.target.value)}
+            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            placeholder="kcal" />
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-600 mb-1">Protein</label>
+          <input type="number" value={protein} onChange={e => setProtein(e.target.value)}
+            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            placeholder="g" />
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-600 mb-1">Carbs</label>
+          <input type="number" value={carbs} onChange={e => setCarbs(e.target.value)}
+            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            placeholder="g" />
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-600 mb-1">Fat</label>
+          <input type="number" value={fat} onChange={e => setFat(e.target.value)}
+            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            placeholder="g" />
+        </div>
+      </div>
+      <div className="flex justify-end gap-2 mt-3">
+        <button onClick={reset}
+          className="px-4 py-2 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-white">
+          Cancel
+        </button>
+        <button onClick={handleSave} disabled={saving}
+          className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg hover:shadow-lg transition-all disabled:opacity-50">
+          {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
+          {saving ? 'Saving...' : 'Save'}
+        </button>
       </div>
     </div>
   )

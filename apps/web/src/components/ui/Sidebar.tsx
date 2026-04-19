@@ -17,6 +17,7 @@ import {
   Settings,
   Brain,
   Sparkles,
+  ClipboardList,
   Compass,
   Inbox,
   LogOut,
@@ -58,6 +59,7 @@ const clientNavItems: {
   { href: '/ai/coaching', label: 'AI Coaching', icon: Brain, roles: ['free', 'pro', 'unlimited'] },
   { href: '/ai/suggest', label: 'AI Suggestions', icon: Sparkles, roles: ['free', 'pro', 'unlimited'], gatedFeature: 'ai_suggestions' },
   { href: '/discover', label: 'Discover Coaches', icon: Compass, roles: ['free', 'pro', 'unlimited'] },
+  { href: '/check-ins', label: 'Check-ins', icon: ClipboardList, roles: ['nutritionist_client', 'personal_trainer_client'] },
   { href: '/my-nutritionist', label: 'My Trainer', icon: UserCheck, roles: ['nutritionist_client', 'personal_trainer_client'] },
   { href: '/settings', label: 'Settings', icon: Settings, roles: ['free', 'pro', 'unlimited', 'nutritionist_client', 'personal_trainer_client'] },
 ]
@@ -65,6 +67,7 @@ const clientNavItems: {
 const trainerNavItems: typeof clientNavItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['nutritionist', 'personal_trainer'] },
   { href: '/clients', label: 'Clients', icon: Users, roles: ['nutritionist', 'personal_trainer'] },
+  { href: '/check-ins', label: 'Check-ins', icon: ClipboardList, roles: ['nutritionist', 'personal_trainer'] },
   { href: '/leads', label: 'Leads', icon: Inbox, roles: ['nutritionist', 'personal_trainer'] },
   { href: '/reports', label: 'Reports', icon: BarChart3, roles: ['nutritionist', 'personal_trainer'] },
   { href: '/ai/coaching', label: 'AI Coaching', icon: Brain, roles: ['nutritionist', 'personal_trainer'] },

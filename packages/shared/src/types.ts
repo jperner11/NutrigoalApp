@@ -554,15 +554,17 @@ export interface Message {
   created_at: string
 }
 
+export type FeedbackQuestionType = 'text' | 'rating' | 'rating_10' | 'yes_no' | 'photo'
+
 export interface FeedbackQuestion {
   id: string
   question: string
-  type: 'text' | 'rating' | 'yes_no'
+  type: FeedbackQuestionType
 }
 
 export interface FeedbackResponse {
   question_id: string
-  answer: string | number | boolean
+  answer: string | number | boolean | string[]
 }
 
 export interface FeedbackRequest {
@@ -573,8 +575,34 @@ export interface FeedbackRequest {
   questions: FeedbackQuestion[]
   responses: FeedbackResponse[] | null
   status: FeedbackStatus
+  template_id: string | null
+  schedule_id: string | null
   created_at: string
   responded_at: string | null
+}
+
+export interface FeedbackTemplate {
+  id: string
+  trainer_id: string
+  name: string
+  questions: FeedbackQuestion[]
+  is_default: boolean
+  created_at: string
+  updated_at: string
+}
+
+export type CheckInRecurrence = 'weekly' | 'biweekly' | 'monthly'
+
+export interface FeedbackSchedule {
+  id: string
+  trainer_id: string
+  client_id: string
+  template_id: string
+  day_of_week: number
+  recurrence: CheckInRecurrence
+  is_active: boolean
+  last_triggered_at: string | null
+  created_at: string
 }
 
 // ─── Training Check-ins ────────────────────────────────
