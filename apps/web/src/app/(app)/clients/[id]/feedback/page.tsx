@@ -6,7 +6,7 @@ import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
 import {
   ArrowLeft, Plus, Trash2, Send, CheckCircle, Clock, Calendar,
-  Loader2, ChevronDown, ChevronRight, Camera,
+  Loader2, ChevronDown, ChevronRight,
 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import Link from 'next/link'
@@ -398,7 +398,7 @@ function ScheduleCard({ schedule, templates, trainerId, clientId, onRefresh }: {
           </p>
         </div>
       ) : (
-        <p className="text-sm text-gray-400">No recurring schedule. Click "Set up" to auto-send check-ins.</p>
+        <p className="text-sm text-gray-400">No recurring schedule. Click &ldquo;Set up&rdquo; to auto-send check-ins.</p>
       )}
     </div>
   )

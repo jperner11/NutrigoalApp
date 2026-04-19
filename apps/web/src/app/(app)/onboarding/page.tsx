@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import {
   ArrowRight, ArrowLeft, User, Utensils,
   Calculator, Heart, Dumbbell, Briefcase, Calendar, Sparkles, Users, ClipboardList, MessageSquare,
-  Cookie, Camera, Loader2, Globe,
+  Cookie, Camera, Globe,
 } from 'lucide-react'
 import {
   ACTIVITY_LEVELS, FITNESS_GOALS, TRAINING_EXPERIENCE, EQUIPMENT_ACCESS,
@@ -191,7 +191,7 @@ export default function OnboardingPage() {
   const [profileCurrency, setProfileCurrency] = useState('USD')
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [avatarPreview, setAvatarPreview] = useState<string | null>(profile?.avatar_url ?? null)
-  const [uploadingAvatar, setUploadingAvatar] = useState(false)
+
 
   useEffect(() => {
     if (!profile || !isTrainer) return
