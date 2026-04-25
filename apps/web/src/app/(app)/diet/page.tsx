@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import type { DietPlan } from '@/lib/supabase/types'
+import AppPageHeader from '@/components/ui/AppPageHeader'
 import { isManagedClientRole } from '@nutrigoal/shared'
 
 interface CompanionContent {
@@ -68,21 +69,19 @@ export default function DietPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Diet Plans</h1>
-          <p className="text-gray-900 mt-1">Manage your meal plans and track your nutrition.</p>
-        </div>
-        {!managedClient && (
-          <Link
-            href="/diet/new"
-            className="flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all"
-          >
-            <Plus className="h-4 w-4" />
-            <span>New Plan</span>
-          </Link>
-        )}
-      </div>
+      <AppPageHeader
+        eyebrow="Nutrition"
+        title="Diet"
+        subtitle="Manage your meal plans and track your nutrition."
+        actions={
+          !managedClient ? (
+            <Link href="/diet/new" className="btn btn-accent">
+              <Plus className="h-4 w-4" />
+              <span>New plan</span>
+            </Link>
+          ) : null
+        }
+      />
 
       {plans.length === 0 ? (
         <div className="card p-12 text-center">

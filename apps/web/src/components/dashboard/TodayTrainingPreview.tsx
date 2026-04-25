@@ -125,12 +125,12 @@ export default function TodayTrainingPreview({ userId }: TodayTrainingPreviewPro
 
   if (loading) {
     return (
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 animate-pulse">
-        <div className="h-5 bg-gray-200 rounded w-1/3 mb-3" />
-        <div className="space-y-2">
-          <div className="h-10 bg-gray-100 rounded" />
-          <div className="h-10 bg-gray-100 rounded" />
-          <div className="h-10 bg-gray-100 rounded" />
+      <div className="card animate-pulse" style={{ padding: 18 }}>
+        <div className="mb-3 h-5 w-1/3 rounded" style={{ background: 'var(--line)' }} />
+        <div className="col gap-2">
+          <div className="h-10 rounded" style={{ background: 'var(--line)' }} />
+          <div className="h-10 rounded" style={{ background: 'var(--line)' }} />
+          <div className="h-10 rounded" style={{ background: 'var(--line)' }} />
         </div>
       </div>
     )
@@ -139,26 +139,34 @@ export default function TodayTrainingPreview({ userId }: TodayTrainingPreviewPro
   if (noPlan || !day) return null
 
   return (
-    <div className="bg-gradient-to-br from-white to-violet-50/40 rounded-2xl p-5 shadow-sm border border-violet-100/60 hover:shadow-md transition-all duration-200">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <div className="bg-gradient-to-br from-violet-100 to-purple-100 rounded-full p-2">
-            <Dumbbell className="h-5 w-5 text-violet-600" />
+    <div className="card" style={{ padding: 18 }}>
+      <div className="row mb-4 justify-between">
+        <div>
+          <div
+            className="mono"
+            style={{
+              fontSize: 10,
+              color: 'var(--fg-4)',
+              letterSpacing: '0.14em',
+            }}
+          >
+            <Dumbbell className="mr-1.5 inline h-3 w-3" />
+            NEXT UP · TODAY
           </div>
-          <div>
-            <h3 className="font-semibold text-gray-900 text-sm">Today&apos;s Workout</h3>
-            <p className="text-xs text-gray-500">{day.dayName}</p>
+          <div className="serif mt-1" style={{ fontSize: 18 }}>
+            {day.dayName}
           </div>
         </div>
         {day.isCompleted ? (
-          <span className="flex items-center gap-1 text-xs bg-green-100 text-green-700 px-2.5 py-1 rounded-full font-medium">
+          <span className="chip" style={{ color: 'var(--ok)' }}>
             <CheckCircle2 className="h-3 w-3" />
             Done
           </span>
         ) : (
           <Link
             href={`/training/session/${day.dayId}`}
-            className="flex items-center gap-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:shadow-lg transition-all"
+            className="btn btn-accent"
+            style={{ padding: '6px 12px', fontSize: 12 }}
           >
             <Play className="h-3 w-3" />
             Start
@@ -166,27 +174,56 @@ export default function TodayTrainingPreview({ userId }: TodayTrainingPreviewPro
         )}
       </div>
 
-      <div className="space-y-2">
+      <div className="col">
         {day.exercises.slice(0, 6).map((ex, i) => (
           <div
             key={i}
-            className={`flex items-center justify-between py-2 px-3 rounded-lg text-sm ${
-              day.isCompleted ? 'bg-green-50/50' : 'bg-gray-50/80'
-            }`}
+            className="row justify-between"
+            style={{
+              padding: '10px 0',
+              borderBottom:
+                i < Math.min(day.exercises.length, 6) - 1
+                  ? '1px solid var(--line)'
+                  : 'none',
+              fontSize: 13,
+            }}
           >
-            <div className="flex items-center gap-2 min-w-0">
-              <span className="text-xs text-gray-400 w-4 text-right flex-shrink-0">{i + 1}</span>
-              <span className={`font-medium truncate ${day.isCompleted ? 'text-green-800' : 'text-gray-900'}`}>
+            <div className="row min-w-0 gap-2">
+              <span
+                className="mono w-4 shrink-0 text-right"
+                style={{ fontSize: 10, color: 'var(--fg-4)' }}
+              >
+                {i + 1}
+              </span>
+              <span
+                className="truncate"
+                style={{
+                  color: day.isCompleted ? 'var(--fg-3)' : 'var(--fg)',
+                  textDecoration: day.isCompleted ? 'line-through' : 'none',
+                }}
+              >
                 {ex.name}
               </span>
             </div>
-            <span className="text-xs text-gray-500 flex-shrink-0 ml-2">
-              {ex.sets} x {ex.reps}
+            <span
+              className="mono ml-2 shrink-0"
+              style={{ fontSize: 10, color: 'var(--fg-3)' }}
+            >
+              {ex.sets} × {ex.reps}
             </span>
           </div>
         ))}
         {day.exercises.length > 6 && (
-          <p className="text-xs text-gray-400 text-center">+{day.exercises.length - 6} more exercises</p>
+          <div
+            className="mono mt-2 text-center"
+            style={{
+              fontSize: 10,
+              color: 'var(--fg-4)',
+              letterSpacing: '0.1em',
+            }}
+          >
+            +{day.exercises.length - 6} MORE
+          </div>
         )}
       </div>
     </div>

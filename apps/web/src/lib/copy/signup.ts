@@ -4,32 +4,25 @@ export const signupCopy = {
   },
 
   intro: {
-    eyebrow: 'Get started',
-    titleLine1: 'Create your',
-    titleLine2: 'account.',
-    subtitle:
-      'Build your own meal and training plans with AI, or run your clients in one place as a Personal Trainer.',
-    highlights: [
-      ['Individuals', 'Build your own meal and training plans, track progress, and find a coach.'],
-      ['Coaches', 'Manage your clients, deliver their plans, and get discovered by new ones.'],
-    ] as const,
+    eyebrow: 'Create your account',
+    titleMain: 'Welcome.',
+    titleAccent: 'Are you here for…',
+  },
+
+  roles: {
+    individual: {
+      title: 'Myself',
+      body: 'I want a plan, with or without a coach later.',
+    },
+    coach: {
+      title: 'My clients',
+      body: 'I am a personal trainer or nutritionist.',
+    },
   },
 
   form: {
-    eyebrow: 'Create account',
-    title: 'Choose your role',
-    subtitle: 'Start as an individual or a coach.',
-    roleLabel: 'I am joining as',
-    roleIndividual: {
-      title: 'Individual',
-      body: 'Your own plans, progress tracking, and coach marketplace access.',
-    },
-    roleCoach: {
-      title: 'Coach / Personal Trainer',
-      body: 'Manage your clients and get a public profile.',
-    },
-    fullNameLabel: 'Full name',
-    fullNamePlaceholder: 'Your full name',
+    fullNameLabel: 'Your name',
+    fullNamePlaceholder: 'First name',
     emailLabel: 'Email',
     emailPlaceholder: 'your.email@example.com',
     passwordLabel: 'Password',

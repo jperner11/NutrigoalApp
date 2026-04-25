@@ -8,6 +8,7 @@ import { Dumbbell, Plus, Calendar, Clock, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 import type { TrainingPlan } from '@/lib/supabase/types'
 import ProgressCheckIn from '@/components/training/ProgressCheckIn'
+import AppPageHeader from '@/components/ui/AppPageHeader'
 import { isManagedClientRole } from '@nutrigoal/shared'
 
 interface PlanWithMeta extends TrainingPlan {
@@ -98,24 +99,19 @@ export default function TrainingPage() {
 
   return (
     <div className="min-h-screen">
-      {/* Subtle background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-50/40 via-transparent to-indigo-50/30 pointer-events-none -z-10" />
-
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Training Plans</h1>
-          <p className="text-gray-800 mt-1">Build and manage your workout routines.</p>
-        </div>
-        {!managedClient && (
-          <Link
-            href="/training/new"
-            className="flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-200"
-          >
-            <Plus className="h-4 w-4" />
-            <span>New Plan</span>
-          </Link>
-        )}
-      </div>
+      <AppPageHeader
+        eyebrow="Strength & cardio"
+        title="Training"
+        subtitle="Build and manage your workout routines."
+        actions={
+          !managedClient ? (
+            <Link href="/training/new" className="btn btn-accent">
+              <Plus className="h-4 w-4" />
+              <span>New plan</span>
+            </Link>
+          ) : null
+        }
+      />
 
       {profile && (
         <ProgressCheckIn

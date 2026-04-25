@@ -28,6 +28,7 @@ import TodayTrainingPreview from '@/components/dashboard/TodayTrainingPreview'
 import QuickWeightLog from '@/components/dashboard/QuickWeightLog'
 import SupplementWidget from '@/components/dashboard/SupplementWidget'
 import TrainerDashboard from '@/components/dashboard/TrainerDashboard'
+import AppPageHeader from '@/components/ui/AppPageHeader'
 import { isManagedClientRole, isTrainerRole } from '@nutrigoal/shared'
 
 function getGreeting(): string {
@@ -288,28 +289,27 @@ export default function DashboardPage() {
 
   const firstName = profile.full_name?.split(' ')[0] || 'there'
 
+  const dateLabel = new Date().toLocaleDateString('en-GB', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  })
+
   return (
     <div className="-m-4 p-4 sm:-m-6 sm:p-6 lg:-m-8 lg:p-8">
-      {/* Welcome */}
-      <div className="mb-8 flex items-center justify-between animate-[fadeIn_0.4s_ease-out_forwards]">
-        <div>
-          <h1 className="font-display text-4xl font-bold text-[var(--foreground)]">
-            {greeting}, {firstName} <span className="inline-block animate-[wave_1.5s_ease-in-out_infinite]" style={{ transformOrigin: '70% 70%' }}>&#128075;</span>
-          </h1>
-          <p className="mt-2 text-base text-[var(--muted)]">
-            Here&apos;s your performance overview for today.
-          </p>
-        </div>
-        {profile.role === 'free' && (
-          <Link
-            href="/pricing"
-            className="btn-primary flex items-center space-x-2 rounded-2xl px-5 py-3 text-sm font-semibold"
-          >
-            <Crown className="h-4 w-4" />
-            <span>Upgrade</span>
-          </Link>
-        )}
-      </div>
+      <AppPageHeader
+        eyebrow={dateLabel}
+        title={`${greeting}, ${firstName}`}
+        accent="."
+        actions={
+          profile.role === 'free' ? (
+            <Link href="/pricing" className="btn btn-accent">
+              <Crown className="h-4 w-4" />
+              <span>Upgrade</span>
+            </Link>
+          ) : null
+        }
+      />
 
       {/* Onboarding prompt */}
       {!profile.onboarding_completed && (

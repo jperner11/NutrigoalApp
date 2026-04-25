@@ -1,91 +1,113 @@
 export const landingCopy = {
   nav: {
+    home: 'Home',
+    findCoach: 'Find a coach',
+    forCoaches: 'For coaches',
+    howItWorks: 'How it works',
     pricing: 'Pricing',
-    faq: 'FAQ',
-    support: 'Support',
     signIn: 'Sign in',
-    createAccount: 'Create account',
+    startFree: 'Start free',
   },
 
   hero: {
-    eyebrow: 'Meal & Motion',
-    titleLine1: 'One place to build your plan',
-    titleLine2: 'or find the right coach.',
+    eyebrow: 'Spring release 01 — open beta',
+    region: 'EST. 2024 · LONDON / LISBOA',
+    titleLines: ['Eat better.', 'Train smarter.'],
+    titleAccent: 'Feel yourself moving.',
     subtitle:
-      'Meal plans, training plans, progress tracking, and a directory of Personal Trainers — all in one app.',
-    ctaPrimary: 'Find a coach',
-    ctaSecondary: 'Create account',
-  },
-
-  mockCard: {
-    kicker: "Today's plan",
-    title: 'Wednesday',
-    targetLabel: 'Target kcal',
-    targetValue: '2,350',
-    nutritionTitle: 'This week',
-    nutritionStatus: '76% of meals logged',
-    nutritionNote: 'Protein on track',
-    nextWorkoutTitle: 'Next workout',
-    nextWorkoutName: 'Upper strength · 45 min',
-    nextWorkoutNote: 'Adjusted for how much you slept and recovered.',
-    nextWorkoutBadge: 'On plan',
-  },
-
-  pillars: {
-    eyebrow: 'How it works',
-    title: 'Plans built around you.',
-    items: [
-      {
-        title: 'Built around you',
-        body: 'Every plan is shaped by your goals, schedule, training history, and food preferences.',
-      },
-      {
-        title: 'Food and training in one app',
-        body: 'Meal plans and training plans live in the same app, so you never have to switch tools.',
-      },
-      {
-        title: 'Solo or with a coach',
-        body: 'Run your own plan with AI, or work with a Personal Trainer inside the app.',
-      },
+      "One calm app for the plan you follow alone — or the coach you work with when you're ready for more. No feed. No noise. Just your momentum.",
+    ctas: {
+      forSelf: "I'm here for myself",
+      forCoach: "I'm a personal trainer",
+      buildPlan: 'Build my first plan',
+      browseCoaches: 'Browse coaches first',
+      trialNote: '7-day free trial · no card',
+    },
+    stats: [
+      { value: '418', label: 'coaches onboarded' },
+      { value: '12k+', label: 'plans generated' },
+      { value: '4.8', label: 'avg. client rating' },
+      { value: '<24h', label: 'avg. coach reply' },
     ],
   },
 
-  coachSection: {
-    eyebrow: 'For Personal Trainers',
-    title: 'Run your clients in one place.',
-    body:
-      'Invite clients, build their meal and training plans, message them, collect feedback, and track their progress — all in one app.',
-    bullets: [
-      'One roster for all your clients',
-      'Meal and training plans in the app',
-      'Client messaging and feedback requests',
-      'A public profile new clients can find you through',
+  clientPreview: {
+    kicker: 'TUESDAY · WEEK 3',
+    title: 'Today, briefly.',
+    statusChip: 'On track',
+    metrics: [
+      { label: 'Protein', value: '142', unit: '/ 165g', progress: 0.86 },
+      { label: 'Training', value: '38', unit: '/ 45 min', progress: 0.84 },
+      { label: 'Water', value: '2.1', unit: '/ 3.0 L', progress: 0.7 },
     ],
+    nextMeal: {
+      kicker: 'NEXT · 12:30 LUNCH',
+      kcal: '560 kcal',
+      name: 'Chickpea bowl, tahini, pickled onion',
+      macros: ['42 g P', '48 g C', '18 g F'],
+    },
+    nudge: {
+      lead: 'Sleep dipped last night —',
+      action: "I lowered today's session by one set.",
+    },
   },
 
-  individualSection: {
-    eyebrow: 'For individuals',
-    title: 'A plan that fits how you train.',
-    body:
-      'Answer a few questions about your goals, schedule, and food preferences. Get a meal plan and a training plan that adapt as you track progress.',
-    cards: [
-      'Meal planning',
-      'Training plans',
-      'Progress tracking',
-      'Cardio and water logging',
-    ],
-  },
+  ticker: [
+    'No streaks. No notifications guilt-tripping you.',
+    'AI that reads your sleep, not just your macros.',
+    'Coach marketplace — verified, not vibes.',
+    'Plans regenerate when life regenerates.',
+    'Hybrid training: lift, run, recover.',
+    'Built with coaches, not against them.',
+  ],
 
-  discoverSection: {
-    eyebrow: 'Discover coaches',
-    title: 'Find a coach who trains the way you want.',
-    body:
-      'Browse Personal Trainers by goal, style, and price. Contact a coach directly and start working together inside the app.',
-    bullets: [
-      'Browse by goal, format, and price',
-      'Compare specialties and style',
-      'Contact a coach directly',
-      'Work with them inside the app',
+  threeLanes: {
+    eyebrow: 'Three ways in',
+    titleMain: 'One app, three doors.',
+    titleAccent: 'Pick what fits today.',
+    lanes: [
+      {
+        tag: '01 · SOLO',
+        title: 'Plan by yourself.',
+        sub: 'AI that reads your life, not just your macros.',
+        body:
+          'Nine calm questions. We build your first week of meals and training. Regenerate anything that does not fit.',
+        bullets: [
+          'Meal generator with allergens & budget',
+          'Hybrid strength + cardio splits',
+          'Grocery list, auto-consolidated',
+        ],
+        cta: 'Start solo',
+        href: '/signup',
+      },
+      {
+        tag: '02 · COACHED',
+        title: 'Work with a coach.',
+        sub: 'The private side of the app, for you and your PT.',
+        body:
+          'If your trainer is on Meal & Motion, their plans land here. You log. They watch. The feedback loop is the product.',
+        bullets: [
+          'Assigned plans from your coach',
+          'Weekly check-ins & feedback loop',
+          'Messaging without algorithms',
+        ],
+        cta: 'Have an invite? Open it',
+        href: '/signup',
+      },
+      {
+        tag: '03 · DISCOVER',
+        title: 'Find a new coach.',
+        sub: 'A marketplace with quality, not vibes.',
+        body:
+          'Browse by goal, budget, format. Send one structured request. No cold DMs, no pricing roulette.',
+        bullets: [
+          'Structured coach profiles',
+          'One-question matching quiz',
+          'Accept/decline, no ghosting',
+        ],
+        cta: 'Browse coaches',
+        href: '/find-coach',
+      },
     ],
   },
 } as const

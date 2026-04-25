@@ -1,8 +1,10 @@
 node_modules
 .turbo
 .next
+.vercel
 out
 dist
+*.tsbuildinfo
 .env
 .env.local
 .DS_Store

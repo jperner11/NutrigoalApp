@@ -13,6 +13,7 @@ import {
   UserPlus,
   Users,
 } from 'lucide-react'
+import AppPageHeader from '@/components/ui/AppPageHeader'
 
 interface TrainerDashboardProps {
   trainerId: string
@@ -251,30 +252,24 @@ export default function TrainerDashboard({ trainerId, trainerName }: TrainerDash
 
   return (
     <div className="space-y-8">
-      <section className="panel-strong relative overflow-hidden p-8">
-        <div className="absolute inset-y-0 right-0 w-72 bg-[radial-gradient(circle_at_center,rgba(77,196,255,0.16),transparent_68%)]" />
-        <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <div className="eyebrow mb-4">Practitioner home</div>
-            <h1 className="font-display text-4xl font-bold text-[var(--foreground)]">
-              {trainerName}, here’s what needs attention today.
-            </h1>
-            <p className="mt-3 max-w-2xl text-base leading-7 text-[var(--muted)]">
-              Keep the day simple: clear pending invites, assign plans to unprogrammed clients, and respond where momentum is slipping.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <Link href="/clients/invite" className="btn-primary inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold">
+      <AppPageHeader
+        eyebrow="Coach studio"
+        title={trainerName}
+        accent="today."
+        subtitle="Clear pending invites, assign plans to unprogrammed clients, and respond where momentum is slipping."
+        actions={
+          <>
+            <Link href="/clients/invite" className="btn btn-accent">
               <UserPlus className="h-4 w-4" />
               Invite client
             </Link>
-            <Link href="/clients" className="btn-secondary inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold">
+            <Link href="/clients" className="btn btn-ghost">
               <Users className="h-4 w-4" />
               Open roster
             </Link>
-          </div>
-        </div>
-      </section>
+          </>
+        }
+      />
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {attentionItems.map((item) => (

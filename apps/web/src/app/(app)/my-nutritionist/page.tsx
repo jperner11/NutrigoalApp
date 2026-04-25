@@ -5,6 +5,7 @@ import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
 import { UserCheck, MessageSquare, FileText, Utensils, Dumbbell } from 'lucide-react'
 import Link from 'next/link'
+import AppPageHeader from '@/components/ui/AppPageHeader'
 import { isManagedClientRole } from '@nutrigoal/shared'
 
 interface TrainerInfo {
@@ -62,13 +63,12 @@ export default function MyNutritionistPage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <div>
-        <div className="eyebrow mb-4">Managed client</div>
-        <h1 className="text-3xl font-bold text-gray-900">My Trainer</h1>
-        <p className="mt-2 text-gray-600">
-          Your plans, messages, and feedback requests all run through this relationship.
-        </p>
-      </div>
+      <AppPageHeader
+        eyebrow="Managed client"
+        title="My"
+        accent="coach."
+        subtitle="Your plans, messages, and feedback requests all run through this relationship."
+      />
 
       <div className="card p-6">
         <div className="flex items-center gap-4 mb-4">

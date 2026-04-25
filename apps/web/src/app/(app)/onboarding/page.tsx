@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import {
-  ArrowRight, ArrowLeft, User, Utensils,
+  ArrowRight, User, Utensils,
   Calculator, Heart, Dumbbell, Briefcase, Calendar, Sparkles, Users, ClipboardList, MessageSquare,
   Cookie, Camera, Globe,
 } from 'lucide-react'
@@ -1944,32 +1944,36 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto pb-8">
-      {/* Progress Bar */}
-      <div className="mb-8">
-        <div className="flex justify-between items-center mb-3">
-          <span className="text-sm font-medium text-gray-600">Step {step + 1} of {steps.length}</span>
-          <span className="text-sm font-medium text-gray-600">{Math.round(((step + 1) / steps.length) * 100)}%</span>
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
+    <div className="mx-auto max-w-[640px] px-4 pb-12 pt-8">
+      {/* Progress — prototype-style segmented bar */}
+      <div className="row mb-6 gap-1.5">
+        {steps.map((s, i) => (
           <div
-            className="bg-gradient-to-r from-purple-600 to-indigo-600 h-2 rounded-full transition-all duration-500 ease-out"
-            style={{ width: `${((step + 1) / steps.length) * 100}%` }}
+            key={s}
+            style={{
+              flex: 1,
+              height: 3,
+              borderRadius: 999,
+              background: i <= step ? 'var(--acc)' : 'var(--line)',
+              transition: 'background 0.3s ease',
+            }}
           />
-        </div>
-        {/* Step dots */}
-        <div className="flex justify-center gap-1.5 mt-3">
-          {steps.map((s, i) => (
-            <div
-              key={s}
-              className={`h-1.5 rounded-full transition-all duration-300 ${
-                i <= step ? 'bg-purple-600 w-5' : 'bg-gray-300 w-1.5'
-              }`}
-            />
-          ))}
-        </div>
-        <p className="text-center text-xs text-gray-500 mt-2">{steps[step]}</p>
+        ))}
       </div>
+
+      <div
+        className="eyebrow mb-4"
+        style={{ color: 'var(--acc)' }}
+      >
+        {isTrainer ? 'YOUR COACHING PROFILE' : "LET'S MEET YOU"} · {String(step + 1).padStart(2, '0')} / {String(steps.length).padStart(2, '0')}
+      </div>
+
+      <h2 className="h2 mb-8">
+        {steps[step]}
+        <span className="italic-serif ml-2" style={{ color: 'var(--fg-3)' }}>
+          ·
+        </span>
+      </h2>
 
       {/* Card */}
       <div className="card p-6 md:p-8">
@@ -1979,30 +1983,23 @@ export default function OnboardingPage() {
 
         {/* Navigation (not shown on Review step which has its own buttons) */}
         {step < steps.length - 1 && (
-          <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-100">
+          <div
+            className="row mt-8 justify-between border-t pt-6"
+            style={{ borderColor: 'var(--line)' }}
+          >
             <button
               onClick={() => setStep(step - 1)}
               disabled={step === 0}
-              className={`flex items-center gap-2 px-5 py-3 rounded-xl transition-all font-medium ${
-                step === 0
-                  ? 'text-gray-300 cursor-not-allowed'
-                  : 'text-gray-600 hover:bg-gray-100'
-              }`}
+              className="btn btn-ghost disabled:opacity-30 disabled:cursor-not-allowed"
             >
-              <ArrowLeft className="h-4 w-4" />
-              <span>Back</span>
+              ← Back
             </button>
             <button
               onClick={() => setStep(step + 1)}
               disabled={!canContinue()}
-              className={`flex items-center gap-2 px-6 py-3 rounded-xl transition-all font-semibold ${
-                canContinue()
-                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:shadow-lg'
-                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-              }`}
+              className="btn btn-accent disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              <span>Continue</span>
-              <ArrowRight className="h-4 w-4" />
+              Continue →
             </button>
           </div>
         )}

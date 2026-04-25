@@ -7,6 +7,7 @@ import { Users, Plus, Mail, UserCheck, Clock3, Copy, Send, Ban, AlertCircle } fr
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { toast } from 'react-hot-toast'
+import AppPageHeader from '@/components/ui/AppPageHeader'
 import { isTrainerRole } from '@nutrigoal/shared'
 
 interface ActiveClientRow {
@@ -164,21 +165,17 @@ export default function ClientsPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Client Roster</h1>
-          <p className="text-gray-700 mt-1">
-            {activeClients.length} active · {pendingInvites.length} pending · {totalNeedsAttention} need attention
-          </p>
-        </div>
-        <Link
-          href="/clients/invite"
-          className="flex items-center space-x-2 bg-gradient-to-r from-sky-500 to-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all"
-        >
-          <Plus className="h-4 w-4" />
-          <span>Invite Client</span>
-        </Link>
-      </div>
+      <AppPageHeader
+        eyebrow={`${activeClients.length} active · ${pendingInvites.length} pending · ${totalNeedsAttention} need attention`}
+        title="Your"
+        accent="clients."
+        actions={
+          <Link href="/clients/invite" className="btn btn-accent">
+            <Plus className="h-4 w-4" />
+            <span>Invite client</span>
+          </Link>
+        }
+      />
 
       <div className="grid gap-4 md:grid-cols-3">
         {[

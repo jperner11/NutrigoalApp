@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight, Eye, EyeOff, Lock, Mail, User, UserCircle, Users } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 import { sanitizeNextPath } from '@/lib/authRedirect'
 import BrandLogo from '@/components/brand/BrandLogo'
 import { signupCopy } from '@/lib/copy/signup'
+
+type Role = 'free' | 'personal_trainer'
 
 export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -18,7 +20,7 @@ export default function SignupPage() {
     email: '',
     password: '',
     confirmPassword: '',
-    role: 'free' as 'free' | 'personal_trainer',
+    role: 'free' as Role,
   })
 
   useEffect(() => {
@@ -27,10 +29,10 @@ export default function SignupPage() {
     const email = params.get('email') || ''
     const role = params.get('role')
     setNextPath(next)
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       email,
-      ...(role === 'free' || role === 'personal_trainer' ? { role } : {}),
+      ...(role === 'free' || role === 'personal_trainer' ? { role: role as Role } : {}),
     }))
   }, [])
 
@@ -44,12 +46,10 @@ export default function SignupPage() {
       toast.error('Please fill in all fields')
       return
     }
-
     if (formData.password.length < 6) {
       toast.error('Password must be at least 6 characters')
       return
     }
-
     if (formData.password !== formData.confirmPassword) {
       toast.error('Passwords do not match')
       return
@@ -89,7 +89,6 @@ export default function SignupPage() {
         } else {
           toast.success('This invite already created your account. Check your email for a password setup link.')
         }
-
         setIsLoading(false)
         return
       }
@@ -108,8 +107,11 @@ export default function SignupPage() {
           .select('id')
           .eq('id', user.id)
           .single()
-        if (data) { profile = data; break }
-        await new Promise(r => setTimeout(r, 500))
+        if (data) {
+          profile = data
+          break
+        }
+        await new Promise((r) => setTimeout(r, 500))
       }
 
       if (!profile) {
@@ -133,173 +135,205 @@ export default function SignupPage() {
           max_clients: 15,
         })
       }
-
     }
 
     toast.success('Account created! Please check your email to confirm.')
     window.location.href = postSignupNextPath
   }
 
+  const setRole = (role: Role) => setFormData((prev) => ({ ...prev, role }))
+
+  const inputStyle: React.CSSProperties = {
+    width: '100%',
+    padding: '14px 16px',
+    fontSize: 15,
+    background: 'var(--ink-2)',
+    border: '1px solid var(--line-2)',
+    borderRadius: 12,
+    color: 'var(--fg)',
+    outline: 'none',
+  }
+
   return (
-    <div className="auth-bg min-h-screen px-4 py-10 sm:px-6 lg:px-8">
-      <div className="mx-auto flex max-w-7xl items-center justify-between pb-8">
+    <div className="min-h-screen overflow-x-hidden">
+      <div className="row mx-auto max-w-[1320px] justify-between px-8 py-5">
         <BrandLogo href="/" />
-        <Link href={`/login${nextPath !== '/onboarding' ? `?next=${encodeURIComponent(nextPath)}` : ''}`} className="btn-secondary rounded-full px-5 py-3 text-sm font-semibold">
+        <Link
+          href={`/login${nextPath !== '/onboarding' ? `?next=${encodeURIComponent(nextPath)}` : ''}`}
+          className="btn btn-ghost"
+        >
           {signupCopy.nav.signIn}
         </Link>
       </div>
 
-      <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.95fr_0.95fr] lg:items-start">
-        <section className="panel-strong p-8 sm:p-10">
-          <div className="eyebrow mb-5">{signupCopy.intro.eyebrow}</div>
-          <h1 className="text-5xl font-bold leading-[0.96] text-[var(--foreground)] sm:text-6xl">
-            {signupCopy.intro.titleLine1}
-            <span className="block text-[var(--brand-500)]">{signupCopy.intro.titleLine2}</span>
-          </h1>
-          <p className="mt-6 max-w-xl text-lg leading-8 text-[var(--muted)]">
-            {signupCopy.intro.subtitle}
-          </p>
-          <div className="mt-10 grid gap-4 sm:grid-cols-2">
-            {signupCopy.intro.highlights.map(([title, body]) => (
-              <div key={title} className="surface-card p-5">
-                <div className="font-display text-2xl font-bold text-[var(--foreground)]">{title}</div>
-                <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{body}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+      <section className="mx-auto max-w-[480px] px-8 pb-20 pt-10">
+        <div className="mb-8 flex justify-center">
+          <BrandLogo compact />
+        </div>
 
-        <section className="glass-card rounded-[32px] p-8 sm:p-10">
-          <div className="mb-8">
-            <div className="eyebrow mb-4">{signupCopy.form.eyebrow}</div>
-            <h2 className="text-4xl font-bold text-[var(--foreground)]">{signupCopy.form.title}</h2>
-            <p className="mt-3 text-base leading-7 text-[var(--muted)]">
-              {signupCopy.form.subtitle}
-            </p>
-          </div>
+        <div className="mb-4 flex justify-center">
+          <div className="eyebrow eyebrow-dot">{signupCopy.intro.eyebrow}</div>
+        </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label className="mb-3 block text-sm font-semibold text-[var(--foreground)]">{signupCopy.form.roleLabel}</label>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setFormData(prev => ({ ...prev, role: 'free' }))}
-                  className={`rounded-[22px] border p-5 text-left transition ${formData.role === 'free'
-                    ? 'border-[rgba(29,168,240,0.34)] bg-[var(--brand-100)] shadow-[0_14px_32px_rgba(29,168,240,0.12)]'
-                    : 'border-[var(--line)] bg-white/65 hover:border-[rgba(29,168,240,0.24)]'
-                  }`}
+        <h1 className="h2 mb-8 text-center">
+          {signupCopy.intro.titleMain}
+          <br />
+          <span className="italic-serif" style={{ color: 'var(--fg-3)' }}>
+            {signupCopy.intro.titleAccent}
+          </span>
+        </h1>
+
+        <div className="col gap-3">
+          {(['free', 'personal_trainer'] as const).map((role) => {
+            const data =
+              role === 'free' ? signupCopy.roles.individual : signupCopy.roles.coach
+            const active = formData.role === role
+            return (
+              <button
+                key={role}
+                type="button"
+                onClick={() => setRole(role)}
+                className="text-left transition"
+                style={{
+                  padding: 22,
+                  border: active ? '1px solid var(--acc)' : '1px solid var(--line-2)',
+                  borderRadius: 16,
+                  background: active ? 'var(--ink-3)' : 'var(--ink-2)',
+                  cursor: 'pointer',
+                }}
+              >
+                <div className="serif" style={{ fontSize: 26 }}>
+                  {data.title}
+                </div>
+                <div
+                  className="mt-1.5"
+                  style={{ fontSize: 14, color: 'var(--fg-2)' }}
                 >
-                  <User className={`mb-3 h-7 w-7 ${formData.role === 'free' ? 'text-[var(--brand-900)]' : 'text-[var(--muted-soft)]'}`} />
-                  <div className="font-display text-xl font-bold text-[var(--foreground)]">{signupCopy.form.roleIndividual.title}</div>
-                  <div className="mt-1 text-sm text-[var(--muted)]">{signupCopy.form.roleIndividual.body}</div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setFormData(prev => ({ ...prev, role: 'personal_trainer' }))}
-                  className={`rounded-[22px] border p-5 text-left transition ${formData.role === 'personal_trainer'
-                    ? 'border-[rgba(29,168,240,0.34)] bg-[var(--brand-100)] shadow-[0_14px_32px_rgba(29,168,240,0.12)]'
-                    : 'border-[var(--line)] bg-white/65 hover:border-[rgba(29,168,240,0.24)]'
-                  }`}
-                >
-                  <Users className={`mb-3 h-7 w-7 ${formData.role === 'personal_trainer' ? 'text-[var(--brand-900)]' : 'text-[var(--muted-soft)]'}`} />
-                  <div className="font-display text-xl font-bold text-[var(--foreground)]">{signupCopy.form.roleCoach.title}</div>
-                  <div className="mt-1 text-sm text-[var(--muted)]">{signupCopy.form.roleCoach.body}</div>
-                </button>
-              </div>
-            </div>
+                  {data.body}
+                </div>
+              </button>
+            )
+          })}
+        </div>
 
-            <div>
-              <label htmlFor="fullName" className="mb-2 block text-sm font-semibold text-[var(--foreground)]">{signupCopy.form.fullNameLabel}</label>
-              <div className="relative">
-                <UserCircle className="pointer-events-none absolute left-5 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-[var(--muted-soft)]" />
-                <input
-                  id="fullName"
-                  type="text"
-                  value={formData.fullName}
-                  onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
-                  className="input-field input-field-icon-left"
-                  placeholder="Your full name"
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="email" className="mb-2 block text-sm font-semibold text-[var(--foreground)]">{signupCopy.form.emailLabel}</label>
-              <div className="relative">
-                <Mail className="pointer-events-none absolute left-5 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-[var(--muted-soft)]" />
-                <input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  className="input-field input-field-icon-left"
-                  placeholder="your.email@example.com"
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="password" className="mb-2 block text-sm font-semibold text-[var(--foreground)]">{signupCopy.form.passwordLabel}</label>
-              <div className="relative">
-                <Lock className="pointer-events-none absolute left-5 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-[var(--muted-soft)]" />
-                <input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  value={formData.password}
-                  onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                  className="input-field input-field-icon-both"
-                  placeholder="Minimum 6 characters"
-                  required
-                />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 flex items-center pr-5 text-[var(--muted-soft)]">
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="confirmPassword" className="mb-2 block text-sm font-semibold text-[var(--foreground)]">{signupCopy.form.confirmPasswordLabel}</label>
-              <div className="relative">
-                <Lock className="pointer-events-none absolute left-5 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-[var(--muted-soft)]" />
-                <input
-                  id="confirmPassword"
-                  type="password"
-                  value={formData.confirmPassword}
-                  onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                  className="input-field input-field-icon-left"
-                  placeholder="Re-enter your password"
-                  required
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="btn-primary flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-4 text-base font-semibold disabled:opacity-50"
+        <form onSubmit={handleSubmit} className="col mt-8 gap-4">
+          <div>
+            <label
+              className="mono mb-2 block"
+              style={{ fontSize: 11, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
             >
-              {isLoading ? (
-                <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-              ) : (
-                <>
-                  <span>{signupCopy.form.submit}</span>
-                  <ArrowRight className="h-4 w-4" />
-                </>
-              )}
-            </button>
-          </form>
-
-          <div className="mt-8 border-t border-[var(--line)] pt-6 text-sm text-[var(--muted)]">
-            {signupCopy.form.alreadyHave}{' '}
-            <Link href={`/login${nextPath !== '/onboarding' ? `?next=${encodeURIComponent(nextPath)}` : ''}`} className="font-semibold text-[var(--foreground)] transition hover:text-[var(--brand-500)]">
-              {signupCopy.form.signInLink}
-            </Link>
+              {signupCopy.form.fullNameLabel.toUpperCase()}
+            </label>
+            <input
+              type="text"
+              value={formData.fullName}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, fullName: e.target.value }))
+              }
+              placeholder={signupCopy.form.fullNamePlaceholder}
+              style={inputStyle}
+              required
+            />
           </div>
-        </section>
-      </div>
+
+          <div>
+            <label
+              className="mono mb-2 block"
+              style={{ fontSize: 11, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
+            >
+              {signupCopy.form.emailLabel.toUpperCase()}
+            </label>
+            <input
+              type="email"
+              value={formData.email}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, email: e.target.value }))
+              }
+              placeholder={signupCopy.form.emailPlaceholder}
+              style={inputStyle}
+              required
+            />
+          </div>
+
+          <div>
+            <label
+              className="mono mb-2 block"
+              style={{ fontSize: 11, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
+            >
+              {signupCopy.form.passwordLabel.toUpperCase()}
+            </label>
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={formData.password}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, password: e.target.value }))
+                }
+                placeholder={signupCopy.form.passwordPlaceholder}
+                style={{ ...inputStyle, paddingRight: 48 }}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 flex items-center pr-4"
+                style={{ color: 'var(--fg-3)' }}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
+                )}
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label
+              className="mono mb-2 block"
+              style={{ fontSize: 11, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
+            >
+              {signupCopy.form.confirmPasswordLabel.toUpperCase()}
+            </label>
+            <input
+              type="password"
+              value={formData.confirmPassword}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, confirmPassword: e.target.value }))
+              }
+              placeholder={signupCopy.form.confirmPasswordPlaceholder}
+              style={inputStyle}
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="btn btn-accent mt-2 w-full justify-center disabled:opacity-50"
+            style={{ padding: '14px 18px', fontSize: 15 }}
+          >
+            {isLoading ? (
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+            ) : (
+              <span>{signupCopy.form.submit} →</span>
+            )}
+          </button>
+        </form>
+
+        <div
+          className="mt-6 text-center"
+          style={{ fontSize: 13, color: 'var(--fg-3)' }}
+        >
+          {signupCopy.form.alreadyHave}{' '}
+          <Link
+            href={`/login${nextPath !== '/onboarding' ? `?next=${encodeURIComponent(nextPath)}` : ''}`}
+            style={{ color: 'var(--fg)', fontWeight: 600 }}
+          >
+            {signupCopy.form.signInLink}
+          </Link>
+        </div>
+      </section>
     </div>
   )
 }

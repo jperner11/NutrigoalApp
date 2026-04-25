@@ -38,6 +38,8 @@ export async function updateSession(request: NextRequest) {
   const publicRoutes = new Set([
     '/',
     '/find-coach',
+    '/for-coaches',
+    '/how-it-works',
     '/api/coach-match',
     '/api/coach-waitlist',
     '/login',
@@ -61,6 +63,7 @@ export async function updateSession(request: NextRequest) {
     publicRoutes.has(pathname) ||
     pathname.startsWith('/auth/') ||
     pathname.startsWith('/invite/') ||
+    pathname.startsWith('/find-coach/') ||
     isInvitePublicApi
 
   // If not authenticated and trying to access protected route, redirect to login

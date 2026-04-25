@@ -370,3 +370,308 @@ input:focus, select:focus, textarea:focus, button:focus-visible {
 main {
   animation: fadeIn 0.3s ease-out;
 }
+
+/* ───────────────────────────────────────────────────────────
+   Meal & Motion prototype port
+   Tokens, utilities, and keyframes from the prototype design,
+   mapped onto the existing light theme + Plus Jakarta / Manrope.
+   ─────────────────────────────────────────────────────────── */
+
+:root {
+  /* Foreground tones */
+  --fg: var(--foreground);
+  --fg-2: var(--muted);
+  --fg-3: var(--muted-soft);
+  --fg-4: rgba(91, 112, 133, 0.55);
+
+  /* Accent (atomic blue) */
+  --acc: var(--brand-500);
+  --acc-soft: rgba(29, 168, 240, 0.14);
+
+  /* Surfaces ("ink" in prototype = surface tones, light-flipped) */
+  --ink-0: var(--background);
+  --ink-1: #ffffff;
+  --ink-2: rgba(255, 255, 255, 0.62);
+  --ink-3: var(--brand-100);
+
+  /* Lines */
+  --line-2: var(--line-strong);
+  --line-3: rgba(91, 121, 144, 0.5);
+
+  /* Paper-ink reverse (dark-on-light page sections) */
+  --paper: var(--brand-900);
+  --paper-ink: #f3f8fc;
+  --paper-line: rgba(255, 255, 255, 0.12);
+
+  /* Status */
+  --ok: #1aa37a;
+  --warn: #c4791c;
+
+  /* Mono stack — no Geist Mono, system fallback per current-fonts decision */
+  --font-mono-stack: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+/* Editorial type — uses display font (Plus Jakarta Sans) with tighter tracking
+   to mimic the prototype's Instrument Serif feel without adding a new font. */
+.serif {
+  font-family: var(--font-display), Arial, Helvetica, sans-serif;
+  letter-spacing: -0.035em;
+  font-weight: 600;
+}
+
+.italic-serif {
+  font-family: var(--font-display), Arial, Helvetica, sans-serif;
+  font-style: italic;
+  letter-spacing: -0.025em;
+  font-weight: 500;
+  opacity: 0.92;
+}
+
+.mono {
+  font-family: var(--font-mono-stack);
+  font-feature-settings: "tnum" on;
+}
+
+/* Display headings used by prototype sections */
+.h1 {
+  font-family: var(--font-display), Arial, Helvetica, sans-serif;
+  font-size: clamp(48px, 7vw, 88px);
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+  font-weight: 700;
+}
+
+.h2 {
+  font-family: var(--font-display), Arial, Helvetica, sans-serif;
+  font-size: clamp(36px, 4.4vw, 56px);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  font-weight: 700;
+}
+
+.h3 {
+  font-family: var(--font-display), Arial, Helvetica, sans-serif;
+  font-size: clamp(22px, 2.2vw, 30px);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+}
+
+/* Layout primitives */
+.row {
+  display: flex;
+  align-items: center;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+}
+
+.gap-4 { gap: 4px; }
+.gap-6 { gap: 6px; }
+.gap-8 { gap: 8px; }
+.gap-10 { gap: 10px; }
+.gap-12 { gap: 12px; }
+.gap-14 { gap: 14px; }
+.gap-16 { gap: 16px; }
+.gap-20 { gap: 20px; }
+.gap-24 { gap: 24px; }
+
+/* Eyebrow with leading dot (prototype's eyebrow-dot variant) */
+.eyebrow-dot::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--acc);
+  margin-right: 8px;
+  vertical-align: middle;
+  transform: translateY(-1px);
+}
+
+/* Chip — small status pill */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line-2);
+  background: rgba(255, 255, 255, 0.6);
+  font-family: var(--font-mono-stack);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--fg-2);
+  white-space: nowrap;
+}
+
+/* Secondary card — flatter than .card */
+.card-2 {
+  background: rgba(255, 255, 255, 0.74);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  transition: border-color 0.2s ease;
+}
+
+.card-2:hover {
+  border-color: var(--line-2);
+}
+
+/* Divider */
+.divider {
+  height: 1px;
+  background: var(--line);
+  border: none;
+  width: 100%;
+}
+
+/* Buttons — base + ghost (existing .btn-primary / .btn-accent kept intact) */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-family: var(--font-body), Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--fg);
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--line-2);
+  color: var(--fg);
+}
+
+.btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: var(--acc);
+}
+
+/* Tabs (used on coach profile) */
+.tab-row {
+  display: flex;
+  gap: 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.tab {
+  font-family: var(--font-mono-stack);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--fg-3);
+  padding: 12px 0;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.tab.active {
+  color: var(--fg);
+  border-bottom-color: var(--acc);
+}
+
+/* Sidebar item (used in client-app + coach-app shells) */
+.side-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  color: var(--fg-2);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.side-item:hover {
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--fg);
+}
+
+.side-item.active {
+  background: var(--ink-3);
+  color: var(--fg);
+  font-weight: 600;
+}
+
+/* Phone chrome (mobile preview) */
+.phone {
+  width: 220px;
+  height: 440px;
+  border-radius: 38px;
+  background: var(--brand-900);
+  padding: 8px;
+  box-shadow:
+    0 22px 54px rgba(13, 27, 42, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.phone-inner {
+  width: 100%;
+  height: 100%;
+  background: var(--ink-0);
+  border-radius: 30px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.phone-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px 6px;
+  font-family: var(--font-mono-stack);
+  font-size: 9px;
+  color: var(--fg-3);
+}
+
+/* Subtle grid background (used on onboarding finish card) */
+.grid-bg {
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* Animations — fade-up + ticker scroll */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-up {
+  opacity: 0;
+  animation: fadeUp 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+}
+
+.fade-up:nth-child(1) { animation-delay: 0.05s; }
+.fade-up:nth-child(2) { animation-delay: 0.15s; }
+.fade-up:nth-child(3) { animation-delay: 0.25s; }
+.fade-up:nth-child(4) { animation-delay: 0.35s; }
+.fade-up:nth-child(5) { animation-delay: 0.45s; }
+
+@keyframes tickerScroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.ticker-track {
+  animation: tickerScroll 50s linear infinite;
+  width: max-content;
+}
+
+/* Range input accent override for budget slider in discover */
+input[type="range"] {
+  accent-color: var(--acc);
+}

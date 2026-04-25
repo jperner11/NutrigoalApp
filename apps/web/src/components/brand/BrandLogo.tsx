@@ -5,51 +5,79 @@ import Link from 'next/link'
 interface BrandLogoProps {
   href?: string
   compact?: boolean
+  tagline?: boolean
   light?: boolean
+  size?: number
   className?: string
 }
 
 export default function BrandLogo({
   href,
   compact = false,
+  tagline = false,
   light = false,
+  size = 28,
   className = '',
 }: BrandLogoProps) {
+  const color = light ? '#ffffff' : 'currentColor'
+  const accentColor = light ? '#ffffff' : 'var(--acc)'
+
   const content = (
-    <div className={`inline-flex items-center gap-3 ${className}`.trim()}>
-      <div className={`brand-mark ${light ? 'brand-mark-light' : ''}`}>
-        <svg viewBox="0 0 64 64" aria-hidden="true" className="h-6 w-6">
-          <path
-            d="M15 43V28.5C15 23.806 18.806 20 23.5 20C28.194 20 32 23.806 32 28.5V43"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M32 43V30C32 24.477 36.477 20 42 20C47.523 20 52 24.477 52 30V43"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="4.75"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M17 45C21.5 49 42.5 49 47 45"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="4.25"
-            strokeLinecap="round"
-            className="brand-mark-accent"
-          />
-          <circle cx="45.5" cy="18.5" r="3.5" fill="currentColor" className="brand-mark-accent" />
-        </svg>
-      </div>
+    <div
+      className={`inline-flex items-center gap-3 ${className}`.trim()}
+      style={{ color: light ? '#fff' : 'var(--foreground)' }}
+    >
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 40 40"
+        fill="none"
+        aria-hidden="true"
+      >
+        <path
+          d="M6 28V18a6 6 0 0112 0v10"
+          stroke={color}
+          strokeWidth="2.6"
+          strokeLinecap="round"
+        />
+        <path
+          d="M22 28V18a6 6 0 0112 0v10"
+          stroke={color}
+          strokeWidth="2.6"
+          strokeLinecap="round"
+        />
+        <path
+          d="M5 32h30"
+          stroke={color}
+          strokeWidth="2.6"
+          strokeLinecap="round"
+        />
+        <circle cx="32" cy="9" r="3" fill={accentColor} />
+      </svg>
+
       {!compact && (
         <div className="min-w-0">
-          <div className={`brand-wordmark ${light ? 'brand-wordmark-light' : ''}`}>Meal &amp; Motion</div>
-          <div className={`brand-tagline ${light ? 'brand-tagline-light' : ''}`}>feel your momentum</div>
+          <div
+            className="font-display"
+            style={{
+              fontSize: Math.round(size * 0.82),
+              letterSpacing: '-0.04em',
+              lineHeight: 1,
+              fontWeight: 700,
+            }}
+          >
+            meal
+            <span style={{ fontStyle: 'italic', opacity: 0.78, fontWeight: 500 }}>&amp;</span>
+            motion
+          </div>
+          {tagline && (
+            <div
+              className={`brand-tagline ${light ? 'brand-tagline-light' : ''}`}
+              style={{ marginTop: 4 }}
+            >
+              feel your momentum
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -1,49 +1,75 @@
 import Link from 'next/link'
 import BrandLogo from '@/components/brand/BrandLogo'
-import { COMPANY_NAME, SUPPORT_EMAIL } from '@/lib/site'
 import { footerCopy } from '@/lib/copy/footer'
 
 export default function PublicFooter() {
   return (
-    <footer className="border-t border-[var(--line)] bg-white/75">
-      <div className="mx-auto flex max-w-7xl flex-col gap-10 px-4 py-12 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
-          <div className="max-w-xl">
-            <BrandLogo href="/" />
-            <p className="mt-4 text-sm leading-7 text-[var(--muted)]">
-              {footerCopy.tagline}
-            </p>
-          </div>
-
-          <div className="grid gap-8 sm:grid-cols-2">
-            <div>
-              <div className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--muted-soft)]">{footerCopy.companyHeading}</div>
-              <div className="mt-4 space-y-3 text-sm text-[var(--muted)]">
-                {footerCopy.links.map((link) => (
-                  <div key={link.href}>
-                    <Link href={link.href} className="transition hover:text-[var(--foreground)]">
-                      {link.label}
-                    </Link>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <div className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--muted-soft)]">{footerCopy.supportHeading}</div>
-              <div className="mt-4 space-y-3 text-sm text-[var(--muted)]">
-                <p>{COMPANY_NAME}</p>
-                <a href={`mailto:${SUPPORT_EMAIL}`} className="transition hover:text-[var(--foreground)]">
-                  {SUPPORT_EMAIL}
-                </a>
-              </div>
-            </div>
-          </div>
+    <footer
+      className="border-t"
+      style={{
+        borderColor: 'var(--line)',
+        background: 'rgba(255,255,255,0.4)',
+        padding: '60px 32px',
+      }}
+    >
+      <div
+        className="mx-auto grid max-w-[1320px] gap-10 lg:grid-cols-[2fr_1fr_1fr_1fr]"
+      >
+        <div>
+          <BrandLogo href="/" />
+          <p
+            className="mt-4 max-w-[360px]"
+            style={{ fontSize: 13, color: 'var(--fg-3)', lineHeight: 1.55 }}
+          >
+            {footerCopy.tagline}
+          </p>
         </div>
 
-        <div className="border-t border-[var(--line)] pt-6 text-sm text-[var(--muted)]">
-          © 2026 {COMPANY_NAME}. {footerCopy.rights}
-        </div>
+        {footerCopy.columns.map((col) => (
+          <div key={col.heading}>
+            <div
+              className="mono mb-3.5"
+              style={{
+                fontSize: 10,
+                color: 'var(--fg-4)',
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+              }}
+            >
+              {col.heading}
+            </div>
+            <div className="col gap-2">
+              {col.links.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="transition hover:text-[var(--fg)]"
+                  style={{ fontSize: 13, color: 'var(--fg-2)' }}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div
+        className="row mx-auto mt-10 max-w-[1320px] justify-between border-t pt-6"
+        style={{ borderColor: 'var(--line)' }}
+      >
+        <span
+          className="mono"
+          style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.12em' }}
+        >
+          {footerCopy.legal}
+        </span>
+        <span
+          className="mono"
+          style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.12em' }}
+        >
+          {footerCopy.version}
+        </span>
       </div>
     </footer>
   )

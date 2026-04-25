@@ -50,49 +50,87 @@ export default function QuickWeightLog({ userId, currentWeight, onWeightLogged }
   }
 
   return (
-    <div className="bg-gradient-to-br from-white to-indigo-50/40 rounded-2xl p-5 shadow-sm border border-indigo-100/60 hover:shadow-md transition-all duration-200">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <div className="bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full p-2">
-            <Scale className="h-5 w-5 text-indigo-600" />
+    <div className="card" style={{ padding: 18 }}>
+      <div className="row mb-3 justify-between">
+        <div className="row gap-2">
+          <Scale className="h-4 w-4" style={{ color: 'var(--fg-3)' }} />
+          <div
+            className="mono"
+            style={{
+              fontSize: 10,
+              color: 'var(--fg-4)',
+              letterSpacing: '0.14em',
+            }}
+          >
+            QUICK WEIGHT LOG
           </div>
-          <h3 className="font-semibold text-gray-900 text-sm">Quick Weight Log</h3>
         </div>
-        <Link href="/progress" className="text-xs text-purple-600 hover:text-purple-800 font-medium">
-          History
+        <Link
+          href="/progress"
+          className="mono"
+          style={{
+            fontSize: 10,
+            color: 'var(--acc)',
+            letterSpacing: '0.1em',
+          }}
+        >
+          HISTORY →
         </Link>
       </div>
 
       {currentWeight && (
-        <p className="text-xs text-gray-500 mb-3">
-          Last: <span className="font-semibold text-gray-700">{currentWeight} kg</span>
-        </p>
+        <div className="mb-3" style={{ fontSize: 12, color: 'var(--fg-3)' }}>
+          Last:{' '}
+          <span className="serif" style={{ color: 'var(--fg)' }}>
+            {currentWeight} kg
+          </span>
+        </div>
       )}
 
       {justLogged ? (
-        <div className="text-center py-3">
-          <p className="text-sm text-green-600 font-medium">Logged today!</p>
+        <div className="py-2 text-center">
+          <p
+            className="serif"
+            style={{ fontSize: 16, color: 'var(--ok)' }}
+          >
+            Logged today.
+          </p>
           <button
             onClick={() => setJustLogged(false)}
-            className="text-xs text-purple-600 hover:text-purple-800 mt-1"
+            className="mono mt-1"
+            style={{
+              fontSize: 10,
+              color: 'var(--acc)',
+              letterSpacing: '0.1em',
+            }}
           >
-            Update
+            UPDATE
           </button>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="flex gap-2">
+        <form onSubmit={handleSubmit} className="row gap-2">
           <input
             type="number"
             step="0.1"
             placeholder={currentWeight ? `${currentWeight}` : 'kg'}
             value={weight}
             onChange={(e) => setWeight(e.target.value)}
-            className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
+            className="flex-1"
+            style={{
+              padding: '10px 12px',
+              background: 'var(--ink-2)',
+              border: '1px solid var(--line-2)',
+              borderRadius: 10,
+              fontSize: 14,
+              color: 'var(--fg)',
+              outline: 'none',
+            }}
           />
           <button
             type="submit"
             disabled={saving || !weight}
-            className="flex items-center gap-1 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all disabled:opacity-50"
+            className="btn btn-accent disabled:opacity-50"
+            style={{ padding: '10px 14px', fontSize: 13 }}
           >
             <Plus className="h-4 w-4" />
             Log

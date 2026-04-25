@@ -73,67 +73,111 @@ export default function SupplementWidget({ userId }: SupplementWidgetProps) {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-200 animate-pulse">
-        <div className="h-5 bg-gray-200 rounded w-1/3 mb-3" />
-        <div className="space-y-2">
-          <div className="h-8 bg-gray-100 rounded" />
-          <div className="h-8 bg-gray-100 rounded" />
+      <div className="card animate-pulse" style={{ padding: 18 }}>
+        <div className="mb-3 h-5 w-1/3 rounded" style={{ background: 'var(--line)' }} />
+        <div className="col gap-2">
+          <div className="h-8 rounded" style={{ background: 'var(--line)' }} />
+          <div className="h-8 rounded" style={{ background: 'var(--line)' }} />
         </div>
       </div>
     )
   }
 
-  // Don't render if user has no supplements
   if (supplements.length === 0) return null
 
   const takenCount = todayLogs.length
   const total = supplements.length
+  const progress = total > 0 ? takenCount / total : 0
 
   return (
-    <div className="bg-gradient-to-br from-white to-green-50/40 rounded-2xl p-5 shadow-sm border border-green-100/60 hover:shadow-md transition-all duration-200">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <div className="bg-gradient-to-br from-green-100 to-emerald-100 rounded-full p-2">
-            <Pill className="h-5 w-5 text-green-600" />
-          </div>
+    <div className="card" style={{ padding: 18 }}>
+      <div className="row mb-3 justify-between">
+        <div className="row gap-2">
+          <Pill className="h-4 w-4" style={{ color: 'var(--fg-3)' }} />
           <div>
-            <h3 className="font-semibold text-gray-900 text-sm">Supplements</h3>
-            <p className="text-xs text-gray-500">{takenCount}/{total} taken today</p>
+            <div
+              className="mono"
+              style={{
+                fontSize: 10,
+                color: 'var(--fg-4)',
+                letterSpacing: '0.14em',
+              }}
+            >
+              SUPPLEMENTS
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--fg-3)' }}>
+              {takenCount}/{total} taken today
+            </div>
           </div>
         </div>
-        <Link href="/supplements" className="text-xs text-purple-600 hover:text-purple-800 font-medium">
-          Manage
+        <Link
+          href="/supplements"
+          className="mono"
+          style={{
+            fontSize: 10,
+            color: 'var(--acc)',
+            letterSpacing: '0.1em',
+          }}
+        >
+          MANAGE →
         </Link>
       </div>
 
-      <div className="w-full bg-green-100/50 rounded-full h-2 mb-3">
+      <div
+        className="mb-3 overflow-hidden rounded-full"
+        style={{ height: 3, background: 'var(--line)' }}
+      >
         <div
-          className="bg-gradient-to-r from-green-400 to-emerald-500 h-2 rounded-full transition-all duration-500 ease-out"
-          style={{ width: `${total > 0 ? (takenCount / total) * 100 : 0}%` }}
+          style={{
+            width: `${progress * 100}%`,
+            height: '100%',
+            background: 'var(--acc)',
+            transition: 'width 0.4s ease',
+          }}
         />
       </div>
 
-      <div className="space-y-1.5 max-h-48 overflow-y-auto">
-        {supplements.map(sup => {
-          const isTaken = todayLogs.some(l => l.supplement_id === sup.id)
+      <div className="col max-h-48 gap-1 overflow-y-auto">
+        {supplements.map((sup) => {
+          const isTaken = todayLogs.some((l) => l.supplement_id === sup.id)
           return (
             <button
               key={sup.id}
               onClick={() => toggleLog(sup)}
-              className={`w-full flex items-center gap-2 py-1.5 px-2 rounded-lg text-left text-sm transition-colors ${
-                isTaken ? 'bg-green-50' : 'hover:bg-gray-50'
-              }`}
+              className="row w-full gap-2 rounded-lg px-2 py-1.5 text-left transition"
+              style={{
+                background: isTaken ? 'var(--ink-3)' : 'transparent',
+                fontSize: 13,
+              }}
             >
-              <div className={`flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
-                isTaken ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300'
-              }`}>
+              <div
+                className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full"
+                style={{
+                  border: isTaken
+                    ? '2px solid var(--acc)'
+                    : '2px solid var(--line-2)',
+                  background: isTaken ? 'var(--acc)' : 'transparent',
+                  color: '#fff',
+                }}
+              >
                 {isTaken && <Check className="h-3 w-3" />}
               </div>
-              <span className={`truncate ${isTaken ? 'text-green-800 line-through' : 'text-gray-700'}`}>
+              <span
+                className="truncate"
+                style={{
+                  color: isTaken ? 'var(--fg-3)' : 'var(--fg)',
+                  textDecoration: isTaken ? 'line-through' : 'none',
+                }}
+              >
                 {sup.name}
               </span>
               {sup.dosage && (
-                <span className="text-xs text-gray-400 ml-auto flex-shrink-0">{sup.dosage}</span>
+                <span
+                  className="mono ml-auto shrink-0"
+                  style={{ fontSize: 10, color: 'var(--fg-4)' }}
+                >
+                  {sup.dosage}
+                </span>
               )}
             </button>
           )
