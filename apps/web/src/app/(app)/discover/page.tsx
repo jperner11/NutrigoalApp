@@ -14,6 +14,8 @@ import {
   loadLeadWizardPreferences,
 } from '@/lib/findCoach'
 import { isManagedClientRole, isTrainerRole } from '@nutrigoal/shared'
+import AppPageHeader from '@/components/ui/AppPageHeader'
+import Portrait from '@/components/ui/Portrait'
 
 interface DiscoverCoach {
   coach_id: string
@@ -46,6 +48,27 @@ interface DiscoverCoach {
     coach_check_in_frequency: string | null
     coach_ideal_client: string | null
   }
+}
+
+const inputStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '12px 14px',
+  background: 'var(--ink-2)',
+  border: '1px solid var(--line-2)',
+  borderRadius: 12,
+  fontSize: 14,
+  color: 'var(--fg)',
+  outline: 'none',
+}
+
+function getInitials(name: string | null) {
+  return (name || 'C')
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((p) => p[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase()
 }
 
 export default function DiscoverPage() {
@@ -153,49 +176,90 @@ export default function DiscoverPage() {
   }
 
   if (loading) {
-    return <div className="text-gray-500">Loading coach discovery...</div>
+    return (
+      <div className="card p-8">
+        <div
+          className="mono"
+          style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}
+        >
+          LOADING
+        </div>
+        <div className="serif mt-2" style={{ fontSize: 24, color: 'var(--fg)' }}>
+          Pulling the coach directory.
+        </div>
+      </div>
+    )
   }
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <div className="eyebrow mb-4">Discover coaches</div>
-          <h1 className="text-3xl font-bold text-gray-900">Find a coach who matches your goal.</h1>
-          <p className="mt-2 max-w-3xl text-gray-600">
-            Browse public coach profiles by specialty, format, and price range, then send a structured coaching request inside Meal & Motion.
-          </p>
-        </div>
-        <div className="rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-600">
-          {filteredCoaches.length} coach{filteredCoaches.length !== 1 ? 'es' : ''} shown
-        </div>
-      </div>
+    <div className="mx-auto max-w-[1200px]">
+      <AppPageHeader
+        eyebrow="Discover coaches"
+        title="Find a coach who"
+        accent="matches your goal."
+        subtitle="Browse public coach profiles by specialty, format, and price range, then send a structured coaching request inside Meal & Motion."
+        chip={
+          <span className="chip">
+            {filteredCoaches.length} COACH{filteredCoaches.length !== 1 ? 'ES' : ''} SHOWN
+          </span>
+        }
+      />
 
       {!canRequestCoach && (
-        <div className="rounded-2xl border border-sky-100 bg-sky-50/80 p-5 text-sm leading-6 text-sky-900">
-          {isManagedClientRole(profile?.role)
-            ? 'You already have an active coach relationship, so discovery is view-only right now.'
-            : 'Discovery requests are available for self-serve users. If you already have a coach linked, your next steps should happen in My Trainer.'}
+        <div
+          className="card-2 mb-6 p-5"
+          style={{ background: 'var(--acc-soft)', borderColor: 'var(--acc)' }}
+        >
+          <div
+            className="mono mb-1.5"
+            style={{ fontSize: 10, color: 'var(--acc)', letterSpacing: '0.14em' }}
+          >
+            ✦ HEADS UP
+          </div>
+          <div style={{ fontSize: 14, color: 'var(--fg-2)', lineHeight: 1.6 }}>
+            {isManagedClientRole(profile?.role)
+              ? 'You already have an active coach relationship, so discovery is view-only right now.'
+              : 'Discovery requests are available for self-serve users. If you already have a coach linked, your next steps should happen in My Coach.'}
+          </div>
         </div>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-[1.6fr_0.8fr]">
+      {/* Search + format filter */}
+      <div className="mb-6 grid gap-3 lg:grid-cols-[1.6fr_0.8fr]">
         <div className="relative">
-          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <Search
+            className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2"
+            style={{ color: 'var(--fg-4)' }}
+          />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by coach name, specialty, or ideal client"
-            className="w-full rounded-2xl border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm text-gray-900 shadow-sm focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-100"
+            style={{ ...inputStyle, paddingLeft: 44 }}
           />
         </div>
-        <div className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white px-4 py-3">
-          <SlidersHorizontal className="h-4 w-4 text-gray-400" />
+        <div
+          className="row gap-3"
+          style={{
+            padding: '8px 14px',
+            background: 'var(--ink-2)',
+            border: '1px solid var(--line-2)',
+            borderRadius: 12,
+          }}
+        >
+          <SlidersHorizontal className="h-4 w-4" style={{ color: 'var(--fg-4)' }} />
           <select
             value={formatFilter}
             onChange={(e) => setFormatFilter(e.target.value)}
-            className="w-full bg-transparent text-sm text-gray-700 focus:outline-none"
+            className="w-full"
+            style={{
+              fontSize: 14,
+              color: 'var(--fg)',
+              background: 'transparent',
+              border: 'none',
+              outline: 'none',
+            }}
           >
             <option value="all">All formats</option>
             {availableFormats.map((format) => (
@@ -205,78 +269,167 @@ export default function DiscoverPage() {
         </div>
       </div>
 
+      {/* Coach grid */}
       {filteredCoaches.length === 0 ? (
-        <div className="rounded-[28px] border border-dashed border-gray-200 bg-white px-6 py-14 text-center">
-          <Compass className="mx-auto h-10 w-10 text-gray-300" />
-          <h2 className="mt-4 text-xl font-semibold text-gray-900">No coaches match that filter yet.</h2>
-          <p className="mt-2 text-sm text-gray-500">Try a broader search or remove the format filter.</p>
+        <div className="card p-12 text-center">
+          <Compass
+            className="mx-auto mb-3 h-10 w-10"
+            style={{ color: 'var(--fg-4)' }}
+          />
+          <div className="serif" style={{ fontSize: 22 }}>
+            No coaches{' '}
+            <span className="italic-serif" style={{ color: 'var(--fg-3)' }}>
+              match that filter yet.
+            </span>
+          </div>
+          <p
+            className="mt-2"
+            style={{ fontSize: 13, color: 'var(--fg-2)' }}
+          >
+            Try a broader search or remove the format filter.
+          </p>
         </div>
       ) : (
-        <div className="grid gap-6 xl:grid-cols-2">
-          {filteredCoaches.map((coach) => {
+        <div className="grid gap-5 xl:grid-cols-2">
+          {filteredCoaches.map((coach, i) => {
             const coachName = coach.coach?.full_name || 'Coach'
-            const initial = coachName[0]?.toUpperCase() || 'C'
+            const initials = getInitials(coachName)
+            const accepting = coach.accepting_new_clients
+
             return (
-              <div key={coach.coach_id} className="rounded-[30px] border border-gray-200 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-center gap-4">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-sky-500 to-blue-600 text-lg font-bold text-white">
-                      {initial}
+              <div key={coach.coach_id} className="card p-6">
+                {/* Top row: portrait + name/headline + accepting chip */}
+                <div className="row items-start justify-between gap-4">
+                  <div className="row items-start gap-4">
+                    <div style={{ width: 64, height: 64, flexShrink: 0 }}>
+                      <Portrait seed={i} label={initials} height={64} />
                     </div>
-                    <div>
-                      <h2 className="text-xl font-semibold text-gray-900">{coachName}</h2>
-                      <p className="mt-1 text-sm text-gray-600">{coach.headline || 'Personal coaching inside Meal & Motion'}</p>
+                    <div className="min-w-0">
+                      <div className="serif" style={{ fontSize: 22, lineHeight: 1.15 }}>
+                        {coachName}
+                      </div>
+                      <div
+                        className="mt-1"
+                        style={{ fontSize: 13, color: 'var(--fg-2)', lineHeight: 1.45 }}
+                      >
+                        {coach.headline || 'Personal coaching inside Meal & Motion'}
+                      </div>
                     </div>
                   </div>
-                  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${coach.accepting_new_clients ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
-                    {coach.accepting_new_clients ? 'Accepting clients' : 'Waitlist only'}
+                  <span
+                    className="chip shrink-0"
+                    style={{
+                      color: accepting ? 'var(--ok)' : 'var(--warn)',
+                    }}
+                  >
+                    ● {accepting ? 'Accepting' : 'Waitlist'}
                   </span>
                 </div>
 
-                <div className="mt-5 flex flex-wrap gap-2">
-                  {(coach.coach?.coach_specialties ?? []).slice(0, 4).map((item) => (
-                    <span key={item} className="rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-700">
-                      {item}
-                    </span>
-                  ))}
-                </div>
+                {/* Specialties chips */}
+                {(coach.coach?.coach_specialties ?? []).length > 0 && (
+                  <div className="row mt-4 flex-wrap gap-1.5">
+                    {(coach.coach?.coach_specialties ?? []).slice(0, 4).map((item) => (
+                      <span key={item} className="chip">
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                )}
 
-                <div className="mt-5 grid gap-3 text-sm text-gray-600 md:grid-cols-2">
+                {/* Stats grid */}
+                <div className="mt-5 grid gap-3 md:grid-cols-2">
                   <div>
-                    <div className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">Formats</div>
-                    <div className="mt-1">{(coach.coach?.coach_formats ?? []).join(', ') || 'Flexible'}</div>
+                    <div
+                      className="mono"
+                      style={{ fontSize: 10, color: 'var(--fg-4)', letterSpacing: '0.12em' }}
+                    >
+                      FORMATS
+                    </div>
+                    <div
+                      className="mt-1"
+                      style={{ fontSize: 13, color: 'var(--fg-2)' }}
+                    >
+                      {(coach.coach?.coach_formats ?? []).join(', ') || 'Flexible'}
+                    </div>
                   </div>
                   <div>
-                    <div className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">Pricing</div>
-                    <div className="mt-1">{formatCoachPriceRange(coach.price_from, coach.price_to, coach.currency)}</div>
+                    <div
+                      className="mono"
+                      style={{ fontSize: 10, color: 'var(--fg-4)', letterSpacing: '0.12em' }}
+                    >
+                      PRICING
+                    </div>
+                    <div
+                      className="serif mt-1"
+                      style={{ fontSize: 15, color: 'var(--fg)' }}
+                    >
+                      {formatCoachPriceRange(coach.price_from, coach.price_to, coach.currency)}
+                    </div>
                   </div>
                   <div>
-                    <div className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">Check-ins</div>
-                    <div className="mt-1">{coach.coach?.coach_check_in_frequency?.replace(/_/g, ' ') || 'Flexible'}</div>
+                    <div
+                      className="mono"
+                      style={{ fontSize: 10, color: 'var(--fg-4)', letterSpacing: '0.12em' }}
+                    >
+                      CHECK-INS
+                    </div>
+                    <div
+                      className="mt-1"
+                      style={{ fontSize: 13, color: 'var(--fg-2)' }}
+                    >
+                      {coach.coach?.coach_check_in_frequency?.replace(/_/g, ' ') || 'Flexible'}
+                    </div>
                   </div>
                   <div>
-                    <div className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">Location</div>
-                    <div className="mt-1 flex items-center gap-1.5">
-                      <MapPin className="h-3.5 w-3.5 text-gray-400" />
+                    <div
+                      className="mono"
+                      style={{ fontSize: 10, color: 'var(--fg-4)', letterSpacing: '0.12em' }}
+                    >
+                      LOCATION
+                    </div>
+                    <div
+                      className="row mt-1 gap-1.5"
+                      style={{ fontSize: 13, color: 'var(--fg-2)' }}
+                    >
+                      <MapPin className="h-3 w-3" style={{ color: 'var(--fg-4)' }} />
                       <span>{coach.location_label || 'Online / remote'}</span>
                     </div>
                   </div>
                 </div>
 
-                <p className="mt-5 text-sm leading-6 text-gray-600">
+                {/* Bio */}
+                <p
+                  className="mt-5"
+                  style={{ fontSize: 13, color: 'var(--fg-2)', lineHeight: 1.6 }}
+                >
                   {coach.bio || coach.coach?.coach_ideal_client || 'This coach has not added a detailed bio yet, but you can still send a structured request if the fit looks right.'}
                 </p>
 
+                {/* Offers */}
                 {coach.offers.length > 0 && (
-                  <div className="mt-5 grid gap-3">
+                  <div className="mt-5 col gap-2">
                     {coach.offers.slice(0, 2).map((offer) => (
-                      <div key={offer.id} className="rounded-2xl border border-gray-200 bg-gray-50/70 p-4">
-                        <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <div className="font-semibold text-gray-900">{offer.title}</div>
-                            <div className="mt-1 text-sm text-gray-600">{offer.description || 'Public coaching offer'}</div>
+                      <div key={offer.id} className="card-2 p-4">
+                        <div className="row items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <div
+                              className="serif"
+                              style={{ fontSize: 15, color: 'var(--fg)' }}
+                            >
+                              {offer.title}
+                            </div>
+                            <div
+                              className="mt-1"
+                              style={{ fontSize: 12, color: 'var(--fg-2)', lineHeight: 1.5 }}
+                            >
+                              {offer.description || 'Public coaching offer'}
+                            </div>
                           </div>
-                          <div className="text-sm font-semibold text-sky-700">
+                          <div
+                            className="serif shrink-0"
+                            style={{ fontSize: 14, color: 'var(--acc)' }}
+                          >
                             {formatOfferPrice(offer.price, coach.currency, offer.billing_period)}
                           </div>
                         </div>
@@ -285,7 +438,8 @@ export default function DiscoverPage() {
                   </div>
                 )}
 
-                <div className="mt-6 flex flex-wrap items-center gap-3">
+                {/* Actions */}
+                <div className="row mt-6 flex-wrap items-center gap-2">
                   <button
                     type="button"
                     onClick={() => {
@@ -298,24 +452,35 @@ export default function DiscoverPage() {
                         message: prev.message || leadWizardPreferences?.additional_notes || '',
                       }))
                     }}
-                    disabled={!canRequestCoach || !coach.accepting_new_clients}
-                    className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 px-4 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+                    disabled={!canRequestCoach || !accepting}
+                    className="btn btn-accent disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <MessageSquare className="h-4 w-4" />
                     Request coaching
                   </button>
-                  <div className="inline-flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-gray-600">
-                    <UserCheck className="h-4 w-4 text-sky-600" />
-                    {(coach.coach?.coach_services ?? []).slice(0, 2).join(' · ') || 'Coaching services listed in profile'}
-                  </div>
+                  {(coach.coach?.coach_services ?? []).length > 0 && (
+                    <span
+                      className="row gap-1.5"
+                      style={{
+                        padding: '8px 12px',
+                        fontSize: 12,
+                        color: 'var(--fg-3)',
+                        border: '1px solid var(--line-2)',
+                        borderRadius: 12,
+                      }}
+                    >
+                      <UserCheck className="h-3.5 w-3.5" style={{ color: 'var(--acc)' }} />
+                      {(coach.coach?.coach_services ?? []).slice(0, 2).join(' · ')}
+                    </span>
+                  )}
                   {coach.consultation_url && (
                     <Link
                       href={coach.consultation_url}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-2 rounded-xl border border-sky-200 px-4 py-2.5 text-sm font-semibold text-sky-700"
+                      className="btn btn-ghost"
                     >
-                      <ExternalLink className="h-4 w-4" />
+                      <ExternalLink className="h-3.5 w-3.5" />
                       Book consult
                     </Link>
                   )}
@@ -326,28 +491,56 @@ export default function DiscoverPage() {
         </div>
       )}
 
+      {/* Request modal */}
       {selectedCoach && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 px-4">
-          <div className="w-full max-w-2xl rounded-[28px] bg-white p-6 shadow-[0_28px_80px_rgba(15,23,42,0.24)]">
-            <div className="flex items-start justify-between gap-4">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center px-4"
+          style={{ background: 'rgba(13, 27, 42, 0.55)', backdropFilter: 'blur(4px)' }}
+        >
+          <div className="card w-full max-w-2xl p-6">
+            <div className="row items-start justify-between gap-4">
               <div>
-                <div className="text-sm font-semibold uppercase tracking-[0.14em] text-sky-600">Request coaching</div>
-                <h2 className="mt-2 text-2xl font-bold text-gray-900">{selectedCoach.coach?.full_name || 'Coach'}</h2>
-                <p className="mt-2 text-sm text-gray-600">{selectedCoach.headline || 'Tell the coach what you want help with and how you prefer to work.'}</p>
+                <div
+                  className="mono"
+                  style={{ fontSize: 11, color: 'var(--acc)', letterSpacing: '0.14em' }}
+                >
+                  ✦ REQUEST COACHING
+                </div>
+                <div
+                  className="serif mt-2"
+                  style={{ fontSize: 26, lineHeight: 1.15 }}
+                >
+                  {selectedCoach.coach?.full_name || 'Coach'}
+                </div>
+                <p
+                  className="mt-2"
+                  style={{ fontSize: 13, color: 'var(--fg-2)', lineHeight: 1.5 }}
+                >
+                  {selectedCoach.headline || 'Tell the coach what you want help with and how you prefer to work.'}
+                </p>
               </div>
-              <button type="button" onClick={() => setSelectedCoach(null)} className="rounded-xl border border-gray-200 px-3 py-2 text-sm text-gray-600">
+              <button
+                type="button"
+                onClick={() => setSelectedCoach(null)}
+                className="btn btn-ghost shrink-0"
+              >
                 Close
               </button>
             </div>
 
-            <div className="mt-6 space-y-4">
+            <div className="col mt-6 gap-3.5">
               {selectedCoach.offers.length > 0 && (
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">Choose an offer</label>
+                  <label
+                    className="mono mb-2 block"
+                    style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
+                  >
+                    CHOOSE AN OFFER
+                  </label>
                   <select
                     value={leadForm.selected_offer_id}
                     onChange={(e) => setLeadForm((prev) => ({ ...prev, selected_offer_id: e.target.value }))}
-                    className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm"
+                    style={inputStyle}
                   >
                     <option value="">General coaching request</option>
                     {selectedCoach.offers.map((offer) => (
@@ -359,60 +552,84 @@ export default function DiscoverPage() {
                 </div>
               )}
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">What do you want help with?</label>
+                <label
+                  className="mono mb-2 block"
+                  style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
+                >
+                  WHAT DO YOU WANT HELP WITH? *
+                </label>
                 <input
                   type="text"
                   value={leadForm.goal_summary}
                   onChange={(e) => setLeadForm((prev) => ({ ...prev, goal_summary: e.target.value }))}
-                  className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm"
                   placeholder="e.g. Lose fat sustainably while keeping strength"
+                  style={inputStyle}
                 />
               </div>
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-3.5 md:grid-cols-2">
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">Preferred format</label>
+                  <label
+                    className="mono mb-2 block"
+                    style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
+                  >
+                    PREFERRED FORMAT
+                  </label>
                   <input
                     type="text"
                     value={leadForm.preferred_format}
                     onChange={(e) => setLeadForm((prev) => ({ ...prev, preferred_format: e.target.value }))}
-                    className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm"
                     placeholder="Online, hybrid, in person"
+                    style={inputStyle}
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">Budget</label>
+                  <label
+                    className="mono mb-2 block"
+                    style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
+                  >
+                    BUDGET
+                  </label>
                   <input
                     type="text"
                     value={leadForm.budget_label}
                     onChange={(e) => setLeadForm((prev) => ({ ...prev, budget_label: e.target.value }))}
-                    className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm"
-                    placeholder="e.g. £100-£150/month"
+                    placeholder="e.g. £100–£150 / month"
+                    style={inputStyle}
                   />
                 </div>
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">Message</label>
+                <label
+                  className="mono mb-2 block"
+                  style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
+                >
+                  MESSAGE
+                </label>
                 <textarea
                   value={leadForm.message}
                   onChange={(e) => setLeadForm((prev) => ({ ...prev, message: e.target.value }))}
-                  className="min-h-[140px] w-full rounded-xl border border-gray-200 px-4 py-3 text-sm"
                   placeholder="Anything useful about your schedule, experience, or what has not worked in the past."
+                  style={{ ...inputStyle, minHeight: 140, resize: 'vertical' }}
                 />
               </div>
             </div>
 
-            <div className="mt-6 flex justify-end gap-3">
-              <button type="button" onClick={() => setSelectedCoach(null)} className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700">
+            <div className="row mt-6 justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setSelectedCoach(null)}
+                className="btn btn-ghost"
+              >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleLeadSubmit}
                 disabled={submitting}
-                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+                className="btn btn-accent disabled:opacity-50"
               >
                 {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <MessageSquare className="h-4 w-4" />}
-                Send request
+                Send request →
               </button>
             </div>
           </div>
