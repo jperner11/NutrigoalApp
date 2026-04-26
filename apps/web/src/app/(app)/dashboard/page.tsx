@@ -4,11 +4,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
 import {
-  Target,
   Droplets,
-  TrendingUp,
-  TrendingDown,
-  Minus,
   Dumbbell,
   HeartPulse,
   Utensils,
@@ -16,7 +12,6 @@ import {
   Sparkles,
   Crown,
   Plus,
-  Scale,
   RefreshCw,
 } from 'lucide-react'
 import Link from 'next/link'
@@ -29,6 +24,8 @@ import QuickWeightLog from '@/components/dashboard/QuickWeightLog'
 import SupplementWidget from '@/components/dashboard/SupplementWidget'
 import TrainerDashboard from '@/components/dashboard/TrainerDashboard'
 import AppPageHeader from '@/components/ui/AppPageHeader'
+import StatTile from '@/components/ui/StatTile'
+import AINudgeCard from '@/components/ui/AINudgeCard'
 import { isManagedClientRole, isTrainerRole } from '@nutrigoal/shared'
 
 function getGreeting(): string {
@@ -283,10 +280,6 @@ export default function DashboardPage() {
     ? Math.min((todayStats.caloriesConsumed / profile.daily_calories) * 100, 100)
     : 0
 
-  const waterProgress = profile.daily_water_ml
-    ? Math.min((todayStats.waterConsumed / profile.daily_water_ml) * 100, 100)
-    : 0
-
   const firstName = profile.full_name?.split(' ')[0] || 'there'
 
   const dateLabel = new Date().toLocaleDateString('en-GB', {
@@ -313,58 +306,71 @@ export default function DashboardPage() {
 
       {/* Onboarding prompt */}
       {!profile.onboarding_completed && (
-        <div className="panel-strong mb-6 animate-[fadeIn_0.5s_ease-out_forwards] p-6">
-          <h3 className="font-display text-2xl font-bold text-[var(--foreground)] mb-2">
-            {isManagedClientRole(profile.role) ? 'Complete your coach intake' : 'Complete your profile'}
-          </h3>
-          <p className="text-sm text-[var(--muted)] mb-4">
-            {isManagedClientRole(profile.role)
-              ? 'Your trainer needs a few details before they can review your case and assign your first plan.'
-              : 'Set up your metrics and goals to get personalized nutrition targets.'}
-          </p>
-          <Link
-            href="/onboarding"
-            className="btn-primary inline-flex items-center space-x-2 rounded-2xl px-5 py-3 text-sm font-semibold"
-          >
-            <span>Complete Setup</span>
-          </Link>
-        </div>
+        <AINudgeCard
+          className="mb-6"
+          kicker={isManagedClientRole(profile.role) ? 'Complete your coach intake' : 'Complete your profile'}
+          body={
+            <div>
+              <p>
+                {isManagedClientRole(profile.role)
+                  ? 'Your trainer needs a few details before they can review your case and assign your first plan.'
+                  : 'Set up your metrics and goals to get personalized nutrition targets.'}
+              </p>
+            </div>
+          }
+          actions={
+            <Link href="/onboarding" className="btn btn-accent">
+              Complete setup →
+            </Link>
+          }
+        />
       )}
 
       {isManagedClientRole(profile.role) && (
         <div className="mb-6 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="panel-strong p-6">
-            <div className="eyebrow mb-3">Trainer connected</div>
-            <h3 className="font-display text-2xl font-bold text-[var(--foreground)]">
-              {trainerInfo?.full_name || 'Your personal trainer'} is managing your plan.
+          <div className="card p-6">
+            <div className="mono" style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}>
+              TRAINER CONNECTED
+            </div>
+            <h3 className="serif mt-2" style={{ fontSize: 26, lineHeight: 1.15 }}>
+              {trainerInfo?.full_name || 'Your personal trainer'}{' '}
+              <span className="italic-serif" style={{ color: 'var(--fg-3)' }}>
+                is managing your plan.
+              </span>
             </h3>
-            <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
+            <p className="mt-3" style={{ fontSize: 14, color: 'var(--fg-2)', lineHeight: 1.6 }}>
               Your nutrition and training programme is now coach-managed. Use the app to follow your plans, log progress,
               and stay in touch when you need support.
             </p>
-            <div className="mt-5 flex flex-wrap gap-3">
-              <Link href="/my-nutritionist" className="btn-primary rounded-2xl px-5 py-3 text-sm font-semibold">
-                Open My Trainer
+            <div className="row mt-5 flex-wrap gap-2">
+              <Link href="/my-nutritionist" className="btn btn-accent">
+                Open my coach
               </Link>
-              <Link href="/diet" className="btn-secondary rounded-2xl px-5 py-3 text-sm font-semibold">
+              <Link href="/diet" className="btn btn-ghost">
                 View plans
               </Link>
             </div>
           </div>
 
-          <div className="panel-strong p-6">
-            <h3 className="font-display text-2xl font-bold text-[var(--foreground)]">Plan status</h3>
-            <div className="mt-5 space-y-3">
-              <div className="rounded-2xl border border-[var(--line)] bg-white/72 px-4 py-4">
-                <div className="text-sm font-semibold text-[var(--foreground)]">Diet plan</div>
-                <div className="mt-1 text-sm text-[var(--muted)]">
-                  {managedClientPlanState.hasDietPlan ? 'Assigned and ready to follow.' : 'Your trainer has not assigned this yet.'}
+          <div className="card p-6">
+            <div className="mono" style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}>
+              PLAN STATUS
+            </div>
+            <div className="mt-4 col gap-2.5">
+              <div className="card-2 p-4">
+                <div className="serif" style={{ fontSize: 16 }}>Diet plan</div>
+                <div className="mt-1" style={{ fontSize: 13, color: 'var(--fg-2)' }}>
+                  {managedClientPlanState.hasDietPlan
+                    ? 'Assigned and ready to follow.'
+                    : 'Your trainer has not assigned this yet.'}
                 </div>
               </div>
-              <div className="rounded-2xl border border-[var(--line)] bg-white/72 px-4 py-4">
-                <div className="text-sm font-semibold text-[var(--foreground)]">Training plan</div>
-                <div className="mt-1 text-sm text-[var(--muted)]">
-                  {managedClientPlanState.hasTrainingPlan ? 'Assigned and ready to follow.' : 'Waiting for your trainer to publish your programme.'}
+              <div className="card-2 p-4">
+                <div className="serif" style={{ fontSize: 16 }}>Training plan</div>
+                <div className="mt-1" style={{ fontSize: 13, color: 'var(--fg-2)' }}>
+                  {managedClientPlanState.hasTrainingPlan
+                    ? 'Assigned and ready to follow.'
+                    : 'Waiting for your trainer to publish your programme.'}
                 </div>
               </div>
             </div>
@@ -372,139 +378,113 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Stats Grid */}
-      <div className="mb-8 grid gap-6 md:grid-cols-2 lg:grid-cols-12">
-        {/* Calories & Macros */}
-        <div className="panel-strong relative overflow-hidden p-6 animate-[fadeIn_0.3s_ease-out_forwards] lg:col-span-7 lg:row-span-2">
-          {/* Accent bar */}
-          <div className="absolute left-0 right-0 top-0 h-1 bg-[linear-gradient(90deg,#0d1b2a,#1da8f0,#4dc4ff)] rounded-t-xl" />
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="rounded-full bg-[var(--brand-100)] p-3 shadow-sm">
-                <Target className="h-6 w-6 text-[var(--brand-900)]" />
-              </div>
-              <div>
-                <span className="text-2xl font-bold text-[var(--foreground)]">{todayStats.caloriesConsumed}</span>
-                <span className="text-sm text-[var(--muted)] ml-1">/ {profile.daily_calories ?? '\u2014'} cal</span>
-              </div>
-            </div>
-            <span className="rounded-full bg-[var(--brand-100)] px-2.5 py-1 text-xs font-semibold text-[#0f4262]">
-              {Math.round(calorieProgress)}%
-            </span>
-          </div>
-          <div className="mb-5 h-2.5 w-full rounded-full bg-[var(--brand-200)]">
-            <div
-              className="h-2.5 rounded-full bg-[linear-gradient(90deg,#0d1b2a,#1da8f0)] transition-all duration-500 ease-out"
-              style={{ width: `${calorieProgress}%` }}
-            />
-          </div>
-          <div className="grid grid-cols-3 gap-3">
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50/80 rounded-lg p-3 text-center border border-green-100/50">
-              <p className="text-xs text-gray-500 mb-1">Protein</p>
-              <p className="text-sm font-bold text-green-700">{Math.round(todayStats.proteinConsumed)}g</p>
-              <p className="text-xs text-gray-400">/ {profile.daily_protein ?? '\u2014'}g</p>
-              <div className="w-full bg-green-100 rounded-full h-1.5 mt-2">
-                <div
-                  className="bg-gradient-to-r from-green-400 to-emerald-500 h-1.5 rounded-full transition-all duration-500 ease-out"
-                  style={{ width: `${profile.daily_protein ? Math.min((todayStats.proteinConsumed / profile.daily_protein) * 100, 100) : 0}%` }}
-                />
-              </div>
-            </div>
-            <div className="bg-gradient-to-br from-amber-50 to-orange-50/80 rounded-lg p-3 text-center border border-amber-100/50">
-              <p className="text-xs text-gray-500 mb-1">Carbs</p>
-              <p className="text-sm font-bold text-amber-700">{Math.round(todayStats.carbsConsumed)}g</p>
-              <p className="text-xs text-gray-400">/ {profile.daily_carbs ?? '\u2014'}g</p>
-              <div className="w-full bg-amber-100 rounded-full h-1.5 mt-2">
-                <div
-                  className="bg-gradient-to-r from-amber-400 to-orange-500 h-1.5 rounded-full transition-all duration-500 ease-out"
-                  style={{ width: `${profile.daily_carbs ? Math.min((todayStats.carbsConsumed / profile.daily_carbs) * 100, 100) : 0}%` }}
-                />
-              </div>
-            </div>
-            <div className="bg-gradient-to-br from-rose-50 to-pink-50/80 rounded-lg p-3 text-center border border-rose-100/50">
-              <p className="text-xs text-gray-500 mb-1">Fat</p>
-              <p className="text-sm font-bold text-rose-700">{Math.round(todayStats.fatConsumed)}g</p>
-              <p className="text-xs text-gray-400">/ {profile.daily_fat ?? '\u2014'}g</p>
-              <div className="w-full bg-rose-100 rounded-full h-1.5 mt-2">
-                <div
-                  className="bg-gradient-to-r from-rose-400 to-pink-500 h-1.5 rounded-full transition-all duration-500 ease-out"
-                  style={{ width: `${profile.daily_fat ? Math.min((todayStats.fatConsumed / profile.daily_fat) * 100, 100) : 0}%` }}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
+      {/* Today's KPIs \u2014 single editorial row */}
+      <div className="mb-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <StatTile
+          variant="card"
+          label="Calories"
+          value={todayStats.caloriesConsumed}
+          unit={profile.daily_calories ? `/ ${profile.daily_calories}` : undefined}
+          progress={
+            profile.daily_calories
+              ? Math.min(todayStats.caloriesConsumed / profile.daily_calories, 1)
+              : undefined
+          }
+        />
+        <StatTile
+          variant="card"
+          label="Water"
+          value={`${(todayStats.waterConsumed / 1000).toFixed(1)}L`}
+          unit={
+            profile.daily_water_ml
+              ? `/ ${(profile.daily_water_ml / 1000).toFixed(1)}L`
+              : undefined
+          }
+          progress={
+            profile.daily_water_ml
+              ? Math.min(todayStats.waterConsumed / profile.daily_water_ml, 1)
+              : undefined
+          }
+        />
+        <StatTile
+          variant="card"
+          label="Workouts today"
+          value={todayStats.workoutsCompleted}
+          unit={
+            todayStats.cardioMinutes > 0
+              ? `+ ${todayStats.cardioMinutes}m cardio`
+              : undefined
+          }
+        />
+        <StatTile
+          variant="card"
+          label="Goal"
+          value={`${Math.round(calorieProgress)}%`}
+          changeTone="acc"
+          change={
+            calorieProgress >= 100
+              ? 'On target'
+              : calorieProgress >= 75
+                ? 'On track'
+                : 'Keep going'
+          }
+        />
+      </div>
 
-        {/* Water */}
-        <div className="panel-strong relative overflow-hidden p-6 animate-[fadeIn_0.4s_ease-out_forwards] lg:col-span-3">
-          {/* Accent bar */}
-          <div className="absolute left-0 right-0 top-0 h-1 rounded-t-xl bg-[linear-gradient(90deg,#4dc4ff,#1da8f0,#0d1b2a)]" />
-          <div className="flex items-center justify-between mb-4">
-            <div className="rounded-full bg-[var(--brand-100)] p-3 shadow-sm">
-              <Droplets className="h-6 w-6 text-[var(--brand-500)]" />
-            </div>
-            <span className="rounded-full bg-[var(--brand-100)] px-2.5 py-1 text-xs font-semibold text-[#0f4262]">
-              {Math.round(waterProgress)}%
-            </span>
-          </div>
-          <div className="space-y-2">
-            <div className="flex justify-between items-end">
-              <div>
-                <span className="text-3xl font-extrabold text-[var(--brand-900)]">{todayStats.waterConsumed}</span>
-                <span className="text-sm text-[var(--muted)] ml-0.5">ml</span>
-              </div>
-              <span className="text-sm text-[var(--muted-soft)]">/ {profile.daily_water_ml ?? '\u2014'}ml</span>
-            </div>
-            <div className="h-2.5 w-full rounded-full bg-[var(--brand-200)]">
-              <div
-                className="h-2.5 rounded-full bg-[linear-gradient(90deg,#4dc4ff,#1da8f0)] transition-all duration-500 ease-out"
-                style={{ width: `${waterProgress}%` }}
-              />
-            </div>
-            <div className="flex gap-2 mt-3">
-              {[{ amount: 250, label: '250ml' }, { amount: 500, label: '500ml' }, { amount: 1000, label: '1L' }].map(({ amount, label }) => (
-                <button
-                  key={amount}
-                  onClick={() => addWater(amount)}
-                  className="flex-1 flex items-center justify-center gap-1 rounded-xl border border-[var(--line)] bg-white/72 px-2 py-1.5 text-xs font-medium text-[var(--brand-900)] transition-all duration-150 hover:border-[rgba(29,168,240,0.3)] hover:bg-[var(--brand-100)] active:scale-95"
-                >
-                  <Plus className="h-3 w-3" />
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+      {/* Macro breakdown */}
+      <div className="mb-3 grid grid-cols-3 gap-3">
+        <StatTile
+          size="sm"
+          label="Protein"
+          value={`${Math.round(todayStats.proteinConsumed)}g`}
+          unit={profile.daily_protein ? `/ ${profile.daily_protein}g` : undefined}
+          progress={
+            profile.daily_protein
+              ? Math.min(todayStats.proteinConsumed / profile.daily_protein, 1)
+              : undefined
+          }
+        />
+        <StatTile
+          size="sm"
+          label="Carbs"
+          value={`${Math.round(todayStats.carbsConsumed)}g`}
+          unit={profile.daily_carbs ? `/ ${profile.daily_carbs}g` : undefined}
+          progress={
+            profile.daily_carbs
+              ? Math.min(todayStats.carbsConsumed / profile.daily_carbs, 1)
+              : undefined
+          }
+        />
+        <StatTile
+          size="sm"
+          label="Fat"
+          value={`${Math.round(todayStats.fatConsumed)}g`}
+          unit={profile.daily_fat ? `/ ${profile.daily_fat}g` : undefined}
+          progress={
+            profile.daily_fat
+              ? Math.min(todayStats.fatConsumed / profile.daily_fat, 1)
+              : undefined
+          }
+        />
+      </div>
 
-        {/* Workouts */}
-        <div className="panel-strong relative overflow-hidden p-6 animate-[fadeIn_0.5s_ease-out_forwards] lg:col-span-2">
-          <div className="absolute left-0 right-0 top-0 h-1 rounded-t-xl bg-[linear-gradient(90deg,#0d1b2a,#1f3650,#4dc4ff)]" />
-          <div className="flex items-center justify-between mb-4">
-            <div className="rounded-full bg-[var(--brand-100)] p-3 shadow-sm">
-              <Dumbbell className="h-6 w-6 text-[var(--brand-900)]" />
-            </div>
-            <span className="text-xs text-[var(--muted-soft)] font-medium">Today</span>
-          </div>
-          <div className="space-y-1">
-            <span className="text-3xl font-extrabold text-[var(--foreground)]">{todayStats.workoutsCompleted}</span>
-            <p className="text-sm text-[var(--muted)]">Workouts completed</p>
-          </div>
-        </div>
-
-        {/* Cardio */}
-        <div className="relative overflow-hidden rounded-2xl border border-red-100/60 bg-gradient-to-br from-white to-red-50/40 p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md animate-[fadeIn_0.6s_ease-out_forwards] lg:col-span-5 lg:col-start-8">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-400 via-rose-500 to-red-400 rounded-t-xl" />
-          <div className="flex items-center justify-between mb-4">
-            <div className="bg-gradient-to-br from-red-100 to-rose-100 rounded-full p-3 shadow-sm">
-              <HeartPulse className="h-6 w-6 text-red-600" />
-            </div>
-            <span className="text-xs text-gray-400 font-medium">Today</span>
-          </div>
-          <div className="space-y-1">
-            <span className="text-3xl font-extrabold text-gray-900">{todayStats.cardioMinutes} <span className="text-lg font-semibold text-gray-400">min</span></span>
-            <p className="text-sm text-gray-500">Cardio completed</p>
-          </div>
-        </div>
+      {/* Water quick-add */}
+      <div className="mb-8 row gap-2">
+        {[
+          { amount: 250, label: '+250ml' },
+          { amount: 500, label: '+500ml' },
+          { amount: 1000, label: '+1L' },
+        ].map(({ amount, label }) => (
+          <button
+            key={amount}
+            onClick={() => addWater(amount)}
+            className="btn btn-ghost flex-1 justify-center"
+            style={{ fontSize: 13 }}
+          >
+            <Droplets className="h-3.5 w-3.5" />
+            {label}
+          </button>
+        ))}
       </div>
 
       {/* Today's Meal Plan */}
@@ -544,192 +524,213 @@ export default function DashboardPage() {
       )}
 
       {/* Quick Actions */}
-      <h2 className="font-display mb-4 text-2xl font-bold text-[var(--foreground)]">Quick Actions</h2>
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-        <Link href="/diet" className="group panel-strong flex items-center space-x-4 p-5">
-          <div className="rounded-2xl bg-[var(--brand-100)] p-3 transition-shadow group-hover:shadow-sm">
-            <Utensils className="h-6 w-6 text-[var(--brand-900)]" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-[var(--foreground)]">Log a Meal</h3>
-            <p className="text-sm text-[var(--muted)]">Track your food intake</p>
-          </div>
-        </Link>
-
-        <Link href="/water" className="group panel-strong flex items-center space-x-4 p-5">
-          <div className="rounded-2xl bg-[var(--brand-100)] p-3 transition-shadow group-hover:shadow-sm">
-            <Droplets className="h-6 w-6 text-[var(--brand-500)]" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-[var(--foreground)]">Log Water</h3>
-            <p className="text-sm text-[var(--muted)]">Track hydration</p>
-          </div>
-        </Link>
-
-        <Link href="/training" className="group panel-strong flex items-center space-x-4 p-5">
-          <div className="rounded-2xl bg-[var(--brand-100)] p-3 transition-shadow group-hover:shadow-sm">
-            <Dumbbell className="h-6 w-6 text-[var(--brand-900)]" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-[var(--foreground)]">Start Workout</h3>
-            <p className="text-sm text-[var(--muted)]">Follow your training plan</p>
-          </div>
-        </Link>
-
-        <Link href="/cardio" className="group panel-strong flex items-center space-x-4 p-5">
-          <div className="rounded-2xl bg-[var(--brand-100)] p-3 transition-shadow group-hover:shadow-sm">
-            <HeartPulse className="h-6 w-6 text-[var(--brand-500)]" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-[var(--foreground)]">Log Cardio</h3>
-            <p className="text-sm text-[var(--muted)]">Record a cardio session</p>
-          </div>
-        </Link>
-
-        <Link href="/ai/suggest" className="group panel-strong flex items-center space-x-4 p-5">
-          <div className="rounded-2xl bg-[var(--brand-100)] p-3 transition-shadow group-hover:shadow-sm">
-            <Sparkles className="h-6 w-6 text-[var(--brand-500)]" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-[var(--foreground)]">AI Suggestions</h3>
-            <p className="text-sm text-[var(--muted)]">Get meal ideas</p>
-          </div>
-        </Link>
-
-        {canAccess(profile.role, 'regenerate') && (
-          <Link href="/generate-plans" className="group panel-strong flex items-center space-x-4 p-5">
-            <div className="rounded-2xl bg-[var(--brand-100)] p-3 transition-shadow group-hover:shadow-sm">
-              <RefreshCw className="h-6 w-6 text-[var(--brand-900)]" />
+      <div className="mb-3">
+        <div
+          className="mono"
+          style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}
+        >
+          QUICK ACTIONS
+        </div>
+      </div>
+      <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {[
+          { href: '/diet', label: 'Log a meal', sub: 'Track your food intake', icon: Utensils },
+          { href: '/water', label: 'Log water', sub: 'Track hydration', icon: Droplets },
+          { href: '/training', label: 'Start workout', sub: 'Follow your training plan', icon: Dumbbell },
+          { href: '/cardio', label: 'Log cardio', sub: 'Record a cardio session', icon: HeartPulse },
+          { href: '/ai/suggest', label: 'AI suggestions', sub: 'Get meal ideas', icon: Sparkles },
+          ...(canAccess(profile.role, 'regenerate')
+            ? [{ href: '/generate-plans', label: 'Regenerate plans', sub: 'Get new AI-generated plans', icon: RefreshCw }]
+            : []),
+          ...(isTrainerRole(profile.role)
+            ? [{
+                href: '/clients',
+                label: 'Client roster',
+                sub: `${clientCount} active · ${pendingInviteCount} pending`,
+                icon: Users,
+              }]
+            : []),
+        ].map(({ href, label, sub, icon: Icon }) => (
+          <Link
+            key={href}
+            href={href}
+            className="card-2 row gap-3 p-4 transition hover:border-[var(--acc)]"
+          >
+            <div
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+              style={{
+                background: 'var(--ink-3)',
+                color: 'var(--acc)',
+              }}
+            >
+              <Icon className="h-4 w-4" />
             </div>
-            <div>
-              <h3 className="font-semibold text-[var(--foreground)]">Regenerate Plans</h3>
-              <p className="text-sm text-[var(--muted)]">Get new AI-generated plans</p>
+            <div className="min-w-0">
+              <div className="serif" style={{ fontSize: 15, lineHeight: 1.2 }}>
+                {label}
+              </div>
+              <div
+                className="mt-0.5 truncate"
+                style={{ fontSize: 12, color: 'var(--fg-3)' }}
+              >
+                {sub}
+              </div>
             </div>
           </Link>
-        )}
-
-        {isTrainerRole(profile.role) && (
-          <Link href="/clients" className="group panel-strong flex items-center space-x-4 p-5">
-            <div className="rounded-2xl bg-[var(--brand-100)] p-3 transition-shadow group-hover:shadow-sm">
-              <Users className="h-6 w-6 text-[var(--brand-900)]" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-[var(--foreground)]">Client Roster</h3>
-              <p className="text-sm text-[var(--muted)]">{clientCount} active · {pendingInviteCount} pending</p>
-            </div>
-          </Link>
-        )}
+        ))}
       </div>
 
       {/* Trainer Client Summary */}
       {isTrainerRole(profile.role) && (
-        <div className="panel-strong p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-display text-2xl font-bold text-[var(--foreground)]">Client Overview</h2>
-            <Link href="/clients" className="text-sm font-semibold text-[var(--brand-500)] transition-colors hover:text-[var(--brand-900)]">
-              View All
+        <div className="card p-6">
+          <div className="row mb-4 justify-between">
+            <div>
+              <div
+                className="mono"
+                style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}
+              >
+                CLIENT OVERVIEW
+              </div>
+            </div>
+            <Link
+              href="/clients"
+              className="mono"
+              style={{ fontSize: 10, color: 'var(--acc)', letterSpacing: '0.1em' }}
+            >
+              VIEW ALL \u2192
             </Link>
           </div>
           {clientCount === 0 && pendingInviteCount === 0 ? (
-            <div className="text-center py-8">
-              <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-[var(--brand-100)]">
-                <Users className="h-8 w-8 text-[var(--brand-500)]" />
+            <div className="py-6 text-center">
+              <Users
+                className="mx-auto mb-3 h-8 w-8"
+                style={{ color: 'var(--fg-4)' }}
+              />
+              <div className="serif" style={{ fontSize: 22 }}>
+                No clients yet.
               </div>
-              <p className="mb-1 font-medium text-[var(--muted)]">No clients yet</p>
-              <p className="mb-5 text-sm text-[var(--muted-soft)]">Start growing your roster by inviting your first client.</p>
-              <Link
-                href="/clients/invite"
-                className="btn-primary inline-flex items-center space-x-2 rounded-2xl px-5 py-3 text-sm font-semibold"
+              <p
+                className="mx-auto mt-2 max-w-[400px]"
+                style={{ fontSize: 13, color: 'var(--fg-2)' }}
               >
+                Start growing your roster by inviting your first client.
+              </p>
+              <Link href="/clients/invite" className="btn btn-accent mt-5">
                 <Plus className="h-4 w-4" />
-                <span>Invite Client</span>
+                Invite client
               </Link>
             </div>
           ) : (
-            <div className="space-y-2 text-[var(--foreground)]">
-              <p>
-                You have <span className="font-semibold text-[var(--brand-500)]">{clientCount}</span> active client{clientCount !== 1 ? 's' : ''}.
-              </p>
-              <p className="text-sm text-[var(--muted)]">
-                {pendingInviteCount} pending invite{pendingInviteCount !== 1 ? 's' : ''} still waiting for acceptance.
+            <div>
+              <div className="serif" style={{ fontSize: 22 }}>
+                {clientCount}{' '}
+                <span className="italic-serif" style={{ color: 'var(--fg-3)' }}>
+                  active client{clientCount !== 1 ? 's' : ''}.
+                </span>
+              </div>
+              <p
+                className="mt-1.5"
+                style={{ fontSize: 13, color: 'var(--fg-2)' }}
+              >
+                {pendingInviteCount} pending invite
+                {pendingInviteCount !== 1 ? 's' : ''} still waiting for acceptance.
               </p>
             </div>
           )}
         </div>
       )}
 
-      {/* Progress Section */}
+      {/* Weekly Progress */}
       {profile.onboarding_completed && (
-        <div className="panel-strong mt-8 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-display text-2xl font-bold text-[var(--foreground)]">Weekly Progress</h2>
-            <Link href="/progress" className="text-sm font-semibold text-[var(--brand-500)] transition-colors hover:text-[var(--brand-900)]">
-              View All
+        <div className="mt-8">
+          <div className="row mb-3 justify-between">
+            <div
+              className="mono"
+              style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}
+            >
+              WEEKLY PROGRESS
+            </div>
+            <Link
+              href="/progress"
+              className="mono"
+              style={{ fontSize: 10, color: 'var(--acc)', letterSpacing: '0.1em' }}
+            >
+              VIEW ALL \u2192
             </Link>
           </div>
-          <div className="grid md:grid-cols-4 gap-4">
-            {/* Weight Widget */}
-            <Link href="/progress" className="text-center p-4 bg-gradient-to-br from-indigo-50 to-purple-50/80 rounded-xl border border-indigo-100/40 hover:shadow-md transition-all group">
-              <div className="inline-flex items-center justify-center w-10 h-10 bg-indigo-100 rounded-full mb-2 group-hover:scale-110 transition-transform">
-                <Scale className="h-5 w-5 text-indigo-600" />
-              </div>
-              <div className="text-sm text-gray-500">Weight</div>
-              <div className="text-lg font-bold text-indigo-600">
-                {weightData.current ? `${weightData.current}kg` : '\u2014'}
-              </div>
-              {weightData.current && weightData.previous && (
-                <div className={`flex items-center justify-center gap-1 text-xs font-medium mt-0.5 ${
-                  weightData.trend === 'up' ? 'text-amber-600' : weightData.trend === 'down' ? 'text-green-600' : 'text-gray-400'
-                }`}>
-                  {weightData.trend === 'up' ? <TrendingUp className="h-3 w-3" /> : weightData.trend === 'down' ? <TrendingDown className="h-3 w-3" /> : <Minus className="h-3 w-3" />}
-                  <span>{(weightData.current - weightData.previous) > 0 ? '+' : ''}{(weightData.current - weightData.previous).toFixed(1)}kg</span>
-                </div>
-              )}
-            </Link>
-
-            {/* Avg Daily Goal */}
-            <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-indigo-50/80 rounded-xl border border-purple-100/40">
-              <div className="inline-flex items-center justify-center w-10 h-10 bg-purple-100 rounded-full mb-2">
-                <TrendingUp className="h-5 w-5 text-purple-600" />
-              </div>
-              <div className="text-sm text-gray-500">Avg. daily goal</div>
-              <div className="text-lg font-bold text-purple-600">
-                {weeklyStats.avgGoalPct !== null ? `${weeklyStats.avgGoalPct}%` : '\u2014'}
-              </div>
-            </div>
-
-            {/* Workouts This Week */}
-            <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-violet-50/80 rounded-xl border border-purple-100/40">
-              <div className="inline-flex items-center justify-center w-10 h-10 bg-purple-100 rounded-full mb-2">
-                <Dumbbell className="h-5 w-5 text-purple-600" />
-              </div>
-              <div className="text-sm text-gray-500">Workouts this week</div>
-              <div className="text-lg font-bold text-purple-600">
-                {weeklyStats.workoutsThisWeek}
-                {profile.workout_days_per_week && (
-                  <span className="text-sm text-gray-400 font-normal"> / {profile.workout_days_per_week}</span>
-                )}
-              </div>
-            </div>
-
-            {/* Avg Water */}
-            <div className="text-center p-4 bg-gradient-to-br from-cyan-50 to-blue-50/80 rounded-xl border border-cyan-100/40">
-              <div className="inline-flex items-center justify-center w-10 h-10 bg-cyan-100 rounded-full mb-2">
-                <Droplets className="h-5 w-5 text-cyan-600" />
-              </div>
-              <div className="text-sm text-gray-500">Avg. water intake</div>
-              <div className="text-lg font-bold text-cyan-600">
-                {weeklyStats.avgWaterMl !== null
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <StatTile
+              variant="card"
+              label="Weight"
+              value={weightData.current ? `${weightData.current}kg` : '\u2014'}
+              change={
+                weightData.current && weightData.previous
+                  ? `${(weightData.current - weightData.previous) > 0 ? '+' : ''}${(weightData.current - weightData.previous).toFixed(1)}kg`
+                  : undefined
+              }
+              changeTone={
+                weightData.trend === 'up'
+                  ? 'warn'
+                  : weightData.trend === 'down'
+                    ? 'ok'
+                    : 'muted'
+              }
+            />
+            <StatTile
+              variant="card"
+              label="Avg. daily goal"
+              value={
+                weeklyStats.avgGoalPct !== null
+                  ? `${weeklyStats.avgGoalPct}%`
+                  : '\u2014'
+              }
+              progress={
+                weeklyStats.avgGoalPct !== null
+                  ? Math.min(weeklyStats.avgGoalPct / 100, 1)
+                  : undefined
+              }
+            />
+            <StatTile
+              variant="card"
+              label="Workouts this week"
+              value={weeklyStats.workoutsThisWeek}
+              unit={
+                profile.workout_days_per_week
+                  ? `/ ${profile.workout_days_per_week}`
+                  : undefined
+              }
+              progress={
+                profile.workout_days_per_week
+                  ? Math.min(
+                      weeklyStats.workoutsThisWeek /
+                        profile.workout_days_per_week,
+                      1,
+                    )
+                  : undefined
+              }
+            />
+            <StatTile
+              variant="card"
+              label="Avg. water intake"
+              value={
+                weeklyStats.avgWaterMl !== null
                   ? `${(weeklyStats.avgWaterMl / 1000).toFixed(1)}L`
                   : '\u2014'
-                }
-              </div>
-              {weeklyStats.avgWaterMl !== null && profile.daily_water_ml && (
-                <div className="text-xs text-gray-400 mt-0.5">
-                  / {(profile.daily_water_ml / 1000).toFixed(1)}L goal
-                </div>
-              )}
-            </div>
+              }
+              unit={
+                weeklyStats.avgWaterMl !== null && profile.daily_water_ml
+                  ? `/ ${(profile.daily_water_ml / 1000).toFixed(1)}L`
+                  : undefined
+              }
+              progress={
+                weeklyStats.avgWaterMl !== null && profile.daily_water_ml
+                  ? Math.min(
+                      weeklyStats.avgWaterMl / profile.daily_water_ml,
+                      1,
+                    )
+                  : undefined
+              }
+            />
           </div>
         </div>
       )}
