@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { ArrowLeft, Send } from 'lucide-react'
 import Link from 'next/link'
 import type { Message } from '@/lib/supabase/types'
+import AppPageHeader from '@/components/ui/AppPageHeader'
 
 type Role = 'coach' | 'client'
 
@@ -129,75 +130,105 @@ export function ChatThread({
     }
   }
 
-  const myBubble =
-    role === 'coach'
-      ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-br-sm'
-      : 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-br-sm'
-  const myMeta = role === 'coach' ? 'text-purple-200' : 'text-emerald-200'
-
   return (
-    <div className="flex flex-col h-[calc(100vh-80px)]">
-      <div className="flex items-center space-x-4 pb-4 border-b border-gray-200">
-        <Link href={backHref} className="text-gray-500 hover:text-gray-700">
-          <ArrowLeft className="h-5 w-5" />
-        </Link>
-        <div>
-          <h1 className="text-lg font-bold text-gray-900">{peerName || 'Messages'}</h1>
-          {peerEmail && <p className="text-xs text-gray-500">{peerEmail}</p>}
-        </div>
-      </div>
+    <div className="mx-auto flex h-[calc(100vh-80px)] max-w-[920px] flex-col">
+      <AppPageHeader
+        eyebrow={role === 'coach' ? 'Client messages' : 'Managed client'}
+        title="Messages"
+        accent="thread."
+        subtitle={peerName ? `Chat with ${peerName}.` : 'Your direct coaching conversation.'}
+        chip={peerEmail ? <span className="chip">{peerEmail}</span> : undefined}
+        actions={
+          <Link href={backHref} className="btn btn-ghost">
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Link>
+        }
+      />
 
-      <div className="flex-1 overflow-y-auto py-4 space-y-3">
-        {!conversationId && missingConversationMessage && (
-          <p className="text-center text-gray-400 text-sm mt-12">{missingConversationMessage}</p>
-        )}
-        {conversationId && messages.length === 0 && (
-          <p className="text-center text-gray-400 text-sm mt-12">
-            No messages yet. Start the conversation!
-          </p>
-        )}
-        {messages.map((msg) => {
-          const isMe = msg.sender_id === currentUserId
-          return (
-            <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+      <div className="card flex min-h-0 flex-1 flex-col overflow-hidden p-0">
+        <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4 md:p-6">
+          {!conversationId && missingConversationMessage && (
+            <div className="card-2 mx-auto mt-8 max-w-[520px] p-6 text-center">
               <div
-                className={`max-w-[70%] rounded-2xl px-4 py-3 ${
-                  isMe
-                    ? myBubble
-                    : 'bg-white border border-gray-200 text-gray-900 rounded-bl-sm'
-                }`}
+                className="mono"
+                style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}
               >
-                <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                <p className={`text-xs mt-1 ${isMe ? myMeta : 'text-gray-400'}`}>
-                  {new Date(msg.created_at).toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </p>
+                THREAD STATUS
               </div>
+              <p className="mt-2 text-sm leading-6" style={{ color: 'var(--fg-2)' }}>
+                {missingConversationMessage}
+              </p>
             </div>
-          )
-        })}
-        <div ref={messagesEndRef} />
-      </div>
+          )}
+          {conversationId && messages.length === 0 && (
+            <div className="card-2 mx-auto mt-8 max-w-[520px] p-6 text-center">
+              <div className="serif" style={{ fontSize: 22, color: 'var(--fg)' }}>
+                No messages{' '}
+                <span className="italic-serif" style={{ color: 'var(--fg-3)' }}>
+                  yet.
+                </span>
+              </div>
+              <p className="mt-2 text-sm leading-6" style={{ color: 'var(--fg-2)' }}>
+                Start the conversation when you are ready.
+              </p>
+            </div>
+          )}
+          {messages.map((msg) => {
+            const isMe = msg.sender_id === currentUserId
+            return (
+              <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                <div
+                  className="max-w-[min(78%,640px)] rounded-2xl px-4 py-3"
+                  style={{
+                    background: isMe ? 'var(--acc)' : 'var(--ink-2)',
+                    border: isMe ? '1px solid var(--acc)' : '1px solid var(--line)',
+                    color: isMe ? 'var(--ink-1)' : 'var(--fg)',
+                    borderBottomRightRadius: isMe ? 4 : 18,
+                    borderBottomLeftRadius: isMe ? 18 : 4,
+                  }}
+                >
+                  <p className="whitespace-pre-wrap text-sm leading-6">{msg.content}</p>
+                  <p
+                    className="mono mt-2"
+                    style={{
+                      fontSize: 10,
+                      color: isMe ? 'rgba(255,255,255,0.72)' : 'var(--fg-4)',
+                      letterSpacing: '0.08em',
+                    }}
+                  >
+                    {new Date(msg.created_at).toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </p>
+                </div>
+              </div>
+            )
+          })}
+          <div ref={messagesEndRef} />
+        </div>
 
-      <div className="border-t border-gray-200 pt-4 flex gap-3">
-        <textarea
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={conversationId ? 'Type a message...' : 'Waiting for conversation...'}
-          rows={1}
-          disabled={!conversationId}
-          className="flex-1 px-4 py-3 border border-gray-300 rounded-xl resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-400"
-        />
-        <button
-          onClick={handleSend}
-          disabled={sending || !text.trim() || !conversationId}
-          className="px-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:shadow-lg transition-all disabled:opacity-50"
-        >
-          <Send className="h-5 w-5" />
-        </button>
+        <div className="flex gap-3 border-t p-4" style={{ borderColor: 'var(--line)' }}>
+          <textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={conversationId ? 'Type a message...' : 'Waiting for conversation...'}
+            rows={1}
+            disabled={!conversationId}
+            className="min-h-[48px] flex-1 resize-none rounded-xl border bg-[var(--ink-2)] px-4 py-3 text-sm text-[var(--fg)] outline-none transition focus:border-[var(--acc)] disabled:opacity-60"
+            style={{ borderColor: 'var(--line-2)' }}
+          />
+          <button
+            onClick={handleSend}
+            disabled={sending || !text.trim() || !conversationId}
+            className="btn btn-accent self-end px-4 disabled:opacity-50"
+            aria-label="Send message"
+          >
+            <Send className="h-5 w-5" />
+          </button>
+        </div>
       </div>
     </div>
   )
