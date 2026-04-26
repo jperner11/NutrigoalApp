@@ -31,6 +31,7 @@ import { BaseClientIntakePreview } from '@/components/onboarding/BaseClientIntak
 import { SUPPORT_EMAIL } from '@/lib/site'
 import { COACH_MARKETPLACE_CURRENCIES, COACH_OFFER_BILLING_PERIODS, buildCoachProfileSlug, formatCoachPriceRange, formatOfferPrice } from '@/lib/coachMarketplace'
 import { isTrainerRole } from '@nutrigoal/shared'
+import AppPageHeader from '@/components/ui/AppPageHeader'
 
 const TABS = [
   { key: 'profile', label: 'Profile', icon: User },
@@ -54,6 +55,25 @@ const QUESTION_TYPE_OPTIONS: Array<{ value: CustomIntakeQuestionType; label: str
   { value: 'yes_no', label: 'Yes / No' },
 ]
 
+const labelClass = 'mono mb-2 block'
+const fieldClass = 'w-full rounded-xl border border-[var(--line-2)] bg-[var(--ink-2)] px-3.5 py-3 text-sm text-[var(--fg)] outline-none transition focus:border-[var(--acc)]'
+const disabledFieldClass = 'w-full rounded-xl border border-[var(--line)] bg-[rgba(255,255,255,0.55)] px-3.5 py-3 text-sm text-[var(--fg-3)] outline-none'
+const fieldStyle: React.CSSProperties = {
+  borderColor: 'var(--line-2)',
+}
+const labelStyle: React.CSSProperties = {
+  fontSize: 11,
+  color: 'var(--fg-4)',
+  letterSpacing: '0.12em',
+}
+
+function chipClass(active: boolean) {
+  return [
+    'chip transition',
+    active ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc)]' : 'hover:border-[var(--acc)]',
+  ].join(' ')
+}
+
 function TimeSelect({ value, onChange, label }: { value: string; onChange: (v: string) => void; label: string }) {
   const times: string[] = []
   for (let h = 0; h < 24; h++) {
@@ -63,11 +83,12 @@ function TimeSelect({ value, onChange, label }: { value: string; onChange: (v: s
   }
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+      <label className={labelClass} style={labelStyle}>{label.toUpperCase()}</label>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+        className={fieldClass}
+        style={fieldStyle}
       >
         {times.map(t => <option key={t} value={t}>{t}</option>)}
       </select>
@@ -83,7 +104,7 @@ function ChipSelect({ options, selected, onChange, label }: {
 }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+      <label className={labelClass} style={labelStyle}>{label.toUpperCase()}</label>
       <div className="flex flex-wrap gap-2">
         {options.map(opt => (
           <button
@@ -92,11 +113,7 @@ function ChipSelect({ options, selected, onChange, label }: {
             onClick={() => onChange(
               selected.includes(opt) ? selected.filter(s => s !== opt) : [...selected, opt]
             )}
-            className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-              selected.includes(opt)
-                ? 'bg-purple-100 text-purple-700 border border-purple-300'
-                : 'bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200'
-            }`}
+            className={chipClass(selected.includes(opt))}
           >
             {opt}
           </button>
@@ -809,7 +826,7 @@ export default function SettingsPage() {
 
   const set = (key: string, value: unknown) => setForm(prev => ({ ...prev, [key]: value }))
 
-  const inputClass = "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+  const inputClass = fieldClass
   const selectClass = inputClass
   const marketplaceReadySignals = [
     profile.coach_specialties?.length ? `${profile.coach_specialties.length} specialties` : null,
@@ -817,30 +834,47 @@ export default function SettingsPage() {
     profile.coach_services?.length ? `${profile.coach_services.length} listed services` : null,
     profile.coach_style ? `Style: ${profile.coach_style.replace(/_/g, ' ')}` : null,
   ].filter(Boolean) as string[]
-  const statusTone: Record<string, string> = {
-    open: 'bg-amber-50 text-amber-700 border-amber-200',
-    in_progress: 'bg-sky-50 text-sky-700 border-sky-200',
-    resolved: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  const statusTone: Record<string, React.CSSProperties> = {
+    open: { color: 'var(--warn)' },
+    in_progress: { color: 'var(--acc)' },
+    resolved: { color: 'var(--ok)' },
   }
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-600 mt-1">Manage your profile and subscription.</p>
-      </div>
+    <div className="mx-auto max-w-[1100px]">
+      <AppPageHeader
+        eyebrow="Account"
+        title="Settings"
+        accent="control."
+        subtitle="Manage your profile, goals, coaching preferences, and subscription."
+      />
 
       {/* Subscription */}
-      <div className="card p-6 mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-3">
-            <Crown className="h-6 w-6 text-purple-600" />
-            <h2 className="text-lg font-semibold text-gray-900">Subscription</h2>
+      <div className="card mb-6 p-6">
+        <div className="row mb-4 flex-wrap justify-between gap-3">
+          <div className="row gap-3">
+            <div
+              className="flex h-10 w-10 items-center justify-center rounded-xl"
+              style={{ background: 'var(--ink-3)', color: 'var(--acc)' }}
+            >
+              <Crown className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="mono" style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}>
+                SUBSCRIPTION
+              </div>
+              <h2 className="serif mt-1" style={{ fontSize: 24, lineHeight: 1.1 }}>
+                {currentPlan.name}{' '}
+                <span className="italic-serif" style={{ color: 'var(--fg-3)' }}>
+                  plan.
+                </span>
+              </h2>
+            </div>
           </div>
           {profile.role === 'free' ? (
             <a
               href="/pricing"
-              className="text-sm bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-1.5 rounded-lg font-medium hover:shadow-lg transition-all"
+              className="btn btn-accent"
             >
               Upgrade
             </a>
@@ -848,34 +882,28 @@ export default function SettingsPage() {
             <button
               onClick={handleManageSubscription}
               disabled={managingSubscription}
-              className="flex items-center gap-1.5 text-sm text-purple-600 hover:text-purple-800 font-medium disabled:opacity-50"
+              className="btn btn-ghost disabled:opacity-50"
             >
               {managingSubscription ? <Loader2 className="h-4 w-4 animate-spin" /> : <ExternalLink className="h-4 w-4" />}
               Manage Subscription
             </button>
           )}
         </div>
-        <div className="flex items-center space-x-2">
-          <span className="text-sm font-medium text-gray-900">{currentPlan.name}</span>
-          <span className="text-sm text-gray-500">
-            {currentPlan.price === 0 ? '— Free' : `— $${currentPlan.price}/mo`}
-          </span>
+        <div className="row flex-wrap gap-2">
+          <span className="chip">{currentPlan.price === 0 ? 'FREE' : `$${currentPlan.price}/MO`}</span>
+          <span className="chip">{profile.role.toUpperCase()}</span>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex overflow-x-auto gap-1 mb-6 bg-gray-100 rounded-xl p-1">
+      <div className="tab-row mb-6 overflow-x-auto">
         {visibleTabs.map(tab => {
           const Icon = tab.icon
           return (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
-                activeTab === tab.key
-                  ? 'bg-white text-purple-700 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
+              className={`tab row shrink-0 gap-2 whitespace-nowrap ${activeTab === tab.key ? 'active' : ''}`}
             >
               <Icon className="h-4 w-4" />
               {tab.label}
@@ -892,20 +920,20 @@ export default function SettingsPage() {
         {activeTab === 'profile' && (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+              <label className={labelClass} style={labelStyle}>Full Name</label>
               <input type="text" value={form.full_name} onChange={(e) => set('full_name', e.target.value)} className={inputClass} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-              <input type="email" value={profile.email} disabled className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500" />
+              <label className={labelClass} style={labelStyle}>Email</label>
+              <input type="email" value={profile.email} disabled className={disabledFieldClass} style={fieldStyle} />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Age</label>
+                <label className={labelClass} style={labelStyle}>Age</label>
                 <input type="number" value={form.age} onChange={(e) => set('age', e.target.value)} className={inputClass} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+                <label className={labelClass} style={labelStyle}>Gender</label>
                 <select value={form.gender} onChange={(e) => set('gender', e.target.value)} className={selectClass}>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
@@ -915,16 +943,16 @@ export default function SettingsPage() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Height (cm)</label>
+                <label className={labelClass} style={labelStyle}>Height (cm)</label>
                 <input type="number" value={form.height_cm} onChange={(e) => set('height_cm', e.target.value)} className={inputClass} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Weight (kg)</label>
+                <label className={labelClass} style={labelStyle}>Weight (kg)</label>
                 <input type="number" value={form.weight_kg} onChange={(e) => set('weight_kg', e.target.value)} className={inputClass} />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Activity Level</label>
+              <label className={labelClass} style={labelStyle}>Activity Level</label>
               <select value={form.activity_level} onChange={(e) => set('activity_level', e.target.value)} className={selectClass}>
                 <option value="">Select...</option>
                 {ACTIVITY_LEVELS.map(l => <option key={l.value} value={l.value}>{l.label} — {l.description}</option>)}
@@ -937,18 +965,18 @@ export default function SettingsPage() {
         {activeTab === 'goals' && (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Fitness Goal</label>
+              <label className={labelClass} style={labelStyle}>Fitness Goal</label>
               <select value={form.goal} onChange={(e) => set('goal', e.target.value)} className={selectClass}>
                 <option value="">Select...</option>
                 {FITNESS_GOALS.map(g => <option key={g.value} value={g.value}>{g.label} — {g.description}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Target Weight (kg)</label>
+              <label className={labelClass} style={labelStyle}>Target Weight (kg)</label>
               <input type="number" value={form.target_weight_kg} onChange={(e) => set('target_weight_kg', e.target.value)} className={inputClass} placeholder="Optional" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Timeline</label>
+              <label className={labelClass} style={labelStyle}>Timeline</label>
               <select value={form.goal_timeline} onChange={(e) => set('goal_timeline', e.target.value)} className={selectClass}>
                 <option value="">Select...</option>
                 {GOAL_TIMELINES.map(t => <option key={t.value} value={t.value}>{t.label} — {t.description}</option>)}
@@ -977,13 +1005,13 @@ export default function SettingsPage() {
             <TimeSelect label="Workout Time" value={form.workout_time} onChange={(v) => set('workout_time', v)} />
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Workout Days/Week</label>
+                <label className={labelClass} style={labelStyle}>Workout Days/Week</label>
                 <select value={form.workout_days_per_week} onChange={(e) => set('workout_days_per_week', Number(e.target.value))} className={selectClass}>
                   {[1,2,3,4,5,6,7].map(n => <option key={n} value={n}>{n} days</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Meals/Day</label>
+                <label className={labelClass} style={labelStyle}>Meals/Day</label>
                 <select value={form.meals_per_day} onChange={(e) => set('meals_per_day', Number(e.target.value))} className={selectClass}>
                   {[2,3,4,5,6].map(n => <option key={n} value={n}>{n} meals</option>)}
                 </select>
@@ -1008,7 +1036,7 @@ export default function SettingsPage() {
               onChange={(v) => set('medical_conditions', v)}
             />
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Medications</label>
+              <label className={labelClass} style={labelStyle}>Medications</label>
               <input
                 type="text"
                 value={form.medications.join(', ')}
@@ -1024,21 +1052,21 @@ export default function SettingsPage() {
         {activeTab === 'fitness' && (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Training Experience</label>
+              <label className={labelClass} style={labelStyle}>Training Experience</label>
               <select value={form.training_experience} onChange={(e) => set('training_experience', e.target.value)} className={selectClass}>
                 <option value="">Select...</option>
                 {TRAINING_EXPERIENCE.map(t => <option key={t.value} value={t.value}>{t.label} — {t.description}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Equipment Access</label>
+              <label className={labelClass} style={labelStyle}>Equipment Access</label>
               <select value={form.equipment_access} onChange={(e) => set('equipment_access', e.target.value)} className={selectClass}>
                 <option value="">Select...</option>
                 {EQUIPMENT_ACCESS.map(e => <option key={e.value} value={e.value}>{e.label} — {e.description}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Training Style</label>
+              <label className={labelClass} style={labelStyle}>Training Style</label>
               <div className="flex flex-wrap gap-2">
                 {TRAINING_STYLES.map(s => (
                   <button
@@ -1049,11 +1077,7 @@ export default function SettingsPage() {
                         ? form.training_style.filter(v => v !== s.value)
                         : [...form.training_style, s.value]
                     )}
-                    className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                      form.training_style.includes(s.value)
-                        ? 'bg-purple-100 text-purple-700 border border-purple-300'
-                        : 'bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200'
-                    }`}
+                    className={chipClass(form.training_style.includes(s.value))}
                   >
                     {s.label}
                   </button>
@@ -1067,7 +1091,7 @@ export default function SettingsPage() {
         {activeTab === 'nutrition' && (
           <div className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Dietary Restrictions</label>
+              <label className={labelClass} style={labelStyle}>Dietary Restrictions</label>
               <div className="flex flex-wrap gap-2">
                 {DIETARY_RESTRICTIONS.map(r => (
                   <button
@@ -1078,11 +1102,7 @@ export default function SettingsPage() {
                         ? form.dietary_restrictions.filter(v => v !== r.value)
                         : [...form.dietary_restrictions, r.value]
                     )}
-                    className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                      form.dietary_restrictions.includes(r.value)
-                        ? 'bg-purple-100 text-purple-700 border border-purple-300'
-                        : 'bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200'
-                    }`}
+                    className={chipClass(form.dietary_restrictions.includes(r.value))}
                   >
                     {r.label}
                   </button>
@@ -1090,7 +1110,7 @@ export default function SettingsPage() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Allergies</label>
+              <label className={labelClass} style={labelStyle}>Allergies</label>
               <input
                 type="text"
                 value={form.allergies.join(', ')}
@@ -1106,7 +1126,7 @@ export default function SettingsPage() {
               onChange={(v) => set('food_dislikes', v)}
             />
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Favourite Foods</label>
+              <label className={labelClass} style={labelStyle}>Favourite Foods</label>
               <input
                 type="text"
                 value={form.favourite_foods.join(', ')}
@@ -1116,14 +1136,14 @@ export default function SettingsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Cooking Skill</label>
+              <label className={labelClass} style={labelStyle}>Cooking Skill</label>
               <select value={form.cooking_skill} onChange={(e) => set('cooking_skill', e.target.value)} className={selectClass}>
                 <option value="">Select...</option>
                 {COOKING_SKILLS.map(c => <option key={c.value} value={c.value}>{c.label} — {c.description}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Meal Prep Preference</label>
+              <label className={labelClass} style={labelStyle}>Meal Prep Preference</label>
               <select value={form.meal_prep_preference} onChange={(e) => set('meal_prep_preference', e.target.value)} className={selectClass}>
                 <option value="">Select...</option>
                 {MEAL_PREP_PREFERENCES.map(m => <option key={m.value} value={m.value}>{m.label} — {m.description}</option>)}
@@ -1136,21 +1156,21 @@ export default function SettingsPage() {
         {activeTab === 'lifestyle' && (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Work Type</label>
+              <label className={labelClass} style={labelStyle}>Work Type</label>
               <select value={form.work_type} onChange={(e) => set('work_type', e.target.value)} className={selectClass}>
                 <option value="">Select...</option>
                 {WORK_TYPES.map(w => <option key={w.value} value={w.value}>{w.label} — {w.description}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Sleep Quality</label>
+              <label className={labelClass} style={labelStyle}>Sleep Quality</label>
               <select value={form.sleep_quality} onChange={(e) => set('sleep_quality', e.target.value)} className={selectClass}>
                 <option value="">Select...</option>
                 {SLEEP_QUALITY_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label} — {s.description}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Stress Level</label>
+              <label className={labelClass} style={labelStyle}>Stress Level</label>
               <select value={form.stress_level} onChange={(e) => set('stress_level', e.target.value)} className={selectClass}>
                 <option value="">Select...</option>
                 {STRESS_LEVELS.map(s => <option key={s.value} value={s.value}>{s.label} — {s.description}</option>)}
@@ -1161,52 +1181,52 @@ export default function SettingsPage() {
 
         {activeTab === 'trainer_intake' && (
           <div className="space-y-6">
-            <div className="rounded-2xl border border-indigo-100 bg-indigo-50/80 p-5">
-              <h3 className="text-base font-semibold text-gray-900">Coach custom intake questions</h3>
-              <p className="mt-2 text-sm leading-6 text-gray-600">
+            <div className="card-2 p-5">
+              <h3 className="serif" style={{ fontSize: 20, color: 'var(--fg)' }}>Coach custom intake questions</h3>
+              <p className="mt-2 text-sm leading-6" style={{ color: 'var(--fg-2)' }}>
                 Add up to 5 extra questions after the standard client intake. These are best for your coaching preferences, equipment checks, and prospect qualification.
               </p>
             </div>
 
             <BaseClientIntakePreview />
 
-            <div className="flex items-center justify-between rounded-2xl border border-gray-200 bg-white p-4">
+            <div className="card-2 row justify-between gap-4 p-4">
               <div>
-                <div className="text-sm font-semibold text-gray-900">Active questions</div>
-                <div className="mt-1 text-sm text-gray-500">{trainerQuestions.filter((question) => question.is_active).length} of 5 in use</div>
+                <div className="serif" style={{ fontSize: 18, color: 'var(--fg)' }}>Active questions</div>
+                <div className="mono mt-1" style={{ fontSize: 10, color: 'var(--fg-4)', letterSpacing: '0.1em' }}>{trainerQuestions.filter((question) => question.is_active).length} OF 5 IN USE</div>
               </div>
               <button
                 type="button"
                 onClick={addTrainerQuestion}
                 disabled={trainerQuestions.filter((question) => question.is_active).length >= 5}
-                className="rounded-xl bg-[var(--brand-900)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                className="btn btn-accent disabled:opacity-50"
               >
                 Add question
               </button>
             </div>
 
             {loadingTrainerQuestions ? (
-              <div className="text-sm text-gray-500">Loading custom intake questions...</div>
+              <div className="text-sm" style={{ color: 'var(--fg-3)' }}>Loading custom intake questions...</div>
             ) : trainerQuestions.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50 px-4 py-8 text-sm text-gray-500">
+              <div className="card-2 px-4 py-8 text-sm" style={{ color: 'var(--fg-3)' }}>
                 No custom questions yet. Add one if you want clients to answer coach-specific questions after the standard intake.
               </div>
             ) : (
               <div className="space-y-4">
                 {trainerQuestions.map((question, index) => (
-                  <div key={question.localKey} className={`rounded-2xl border p-5 ${question.is_active ? 'border-gray-200 bg-white' : 'border-gray-200 bg-gray-50/80 opacity-80'}`}>
+                  <div key={question.localKey} className={`card-2 p-5 ${question.is_active ? '' : 'opacity-80'}`}>
                     <div className="flex items-start justify-between gap-4">
                       <div>
-                        <div className="text-sm font-semibold text-gray-900">
+                        <div className="serif" style={{ fontSize: 17, color: 'var(--fg)' }}>
                           Question {index + 1} {question.is_active ? '' : '(Archived)'}
                         </div>
-                        <div className="mt-1 text-xs uppercase tracking-[0.12em] text-gray-500">{QUESTION_TYPE_OPTIONS.find((option) => option.value === question.type)?.label}</div>
+                        <div className="mono mt-1" style={{ fontSize: 10, color: 'var(--fg-4)', letterSpacing: '0.12em' }}>{QUESTION_TYPE_OPTIONS.find((option) => option.value === question.type)?.label}</div>
                       </div>
                       <div className="flex gap-2">
-                        <button type="button" onClick={() => moveTrainerQuestion(question.localKey, -1)} disabled={index === 0} className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 disabled:opacity-40">Up</button>
-                        <button type="button" onClick={() => moveTrainerQuestion(question.localKey, 1)} disabled={index === trainerQuestions.length - 1} className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 disabled:opacity-40">Down</button>
+                        <button type="button" onClick={() => moveTrainerQuestion(question.localKey, -1)} disabled={index === 0} className="btn btn-ghost px-3 py-1.5 text-xs disabled:opacity-40">Up</button>
+                        <button type="button" onClick={() => moveTrainerQuestion(question.localKey, 1)} disabled={index === trainerQuestions.length - 1} className="btn btn-ghost px-3 py-1.5 text-xs disabled:opacity-40">Down</button>
                         {question.is_active && (
-                          <button type="button" onClick={() => archiveTrainerQuestion(question.localKey)} className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600">
+                          <button type="button" onClick={() => archiveTrainerQuestion(question.localKey)} className="btn btn-ghost px-3 py-1.5 text-xs" style={{ color: 'var(--warn)' }}>
                             Archive
                           </button>
                         )}
@@ -1215,7 +1235,7 @@ export default function SettingsPage() {
 
                     <div className="mt-4 space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Question label</label>
+                        <label className={labelClass} style={labelStyle}>Question label</label>
                         <input
                           type="text"
                           value={question.label}
@@ -1226,7 +1246,7 @@ export default function SettingsPage() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Help text</label>
+                        <label className={labelClass} style={labelStyle}>Help text</label>
                         <input
                           type="text"
                           value={question.help_text ?? ''}
@@ -1238,7 +1258,7 @@ export default function SettingsPage() {
                       </div>
                       <div className="grid gap-4 md:grid-cols-[1fr_auto]">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Answer type</label>
+                          <label className={labelClass} style={labelStyle}>Answer type</label>
                           <select
                             value={question.type}
                             onChange={(e) => updateTrainerQuestion(question.localKey, { type: e.target.value as CustomIntakeQuestionType, options: e.target.value === 'single_select' || e.target.value === 'multi_select' ? question.options : [] })}
@@ -1248,19 +1268,19 @@ export default function SettingsPage() {
                             {QUESTION_TYPE_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
                           </select>
                         </div>
-                        <label className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-gray-700">
+                        <label className="mono mt-6 inline-flex items-center gap-2" style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.12em' }}>
                           <input
                             type="checkbox"
                             checked={question.required}
                             onChange={(e) => updateTrainerQuestion(question.localKey, { required: e.target.checked })}
                             disabled={!question.is_active}
                           />
-                          Required
+                          REQUIRED
                         </label>
                       </div>
                       {(question.type === 'single_select' || question.type === 'multi_select') && (
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Options</label>
+                          <label className={labelClass} style={labelStyle}>Options</label>
                           <input
                             type="text"
                             value={question.options.join(', ')}
@@ -1279,12 +1299,12 @@ export default function SettingsPage() {
               </div>
             )}
 
-            <div className="flex justify-end border-t border-gray-100 pt-4">
+            <div className="flex justify-end border-t pt-4" style={{ borderColor: 'var(--line)' }}>
               <button
                 type="button"
                 onClick={saveTrainerQuestions}
                 disabled={savingTrainerQuestions || loadingTrainerQuestions}
-                className="rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+                className="btn btn-accent disabled:opacity-50"
               >
                 {savingTrainerQuestions ? 'Saving...' : 'Save custom intake questions'}
               </button>
@@ -1294,26 +1314,26 @@ export default function SettingsPage() {
 
         {activeTab === 'trainer_marketplace' && (
           <div className="space-y-6">
-            <div className="rounded-2xl border border-sky-100 bg-sky-50/80 p-5">
-              <h3 className="text-base font-semibold text-gray-900">Coach marketplace profile</h3>
-              <p className="mt-2 text-sm leading-6 text-gray-600">
+            <div className="card-2 p-5">
+              <h3 className="serif" style={{ fontSize: 20, color: 'var(--fg)' }}>Coach marketplace profile</h3>
+              <p className="mt-2 text-sm leading-6" style={{ color: 'var(--fg-2)' }}>
                 This powers the Discover Coaches experience. Your coach specialties, formats, and services from onboarding are reused as trust signals, while this tab controls your public listing, pricing, and lead intake status.
               </p>
             </div>
 
             {loadingMarketplaceProfile ? (
-              <div className="text-sm text-gray-500">Loading marketplace profile...</div>
+              <div className="text-sm" style={{ color: 'var(--fg-3)' }}>Loading marketplace profile...</div>
             ) : (
               <>
-                <div className="rounded-2xl border border-gray-200 bg-white p-5">
+                <div className="card-2 p-5">
                   <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                     <div>
-                      <div className="text-sm font-semibold text-gray-900">Discovery visibility</div>
-                      <p className="mt-1 text-sm leading-6 text-gray-500">
+                      <div className="serif" style={{ fontSize: 18, color: 'var(--fg)' }}>Discovery visibility</div>
+                      <p className="mt-1 text-sm leading-6" style={{ color: 'var(--fg-2)' }}>
                         Turn this on when your headline, bio, pricing, and coach setup are ready for public discovery.
                       </p>
                     </div>
-                    <label className="inline-flex items-center gap-3 text-sm font-medium text-gray-700">
+                    <label className="inline-flex items-center gap-3 text-sm font-medium" style={{ color: 'var(--fg)' }}>
                       <input
                         type="checkbox"
                         checked={marketplaceProfile.is_public}
@@ -1325,12 +1345,12 @@ export default function SettingsPage() {
 
                   <div className="mt-4 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                     <div>
-                      <div className="text-sm font-semibold text-gray-900">Lead availability</div>
-                      <p className="mt-1 text-sm leading-6 text-gray-500">
+                      <div className="serif" style={{ fontSize: 18, color: 'var(--fg)' }}>Lead availability</div>
+                      <p className="mt-1 text-sm leading-6" style={{ color: 'var(--fg-2)' }}>
                         If you are at capacity, keep your listing visible but pause new inbound requests.
                       </p>
                     </div>
-                    <label className="inline-flex items-center gap-3 text-sm font-medium text-gray-700">
+                    <label className="inline-flex items-center gap-3 text-sm font-medium" style={{ color: 'var(--fg)' }}>
                       <input
                         type="checkbox"
                         checked={marketplaceProfile.accepting_new_clients}
@@ -1343,17 +1363,17 @@ export default function SettingsPage() {
 
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Profile slug</label>
+                    <label className={labelClass} style={labelStyle}>Profile slug</label>
                     <input
                       type="text"
                       value={marketplaceProfile.slug}
                       disabled
-                      className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500"
+                      className={disabledFieldClass} style={fieldStyle}
                     />
-                    <p className="mt-1 text-xs text-gray-500">Generated from your name. We can make this editable later if needed.</p>
+                    <p className="mt-1 text-xs" style={{ color: 'var(--fg-3)' }}>Generated from your name. We can make this editable later if needed.</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                    <label className={labelClass} style={labelStyle}>Location</label>
                     <input
                       type="text"
                       value={marketplaceProfile.location_label ?? ''}
@@ -1365,7 +1385,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Headline</label>
+                  <label className={labelClass} style={labelStyle}>Headline</label>
                   <input
                     type="text"
                     value={marketplaceProfile.headline ?? ''}
@@ -1376,7 +1396,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Short bio</label>
+                  <label className={labelClass} style={labelStyle}>Short bio</label>
                   <textarea
                     value={marketplaceProfile.bio ?? ''}
                     onChange={(e) => setMarketplaceField('bio', e.target.value)}
@@ -1386,7 +1406,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Consultation link</label>
+                  <label className={labelClass} style={labelStyle}>Consultation link</label>
                   <input
                     type="url"
                     value={marketplaceProfile.consultation_url ?? ''}
@@ -1394,12 +1414,12 @@ export default function SettingsPage() {
                     className={inputClass}
                     placeholder="https://cal.com/your-name/intro-call"
                   />
-                  <p className="mt-1 text-xs text-gray-500">Optional. Add this if you want discovery to feel more like a Trainerize-style consult flow.</p>
+                  <p className="mt-1 text-xs" style={{ color: 'var(--fg-3)' }}>Optional. Add this if you want discovery to feel more like a Trainerize-style consult flow.</p>
                 </div>
 
                 <div className="grid gap-4 md:grid-cols-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Price from</label>
+                    <label className={labelClass} style={labelStyle}>Price from</label>
                     <input
                       type="number"
                       min={0}
@@ -1410,7 +1430,7 @@ export default function SettingsPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Price to</label>
+                    <label className={labelClass} style={labelStyle}>Price to</label>
                     <input
                       type="number"
                       min={0}
@@ -1421,7 +1441,7 @@ export default function SettingsPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Currency</label>
+                    <label className={labelClass} style={labelStyle}>Currency</label>
                     <select
                       value={marketplaceProfile.currency}
                       onChange={(e) => setMarketplaceField('currency', e.target.value)}
@@ -1434,46 +1454,46 @@ export default function SettingsPage() {
                   </div>
                 </div>
 
-                <div className="rounded-2xl border border-gray-200 bg-white p-5">
-                  <div className="text-sm font-semibold text-gray-900">Public discovery preview</div>
+                <div className="card-2 p-5">
+                  <div className="mono" style={{ fontSize: 10, color: 'var(--fg-4)', letterSpacing: '0.12em' }}>PUBLIC DISCOVERY PREVIEW</div>
                   <div className="mt-4 space-y-3">
-                    <div className="text-lg font-semibold text-gray-900">{form.full_name || profile.full_name || 'Coach profile'}</div>
-                    <div className="text-sm text-gray-600">{marketplaceProfile.headline || 'Add a headline to explain the kind of coaching you offer.'}</div>
+                    <div className="serif" style={{ fontSize: 22, color: 'var(--fg)' }}>{form.full_name || profile.full_name || 'Coach profile'}</div>
+                    <div className="text-sm" style={{ color: 'var(--fg-2)' }}>{marketplaceProfile.headline || 'Add a headline to explain the kind of coaching you offer.'}</div>
                     <div className="flex flex-wrap gap-2">
                       {marketplaceReadySignals.length > 0 ? marketplaceReadySignals.map((item) => (
-                        <span key={item} className="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700">
+                        <span key={item} className="chip">
                           {item}
                         </span>
                       )) : (
-                        <span className="text-sm text-amber-700">Complete your coach onboarding to improve how your listing appears in discovery.</span>
+                        <span className="text-sm" style={{ color: 'var(--warn)' }}>Complete your coach onboarding to improve how your listing appears in discovery.</span>
                       )}
                     </div>
-                    <div className="text-sm text-gray-500">
+                    <div className="text-sm" style={{ color: 'var(--fg-3)' }}>
                       {formatCoachPriceRange(marketplaceProfile.price_from, marketplaceProfile.price_to, marketplaceProfile.currency)}
                       {marketplaceProfile.location_label ? ` · ${marketplaceProfile.location_label}` : ''}
                     </div>
                     {marketplaceProfile.consultation_url && (
-                      <div className="text-sm text-sky-700">Consult link ready</div>
+                      <div className="text-sm" style={{ color: 'var(--acc)' }}>Consult link ready</div>
                     )}
                   </div>
                 </div>
 
-                <div className="flex justify-end border-t border-gray-100 pt-4">
+                <div className="flex justify-end border-t pt-4" style={{ borderColor: 'var(--line)' }}>
                   <button
                     type="button"
                     onClick={saveMarketplaceProfile}
                     disabled={savingMarketplaceProfile}
-                    className="rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+                    className="btn btn-accent disabled:opacity-50"
                   >
                     {savingMarketplaceProfile ? 'Saving...' : 'Save marketplace profile'}
                   </button>
                 </div>
 
-                <div className="rounded-2xl border border-gray-200 bg-white p-5">
+                <div className="card-2 p-5">
                   <div className="flex items-center justify-between gap-4">
                     <div>
-                      <div className="text-sm font-semibold text-gray-900">Coaching offers</div>
-                      <p className="mt-1 text-sm leading-6 text-gray-500">
+                      <div className="serif" style={{ fontSize: 18, color: 'var(--fg)' }}>Coaching offers</div>
+                      <p className="mt-1 text-sm leading-6" style={{ color: 'var(--fg-2)' }}>
                         Define up to 3 public packages so leads can apply for a specific offer instead of sending a vague message.
                       </p>
                     </div>
@@ -1481,36 +1501,36 @@ export default function SettingsPage() {
                       type="button"
                       onClick={addCoachOffer}
                       disabled={coachOffers.filter((offer) => offer.is_active).length >= 3}
-                      className="rounded-xl bg-[var(--brand-900)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                      className="btn btn-accent disabled:opacity-50"
                     >
                       Add offer
                     </button>
                   </div>
 
                   {loadingCoachOffers ? (
-                    <div className="mt-4 text-sm text-gray-500">Loading offers...</div>
+                    <div className="mt-4 text-sm" style={{ color: 'var(--fg-3)' }}>Loading offers...</div>
                   ) : coachOffers.length === 0 ? (
-                    <div className="mt-4 rounded-2xl border border-dashed border-gray-200 bg-gray-50 px-4 py-8 text-sm text-gray-500">
+                    <div className="card-2 mt-4 px-4 py-8 text-sm" style={{ color: 'var(--fg-3)' }}>
                       No public offers yet. Add a focused monthly, weekly, or one-off package to help prospects self-qualify.
                     </div>
                   ) : (
                     <div className="mt-4 space-y-4">
                       {coachOffers.map((offer, index) => (
-                        <div key={offer.localKey} className={`rounded-2xl border p-5 ${offer.is_active ? 'border-gray-200 bg-white' : 'border-gray-200 bg-gray-50/80 opacity-80'}`}>
+                        <div key={offer.localKey} className={`card-2 p-5 ${offer.is_active ? '' : 'opacity-80'}`}>
                           <div className="flex items-start justify-between gap-4">
                             <div>
-                              <div className="text-sm font-semibold text-gray-900">
+                              <div className="serif" style={{ fontSize: 17, color: 'var(--fg)' }}>
                                 Offer {index + 1} {offer.is_active ? '' : '(Archived)'}
                               </div>
-                              <div className="mt-1 text-xs uppercase tracking-[0.12em] text-gray-500">
+                              <div className="mono mt-1" style={{ fontSize: 10, color: 'var(--fg-4)', letterSpacing: '0.12em' }}>
                                 {formatOfferPrice(offer.price || 0, marketplaceProfile.currency, offer.billing_period)}
                               </div>
                             </div>
                             <div className="flex gap-2">
-                              <button type="button" onClick={() => moveCoachOffer(offer.localKey, -1)} disabled={index === 0} className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 disabled:opacity-40">Up</button>
-                              <button type="button" onClick={() => moveCoachOffer(offer.localKey, 1)} disabled={index === coachOffers.length - 1} className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 disabled:opacity-40">Down</button>
+                              <button type="button" onClick={() => moveCoachOffer(offer.localKey, -1)} disabled={index === 0} className="btn btn-ghost px-3 py-1.5 text-xs disabled:opacity-40">Up</button>
+                              <button type="button" onClick={() => moveCoachOffer(offer.localKey, 1)} disabled={index === coachOffers.length - 1} className="btn btn-ghost px-3 py-1.5 text-xs disabled:opacity-40">Down</button>
                               {offer.is_active && (
-                                <button type="button" onClick={() => archiveCoachOffer(offer.localKey)} className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600">
+                                <button type="button" onClick={() => archiveCoachOffer(offer.localKey)} className="btn btn-ghost px-3 py-1.5 text-xs" style={{ color: 'var(--warn)' }}>
                                   Archive
                                 </button>
                               )}
@@ -1519,7 +1539,7 @@ export default function SettingsPage() {
 
                           <div className="mt-4 grid gap-4 md:grid-cols-2">
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Offer title</label>
+                              <label className={labelClass} style={labelStyle}>Offer title</label>
                               <input
                                 type="text"
                                 value={offer.title}
@@ -1530,7 +1550,7 @@ export default function SettingsPage() {
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">CTA label</label>
+                              <label className={labelClass} style={labelStyle}>CTA label</label>
                               <input
                                 type="text"
                                 value={offer.cta_label}
@@ -1541,7 +1561,7 @@ export default function SettingsPage() {
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Price</label>
+                              <label className={labelClass} style={labelStyle}>Price</label>
                               <input
                                 type="number"
                                 min={1}
@@ -1552,7 +1572,7 @@ export default function SettingsPage() {
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Billing period</label>
+                              <label className={labelClass} style={labelStyle}>Billing period</label>
                               <select
                                 value={offer.billing_period}
                                 onChange={(e) => updateCoachOffer(offer.localKey, { billing_period: e.target.value as CoachOfferBillingPeriod })}
@@ -1567,7 +1587,7 @@ export default function SettingsPage() {
                           </div>
 
                           <div className="mt-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Offer description</label>
+                            <label className={labelClass} style={labelStyle}>Offer description</label>
                             <textarea
                               value={offer.description ?? ''}
                               onChange={(e) => updateCoachOffer(offer.localKey, { description: e.target.value })}
@@ -1581,12 +1601,12 @@ export default function SettingsPage() {
                     </div>
                   )}
 
-                  <div className="mt-4 flex justify-end border-t border-gray-100 pt-4">
+                  <div className="mt-4 flex justify-end border-t pt-4" style={{ borderColor: 'var(--line)' }}>
                     <button
                       type="button"
                       onClick={saveCoachOffers}
                       disabled={savingCoachOffers || loadingCoachOffers}
-                      className="rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+                      className="btn btn-accent disabled:opacity-50"
                     >
                       {savingCoachOffers ? 'Saving...' : 'Save coaching offers'}
                     </button>
@@ -1600,47 +1620,47 @@ export default function SettingsPage() {
         {/* Account Tab */}
         {activeTab === 'account' && (
           <div className="space-y-8">
-            <div className="rounded-2xl border border-sky-100 bg-sky-50/80 p-5">
+            <div className="card-2 p-5">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h3 className="text-base font-semibold text-gray-900">Beta support</h3>
-                  <p className="mt-2 text-sm leading-6 text-gray-600">
+                  <h3 className="serif" style={{ fontSize: 20, color: 'var(--fg)' }}>Beta support</h3>
+                  <p className="mt-2 text-sm leading-6" style={{ color: 'var(--fg-2)' }}>
                     Need help with onboarding, invites, trainer-client linking, or a broken workflow? Contact support or review the public beta guidance.
                   </p>
                 </div>
-                <AlertTriangle className="h-5 w-5 text-sky-600" />
+                <AlertTriangle className="h-5 w-5" style={{ color: 'var(--acc)' }} />
               </div>
               <div className="mt-4 flex flex-wrap gap-3">
                 <a
                   href={`mailto:${SUPPORT_EMAIL}?subject=mealandmotion%20beta%20support`}
-                  className="inline-flex items-center gap-2 rounded-xl bg-[var(--brand-900)] px-4 py-2.5 text-sm font-semibold text-white"
+                  className="btn btn-accent"
                 >
                   Email support
                   <ExternalLink className="h-4 w-4" />
                 </a>
                 <Link
                   href="/support"
-                  className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700"
+                  className="btn btn-ghost"
                 >
                   Support page
                 </Link>
                 <Link
                   href="/faq"
-                  className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700"
+                  className="btn btn-ghost"
                 >
                   Beta FAQ
                 </Link>
               </div>
             </div>
 
-            <div className="rounded-2xl border border-gray-200 bg-white p-5">
-              <h3 className="text-base font-semibold text-gray-900">Report an issue</h3>
-              <p className="mt-2 text-sm leading-6 text-gray-600">
+            <div className="card-2 p-5">
+              <h3 className="serif" style={{ fontSize: 20, color: 'var(--fg)' }}>Report an issue</h3>
+              <p className="mt-2 text-sm leading-6" style={{ color: 'var(--fg-2)' }}>
                 Send bugs, onboarding issues, and workflow blockers directly into the beta support queue.
               </p>
               <div className="mt-4 space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                  <label className={labelClass} style={labelStyle}>Category</label>
                   <select value={supportCategory} onChange={(e) => setSupportCategory(e.target.value)} className={selectClass}>
                     <option value="bug">Bug</option>
                     <option value="invite">Invite / onboarding</option>
@@ -1649,7 +1669,7 @@ export default function SettingsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                  <label className={labelClass} style={labelStyle}>Subject</label>
                   <input
                     type="text"
                     value={supportSubject}
@@ -1659,7 +1679,7 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Message</label>
+                  <label className={labelClass} style={labelStyle}>Message</label>
                   <textarea
                     value={supportMessage}
                     onChange={(e) => setSupportMessage(e.target.value)}
@@ -1671,7 +1691,7 @@ export default function SettingsPage() {
                   type="button"
                   onClick={handleSupportRequest}
                   disabled={submittingSupport || !supportSubject.trim() || !supportMessage.trim()}
-                  className="inline-flex items-center gap-2 rounded-xl bg-[var(--brand-900)] px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+                  className="btn btn-accent disabled:opacity-50"
                 >
                   <ExternalLink className="h-4 w-4" />
                   <span>{submittingSupport ? 'Sending...' : 'Submit report'}</span>
@@ -1679,30 +1699,30 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-gray-200 bg-white p-5">
+            <div className="card-2 p-5">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <h3 className="text-base font-semibold text-gray-900">Recent support requests</h3>
-                  <p className="mt-2 text-sm leading-6 text-gray-600">
+                  <h3 className="serif" style={{ fontSize: 20, color: 'var(--fg)' }}>Recent support requests</h3>
+                  <p className="mt-2 text-sm leading-6" style={{ color: 'var(--fg-2)' }}>
                     Track the most recent issues you have already sent to the beta support queue.
                   </p>
                 </div>
               </div>
 
               {loadingSupportHistory ? (
-                <div className="mt-4 text-sm text-gray-500">Loading support history...</div>
+                <div className="mt-4 text-sm" style={{ color: 'var(--fg-3)' }}>Loading support history...</div>
               ) : supportHistory.length === 0 ? (
-                <div className="mt-4 rounded-xl border border-dashed border-gray-200 bg-gray-50 px-4 py-5 text-sm text-gray-500">
+                <div className="card-2 mt-4 px-4 py-5 text-sm" style={{ color: 'var(--fg-3)' }}>
                   No support requests yet. Use the form above if you hit a blocker or want to share product feedback.
                 </div>
               ) : (
                 <div className="mt-4 space-y-3">
                   {supportHistory.map((request) => (
-                    <div key={request.id} className="rounded-xl border border-gray-200 bg-gray-50/70 p-4">
+                    <div key={request.id} className="card-2 p-4">
                       <div className="flex flex-wrap items-center justify-between gap-3">
                         <div>
-                          <div className="text-sm font-semibold text-gray-900">{request.subject}</div>
-                          <div className="mt-1 text-xs uppercase tracking-[0.12em] text-gray-500">
+                          <div className="serif" style={{ fontSize: 16, color: 'var(--fg)' }}>{request.subject}</div>
+                          <div className="mono mt-1" style={{ fontSize: 10, color: 'var(--fg-4)', letterSpacing: '0.12em' }}>
                             {request.category} · {new Date(request.created_at).toLocaleDateString('en-GB', {
                               day: 'numeric',
                               month: 'short',
@@ -1710,7 +1730,7 @@ export default function SettingsPage() {
                             })}
                           </div>
                         </div>
-                        <span className={`rounded-full border px-3 py-1 text-xs font-semibold capitalize ${statusTone[request.status] ?? 'bg-gray-100 text-gray-700 border-gray-200'}`}>
+                        <span className="chip capitalize" style={statusTone[request.status]}>
                           {request.status.replace('_', ' ')}
                         </span>
                       </div>
@@ -1721,14 +1741,14 @@ export default function SettingsPage() {
             </div>
 
             {/* Change Password */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <Lock className="h-5 w-5 text-purple-600" />
+            <div className="card-2 p-5">
+              <h3 className="serif mb-4 flex items-center gap-2" style={{ fontSize: 20, color: 'var(--fg)' }}>
+                <Lock className="h-5 w-5" style={{ color: 'var(--acc)' }} />
                 Change Password
               </h3>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+                  <label className={labelClass} style={labelStyle}>New Password</label>
                   <input
                     type="password"
                     value={passwords.newPassword}
@@ -1739,7 +1759,7 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+                  <label className={labelClass} style={labelStyle}>Confirm New Password</label>
                   <input
                     type="password"
                     value={passwords.confirmPassword}
@@ -1752,7 +1772,7 @@ export default function SettingsPage() {
                   type="button"
                   onClick={handlePasswordChange}
                   disabled={changingPassword || !passwords.newPassword}
-                  className="flex items-center space-x-2 bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors disabled:opacity-50"
+                  className="btn btn-accent disabled:opacity-50"
                 >
                   <Lock className="h-4 w-4" />
                   <span>{changingPassword ? 'Updating...' : 'Update Password'}</span>
@@ -1761,33 +1781,34 @@ export default function SettingsPage() {
             </div>
 
             {/* Delete Account */}
-            <div className="border-t border-gray-200 pt-6">
-              <h3 className="text-lg font-semibold text-red-600 mb-2 flex items-center gap-2">
+            <div className="card-2 p-5">
+              <h3 className="serif mb-2 flex items-center gap-2" style={{ fontSize: 20, color: 'var(--warn)' }}>
                 <AlertTriangle className="h-5 w-5" />
                 Danger Zone
               </h3>
-              <p className="text-sm text-gray-600 mb-4">
+              <p className="mb-4 text-sm" style={{ color: 'var(--fg-2)' }}>
                 Permanently delete your account and all associated data. This action cannot be undone.
               </p>
               {!showDeleteConfirm ? (
                 <button
                   type="button"
                   onClick={() => setShowDeleteConfirm(true)}
-                  className="flex items-center space-x-2 border border-red-300 text-red-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-50 transition-colors"
+                  className="btn btn-ghost"
+                  style={{ color: 'var(--warn)' }}
                 >
                   <Trash2 className="h-4 w-4" />
                   <span>Delete Account</span>
                 </button>
               ) : (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4 space-y-3">
-                  <p className="text-sm font-medium text-red-800">
-                    Type <span className="font-mono bg-red-100 px-1 rounded">DELETE</span> to confirm:
+                <div className="card-2 space-y-3 p-4">
+                  <p className="text-sm font-medium" style={{ color: 'var(--warn)' }}>
+                    Type <span className="mono rounded px-1" style={{ background: 'var(--ink-3)' }}>DELETE</span> to confirm:
                   </p>
                   <input
                     type="text"
                     value={deleteConfirmText}
                     onChange={(e) => setDeleteConfirmText(e.target.value)}
-                    className="w-full px-3 py-2 border border-red-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    className={inputClass}
                     placeholder="Type DELETE"
                   />
                   <div className="flex gap-3">
@@ -1795,7 +1816,7 @@ export default function SettingsPage() {
                       type="button"
                       onClick={handleDeleteAccount}
                       disabled={deleteConfirmText !== 'DELETE' || deleting}
-                      className="flex items-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors disabled:opacity-50"
+                      className="btn btn-accent disabled:opacity-50"
                     >
                       <Trash2 className="h-4 w-4" />
                       <span>{deleting ? 'Deleting...' : 'Permanently Delete'}</span>
@@ -1803,7 +1824,7 @@ export default function SettingsPage() {
                     <button
                       type="button"
                       onClick={() => { setShowDeleteConfirm(false); setDeleteConfirmText('') }}
-                      className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800"
+                      className="btn btn-ghost"
                     >
                       Cancel
                     </button>
@@ -1818,11 +1839,11 @@ export default function SettingsPage() {
 
         {/* Save Button — hide on account tab since it has its own actions */}
         {activeTab !== 'account' && activeTab !== 'trainer_intake' && activeTab !== 'trainer_marketplace' && (
-          <div className="flex justify-end mt-6 pt-4 border-t border-gray-100">
+          <div className="mt-6 flex justify-end border-t pt-4" style={{ borderColor: 'var(--line)' }}>
             <button
               type="submit"
               disabled={saving}
-              className="flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-2 rounded-lg font-medium hover:shadow-lg transition-all disabled:opacity-50"
+              className="btn btn-accent disabled:opacity-50"
             >
               <Settings className="h-4 w-4" />
               <span>{saving ? 'Saving...' : 'Save Changes'}</span>
