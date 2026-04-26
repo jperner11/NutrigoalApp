@@ -9,6 +9,32 @@ import type { DietPlan, DietPlanMeal, FoodItem } from '@/lib/supabase/types'
 import { isFeatureLocked } from '@/lib/tierUtils'
 import type { UserRole } from '@/lib/supabase/types'
 
+interface MealMeta {
+  label?: string
+  time?: string
+  timing_note?: string
+  notes?: string
+}
+
+function parseMealFoods(raw: DietPlanMeal['foods']): { meta: MealMeta; foods: FoodItem[] } {
+  if (Array.isArray(raw)) return { meta: {}, foods: raw }
+
+  if (typeof raw === 'object' && raw !== null && '_meta' in raw) {
+    const wrapped = raw as { _meta?: MealMeta; items?: FoodItem[] }
+    return { meta: wrapped._meta ?? {}, foods: wrapped.items ?? [] }
+  }
+
+  return { meta: {}, foods: [] }
+}
+
+function formatMealType(type: string) {
+  return type.replace(/_/g, ' ').toUpperCase()
+}
+
+function formatMacroLine(meal: DietPlanMeal) {
+  return `${Math.round(meal.total_calories)} KCAL · ${Math.round(meal.total_protein)}P · ${Math.round(meal.total_carbs)}C · ${Math.round(meal.total_fat)}F`
+}
+
 interface MealPlanTrackerProps {
   userId: string
   userRole?: UserRole
@@ -188,10 +214,16 @@ export default function MealPlanTracker({ userId, userRole = 'free', onMacrosUpd
 
   if (loading) {
     return (
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 mb-8">
-        <div className="animate-pulse space-y-3">
-          <div className="h-5 bg-gray-200 rounded w-1/3" />
-          <div className="h-20 bg-gray-100 rounded" />
+      <div className="card mb-8 p-6">
+        <div
+          className="mono"
+          style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}
+        >
+          TODAY&apos;S MEALS
+        </div>
+        <div className="mt-4 animate-pulse space-y-3">
+          <div className="h-5 w-1/3 rounded" style={{ background: 'var(--line)' }} />
+          <div className="h-20 rounded-xl" style={{ background: 'var(--ink-2)' }} />
         </div>
       </div>
     )
@@ -199,16 +231,29 @@ export default function MealPlanTracker({ userId, userRole = 'free', onMacrosUpd
 
   if (!activePlan) {
     return (
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 mb-8">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-semibold text-gray-900">Today&apos;s Meals</h2>
+      <div className="card mb-8 p-6">
+        <div
+          className="mono"
+          style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}
+        >
+          TODAY&apos;S MEALS
         </div>
-        <div className="text-center py-6">
-          <Utensils className="h-10 w-10 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500 mb-4">No active diet plan. Create one to start tracking meals.</p>
+        <div className="py-6 text-center">
+          <div
+            className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl"
+            style={{ background: 'var(--ink-3)', color: 'var(--acc)' }}
+          >
+            <Utensils className="h-5 w-5" />
+          </div>
+          <div className="serif" style={{ fontSize: 22, color: 'var(--fg)' }}>
+            No active meal plan.
+          </div>
+          <p className="mx-auto mt-2 mb-5 max-w-[360px] text-sm leading-6" style={{ color: 'var(--fg-2)' }}>
+            Create a diet plan to start tracking today&apos;s meals from your dashboard.
+          </p>
           <Link
             href="/diet"
-            className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all"
+            className="btn btn-accent"
           >
             <span>Create Diet Plan</span>
           </Link>
@@ -220,101 +265,136 @@ export default function MealPlanTracker({ userId, userRole = 'free', onMacrosUpd
   const mealsEaten = meals.filter(m => loggedMealIds.has(m.id)).length
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 mb-8">
-      <div className="flex items-center justify-between mb-4">
+    <div className="card mb-8 p-6">
+      <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">Today&apos;s Meals</h2>
-          <p className="text-sm text-gray-500">{activePlan.name} &middot; {mealsEaten}/{meals.length} completed</p>
+          <div
+            className="mono"
+            style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}
+          >
+            TODAY&apos;S MEALS
+          </div>
+          <h2 className="serif mt-1" style={{ fontSize: 24, lineHeight: 1.1, color: 'var(--fg)' }}>
+            Plan,{' '}
+            <span className="italic-serif" style={{ color: 'var(--fg-3)' }}>
+              plated.
+            </span>
+          </h2>
+          <p className="mt-1 text-sm" style={{ color: 'var(--fg-2)' }}>
+            {activePlan.name} · {mealsEaten}/{meals.length} completed
+          </p>
         </div>
-        <Link href="/diet" className="text-sm text-purple-600 hover:text-purple-800 font-medium">
+        <Link href="/diet" className="btn btn-ghost">
           View Plan
         </Link>
       </div>
 
       {meals.length === 0 ? (
-        <p className="text-gray-500 text-sm py-4">No meals planned for today.</p>
+        <div className="card-2 px-4 py-6 text-sm" style={{ color: 'var(--fg-3)' }}>
+          No meals planned for today.
+        </div>
       ) : (
         <div className="space-y-3">
           {meals.map(meal => {
             const isEaten = loggedMealIds.has(meal.id)
             const isExpanded = expandedMeal === meal.id
-            const rawFoods = meal.foods as FoodItem[] | { _meta?: Record<string, string>; items?: FoodItem[] }
-            const foods: FoodItem[] = Array.isArray(rawFoods)
-              ? rawFoods
-              : (rawFoods?.items ?? []) as FoodItem[]
-            const mealLabel = !Array.isArray(rawFoods) ? rawFoods?._meta?.label : undefined
+            const { meta, foods } = parseMealFoods(meal.foods)
+            const mealLabel = meta.label || formatMealType(meal.meal_type)
+            const kicker = `${mealLabel.toUpperCase()}${meta.time ? ` · ${meta.time}` : ''}`
             const isLocked = isFreeUser && selectedMealId !== null && meal.id !== selectedMealId
 
             return (
               <div
                 key={meal.id}
-                className={`border rounded-lg overflow-hidden transition-colors ${
-                  isLocked ? 'border-gray-200 opacity-60' :
-                  isEaten ? 'border-purple-200 bg-purple-50/50' : 'border-gray-200'
-                }`}
+                className={`card-2 overflow-hidden transition ${isLocked ? 'opacity-60' : ''}`}
+                style={{
+                  borderColor: isEaten ? 'var(--acc)' : 'var(--line)',
+                  background: isEaten ? 'var(--ink-3)' : undefined,
+                }}
               >
-                <div className="flex items-center p-4">
+                <div className="flex items-center gap-3 p-4">
                   <button
                     onClick={() => !isLocked && setExpandedMeal(isExpanded ? null : meal.id)}
-                    className="flex-1 flex items-center gap-3 text-left"
+                    className="flex min-w-0 flex-1 items-center gap-3 text-left"
                     disabled={isLocked}
                   >
-                    <div className={`rounded-lg p-2 ${isLocked ? 'bg-gray-100' : isEaten ? 'bg-purple-100' : 'bg-gray-100'}`}>
+                    <div
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+                      style={{ background: isEaten ? 'var(--acc-soft)' : 'var(--ink-2)', color: isEaten ? 'var(--acc)' : 'var(--fg-3)' }}
+                    >
                       {isLocked ? (
-                        <Lock className="h-4 w-4 text-gray-400" />
+                        <Lock className="h-4 w-4" />
                       ) : (
-                        <Utensils className={`h-4 w-4 ${isEaten ? 'text-purple-600' : 'text-gray-500'}`} />
+                        <Utensils className="h-4 w-4" />
                       )}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      {mealLabel && !isLocked && (
-                        <p className="text-[10px] font-semibold uppercase tracking-wide text-purple-600">{mealLabel}</p>
+                    <div className="min-w-0 flex-1">
+                      {!isLocked && (
+                        <p
+                          className="mono"
+                          style={{ fontSize: 10, color: 'var(--fg-4)', letterSpacing: '0.12em' }}
+                        >
+                          {kicker}
+                        </p>
                       )}
-                      <p className={`font-medium ${isLocked ? 'text-gray-400' : isEaten ? 'text-purple-800' : 'text-gray-900'}`}>
+                      <p className="serif truncate" style={{ fontSize: 18, color: isLocked ? 'var(--fg-3)' : 'var(--fg)', lineHeight: 1.2 }}>
                         {meal.meal_name}
                       </p>
                       {!isLocked && (
-                        <p className="text-xs text-gray-500">
-                          {meal.total_calories} cal &middot; {Math.round(meal.total_protein)}g P &middot; {Math.round(meal.total_carbs)}g C &middot; {Math.round(meal.total_fat)}g F
+                        <p
+                          className="mono mt-1"
+                          style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.08em' }}
+                        >
+                          {formatMacroLine(meal)}
                         </p>
                       )}
                     </div>
                     {!isLocked && (isExpanded ? (
-                      <ChevronUp className="h-4 w-4 text-gray-400" />
+                      <ChevronUp className="h-4 w-4 shrink-0" style={{ color: 'var(--fg-3)' }} />
                     ) : (
-                      <ChevronDown className="h-4 w-4 text-gray-400" />
+                      <ChevronDown className="h-4 w-4 shrink-0" style={{ color: 'var(--fg-3)' }} />
                     ))}
                   </button>
 
                   {!isLocked && (
                     <button
                       onClick={() => toggleMeal(meal)}
-                      className={`ml-3 flex-shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center transition-colors ${
-                        isEaten
-                          ? 'bg-purple-600 border-purple-600 text-white'
-                          : 'border-gray-300 hover:border-purple-400'
-                      }`}
+                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border transition"
+                      style={{
+                        borderColor: isEaten ? 'var(--acc)' : 'var(--line-2)',
+                        background: isEaten ? 'var(--acc)' : 'var(--ink-2)',
+                        color: isEaten ? 'var(--ink-1)' : 'var(--fg-3)',
+                      }}
+                      aria-label={isEaten ? `Unmark ${meal.meal_name}` : `Mark ${meal.meal_name} eaten`}
                     >
                       {isEaten && <Check className="h-4 w-4" />}
                     </button>
                   )}
                 </div>
 
-                {isExpanded && !isLocked && foods.length > 0 && (
-                  <div className="px-4 pb-4 border-t border-gray-100">
-                    <div className="space-y-2 mt-3">
+                {isExpanded && !isLocked && (
+                  <div className="border-t px-4 pb-4" style={{ borderColor: 'var(--line)' }}>
+                    {(meta.timing_note || meta.notes) && (
+                      <div className="mt-3 rounded-xl p-3 text-sm leading-6" style={{ background: 'var(--ink-2)', color: 'var(--fg-2)' }}>
+                        {meta.timing_note && <p>{meta.timing_note}</p>}
+                        {meta.notes && <p>{meta.notes}</p>}
+                      </div>
+                    )}
+                    {foods.length > 0 && (
+                    <div className="mt-3 space-y-2">
                       {foods.map((food, i) => (
-                        <div key={i} className="flex items-center gap-2 text-sm">
-                          <Clock className="h-3 w-3 text-gray-400 flex-shrink-0" />
-                          <span className="text-gray-700">
+                        <div key={`${food.name}-${i}`} className="flex items-center gap-2 text-sm">
+                          <Clock className="h-3 w-3 shrink-0" style={{ color: 'var(--fg-4)' }} />
+                          <span style={{ color: 'var(--fg-2)' }}>
                             {food.amount} {food.unit} {food.name}
                           </span>
-                          <span className="text-gray-400 ml-auto text-xs">
-                            {food.calories} cal
+                          <span className="mono ml-auto text-xs" style={{ color: 'var(--fg-4)' }}>
+                            {Math.round(food.calories)} KCAL
                           </span>
                         </div>
                       ))}
                     </div>
+                    )}
                   </div>
                 )}
               </div>
