@@ -10,8 +10,6 @@ import {
   TrendingDown,
   Minus,
   Scale,
-  Target,
-  Hash,
   Plus,
   Trash2,
   Pencil,
@@ -29,6 +27,8 @@ import {
   ReferenceLine,
 } from 'recharts'
 import type { WeightLog } from '@/lib/supabase/types'
+import AppPageHeader from '@/components/ui/AppPageHeader'
+import StatTile from '@/components/ui/StatTile'
 
 type TimeRange = '7D' | '1M' | '3M' | '6M' | 'ALL'
 
@@ -54,6 +54,17 @@ function formatFullDate(dateStr: string): string {
   return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', {
     weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'
   })
+}
+
+const inputStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '10px 12px',
+  background: 'var(--ink-2)',
+  border: '1px solid var(--line-2)',
+  borderRadius: 10,
+  fontSize: 14,
+  color: 'var(--fg)',
+  outline: 'none',
 }
 
 export default function ProgressPage() {
@@ -113,10 +124,9 @@ export default function ProgressPage() {
       return
     }
 
-    // Also update profile weight_kg to latest
     await supabase.from('user_profiles').update({ weight_kg: parseFloat(formWeight) }).eq('id', profile.id)
 
-    toast.success('Weight logged!')
+    toast.success('Weight logged.')
     setShowForm(false)
     setFormWeight('')
     setFormBodyFat('')
@@ -160,7 +170,6 @@ export default function ProgressPage() {
     ? logs.filter(l => new Date(l.date + 'T00:00:00') >= threshold)
     : logs
 
-  // Chart data
   const chartData = filteredLogs.map(l => ({
     date: l.date,
     label: formatDate(l.date, range),
@@ -183,8 +192,12 @@ export default function ProgressPage() {
     else if (diff < -0.3) trend = 'down'
   }
 
-  const trendIcon = trend === 'up' ? <TrendingUp className="h-4 w-4" /> : trend === 'down' ? <TrendingDown className="h-4 w-4" /> : <Minus className="h-4 w-4" />
-  const trendColor = trend === 'up' ? 'text-amber-600' : trend === 'down' ? 'text-green-600' : 'text-gray-500'
+  const trendIcon =
+    trend === 'up' ? <TrendingUp className="h-3 w-3" />
+    : trend === 'down' ? <TrendingDown className="h-3 w-3" />
+    : <Minus className="h-3 w-3" />
+  const trendTone: 'warn' | 'ok' | 'muted' =
+    trend === 'up' ? 'warn' : trend === 'down' ? 'ok' : 'muted'
   const trendLabel = trend === 'up' ? 'Going up' : trend === 'down' ? 'Going down' : 'Stable'
 
   // Chart Y-axis domain
@@ -194,201 +207,248 @@ export default function ProgressPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600" />
+      <div className="card p-8">
+        <div
+          className="mono"
+          style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}
+        >
+          LOADING
+        </div>
+        <div className="serif mt-2" style={{ fontSize: 24, color: 'var(--fg)' }}>
+          Pulling your progress data.
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      {/* Tab nav */}
-      <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-6">
-        <Link href="/progress" className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-center bg-white text-purple-700 shadow-sm">
-          Weight
+    <div className="mx-auto max-w-[920px]">
+      {/* Sub-tab nav */}
+      <div className="tab-row mb-6">
+        <Link href="/progress" className="tab active">
+          WEIGHT
         </Link>
-        <Link href="/progress/measurements" className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-center text-gray-600 hover:text-gray-900">
-          Measurements
+        <Link href="/progress/measurements" className="tab">
+          MEASUREMENTS
         </Link>
-        <Link href="/progress/photos" className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-center text-gray-600 hover:text-gray-900">
-          Photos
+        <Link href="/progress/photos" className="tab">
+          PHOTOS
         </Link>
       </div>
 
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Weight Tracking</h1>
-          <p className="text-gray-500 mt-1">Track your weight and body composition over time.</p>
-        </div>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-5 py-2.5 rounded-lg font-medium hover:shadow-lg transition-all"
-        >
-          <Plus className="h-4 w-4" />
-          Log Weight
-        </button>
-      </div>
+      <AppPageHeader
+        eyebrow="Progress"
+        title="Weight"
+        accent="over time."
+        subtitle="Track your weight and body composition."
+        actions={
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="btn btn-accent"
+          >
+            <Plus className="h-4 w-4" />
+            Log weight
+          </button>
+        }
+      />
 
       {/* Quick Log Form */}
       {showForm && (
-        <div className="card p-6 mb-6 animate-[fadeIn_0.2s_ease-out]">
-          <h3 className="font-semibold text-gray-900 mb-4">Log Weight</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="card mb-6 p-6 animate-[fadeIn_0.2s_ease-out]">
+          <div
+            className="mono mb-4"
+            style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}
+          >
+            LOG WEIGHT
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-4">
             <div>
-              <label className="text-xs text-gray-500 font-medium mb-1 block">Date</label>
+              <label
+                className="mono mb-2 block"
+                style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
+              >
+                DATE
+              </label>
               <input
                 type="date"
                 value={formDate}
-                onChange={e => setFormDate(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-purple-200 focus:border-purple-400"
+                onChange={(e) => setFormDate(e.target.value)}
+                style={inputStyle}
               />
             </div>
             <div>
-              <label className="text-xs text-gray-500 font-medium mb-1 block">Weight (kg) *</label>
+              <label
+                className="mono mb-2 block"
+                style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
+              >
+                WEIGHT (KG) *
+              </label>
               <input
                 type="number"
                 step="0.1"
                 value={formWeight}
-                onChange={e => setFormWeight(e.target.value)}
+                onChange={(e) => setFormWeight(e.target.value)}
                 placeholder={String(currentWeight || '')}
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-purple-200 focus:border-purple-400"
+                style={inputStyle}
               />
             </div>
             <div>
-              <label className="text-xs text-gray-500 font-medium mb-1 block">Body Fat %</label>
+              <label
+                className="mono mb-2 block"
+                style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
+              >
+                BODY FAT %
+              </label>
               <input
                 type="number"
                 step="0.1"
                 value={formBodyFat}
-                onChange={e => setFormBodyFat(e.target.value)}
+                onChange={(e) => setFormBodyFat(e.target.value)}
                 placeholder="Optional"
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-purple-200 focus:border-purple-400"
+                style={inputStyle}
               />
             </div>
             <div>
-              <label className="text-xs text-gray-500 font-medium mb-1 block">Notes</label>
+              <label
+                className="mono mb-2 block"
+                style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
+              >
+                NOTES
+              </label>
               <input
                 type="text"
                 value={formNotes}
-                onChange={e => setFormNotes(e.target.value)}
+                onChange={(e) => setFormNotes(e.target.value)}
                 placeholder="Optional"
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-purple-200 focus:border-purple-400"
+                style={inputStyle}
               />
             </div>
           </div>
-          <div className="flex justify-end gap-3 mt-4">
+          <div className="row mt-5 justify-end gap-2">
             <button
               onClick={() => setShowForm(false)}
-              className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900"
+              className="btn btn-ghost"
             >
               Cancel
             </button>
             <button
               onClick={handleSave}
               disabled={!formWeight || saving}
-              className="px-5 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 disabled:opacity-50 transition-all"
+              className="btn btn-accent disabled:opacity-50"
             >
-              {saving ? 'Saving...' : 'Save'}
+              {saving ? 'Saving…' : 'Save'}
             </button>
           </div>
         </div>
       )}
 
       {/* Time Range Filters */}
-      <div className="flex gap-2 mb-6">
-        {(['7D', '1M', '3M', '6M', 'ALL'] as TimeRange[]).map(r => (
-          <button
-            key={r}
-            onClick={() => setRange(r)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              range === r
-                ? 'bg-purple-600 text-white shadow-md'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            {r}
-          </button>
-        ))}
+      <div className="row mb-6 gap-1.5">
+        {(['7D', '1M', '3M', '6M', 'ALL'] as TimeRange[]).map((r) => {
+          const active = range === r
+          return (
+            <button
+              key={r}
+              onClick={() => setRange(r)}
+              className="chip"
+              style={{
+                cursor: 'pointer',
+                color: active ? 'var(--acc)' : 'var(--fg-3)',
+                background: active ? 'var(--ink-3)' : 'rgba(255,255,255,0.6)',
+                borderColor: active ? 'var(--acc)' : 'var(--line-2)',
+                fontWeight: active ? 600 : 500,
+              }}
+            >
+              {r}
+            </button>
+          )
+        })}
       </div>
 
       {/* Stats Row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="card p-4 text-center">
-          <div className="inline-flex items-center justify-center w-10 h-10 bg-purple-100 rounded-full mb-2">
-            <Scale className="h-5 w-5 text-purple-600" />
-          </div>
-          <p className="text-xs text-gray-500">Current</p>
-          <p className="text-2xl font-bold text-gray-900">{currentWeight}<span className="text-sm text-gray-400">kg</span></p>
-          <div className={`flex items-center justify-center gap-1 text-xs font-medium mt-1 ${trendColor}`}>
-            {trendIcon}
-            <span>{trendLabel}</span>
-          </div>
-        </div>
-
-        <div className="card p-4 text-center">
-          <div className="inline-flex items-center justify-center w-10 h-10 bg-indigo-100 rounded-full mb-2">
-            <Scale className="h-5 w-5 text-indigo-600" />
-          </div>
-          <p className="text-xs text-gray-500">Starting</p>
-          <p className="text-2xl font-bold text-gray-900">{startWeight}<span className="text-sm text-gray-400">kg</span></p>
-        </div>
-
-        <div className="card p-4 text-center">
-          <div className="inline-flex items-center justify-center w-10 h-10 bg-emerald-100 rounded-full mb-2">
-            <TrendingUp className="h-5 w-5 text-emerald-600" />
-          </div>
-          <p className="text-xs text-gray-500">Change</p>
-          <p className={`text-2xl font-bold ${change > 0 ? 'text-amber-600' : change < 0 ? 'text-green-600' : 'text-gray-900'}`}>
-            {change > 0 ? '+' : ''}{change.toFixed(1)}<span className="text-sm text-gray-400">kg</span>
-          </p>
-        </div>
-
-        <div className="card p-4 text-center">
-          <div className="inline-flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full mb-2">
-            <Hash className="h-5 w-5 text-blue-600" />
-          </div>
-          <p className="text-xs text-gray-500">Entries</p>
-          <p className="text-2xl font-bold text-gray-900">{logs.length}</p>
-        </div>
+      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+        <StatTile
+          variant="card"
+          label="Current"
+          value={`${currentWeight}kg`}
+          change={
+            <span className="row gap-1">
+              {trendIcon}
+              <span>{trendLabel}</span>
+            </span>
+          }
+          changeTone={trendTone}
+        />
+        <StatTile
+          variant="card"
+          label="Starting"
+          value={`${startWeight}kg`}
+        />
+        <StatTile
+          variant="card"
+          label="Change"
+          value={`${change > 0 ? '+' : ''}${change.toFixed(1)}kg`}
+          change={
+            change > 0 ? 'Above start' : change < 0 ? 'Below start' : 'No change'
+          }
+          changeTone={change > 0 ? 'warn' : change < 0 ? 'ok' : 'muted'}
+        />
+        <StatTile
+          variant="card"
+          label="Entries"
+          value={logs.length}
+        />
       </div>
 
       {/* Target Weight Banner */}
       {targetWeight && (
-        <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-100 rounded-xl p-4 mb-6 flex items-center gap-3">
-          <Target className="h-5 w-5 text-purple-600" />
-          <div>
-            <span className="text-sm font-medium text-purple-800">Target Weight</span>
-            <span className="text-sm text-purple-600 ml-2">{targetWeight}kg</span>
-            {currentWeight && (
-              <span className="text-xs text-purple-400 ml-2">
-                ({Math.abs(currentWeight - targetWeight).toFixed(1)}kg {currentWeight > targetWeight ? 'to lose' : 'to gain'})
-              </span>
-            )}
+        <div
+          className="card-2 mb-6 row gap-3 p-4"
+          style={{ borderColor: 'var(--acc)', background: 'var(--acc-soft)' }}
+        >
+          <Scale className="h-4 w-4" style={{ color: 'var(--acc)' }} />
+          <div
+            className="mono"
+            style={{ fontSize: 11, color: 'var(--acc)', letterSpacing: '0.14em' }}
+          >
+            TARGET · {targetWeight}KG
           </div>
+          {currentWeight ? (
+            <span style={{ fontSize: 13, color: 'var(--fg-2)' }}>
+              {Math.abs(currentWeight - targetWeight).toFixed(1)}kg{' '}
+              {currentWeight > targetWeight ? 'to lose' : 'to gain'}
+            </span>
+          ) : null}
         </div>
       )}
 
       {/* Chart */}
       {chartData.length >= 2 ? (
-        <div className="card p-6 mb-6">
-          <h3 className="font-semibold text-gray-900 mb-4">Weight Over Time</h3>
+        <div className="card mb-6 p-6">
+          <div
+            className="mono mb-4"
+            style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}
+          >
+            WEIGHT OVER TIME
+          </div>
           <ResponsiveContainer width="100%" height={320}>
             <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="weightGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#1da8f0" stopOpacity={0.32} />
+                  <stop offset="95%" stopColor="#1da8f0" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="label" tick={{ fontSize: 12, fill: '#9ca3af' }} />
-              <YAxis domain={[yMin, yMax]} tick={{ fontSize: 12, fill: '#9ca3af' }} unit="kg" />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(140, 168, 192, 0.24)" />
+              <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#7f93a7' }} stroke="rgba(140, 168, 192, 0.35)" />
+              <YAxis domain={[yMin, yMax]} tick={{ fontSize: 11, fill: '#7f93a7' }} unit="kg" stroke="rgba(140, 168, 192, 0.35)" />
               <Tooltip
                 contentStyle={{
                   borderRadius: '12px',
-                  border: '1px solid #e5e7eb',
-                  boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
+                  border: '1px solid rgba(140, 168, 192, 0.32)',
+                  background: '#fbfdff',
+                  boxShadow: '0 8px 24px rgba(13, 27, 42, 0.08)',
+                  fontSize: 12,
                 }}
                 formatter={(value) => [`${value}kg`, 'Weight']}
                 labelFormatter={(_, payload) => {
@@ -399,102 +459,178 @@ export default function ProgressPage() {
               {targetWeight && (
                 <ReferenceLine
                   y={targetWeight}
-                  stroke="#a78bfa"
+                  stroke="#1da8f0"
                   strokeDasharray="6 4"
-                  label={{ value: `Target: ${targetWeight}kg`, position: 'right', fill: '#8b5cf6', fontSize: 11 }}
+                  strokeOpacity={0.55}
+                  label={{ value: `Target: ${targetWeight}kg`, position: 'right', fill: '#1da8f0', fontSize: 11 }}
                 />
               )}
               <Area
                 type="monotone"
                 dataKey="weight"
-                stroke="#8b5cf6"
+                stroke="#1da8f0"
                 strokeWidth={2.5}
                 fill="url(#weightGradient)"
-                dot={{ r: 4, fill: '#8b5cf6', stroke: '#fff', strokeWidth: 2 }}
-                activeDot={{ r: 6, fill: '#7c3aed', stroke: '#fff', strokeWidth: 2 }}
+                dot={{ r: 4, fill: '#1da8f0', stroke: '#fff', strokeWidth: 2 }}
+                activeDot={{ r: 6, fill: '#0d1b2a', stroke: '#fff', strokeWidth: 2 }}
               />
             </AreaChart>
           </ResponsiveContainer>
         </div>
       ) : chartData.length === 1 ? (
-        <div className="card p-12 mb-6 text-center">
-          <Scale className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500 font-medium">Log at least 2 entries to see your chart</p>
-          <p className="text-gray-400 text-sm mt-1">You have 1 entry so far — keep going!</p>
+        <div className="card mb-6 p-12 text-center">
+          <Scale className="mx-auto mb-3 h-10 w-10" style={{ color: 'var(--fg-4)' }} />
+          <div className="serif" style={{ fontSize: 22 }}>
+            Log at least{' '}
+            <span className="italic-serif" style={{ color: 'var(--fg-3)' }}>
+              two entries
+            </span>{' '}
+            to see your chart.
+          </div>
+          <p
+            className="mt-2"
+            style={{ fontSize: 13, color: 'var(--fg-2)' }}
+          >
+            You have 1 entry so far — keep going.
+          </p>
         </div>
       ) : (
-        <div className="card p-12 mb-6 text-center">
-          <Scale className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500 font-medium">No weight entries yet</p>
-          <p className="text-gray-400 text-sm mt-1">Click &quot;Log Weight&quot; to start tracking your progress.</p>
+        <div className="card mb-6 p-12 text-center">
+          <Scale className="mx-auto mb-3 h-10 w-10" style={{ color: 'var(--fg-4)' }} />
+          <div className="serif" style={{ fontSize: 22 }}>
+            No entries{' '}
+            <span className="italic-serif" style={{ color: 'var(--fg-3)' }}>
+              yet.
+            </span>
+          </div>
+          <p
+            className="mt-2"
+            style={{ fontSize: 13, color: 'var(--fg-2)' }}
+          >
+            Click <span className="serif">Log weight</span> to start tracking your progress.
+          </p>
         </div>
       )}
 
       {/* Recent Entries */}
       {logs.length > 0 && (
         <div className="card overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-100">
-            <h3 className="font-semibold text-gray-900">All Entries</h3>
+          <div
+            className="px-6 py-4"
+            style={{ borderBottom: '1px solid var(--line)' }}
+          >
+            <div
+              className="mono"
+              style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}
+            >
+              ALL ENTRIES
+            </div>
           </div>
-          <div className="divide-y divide-gray-50">
-            {[...logs].reverse().map(log => (
-              <div key={log.id} className="px-6 py-3.5 flex items-center justify-between hover:bg-gray-50/50 transition-colors">
+          <div>
+            {[...logs].reverse().map((log, i, arr) => (
+              <div
+                key={log.id}
+                className="row justify-between px-6 py-3.5"
+                style={{
+                  borderBottom: i < arr.length - 1 ? '1px solid var(--line)' : 'none',
+                  fontSize: 13,
+                }}
+              >
                 {editingId === log.id ? (
                   <>
-                    <div className="flex items-center gap-3 flex-1">
-                      <span className="text-sm text-gray-500 min-w-[120px]">{formatFullDate(log.date)}</span>
+                    <div className="row flex-1 gap-3">
+                      <span
+                        className="mono shrink-0"
+                        style={{
+                          fontSize: 11,
+                          color: 'var(--fg-3)',
+                          letterSpacing: '0.08em',
+                          minWidth: 140,
+                        }}
+                      >
+                        {formatFullDate(log.date).toUpperCase()}
+                      </span>
                       <input
                         type="number"
                         step="0.1"
                         value={editWeight}
-                        onChange={e => setEditWeight(e.target.value)}
-                        className="w-24 px-2 py-1 border border-gray-200 rounded text-sm"
+                        onChange={(e) => setEditWeight(e.target.value)}
+                        style={{ ...inputStyle, width: 100, padding: '6px 10px' }}
                       />
-                      <span className="text-xs text-gray-400">kg</span>
+                      <span style={{ fontSize: 11, color: 'var(--fg-4)' }}>kg</span>
                       <input
                         type="number"
                         step="0.1"
                         value={editBodyFat}
-                        onChange={e => setEditBodyFat(e.target.value)}
+                        onChange={(e) => setEditBodyFat(e.target.value)}
                         placeholder="BF%"
-                        className="w-20 px-2 py-1 border border-gray-200 rounded text-sm"
+                        style={{ ...inputStyle, width: 90, padding: '6px 10px' }}
                       />
                     </div>
-                    <div className="flex gap-1">
-                      <button onClick={() => handleEditSave(log)} className="p-1.5 text-green-600 hover:bg-green-50 rounded">
+                    <div className="row gap-1">
+                      <button
+                        onClick={() => handleEditSave(log)}
+                        className="btn btn-ghost"
+                        style={{ padding: 6, color: 'var(--ok)' }}
+                      >
                         <Check className="h-4 w-4" />
                       </button>
-                      <button onClick={() => setEditingId(null)} className="p-1.5 text-gray-400 hover:bg-gray-100 rounded">
+                      <button
+                        onClick={() => setEditingId(null)}
+                        className="btn btn-ghost"
+                        style={{ padding: 6 }}
+                      >
                         <X className="h-4 w-4" />
                       </button>
                     </div>
                   </>
                 ) : (
                   <>
-                    <div className="flex items-center gap-4">
-                      <span className="text-sm text-gray-500 min-w-[120px]">{formatFullDate(log.date)}</span>
-                      <span className="text-sm font-bold text-gray-900">{log.weight_kg}kg</span>
+                    <div className="row gap-4">
+                      <span
+                        className="mono shrink-0"
+                        style={{
+                          fontSize: 11,
+                          color: 'var(--fg-3)',
+                          letterSpacing: '0.08em',
+                          minWidth: 140,
+                        }}
+                      >
+                        {formatFullDate(log.date).toUpperCase()}
+                      </span>
+                      <span className="serif" style={{ fontSize: 16, color: 'var(--fg)' }}>
+                        {log.weight_kg}kg
+                      </span>
                       {log.body_fat_pct && (
-                        <span className="text-xs bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full font-medium">
+                        <span className="chip" style={{ color: 'var(--acc)' }}>
                           {log.body_fat_pct}% BF
                         </span>
                       )}
-                      {log.notes && <span className="text-xs text-gray-400">{log.notes}</span>}
+                      {log.notes && (
+                        <span
+                          className="truncate"
+                          style={{ fontSize: 12, color: 'var(--fg-3)' }}
+                        >
+                          {log.notes}
+                        </span>
+                      )}
                     </div>
-                    <div className="flex gap-1">
+                    <div className="row gap-1">
                       <button
                         onClick={() => {
                           setEditingId(log.id)
                           setEditWeight(String(log.weight_kg))
                           setEditBodyFat(log.body_fat_pct ? String(log.body_fat_pct) : '')
                         }}
-                        className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors"
+                        className="btn btn-ghost"
+                        style={{ padding: 6 }}
                       >
                         <Pencil className="h-3.5 w-3.5" />
                       </button>
                       <button
                         onClick={() => handleDelete(log.id)}
-                        className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                        className="btn btn-ghost"
+                        style={{ padding: 6, color: 'var(--warn)' }}
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
