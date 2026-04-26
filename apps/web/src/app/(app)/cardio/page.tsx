@@ -4,18 +4,38 @@ import { useState, useEffect } from 'react'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
 import { calculateCardioCalories } from '@/lib/cardio'
-import { HeartPulse, Plus, Flame, Clock, Lock } from 'lucide-react'
+import { HeartPulse, Lock } from 'lucide-react'
 import Link from 'next/link'
 import { isFeatureLocked } from '@/lib/tierUtils'
 import { toast } from 'react-hot-toast'
 import type { CardioSession, CardioType } from '@/lib/supabase/types'
+import AppPageHeader from '@/components/ui/AppPageHeader'
+
+const inputStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '10px 12px',
+  background: 'var(--ink-2)',
+  border: '1px solid var(--line-2)',
+  borderRadius: 10,
+  fontSize: 14,
+  color: 'var(--fg)',
+  outline: 'none',
+}
+
+function formatSessionDate(dateStr: string) {
+  return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-GB', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+  })
+}
 
 export default function CardioPage() {
   const { profile } = useUser()
   const [sessions, setSessions] = useState<(CardioSession & { cardio_type?: CardioType })[]>([])
   const [cardioTypes, setCardioTypes] = useState<CardioType[]>([])
   const [loading, setLoading] = useState(true)
-  const [showForm, setShowForm] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
   const [formData, setFormData] = useState({
     cardio_type_id: '',
     duration_minutes: 30,
@@ -61,6 +81,7 @@ export default function CardioPage() {
     const selectedType = cardioTypes.find(t => t.id === formData.cardio_type_id)
     if (!selectedType) return
 
+    setSubmitting(true)
     const avgBpm = formData.avg_bpm ? Number(formData.avg_bpm) : null
 
     const caloriesBurned = calculateCardioCalories({
@@ -86,13 +107,12 @@ export default function CardioPage() {
 
     if (error) {
       toast.error('Failed to log cardio session')
+      setSubmitting(false)
       return
     }
 
-    toast.success(`Logged ${formData.duration_minutes} min of ${selectedType.name} — ${caloriesBurned} cal burned!`)
-    setShowForm(false)
+    toast.success(`Logged ${formData.duration_minutes} min of ${selectedType.name} — ${caloriesBurned} cal burned.`)
 
-    // Reload sessions
     const { data } = await supabase
       .from('cardio_sessions')
       .select('*, cardio_types(*)')
@@ -106,26 +126,61 @@ export default function CardioPage() {
         cardio_type: s.cardio_types as unknown as CardioType,
       }))
     )
+
+    setFormData(prev => ({
+      ...prev,
+      avg_bpm: '',
+      date: new Date().toISOString().split('T')[0],
+    }))
+    setSubmitting(false)
   }
 
-  if (loading) return <div className="text-gray-500">Loading cardio sessions...</div>
+  if (loading) {
+    return (
+      <div className="card p-8">
+        <div
+          className="mono"
+          style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}
+        >
+          LOADING
+        </div>
+        <div className="serif mt-2" style={{ fontSize: 24, color: 'var(--fg)' }}>
+          Pulling your cardio sessions.
+        </div>
+      </div>
+    )
+  }
 
   if (isFeatureLocked(profile?.role ?? 'free', 'cardio')) {
     return (
-      <div className="max-w-3xl mx-auto">
-        <div className="card p-12 text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-purple-100 mb-4">
-            <Lock className="h-7 w-7 text-purple-600" />
-          </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Cardio Tracking</h2>
-          <p className="text-gray-500 mb-6 max-w-sm mx-auto">
-            Track your cardio sessions and monitor heart rate calories. Available on Pro plan and above.
-          </p>
-          <Link
-            href="/pricing"
-            className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
+      <div className="mx-auto max-w-[520px]">
+        <AppPageHeader
+          eyebrow="Movement"
+          title="Cardio"
+          accent="sessions."
+          subtitle="Track sessions, monitor heart rate, and estimate calories burned."
+        />
+        <div className="card p-10 text-center">
+          <div
+            className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl"
+            style={{ background: 'var(--ink-3)', color: 'var(--acc)' }}
           >
-            <span>Upgrade to Pro</span>
+            <Lock className="h-6 w-6" />
+          </div>
+          <div className="serif" style={{ fontSize: 26 }}>
+            Cardio tracking{' '}
+            <span className="italic-serif" style={{ color: 'var(--fg-3)' }}>
+              is on Pro.
+            </span>
+          </div>
+          <p
+            className="mx-auto mt-3 max-w-[420px]"
+            style={{ fontSize: 14, color: 'var(--fg-2)', lineHeight: 1.6 }}
+          >
+            Track your cardio sessions and monitor heart-rate calories. Available on Pro plan and above.
+          </p>
+          <Link href="/pricing" className="btn btn-accent mt-6">
+            Upgrade to Pro →
           </Link>
         </div>
       </div>
@@ -133,132 +188,242 @@ export default function CardioPage() {
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Cardio</h1>
-          <p className="text-gray-900 mt-1">Track your cardiovascular sessions.</p>
-        </div>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="flex items-center space-x-2 bg-gradient-to-r from-red-500 to-pink-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all"
-        >
-          <Plus className="h-4 w-4" />
-          <span>Log Session</span>
-        </button>
-      </div>
+    <div className="mx-auto max-w-[1100px]">
+      <AppPageHeader
+        eyebrow="Movement"
+        title="Cardio"
+        accent="sessions."
+        subtitle="Track your cardiovascular sessions and calories burned."
+      />
 
-      {/* Log Form */}
-      {showForm && (
-        <form onSubmit={handleSubmit} className="card p-6 mb-8">
-          <h3 className="font-semibold text-gray-900 mb-4">Log Cardio Session</h3>
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Activity</label>
-              <select
-                value={formData.cardio_type_id}
-                onChange={(e) => setFormData(prev => ({ ...prev, cardio_type_id: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-              >
-                {cardioTypes.map(type => (
-                  <option key={type.id} value={type.id}>{type.name}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
-              <input
-                type="date"
-                value={formData.date}
-                onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Duration (minutes)</label>
-              <input
-                type="number"
-                min={1}
-                value={formData.duration_minutes}
-                onChange={(e) => setFormData(prev => ({ ...prev, duration_minutes: parseInt(e.target.value) || 0 }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Avg Heart Rate (BPM) <span className="text-gray-400">— optional</span></label>
-              <input
-                type="number"
-                min={40}
-                max={220}
-                value={formData.avg_bpm}
-                onChange={(e) => setFormData(prev => ({ ...prev, avg_bpm: e.target.value }))}
-                placeholder="e.g. 145"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-              />
-            </div>
+      <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
+        {/* Sessions list */}
+        <section>
+          <div
+            className="mono mb-3"
+            style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}
+          >
+            RECENT SESSIONS · LAST 20
           </div>
 
-          <div className="flex justify-end space-x-3 mt-6">
-            <button
-              type="button"
-              onClick={() => setShowForm(false)}
-              className="px-4 py-2 text-gray-900 hover:bg-gray-100 rounded-lg text-sm"
+          {sessions.length === 0 ? (
+            <div className="card p-10 text-center">
+              <HeartPulse
+                className="mx-auto mb-3 h-10 w-10"
+                style={{ color: 'var(--fg-4)' }}
+              />
+              <div className="serif" style={{ fontSize: 22 }}>
+                No sessions{' '}
+                <span className="italic-serif" style={{ color: 'var(--fg-3)' }}>
+                  yet.
+                </span>
+              </div>
+              <p
+                className="mx-auto mt-2 max-w-[360px]"
+                style={{ fontSize: 13, color: 'var(--fg-2)', lineHeight: 1.5 }}
+              >
+                Log your first session on the right to start tracking calories burned.
+              </p>
+            </div>
+          ) : (
+            <div className="col gap-2">
+              {sessions.map((session) => (
+                <div key={session.id} className="card-2 p-4">
+                  <div className="row justify-between gap-4">
+                    <div className="min-w-0">
+                      <div
+                        className="mono"
+                        style={{
+                          fontSize: 10,
+                          color: 'var(--fg-4)',
+                          letterSpacing: '0.12em',
+                        }}
+                      >
+                        {formatSessionDate(session.date).toUpperCase()}
+                      </div>
+                      <div
+                        className="serif mt-1 truncate"
+                        style={{ fontSize: 18, lineHeight: 1.2 }}
+                      >
+                        {session.cardio_type?.name ?? 'Cardio'}
+                      </div>
+                    </div>
+                    <div className="row shrink-0 gap-4">
+                      <div className="col">
+                        <div
+                          className="mono"
+                          style={{
+                            fontSize: 9,
+                            color: 'var(--fg-4)',
+                            letterSpacing: '0.1em',
+                          }}
+                        >
+                          DURATION
+                        </div>
+                        <div className="serif mt-0.5" style={{ fontSize: 16 }}>
+                          {session.duration_minutes}
+                          <span style={{ fontSize: 11, color: 'var(--fg-3)' }}>
+                            {' '}
+                            min
+                          </span>
+                        </div>
+                      </div>
+                      {session.avg_bpm ? (
+                        <div className="col">
+                          <div
+                            className="mono"
+                            style={{
+                              fontSize: 9,
+                              color: 'var(--fg-4)',
+                              letterSpacing: '0.1em',
+                            }}
+                          >
+                            BPM
+                          </div>
+                          <div className="serif mt-0.5" style={{ fontSize: 16 }}>
+                            {session.avg_bpm}
+                          </div>
+                        </div>
+                      ) : null}
+                      <div className="col">
+                        <div
+                          className="mono"
+                          style={{
+                            fontSize: 9,
+                            color: 'var(--acc)',
+                            letterSpacing: '0.1em',
+                          }}
+                        >
+                          KCAL
+                        </div>
+                        <div className="serif mt-0.5" style={{ fontSize: 16 }}>
+                          {session.calories_burned}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* Log form */}
+        <aside>
+          <form onSubmit={handleSubmit} className="card p-5">
+            <div
+              className="mono"
+              style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}
             >
-              Cancel
-            </button>
+              LOG NEW SESSION
+            </div>
+            <div className="serif mt-1" style={{ fontSize: 22, lineHeight: 1.2 }}>
+              What did you{' '}
+              <span className="italic-serif" style={{ color: 'var(--fg-3)' }}>
+                just do?
+              </span>
+            </div>
+
+            <div className="col mt-5 gap-3.5">
+              <div>
+                <label
+                  className="mono mb-2 block"
+                  style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
+                >
+                  ACTIVITY
+                </label>
+                <select
+                  value={formData.cardio_type_id}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, cardio_type_id: e.target.value }))
+                  }
+                  style={inputStyle}
+                >
+                  {cardioTypes.map((type) => (
+                    <option key={type.id} value={type.id}>
+                      {type.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label
+                  className="mono mb-2 block"
+                  style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
+                >
+                  DATE
+                </label>
+                <input
+                  type="date"
+                  value={formData.date}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, date: e.target.value }))
+                  }
+                  style={inputStyle}
+                />
+              </div>
+
+              <div>
+                <label
+                  className="mono mb-2 block"
+                  style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
+                >
+                  DURATION (MINUTES)
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  value={formData.duration_minutes}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      duration_minutes: parseInt(e.target.value) || 0,
+                    }))
+                  }
+                  style={inputStyle}
+                />
+              </div>
+
+              <div>
+                <label
+                  className="mono mb-2 block"
+                  style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
+                >
+                  AVG HEART RATE — OPTIONAL
+                </label>
+                <input
+                  type="number"
+                  min={40}
+                  max={220}
+                  value={formData.avg_bpm}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, avg_bpm: e.target.value }))
+                  }
+                  placeholder="e.g. 145 bpm"
+                  style={inputStyle}
+                />
+              </div>
+            </div>
+
             <button
               type="submit"
-              className="px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg text-sm font-medium hover:shadow-lg transition-all"
+              disabled={submitting || !formData.cardio_type_id}
+              className="btn btn-accent mt-5 w-full justify-center disabled:opacity-50"
+              style={{ padding: '12px 18px', fontSize: 14 }}
             >
-              Log Session
+              {submitting ? 'Logging…' : 'Log session →'}
             </button>
-          </div>
-        </form>
-      )}
 
-      {/* Sessions List */}
-      {sessions.length === 0 ? (
-        <div className="card p-12 text-center">
-          <HeartPulse className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No cardio sessions yet</h3>
-          <p className="text-gray-500">Start logging your cardio to track calories burned.</p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {sessions.map((session) => (
-            <div key={session.id} className="card p-5 flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="bg-red-100 rounded-lg p-2">
-                  <HeartPulse className="h-5 w-5 text-red-600" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">{session.cardio_type?.name ?? 'Cardio'}</h3>
-                  <p className="text-sm text-gray-500">{session.date}</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-6 text-sm">
-                <div className="flex items-center space-x-1 text-gray-900">
-                  <Clock className="h-4 w-4" />
-                  <span>{session.duration_minutes} min</span>
-                </div>
-                {session.avg_bpm && (
-                  <div className="flex items-center space-x-1 text-gray-900">
-                    <HeartPulse className="h-4 w-4" />
-                    <span>{session.avg_bpm} bpm</span>
-                  </div>
-                )}
-                <div className="flex items-center space-x-1 text-orange-600 font-medium">
-                  <Flame className="h-4 w-4" />
-                  <span>{session.calories_burned} cal</span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+            <p
+              className="mt-3"
+              style={{ fontSize: 11, color: 'var(--fg-4)', lineHeight: 1.5 }}
+            >
+              Calories burned are estimated from MET value and your profile (weight, age, gender).
+            </p>
+          </form>
+        </aside>
+      </div>
     </div>
   )
 }
