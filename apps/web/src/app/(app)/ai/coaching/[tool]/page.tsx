@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import type { CoachingTool } from '@/lib/coachingPrompts'
+import AppPageHeader from '@/components/ui/AppPageHeader'
 
 interface FieldDef {
   key: string
@@ -26,34 +27,41 @@ const TOOL_CONFIG: Record<string, {
   title: string
   description: string
   icon: React.ComponentType<{ className?: string }>
-  color: string
-  bg: string
+  kicker: string
   fields: FieldDef[]
 }> = {
   recovery: {
     title: 'Recovery Protocol',
     description: 'A complete recovery system built from your profile — sleep, mobility, deload, nutrition, and supplements.',
     icon: Moon,
-    color: 'text-indigo-500',
-    bg: 'bg-indigo-50',
+    kicker: 'SLEEP · MOBILITY · DELOADS',
     fields: [],
   },
   'injury-prevention': {
     title: 'Injury Prevention',
     description: 'Prehab routines, warm-up protocols, and training modifications built around your injury profile.',
     icon: Shield,
-    color: 'text-green-500',
-    bg: 'bg-green-50',
+    kicker: 'PREHAB · WARM-UPS · MODIFICATIONS',
     fields: [],
   },
   recomp: {
     title: 'Body Recomposition',
     description: 'A complete 16-week blueprint built from your stats — training, nutrition, cardio, and tracking.',
     icon: Activity,
-    color: 'text-cyan-500',
-    bg: 'bg-cyan-50',
+    kicker: 'TRAINING · NUTRITION · TRACKING',
     fields: [],
   },
+}
+
+const labelClass = 'mono mb-2 block'
+const fieldClass = 'w-full rounded-xl border border-[var(--line-2)] bg-[var(--ink-2)] px-4 py-3 text-sm text-[var(--fg)] outline-none transition focus:border-[var(--acc)]'
+const fieldStyle = {
+  borderColor: 'var(--line-2)',
+}
+const labelStyle = {
+  fontSize: 11,
+  color: 'var(--fg-4)',
+  letterSpacing: '0.12em',
 }
 
 export default function CoachingToolPage() {
@@ -69,11 +77,52 @@ export default function CoachingToolPage() {
 
   if (!config) {
     return (
-      <div className="max-w-2xl mx-auto text-center py-12">
-        <p className="text-gray-600">Tool not found.</p>
-        <Link href="/ai/coaching" className="text-purple-600 hover:underline mt-2 inline-block">
-          Back to coaching tools
-        </Link>
+      <div className="mx-auto max-w-[620px]">
+        <AppPageHeader
+          eyebrow="AI coaching"
+          title="Tool"
+          accent="missing."
+          subtitle="That coaching tool is not available."
+        />
+        <div className="card p-8 text-center">
+          <p className="text-sm" style={{ color: 'var(--fg-2)' }}>Tool not found.</p>
+          <Link href="/ai/coaching" className="btn btn-accent mt-5">
+            Back to coaching tools
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  if (!profile) {
+    return (
+      <div className="mx-auto max-w-[760px]">
+        <AppPageHeader
+          eyebrow="AI coaching"
+          title={config.title}
+          accent="report."
+          subtitle={config.description}
+          actions={
+            <Link href="/ai/coaching" className="btn btn-ghost">
+              <ArrowLeft className="h-4 w-4" />
+              Tools
+            </Link>
+          }
+        />
+        <div className="card p-8">
+          <div
+            className="mono"
+            style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}
+          >
+            PROFILE REQUIRED
+          </div>
+          <div className="serif mt-2" style={{ fontSize: 24, color: 'var(--fg)' }}>
+            Loading your profile context.
+          </div>
+          <p className="mt-2 text-sm leading-6" style={{ color: 'var(--fg-2)' }}>
+            The coaching tools use your profile before generating a report.
+          </p>
+        </div>
       </div>
     )
   }
@@ -119,7 +168,7 @@ export default function CoachingToolPage() {
   }
 
   // Auto-fill summary from profile
-  const profileSummary = profile ? [
+  const profileSummary = [
     `${profile.age ?? '?'}yo ${profile.gender ?? ''}`,
     `${profile.weight_kg ?? '?'}kg`,
     profile.training_experience ?? 'beginner',
@@ -130,118 +179,162 @@ export default function CoachingToolPage() {
     `${profile.workout_days_per_week ?? 4}x/week`,
     `${profile.sleep_hours ?? 7}h sleep`,
     `Stress: ${profile.stress_level ?? 'moderate'}`,
-  ].filter(Boolean).join(' · ') : ''
+  ].filter(Boolean).join(' · ')
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <button
-        onClick={() => router.push('/ai/coaching')}
-        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        <span className="text-sm font-medium">Back to coaching tools</span>
-      </button>
+    <div className="mx-auto max-w-[900px]">
+      <AppPageHeader
+        eyebrow="AI coaching"
+        title={config.title}
+        accent="report."
+        subtitle={config.description}
+        actions={
+          <Link href="/ai/coaching" className="btn btn-ghost">
+            <ArrowLeft className="h-4 w-4" />
+            Tools
+          </Link>
+        }
+        chip={<span className="chip">{config.kicker}</span>}
+      />
 
-      <div className="card p-6 md:p-8">
-        {/* Header */}
-        <div className="flex items-start gap-4 mb-6">
-          <div className={`p-3 rounded-xl ${config.bg}`}>
-            <Icon className={`h-8 w-8 ${config.color}`} />
+      <div className="grid gap-5 lg:grid-cols-[1fr_280px]">
+        <div className="card p-6 md:p-8">
+          <div className="row mb-6 items-start gap-4">
+            <div
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
+              style={{ background: 'var(--ink-3)', color: 'var(--acc)' }}
+            >
+              <Icon className="h-6 w-6" />
+            </div>
+            <div>
+              <div
+                className="mono"
+                style={{ fontSize: 10, color: 'var(--fg-4)', letterSpacing: '0.12em' }}
+              >
+                {config.kicker}
+              </div>
+              <h1 className="serif mt-1" style={{ fontSize: 28, lineHeight: 1.1, color: 'var(--fg)' }}>
+                Build my{' '}
+                <span className="italic-serif" style={{ color: 'var(--fg-3)' }}>
+                  report.
+                </span>
+              </h1>
+              <p className="mt-2 text-sm leading-6" style={{ color: 'var(--fg-2)' }}>
+                We will use your saved profile and return a practical plan, not a generic prompt.
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">{config.title}</h1>
-            <p className="text-gray-600 mt-1">{config.description}</p>
-          </div>
+
+          {config.fields.length > 0 && (
+            <div className="mb-6 space-y-4">
+              {config.fields.map((field) => (
+                <div key={field.key}>
+                  <label className={labelClass} style={labelStyle}>
+                    {field.label.toUpperCase()}
+                    {field.required && <span style={{ color: 'var(--warn)' }}> *</span>}
+                  </label>
+                  {field.type === 'textarea' ? (
+                    <textarea
+                      value={inputs[field.key] ?? ''}
+                      onChange={(e) => setInputs({ ...inputs, [field.key]: e.target.value })}
+                      placeholder={field.placeholder}
+                      rows={3}
+                      className={`${fieldClass} resize-none`}
+                      style={fieldStyle}
+                    />
+                  ) : (
+                    <input
+                      type={field.type}
+                      value={inputs[field.key] ?? ''}
+                      onChange={(e) => setInputs({ ...inputs, [field.key]: e.target.value })}
+                      placeholder={field.placeholder}
+                      className={fieldClass}
+                      style={fieldStyle}
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {!response && (
+            <button
+              onClick={handleSubmit}
+              disabled={loading}
+              className="btn btn-accent w-full justify-center disabled:opacity-50"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <span>Analysing your profile...</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-5 w-5" />
+                  <span>Get My {config.title}</span>
+                </>
+              )}
+            </button>
+          )}
+
+          {response && (
+            <div className="mt-6">
+              <div className="card-2 p-5">
+                <div className="row gap-2">
+                  <Sparkles className="h-4 w-4" style={{ color: 'var(--acc)' }} />
+                  <div
+                    className="mono"
+                    style={{ fontSize: 10, color: 'var(--fg-4)', letterSpacing: '0.12em' }}
+                  >
+                    YOUR COACHING REPORT
+                  </div>
+                </div>
+                <div
+                  className="mt-4 rounded-xl p-5 text-sm leading-7 whitespace-pre-wrap"
+                  style={{
+                    background: 'var(--ink-2)',
+                    border: '1px solid var(--line)',
+                    color: 'var(--fg)',
+                  }}
+                >
+                  {response}
+                </div>
+              </div>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <button
+                  onClick={() => { setResponse(null); setInputs({}) }}
+                  className="btn btn-ghost justify-center"
+                >
+                  Run Again
+                </button>
+                <button
+                  onClick={() => router.push('/ai/coaching')}
+                  className="btn btn-accent justify-center"
+                >
+                  Try Another Tool
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Profile context */}
-        {profileSummary && (
-          <div className="bg-gray-50 rounded-xl p-4 mb-6">
-            <p className="text-xs font-medium text-gray-500 mb-1">Auto-filled from your profile</p>
-            <p className="text-sm text-gray-700">{profileSummary}</p>
-          </div>
-        )}
-
-        {/* Additional inputs */}
-        {config.fields.length > 0 && (
-          <div className="space-y-4 mb-6">
-            {config.fields.map((field) => (
-              <div key={field.key}>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  {field.label}
-                  {field.required && <span className="text-red-500 ml-1">*</span>}
-                </label>
-                {field.type === 'textarea' ? (
-                  <textarea
-                    value={inputs[field.key] ?? ''}
-                    onChange={(e) => setInputs({ ...inputs, [field.key]: e.target.value })}
-                    placeholder={field.placeholder}
-                    rows={3}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
-                  />
-                ) : (
-                  <input
-                    type={field.type}
-                    value={inputs[field.key] ?? ''}
-                    onChange={(e) => setInputs({ ...inputs, [field.key]: e.target.value })}
-                    placeholder={field.placeholder}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                  />
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Submit */}
-        {!response && (
-          <button
-            onClick={handleSubmit}
-            disabled={loading || !profile}
-            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-4 rounded-xl text-base font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+        <aside className="card-2 p-5">
+          <div
+            className="mono"
+            style={{ fontSize: 10, color: 'var(--fg-4)', letterSpacing: '0.12em' }}
           >
-            {loading ? (
-              <>
-                <Loader2 className="h-5 w-5 animate-spin" />
-                <span>Analysing your profile...</span>
-              </>
-            ) : (
-              <>
-                <Sparkles className="h-5 w-5" />
-                <span>Get My {config.title}</span>
-              </>
-            )}
-          </button>
-        )}
-
-        {/* Response */}
-        {response && (
-          <div className="mt-6">
-            <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl p-6 border border-purple-100">
-              <div className="flex items-center gap-2 mb-4">
-                <Sparkles className="h-5 w-5 text-purple-600" />
-                <h3 className="font-semibold text-purple-800">Your Coaching Report</h3>
-              </div>
-              <div className="prose prose-sm max-w-none text-gray-800 whitespace-pre-wrap leading-relaxed">
-                {response}
-              </div>
-            </div>
-            <div className="flex gap-3 mt-4">
-              <button
-                onClick={() => { setResponse(null); setInputs({}) }}
-                className="flex-1 py-3 px-4 rounded-xl border-2 border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-all"
-              >
-                Run Again
-              </button>
-              <button
-                onClick={() => router.push('/ai/coaching')}
-                className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium hover:shadow-lg transition-all"
-              >
-                Try Another Tool
-              </button>
-            </div>
+            PROFILE CONTEXT
           </div>
-        )}
+          <div className="serif mt-2" style={{ fontSize: 20, lineHeight: 1.15, color: 'var(--fg)' }}>
+            Auto-filled from{' '}
+            <span className="italic-serif" style={{ color: 'var(--fg-3)' }}>
+              your data.
+            </span>
+          </div>
+          <p className="mt-3 text-sm leading-6" style={{ color: 'var(--fg-2)' }}>
+            {profileSummary}
+          </p>
+        </aside>
       </div>
     </div>
   )

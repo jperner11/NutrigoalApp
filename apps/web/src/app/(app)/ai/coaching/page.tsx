@@ -8,6 +8,7 @@ import {
   ArrowRight,
   Brain,
 } from 'lucide-react'
+import AppPageHeader from '@/components/ui/AppPageHeader'
 
 const TOOLS = [
   {
@@ -15,64 +16,101 @@ const TOOLS = [
     title: 'Recovery Protocol',
     description: 'Complete recovery system — sleep, mobility, stress management, deload strategy, and supplements.',
     icon: Moon,
-    color: 'text-indigo-500',
-    bg: 'bg-indigo-50',
+    kicker: 'SLEEP · MOBILITY · DELOADS',
   },
   {
     slug: 'injury-prevention',
     title: 'Injury Prevention',
     description: 'Prehab routines, warm-up protocols, and a framework for training around niggles.',
     icon: Shield,
-    color: 'text-green-500',
-    bg: 'bg-green-50',
+    kicker: 'PREHAB · WARM-UPS · MODIFICATIONS',
   },
   {
     slug: 'recomp',
     title: 'Body Recomposition',
     description: '16-week blueprint to build muscle and lose fat simultaneously — training, nutrition, and tracking.',
     icon: Activity,
-    color: 'text-cyan-500',
-    bg: 'bg-cyan-50',
+    kicker: 'TRAINING · NUTRITION · TRACKING',
   },
 ]
 
 export default function AICoachingHub() {
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="text-center mb-8">
-        <div className="flex justify-center mb-4">
-          <div className="p-3 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-2xl">
-            <Brain className="h-10 w-10 text-purple-600" />
+    <div className="mx-auto max-w-[980px]">
+      <AppPageHeader
+        eyebrow="AI coaching"
+        title="Coaching"
+        accent="tools."
+        subtitle="Expert-level analysis powered by your profile data, built for recovery, injury prevention, and body recomposition."
+        chip={<span className="chip">Profile-aware</span>}
+      />
+
+      <div className="card mb-5 p-6">
+        <div className="row flex-wrap justify-between gap-5">
+          <div className="max-w-[620px]">
+            <div
+              className="mono"
+              style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}
+            >
+              ON-DEMAND COACH
+            </div>
+            <h2 className="serif mt-2" style={{ fontSize: 30, lineHeight: 1.08, color: 'var(--fg)' }}>
+              Pick a lens,{' '}
+              <span className="italic-serif" style={{ color: 'var(--fg-3)' }}>
+                get the blueprint.
+              </span>
+            </h2>
+            <p className="mt-3 max-w-[560px] text-sm leading-6" style={{ color: 'var(--fg-2)' }}>
+              Each tool reads your profile context and returns a practical coaching report you can act on this week.
+            </p>
+          </div>
+          <div
+            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl"
+            style={{ background: 'var(--ink-3)', color: 'var(--acc)' }}
+          >
+            <Brain className="h-7 w-7" />
           </div>
         </div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">AI Coaching Tools</h1>
-        <p className="text-gray-600 max-w-lg mx-auto">
-          Expert-level analysis powered by AI. Each tool uses your profile data to deliver
-          personalised, actionable advice — like having a coach on demand.
-        </p>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid gap-4 md:grid-cols-3">
         {TOOLS.map((tool) => {
           const Icon = tool.icon
           return (
             <Link
               key={tool.slug}
               href={`/ai/coaching/${tool.slug}`}
-              className="card p-6 hover:shadow-md transition-all group"
+              className="card-2 group p-5 transition hover:border-[var(--acc)]"
             >
-              <div className="flex items-start gap-4">
-                <div className={`p-3 rounded-xl ${tool.bg}`}>
-                  <Icon className={`h-6 w-6 ${tool.color}`} />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-gray-900 group-hover:text-purple-700 transition-colors">
-                      {tool.title}
-                    </h3>
-                    <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-purple-600 group-hover:translate-x-0.5 transition-all" />
+              <div className="flex h-full flex-col justify-between gap-6">
+                <div>
+                  <div className="row justify-between gap-4">
+                    <div
+                      className="flex h-11 w-11 items-center justify-center rounded-xl"
+                      style={{ background: 'var(--ink-3)', color: 'var(--acc)' }}
+                    >
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" style={{ color: 'var(--acc)' }} />
                   </div>
-                  <p className="text-sm text-gray-600 mt-1">{tool.description}</p>
+                  <div
+                    className="mono mt-5"
+                    style={{ fontSize: 10, color: 'var(--fg-4)', letterSpacing: '0.12em' }}
+                  >
+                    {tool.kicker}
+                  </div>
+                  <h3 className="serif mt-2" style={{ fontSize: 20, lineHeight: 1.18, color: 'var(--fg)' }}>
+                    {tool.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-6" style={{ color: 'var(--fg-2)' }}>
+                    {tool.description}
+                  </p>
+                </div>
+                <div
+                  className="mono"
+                  style={{ fontSize: 10, color: 'var(--acc)', letterSpacing: '0.1em' }}
+                >
+                  OPEN TOOL →
                 </div>
               </div>
             </Link>
