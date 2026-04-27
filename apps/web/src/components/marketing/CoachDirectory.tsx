@@ -177,7 +177,7 @@ export default function CoachDirectory() {
             className="chip"
             style={{
               cursor: 'pointer',
-              background: acceptingOnly ? 'var(--ink-3)' : 'rgba(255,255,255,0.6)',
+              background: acceptingOnly ? 'var(--ink-3)' : 'var(--ink-2)',
               borderColor: acceptingOnly ? 'var(--acc)' : 'var(--line-2)',
             }}
           >

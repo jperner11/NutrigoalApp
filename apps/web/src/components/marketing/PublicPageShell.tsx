@@ -13,7 +13,7 @@ interface PublicPageShellProps {
 export default function PublicPageShell({ eyebrow, title, intro, children }: PublicPageShellProps) {
   return (
     <div className="min-h-screen bg-[var(--background)]">
-      <header className="border-b border-[var(--line)] bg-[rgba(251,253,255,0.82)] backdrop-blur-xl">
+      <header className="border-b border-[var(--line)] bg-[rgba(19,16,18,0.88)] backdrop-blur-xl">
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <BrandLogo href="/" />
           <div className="flex items-center gap-3">
@@ -48,4 +48,3 @@ export default function PublicPageShell({ eyebrow, title, intro, children }: Pub
     </div>
   )
 }
-

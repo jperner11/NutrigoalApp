@@ -35,7 +35,7 @@ export default function ProGate({ feature, featureLabel, children, fallback }: P
         </div>
         <div
           className="absolute inset-0 flex items-center justify-center rounded-xl"
-          style={{ background: 'rgba(255,255,255,0.6)' }}
+          style={{ background: 'rgba(19,16,18,0.72)' }}
         >
           <button
             onClick={() => setShowUpgrade(true)}

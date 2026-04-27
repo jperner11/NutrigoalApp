@@ -356,7 +356,7 @@ export default function ProgressPage() {
               style={{
                 cursor: 'pointer',
                 color: active ? 'var(--acc)' : 'var(--fg-3)',
-                background: active ? 'var(--ink-3)' : 'rgba(255,255,255,0.6)',
+                background: active ? 'var(--ink-3)' : 'var(--ink-2)',
                 borderColor: active ? 'var(--acc)' : 'var(--line-2)',
                 fontWeight: active ? 600 : 500,
               }}
@@ -452,19 +452,20 @@ export default function ProgressPage() {
             <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="weightGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#1da8f0" stopOpacity={0.32} />
-                  <stop offset="95%" stopColor="#1da8f0" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#e63946" stopOpacity={0.32} />
+                  <stop offset="95%" stopColor="#e63946" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(140, 168, 192, 0.24)" />
-              <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#7f93a7' }} stroke="rgba(140, 168, 192, 0.35)" />
-              <YAxis domain={[yMin, yMax]} tick={{ fontSize: 11, fill: '#7f93a7' }} unit="kg" stroke="rgba(140, 168, 192, 0.35)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(245, 241, 234, 0.10)" />
+              <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#8a847d' }} stroke="rgba(245, 241, 234, 0.20)" />
+              <YAxis domain={[yMin, yMax]} tick={{ fontSize: 11, fill: '#8a847d' }} unit="kg" stroke="rgba(245, 241, 234, 0.20)" />
               <Tooltip
                 contentStyle={{
                   borderRadius: '12px',
-                  border: '1px solid rgba(140, 168, 192, 0.32)',
-                  background: '#fbfdff',
-                  boxShadow: '0 8px 24px rgba(13, 27, 42, 0.08)',
+                  border: '1px solid rgba(245, 241, 234, 0.20)',
+                  background: '#1a1719',
+                  color: '#f5f1ea',
+                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.28)',
                   fontSize: 12,
                 }}
                 formatter={(value) => [`${value}kg`, 'Weight']}
@@ -476,20 +477,20 @@ export default function ProgressPage() {
               {targetWeight && (
                 <ReferenceLine
                   y={targetWeight}
-                  stroke="#1da8f0"
+                  stroke="#e63946"
                   strokeDasharray="6 4"
                   strokeOpacity={0.55}
-                  label={{ value: `Target: ${targetWeight}kg`, position: 'right', fill: '#1da8f0', fontSize: 11 }}
+                  label={{ value: `Target: ${targetWeight}kg`, position: 'right', fill: '#e63946', fontSize: 11 }}
                 />
               )}
               <Area
                 type="monotone"
                 dataKey="weight"
-                stroke="#1da8f0"
+                stroke="#e63946"
                 strokeWidth={2.5}
                 fill="url(#weightGradient)"
-                dot={{ r: 4, fill: '#1da8f0', stroke: '#fff', strokeWidth: 2 }}
-                activeDot={{ r: 6, fill: '#0d1b2a', stroke: '#fff', strokeWidth: 2 }}
+                dot={{ r: 4, fill: '#e63946', stroke: '#1a1719', strokeWidth: 2 }}
+                activeDot={{ r: 6, fill: '#f5f1ea', stroke: '#1a1719', strokeWidth: 2 }}
               />
             </AreaChart>
           </ResponsiveContainer>

@@ -118,13 +118,13 @@ export default function Sidebar({ userRole, userName, onSignOut }: SidebarProps)
               href={item.href}
               className={`flex items-center space-x-3 px-3 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 group ${
                 isActive
-                  ? 'bg-[linear-gradient(135deg,rgba(77,196,255,0.16),rgba(255,255,255,0.08))] text-white shadow-[0_14px_28px_rgba(0,0,0,0.18)] ring-1 ring-white/14'
-                  : 'text-slate-300 hover:bg-white/8 hover:text-white'
+                  ? 'bg-[linear-gradient(135deg,rgba(230,57,70,0.22),rgba(245,241,234,0.06))] text-white shadow-[0_14px_28px_rgba(0,0,0,0.22)] ring-1 ring-[rgba(230,57,70,0.28)]'
+                  : 'text-[var(--muted)] hover:bg-[rgba(245,241,234,0.06)] hover:text-white'
               }`}
               title={collapsed && !mobileOpen ? item.label : undefined}
             >
               <Icon className={`h-5 w-5 flex-shrink-0 transition-transform duration-200 ${
-                isActive ? 'text-sky-200' : 'text-slate-400 group-hover:text-white group-hover:scale-110'
+                isActive ? 'text-[var(--brand-400)]' : 'text-[var(--muted-soft)] group-hover:text-white group-hover:scale-110'
               }`} />
               {(!collapsed || mobileOpen) && (
                 <>
@@ -144,13 +144,13 @@ export default function Sidebar({ userRole, userName, onSignOut }: SidebarProps)
         {(!collapsed || mobileOpen) && (
           <div className="rounded-2xl border border-white/10 bg-white/6 px-3 py-3 backdrop-blur-sm">
             <p className="truncate text-sm font-semibold text-white">{userName}</p>
-            <p className="text-xs font-semibold tracking-[0.14em] text-sky-200/70">{getRolePlanLabel(userRole).toUpperCase()}</p>
+            <p className="text-xs font-semibold tracking-[0.14em] text-[var(--brand-400)]/80">{getRolePlanLabel(userRole).toUpperCase()}</p>
           </div>
         )}
 
         <button
           onClick={onSignOut}
-          className="flex items-center space-x-3 px-3 py-2 rounded-xl text-sm text-slate-400 hover:bg-white/8 hover:text-white transition-all duration-200 w-full"
+          className="flex items-center space-x-3 px-3 py-2 rounded-xl text-sm text-[var(--muted-soft)] hover:bg-[rgba(245,241,234,0.06)] hover:text-white transition-all duration-200 w-full"
           title={collapsed && !mobileOpen ? 'Sign Out' : undefined}
         >
           <LogOut className="h-5 w-5 flex-shrink-0" />
@@ -160,7 +160,7 @@ export default function Sidebar({ userRole, userName, onSignOut }: SidebarProps)
         {/* Collapse toggle — desktop only */}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="hidden md:flex items-center justify-center p-2 rounded-xl text-slate-500 hover:bg-white/8 hover:text-white transition-all duration-200 w-full"
+          className="hidden md:flex items-center justify-center p-2 rounded-xl text-[var(--muted-soft)] hover:bg-[rgba(245,241,234,0.06)] hover:text-white transition-all duration-200 w-full"
         >
           {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
         </button>
@@ -173,10 +173,10 @@ export default function Sidebar({ userRole, userName, onSignOut }: SidebarProps)
       {/* Mobile hamburger button */}
       <button
         onClick={() => setMobileOpen(true)}
-        className="fixed top-4 left-4 z-50 p-2 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200/60 md:hidden"
+        className="fixed top-4 left-4 z-50 rounded-xl border border-[var(--line)] bg-[var(--surface-strong)] p-2 shadow-lg backdrop-blur-sm md:hidden"
         aria-label="Open menu"
       >
-        <Menu className="h-5 w-5 text-gray-700" />
+        <Menu className="h-5 w-5 text-[var(--foreground)]" />
       </button>
 
       {/* Mobile overlay */}
@@ -190,7 +190,7 @@ export default function Sidebar({ userRole, userName, onSignOut }: SidebarProps)
       {/* Sidebar — desktop: fixed, mobile: drawer */}
       <aside
         className={`
-          fixed left-0 top-0 h-full bg-[linear-gradient(180deg,#0b1724_0%,#102436_38%,#12283c_100%)] backdrop-blur-xl border-r border-white/8 flex flex-col z-40 transition-all duration-300
+          fixed left-0 top-0 h-full bg-[linear-gradient(180deg,#131012_0%,#1a1719_42%,#0e0c0d_100%)] backdrop-blur-xl border-r border-white/8 flex flex-col z-40 transition-all duration-300
           ${mobileOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64'}
           md:translate-x-0 ${!mobileOpen && (collapsed ? 'md:w-16' : 'md:w-64')}
         `}

@@ -294,7 +294,7 @@ export default function TrainerDashboard({ trainerId, trainerName }: TrainerDash
           </div>
 
           {state.activeClients.length === 0 ? (
-            <div className="rounded-[24px] border border-[var(--line)] bg-white/70 p-8 text-center">
+            <div className="rounded-[24px] border border-[var(--line)] bg-[var(--surface-strong)] p-8 text-center">
               <Users className="mx-auto h-10 w-10 text-[var(--muted-soft)]" />
               <div className="mt-4 text-lg font-semibold text-[var(--foreground)]">No active clients yet</div>
               <p className="mt-2 text-sm text-[var(--muted)]">Start with an invite, then assign the first plan once they accept.</p>
@@ -308,7 +308,7 @@ export default function TrainerDashboard({ trainerId, trainerName }: TrainerDash
                   <Link
                     key={client.id}
                     href={client.client ? `/clients/${client.client.id}` : '/clients'}
-                    className="flex items-center justify-between rounded-[22px] border border-[var(--line)] bg-white/72 px-4 py-4 transition hover:border-[rgba(29,168,240,0.28)] hover:bg-[var(--brand-100)]"
+                    className="flex items-center justify-between rounded-[22px] border border-[var(--line)] bg-[var(--surface-strong)] px-4 py-4 transition hover:border-[rgba(230,57,70,0.28)] hover:bg-[var(--brand-100)]"
                   >
                     <div>
                       <div className="font-semibold text-[var(--foreground)]">{client.client?.full_name || client.client?.email || client.invited_email}</div>
@@ -352,7 +352,7 @@ export default function TrainerDashboard({ trainerId, trainerName }: TrainerDash
             ) : (
               <div className="space-y-3">
                 {state.recentActivity.map((item) => (
-                  <div key={item.id} className="rounded-[20px] border border-[var(--line)] bg-white/70 px-4 py-3">
+                  <div key={item.id} className="rounded-[20px] border border-[var(--line)] bg-[var(--surface-strong)] px-4 py-3">
                     <div className="font-medium text-[var(--foreground)]">{item.clientName}</div>
                     <div className="mt-1 text-sm text-[var(--muted)]">{item.label}</div>
                     <div className="mt-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted-soft)]">{formatRelativeDate(item.at)}</div>
@@ -372,7 +372,7 @@ export default function TrainerDashboard({ trainerId, trainerName }: TrainerDash
             ) : (
               <div className="space-y-3">
                 {state.pendingInvites.slice(0, 4).map((invite) => (
-                  <div key={invite.id} className="rounded-[20px] border border-[var(--line)] bg-white/70 px-4 py-3">
+                  <div key={invite.id} className="rounded-[20px] border border-[var(--line)] bg-[var(--surface-strong)] px-4 py-3">
                     <div className="font-medium text-[var(--foreground)]">{invite.invited_email}</div>
                     <div className="mt-1 text-sm text-[var(--muted)]">
                       Sent {formatRelativeDate(invite.created_at)} · expires {new Date(invite.expires_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
@@ -390,9 +390,9 @@ export default function TrainerDashboard({ trainerId, trainerName }: TrainerDash
 
 function TaskRow({ label, value }: { label: string; value: number }) {
   return (
-    <div className="flex items-center justify-between rounded-[18px] border border-[var(--line)] bg-white/72 px-4 py-3">
+    <div className="flex items-center justify-between rounded-[18px] border border-[var(--line)] bg-[var(--surface-strong)] px-4 py-3">
       <span>{label}</span>
-      <span className="rounded-full bg-[var(--brand-100)] px-3 py-1 text-xs font-semibold text-[var(--brand-900)]">
+      <span className="rounded-full bg-[var(--brand-100)] px-3 py-1 text-xs font-semibold text-[var(--brand-400)]">
         {value}
       </span>
     </div>

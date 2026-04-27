@@ -366,7 +366,7 @@ export default function CoachWizard({ initialGoal = null }: { initialGoal?: stri
         <currentStep.Component answers={answers} updateAnswers={updateAnswers} statusMessage={statusMessage} />
       )}
 
-      <div className="mt-8 flex items-center gap-3 rounded-[22px] border border-[var(--line)] bg-[rgba(243,248,252,0.9)] px-4 py-3 text-sm text-[var(--muted)]">
+      <div className="mt-8 flex items-center gap-3 rounded-[22px] border border-[var(--line)] bg-[var(--surface-strong)] px-4 py-3 text-sm text-[var(--muted)]">
         <Sparkles className="h-4 w-4 text-[var(--brand-500)]" />
         <span>This route is public by design, so people can discover a coach before creating an account.</span>
       </div>

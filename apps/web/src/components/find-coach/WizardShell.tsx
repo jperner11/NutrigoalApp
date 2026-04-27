@@ -20,10 +20,10 @@ export default function WizardShell({
   footer,
 }: WizardShellProps) {
   return (
-    <div className="overflow-hidden rounded-[36px] border border-[var(--line)] bg-[var(--panel-strong)] shadow-[0_30px_80px_rgba(13,27,42,0.09)]">
+    <div className="overflow-hidden rounded-[36px] border border-[var(--line)] bg-[var(--panel-strong)] shadow-[0_30px_80px_rgba(0,0,0,0.32)]">
       <div className="grid min-h-[760px] lg:grid-cols-[0.9fr_1.1fr]">
-        <aside className="relative overflow-hidden bg-[linear-gradient(160deg,#0d1b2a_0%,#153453_50%,#1da8f0_120%)] p-8 text-white sm:p-10 lg:p-12">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.16),transparent_34%),radial-gradient(circle_at_88%_18%,rgba(77,196,255,0.26),transparent_22%)]" />
+        <aside className="relative overflow-hidden bg-[linear-gradient(160deg,#221d1f_0%,#5a0f15_58%,#e63946_140%)] p-8 text-white sm:p-10 lg:p-12">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(245,241,234,0.12),transparent_34%),radial-gradient(circle_at_88%_18%,rgba(230,57,70,0.24),transparent_22%)]" />
           <div className="relative flex h-full flex-col justify-between gap-10">
             <div>
               <div className="inline-flex rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-sky-100/90">
@@ -43,7 +43,7 @@ export default function WizardShell({
           </div>
         </aside>
 
-        <div className="flex min-h-full flex-col bg-white/92">
+        <div className="flex min-h-full flex-col bg-[var(--background-elevated)]">
           <div className="border-b border-[var(--line)] px-6 py-5 sm:px-8">
             {progress}
           </div>
@@ -52,7 +52,7 @@ export default function WizardShell({
             {children}
           </div>
 
-          <div className="border-t border-[var(--line)] bg-[rgba(248,252,255,0.82)] px-6 py-5 sm:px-8">
+          <div className="border-t border-[var(--line)] bg-[var(--surface-strong)] px-6 py-5 sm:px-8">
             {footer}
           </div>
         </div>

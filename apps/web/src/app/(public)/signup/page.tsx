@@ -155,7 +155,7 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen overflow-x-hidden">
+    <div className="auth-bg min-h-screen overflow-x-hidden">
       <div className="row mx-auto max-w-[1320px] justify-between px-8 py-5">
         <BrandLogo href="/" />
         <Link

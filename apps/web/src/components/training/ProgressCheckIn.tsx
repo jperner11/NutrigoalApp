@@ -91,15 +91,15 @@ export default function ProgressCheckIn({ userId, onPlanRegenerate }: ProgressCh
   }
 
   const trendIcon = (trend: string) => {
-    if (trend === 'improving') return <TrendingUp className="h-4 w-4 text-green-500" />
-    if (trend === 'declining') return <TrendingDown className="h-4 w-4 text-red-500" />
-    return <Minus className="h-4 w-4 text-amber-500" />
+    if (trend === 'improving') return <TrendingUp className="h-4 w-4 text-emerald-300" />
+    if (trend === 'declining') return <TrendingDown className="h-4 w-4 text-[var(--brand-400)]" />
+    return <Minus className="h-4 w-4 text-amber-300" />
   }
 
   const trendColor = (trend: string) => {
-    if (trend === 'improving') return 'text-green-700 bg-green-50 border-green-200'
-    if (trend === 'declining') return 'text-red-700 bg-red-50 border-red-200'
-    return 'text-amber-700 bg-amber-50 border-amber-200'
+    if (trend === 'improving') return 'text-emerald-200 bg-[rgba(26,163,122,0.12)] border-[rgba(26,163,122,0.34)]'
+    if (trend === 'declining') return 'text-[var(--foreground)] bg-[var(--danger-bg)] border-[rgba(230,57,70,0.34)]'
+    return 'text-amber-200 bg-[rgba(196,121,28,0.12)] border-[rgba(196,121,28,0.34)]'
   }
 
   if (checking || (!eligible && !result)) return null
@@ -109,20 +109,20 @@ export default function ProgressCheckIn({ userId, onPlanRegenerate }: ProgressCh
       <div className="mb-6">
         <button
           onClick={runCheckIn}
-          className="w-full flex items-center gap-4 px-5 py-4 rounded-xl border-2 border-dashed border-purple-300 bg-purple-50/50 hover:bg-purple-50 hover:border-purple-400 transition-all group"
+          className="group flex w-full items-center gap-4 rounded-xl border-2 border-dashed border-[rgba(230,57,70,0.34)] bg-[var(--brand-100)] px-5 py-4 transition-all hover:border-[rgba(230,57,70,0.52)] hover:bg-[rgba(230,57,70,0.16)]"
         >
-          <div className="p-2.5 rounded-xl bg-purple-100 group-hover:bg-purple-200 transition-colors">
-            <BarChart3 className="h-5 w-5 text-purple-600" />
+          <div className="rounded-xl bg-[var(--brand-100)] p-2.5 transition-colors group-hover:bg-[rgba(230,57,70,0.18)]">
+            <BarChart3 className="h-5 w-5 text-[var(--brand-400)]" />
           </div>
           <div className="flex-1 text-left">
-            <p className="text-sm font-semibold text-purple-800">Progress Check-In Available</p>
-            <p className="text-xs text-purple-600">
+            <p className="text-sm font-semibold text-[var(--foreground)]">Progress Check-In Available</p>
+            <p className="text-xs text-[var(--muted)]">
               {lastCheckInDate
                 ? `Last check-in: ${new Date(lastCheckInDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} — time to review your progress`
                 : 'Analyse your workout data and get AI-powered insights'}
             </p>
           </div>
-          <ArrowRight className="h-4 w-4 text-purple-400 group-hover:translate-x-0.5 transition-transform" />
+          <ArrowRight className="h-4 w-4 text-[var(--brand-400)] transition-transform group-hover:translate-x-0.5" />
         </button>
       </div>
     )
@@ -130,12 +130,12 @@ export default function ProgressCheckIn({ userId, onPlanRegenerate }: ProgressCh
 
   if (loading) {
     return (
-      <div className="mb-6 bg-purple-50 rounded-xl p-6 border border-purple-200">
+      <div className="mb-6 rounded-xl border border-[var(--line)] bg-[var(--surface-strong)] p-6">
         <div className="flex items-center gap-3">
-          <Loader2 className="h-5 w-5 text-purple-600 animate-spin" />
+          <Loader2 className="h-5 w-5 animate-spin text-[var(--brand-400)]" />
           <div>
-            <p className="text-sm font-semibold text-purple-800">Analysing your training data...</p>
-            <p className="text-xs text-purple-600">Crunching your sets, reps, and weights from the last 2 weeks</p>
+            <p className="text-sm font-semibold text-[var(--foreground)]">Analysing your training data...</p>
+            <p className="text-xs text-[var(--muted)]">Crunching your sets, reps, and weights from the last 2 weeks</p>
           </div>
         </div>
       </div>
@@ -152,53 +152,53 @@ export default function ProgressCheckIn({ userId, onPlanRegenerate }: ProgressCh
   const declining = result.exerciseProgress.filter(e => e.trend === 'declining').length
 
   return (
-    <div className="mb-6 bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    <div className="mb-6 overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--surface-strong)] shadow-[0_16px_36px_rgba(0,0,0,0.28)] backdrop-blur-sm">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center gap-4 px-5 py-4 hover:bg-gray-50 transition-colors"
+        className="flex w-full items-center gap-4 px-5 py-4 transition-colors hover:bg-[rgba(245,241,234,0.05)]"
       >
-        <div className="p-2 rounded-xl bg-gradient-to-br from-purple-100 to-indigo-100">
-          <Sparkles className="h-5 w-5 text-purple-600" />
+        <div className="rounded-xl bg-[var(--brand-100)] p-2">
+          <Sparkles className="h-5 w-5 text-[var(--brand-400)]" />
         </div>
         <div className="flex-1 text-left">
-          <p className="text-sm font-semibold text-gray-900">Progress Check-In</p>
-          <p className="text-xs text-gray-500">
+          <p className="text-sm font-semibold text-[var(--foreground)]">Progress Check-In</p>
+          <p className="text-xs text-[var(--muted-soft)]">
             {new Date(result.periodStart).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} — {new Date(result.periodEnd).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
           </p>
         </div>
         <div className="flex items-center gap-3">
           <div className="hidden sm:flex items-center gap-2 text-xs">
-            {improving > 0 && <span className="text-green-600 font-medium">{improving} up</span>}
-            {stalled > 0 && <span className="text-amber-600 font-medium">{stalled} flat</span>}
-            {declining > 0 && <span className="text-red-600 font-medium">{declining} down</span>}
+            {improving > 0 && <span className="font-medium text-emerald-300">{improving} up</span>}
+            {stalled > 0 && <span className="font-medium text-amber-300">{stalled} flat</span>}
+            {declining > 0 && <span className="font-medium text-[var(--brand-400)]">{declining} down</span>}
           </div>
-          {expanded ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />}
+          {expanded ? <ChevronUp className="h-4 w-4 text-[var(--muted-soft)]" /> : <ChevronDown className="h-4 w-4 text-[var(--muted-soft)]" />}
         </div>
       </button>
 
       {expanded && (
-        <div className="border-t border-gray-100">
+        <div className="border-t border-[var(--line)]">
           <div className="grid grid-cols-3 gap-3 px-5 py-4">
-            <div className="bg-purple-50 rounded-lg p-3 text-center">
-              <Calendar className="h-4 w-4 text-purple-500 mx-auto mb-1" />
-              <p className="text-lg font-bold text-purple-700">{result.workoutsLogged}/{result.workoutsPlanned}</p>
-              <p className="text-xs text-purple-600">Workouts</p>
+            <div className="rounded-lg bg-[var(--brand-100)] p-3 text-center">
+              <Calendar className="mx-auto mb-1 h-4 w-4 text-[var(--brand-400)]" />
+              <p className="text-lg font-bold text-[var(--foreground)]">{result.workoutsLogged}/{result.workoutsPlanned}</p>
+              <p className="text-xs text-[var(--muted)]">Workouts</p>
             </div>
-            <div className="bg-green-50 rounded-lg p-3 text-center">
-              <Target className="h-4 w-4 text-green-500 mx-auto mb-1" />
-              <p className="text-lg font-bold text-green-700">{consistency}%</p>
-              <p className="text-xs text-green-600">Consistency</p>
+            <div className="rounded-lg bg-[rgba(26,163,122,0.12)] p-3 text-center">
+              <Target className="mx-auto mb-1 h-4 w-4 text-emerald-300" />
+              <p className="text-lg font-bold text-[var(--foreground)]">{consistency}%</p>
+              <p className="text-xs text-[var(--muted)]">Consistency</p>
             </div>
-            <div className="bg-indigo-50 rounded-lg p-3 text-center">
-              <Dumbbell className="h-4 w-4 text-indigo-500 mx-auto mb-1" />
-              <p className="text-lg font-bold text-indigo-700">{result.exerciseProgress.length}</p>
-              <p className="text-xs text-indigo-600">Exercises</p>
+            <div className="rounded-lg bg-[rgba(245,241,234,0.06)] p-3 text-center">
+              <Dumbbell className="mx-auto mb-1 h-4 w-4 text-[var(--muted)]" />
+              <p className="text-lg font-bold text-[var(--foreground)]">{result.exerciseProgress.length}</p>
+              <p className="text-xs text-[var(--muted)]">Exercises</p>
             </div>
           </div>
 
           {result.exerciseProgress.length > 0 && (
             <div className="px-5 pb-4">
-              <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Exercise Progress</h4>
+              <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--muted-soft)]">Exercise Progress</h4>
               <div className="space-y-2">
                 {result.exerciseProgress.map((ex, i) => (
                   <div key={i} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg border ${trendColor(ex.trend)}`}>
@@ -218,9 +218,9 @@ export default function ProgressCheckIn({ userId, onPlanRegenerate }: ProgressCh
           {result.aiAnalysis && (
             <div className="px-5 pb-4 space-y-4">
               {result.aiAnalysis.overall_summary && (
-                <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl p-4 border border-purple-100">
-                  <h4 className="text-xs font-semibold text-purple-700 uppercase tracking-wider mb-2">Coach&apos;s Assessment</h4>
-                  <div className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">
+                <div className="rounded-xl border border-[var(--line)] bg-[var(--ink-2)] p-4">
+                  <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--brand-400)]">Coach&apos;s Assessment</h4>
+                  <div className="whitespace-pre-line text-sm leading-relaxed text-[var(--muted)]">
                     {result.aiAnalysis.overall_summary}
                   </div>
                 </div>
@@ -228,11 +228,11 @@ export default function ProgressCheckIn({ userId, onPlanRegenerate }: ProgressCh
 
               {result.aiAnalysis.recommendations?.length > 0 && (
                 <div>
-                  <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Recommendations</h4>
+                  <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--muted-soft)]">Recommendations</h4>
                   <ul className="space-y-1.5">
                     {result.aiAnalysis.recommendations.map((rec, i) => (
-                      <li key={i} className="flex gap-2 text-sm text-gray-700">
-                        <span className="flex-shrink-0 w-5 h-5 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xs font-bold mt-0.5">{i + 1}</span>
+                      <li key={i} className="flex gap-2 text-sm text-[var(--muted)]">
+                        <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-[var(--brand-100)] text-xs font-bold text-[var(--brand-400)]">{i + 1}</span>
                         <span>{rec}</span>
                       </li>
                     ))}
@@ -241,12 +241,12 @@ export default function ProgressCheckIn({ userId, onPlanRegenerate }: ProgressCh
               )}
 
               {result.aiAnalysis.plan_adjustments?.length > 0 && (
-                <div className="bg-amber-50 rounded-xl p-4 border border-amber-100">
-                  <h4 className="text-xs font-semibold text-amber-700 uppercase tracking-wider mb-2">Suggested Plan Changes</h4>
+                <div className="rounded-xl border border-[rgba(196,121,28,0.34)] bg-[rgba(196,121,28,0.12)] p-4">
+                  <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-amber-300">Suggested Plan Changes</h4>
                   <ul className="space-y-1.5">
                     {result.aiAnalysis.plan_adjustments.map((adj, i) => (
-                      <li key={i} className="text-sm text-amber-800 flex gap-2">
-                        <span className="text-amber-500">•</span>
+                      <li key={i} className="flex gap-2 text-sm text-amber-100">
+                        <span className="text-amber-300">•</span>
                         <span>{adj}</span>
                       </li>
                     ))}
@@ -259,7 +259,7 @@ export default function ProgressCheckIn({ userId, onPlanRegenerate }: ProgressCh
           <div className="px-5 pb-5">
             <button
               onClick={onPlanRegenerate}
-              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-5 py-3 rounded-xl text-sm font-semibold hover:shadow-lg transition-all"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[var(--brand-500)] to-[var(--brand-400)] px-5 py-3 text-sm font-semibold text-white transition-all hover:shadow-lg"
             >
               <RefreshCw className="h-4 w-4" />
               <span>Generate Updated Training Plan</span>

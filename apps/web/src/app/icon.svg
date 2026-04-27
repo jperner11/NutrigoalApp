@@ -5,13 +5,13 @@
       <stop offset="100%" stop-color="#dff2ff"/>
     </linearGradient>
     <linearGradient id="accent" x1="14%" y1="20%" x2="86%" y2="80%">
-      <stop offset="0%" stop-color="#1da8f0"/>
-      <stop offset="100%" stop-color="#4dc4ff"/>
+      <stop offset="0%" stop-color="#e63946"/>
+      <stop offset="100%" stop-color="#f05661"/>
     </linearGradient>
   </defs>
   <rect width="32" height="32" rx="9" fill="url(#bg)"/>
-  <path d="M7.5 21.5V13.5C7.5 11 9.5 9 12 9C14.5 9 16.5 11 16.5 13.5V21.5" fill="none" stroke="#0d1b2a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M16.5 21.5V14.5C16.5 11.7386 18.7386 9.5 21.5 9.5C24.2614 9.5 26.5 11.7386 26.5 14.5V21.5" fill="none" stroke="#0d1b2a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M7.5 21.5V13.5C7.5 11 9.5 9 12 9C14.5 9 16.5 11 16.5 13.5V21.5" fill="none" stroke="#f5f1ea" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M16.5 21.5V14.5C16.5 11.7386 18.7386 9.5 21.5 9.5C24.2614 9.5 26.5 11.7386 26.5 14.5V21.5" fill="none" stroke="#f5f1ea" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
   <path d="M8.5 23.2C10.7 25.1 21.3 25.1 23.5 23.2" fill="none" stroke="url(#accent)" stroke-width="2.25" stroke-linecap="round"/>
   <circle cx="23.4" cy="8" r="1.8" fill="url(#accent)"/>
 </svg>

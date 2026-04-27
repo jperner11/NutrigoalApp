@@ -8,26 +8,26 @@ export default function MarketingForCoaches() {
   return (
     <section
       className="px-8 py-24"
-      style={{ background: 'var(--paper)', color: 'var(--paper-ink)' }}
+      style={{ background: 'var(--surface-strong)', color: 'var(--on-strong)' }}
     >
       <div className="mx-auto grid max-w-[1320px] items-center gap-14 lg:grid-cols-[1fr_1.2fr]">
         <div>
           <div
             className="eyebrow mb-4"
             style={{
-              background: 'rgba(255,255,255,0.08)',
-              color: 'rgba(255,255,255,0.7)',
-              borderColor: 'rgba(255,255,255,0.12)',
+              background: 'rgba(245,241,234,0.08)',
+              color: 'rgba(245,241,234,0.7)',
+              borderColor: 'rgba(245,241,234,0.12)',
             }}
           >
             {c.eyebrow}
           </div>
-          <h2 className="h2" style={{ color: 'var(--paper-ink)' }}>
+          <h2 className="h2" style={{ color: 'var(--on-strong)' }}>
             {c.titleMain}
             <br />
             <span
               className="italic-serif"
-              style={{ color: 'rgba(243,248,252,0.55)' }}
+              style={{ color: 'rgba(245,241,234,0.55)' }}
             >
               {c.titleAccent}
             </span>
@@ -37,7 +37,7 @@ export default function MarketingForCoaches() {
             style={{
               fontSize: 17,
               lineHeight: 1.6,
-              color: 'rgba(243,248,252,0.7)',
+              color: 'rgba(245,241,234,0.7)',
             }}
           >
             {c.body}
@@ -48,14 +48,14 @@ export default function MarketingForCoaches() {
               <div
                 key={b.title}
                 className="pb-4"
-                style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}
+                style={{ borderBottom: '1px solid rgba(245,241,234,0.1)' }}
               >
                 <div className="serif" style={{ fontSize: 22, lineHeight: 1.15 }}>
                   {b.title}
                 </div>
                 <div
                   className="mt-1"
-                  style={{ fontSize: 14, color: 'rgba(243,248,252,0.6)' }}
+                  style={{ fontSize: 14, color: 'rgba(245,241,234,0.6)' }}
                 >
                   {b.sub}
                 </div>
@@ -68,8 +68,8 @@ export default function MarketingForCoaches() {
               href="/signup?role=coach"
               className="btn"
               style={{
-                background: 'var(--paper-ink)',
-                color: 'var(--paper)',
+                background: 'var(--foreground)',
+                color: 'var(--background)',
               }}
             >
               {c.ctas.open} →
@@ -78,8 +78,8 @@ export default function MarketingForCoaches() {
               href="/how-it-works"
               className="btn"
               style={{
-                color: 'var(--paper-ink)',
-                border: '1px solid rgba(255,255,255,0.2)',
+                color: 'var(--on-strong)',
+                border: '1px solid rgba(245,241,234,0.2)',
               }}
             >
               {c.ctas.how}
@@ -90,8 +90,8 @@ export default function MarketingForCoaches() {
         <div
           className="rounded-3xl p-7"
           style={{
-            background: 'rgba(255,255,255,0.04)',
-            border: '1px solid rgba(255,255,255,0.1)',
+            background: 'rgba(245,241,234,0.04)',
+            border: '1px solid rgba(245,241,234,0.1)',
           }}
         >
           <div className="row mb-5 justify-between">
@@ -100,7 +100,7 @@ export default function MarketingForCoaches() {
               style={{
                 fontSize: 10,
                 letterSpacing: '0.14em',
-                color: 'rgba(243,248,252,0.55)',
+                color: 'rgba(245,241,234,0.55)',
               }}
             >
               {c.preview.kicker}
@@ -125,7 +125,7 @@ export default function MarketingForCoaches() {
               </div>
               <div
                 className="mono mt-1"
-                style={{ fontSize: 11, color: 'rgba(243,248,252,0.55)' }}
+                style={{ fontSize: 11, color: 'rgba(245,241,234,0.55)' }}
               >
                 {c.preview.coachLine}
               </div>
@@ -135,9 +135,9 @@ export default function MarketingForCoaches() {
                     key={t}
                     className="chip"
                     style={{
-                      background: 'rgba(255,255,255,0.06)',
-                      borderColor: 'rgba(255,255,255,0.1)',
-                      color: 'rgba(243,248,252,0.75)',
+                      background: 'rgba(245,241,234,0.06)',
+                      borderColor: 'rgba(245,241,234,0.1)',
+                      color: 'rgba(245,241,234,0.75)',
                     }}
                   >
                     {t}
@@ -149,7 +149,7 @@ export default function MarketingForCoaches() {
 
           <div
             className="my-5 h-px w-full"
-            style={{ background: 'rgba(255,255,255,0.1)' }}
+            style={{ background: 'rgba(245,241,234,0.1)' }}
           />
 
           <div className="grid grid-cols-3 gap-3">
@@ -159,7 +159,7 @@ export default function MarketingForCoaches() {
                   className="mono"
                   style={{
                     fontSize: 10,
-                    color: 'rgba(243,248,252,0.45)',
+                    color: 'rgba(245,241,234,0.45)',
                     letterSpacing: '0.1em',
                   }}
                 >
@@ -175,15 +175,15 @@ export default function MarketingForCoaches() {
           <div
             className="mt-5 rounded-xl p-3.5"
             style={{
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.1)',
+              background: 'rgba(245,241,234,0.05)',
+              border: '1px solid rgba(245,241,234,0.1)',
             }}
           >
             <div
               className="mono"
               style={{
                 fontSize: 10,
-                color: 'rgba(243,248,252,0.6)',
+                color: 'rgba(245,241,234,0.6)',
                 letterSpacing: '0.12em',
               }}
             >
@@ -204,8 +204,8 @@ export default function MarketingForCoaches() {
                 style={{
                   padding: '6px 12px',
                   fontSize: 11,
-                  color: 'var(--paper-ink)',
-                  border: '1px solid rgba(255,255,255,0.2)',
+                  color: 'var(--on-strong)',
+                  border: '1px solid rgba(245,241,234,0.2)',
                 }}
               >
                 Reply
@@ -215,8 +215,8 @@ export default function MarketingForCoaches() {
                 style={{
                   padding: '6px 12px',
                   fontSize: 11,
-                  color: 'var(--paper-ink)',
-                  border: '1px solid rgba(255,255,255,0.2)',
+                  color: 'var(--on-strong)',
+                  border: '1px solid rgba(245,241,234,0.2)',
                 }}
               >
                 Decline

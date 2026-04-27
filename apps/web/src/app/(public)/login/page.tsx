@@ -65,7 +65,7 @@ export default function LoginPage() {
   const signupHref = `/signup${nextPath !== '/dashboard' ? `?next=${encodeURIComponent(nextPath)}` : ''}`
 
   return (
-    <div className="min-h-screen overflow-x-hidden">
+    <div className="auth-bg min-h-screen overflow-x-hidden">
       <div className="row mx-auto max-w-[1320px] justify-between px-8 py-5">
         <BrandLogo href="/" />
         <Link href={signupHref} className="btn btn-ghost">

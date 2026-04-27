@@ -37,11 +37,11 @@ export function ChoiceCard({
       onClick={onClick}
       className={`rounded-[24px] border p-5 text-left transition ${
         selected
-          ? 'border-[rgba(29,168,240,0.34)] bg-[var(--brand-100)] shadow-[0_14px_32px_rgba(29,168,240,0.12)]'
-          : 'border-[var(--line)] bg-white hover:border-[rgba(29,168,240,0.22)] hover:bg-[rgba(237,248,255,0.4)]'
+          ? 'border-[rgba(230,57,70,0.34)] bg-[var(--brand-100)] shadow-[0_14px_32px_rgba(230,57,70,0.16)]'
+          : 'border-[var(--line)] bg-[var(--surface-strong)] hover:border-[rgba(230,57,70,0.28)] hover:bg-[rgba(230,57,70,0.08)]'
       }`}
     >
-      {icon ? <div className={`mb-4 inline-flex rounded-2xl p-3 ${selected ? 'bg-white text-[var(--brand-900)]' : 'bg-[var(--brand-100)] text-[var(--brand-700)]'}`}>{icon}</div> : null}
+      {icon ? <div className={`mb-4 inline-flex rounded-2xl p-3 ${selected ? 'bg-[var(--brand-500)] text-white' : 'bg-[var(--brand-100)] text-[var(--brand-400)]'}`}>{icon}</div> : null}
       <div className="text-lg font-semibold text-[var(--foreground)]">{title}</div>
       {description ? <div className="mt-2 text-sm leading-6 text-[var(--muted)]">{description}</div> : null}
     </button>
@@ -65,8 +65,8 @@ export function ChoiceListItem({
       onClick={onClick}
       className={`flex w-full items-start justify-between gap-4 rounded-[22px] border px-5 py-4 text-left transition ${
         selected
-          ? 'border-[rgba(29,168,240,0.34)] bg-[var(--brand-100)]'
-          : 'border-[var(--line)] bg-white hover:border-[rgba(29,168,240,0.22)]'
+          ? 'border-[rgba(230,57,70,0.34)] bg-[var(--brand-100)]'
+          : 'border-[var(--line)] bg-[var(--surface-strong)] hover:border-[rgba(230,57,70,0.28)]'
       }`}
     >
       <div>
@@ -75,7 +75,7 @@ export function ChoiceListItem({
       </div>
       <div
         className={`mt-1 h-5 w-5 shrink-0 rounded-full border transition ${
-          selected ? 'border-[var(--brand-500)] bg-[var(--brand-500)] shadow-[inset_0_0_0_4px_white]' : 'border-[var(--line-strong)] bg-white'
+          selected ? 'border-[var(--brand-500)] bg-[var(--brand-500)] shadow-[inset_0_0_0_4px_var(--background)]' : 'border-[var(--line-strong)] bg-[var(--background-elevated)]'
         }`}
       />
     </button>
@@ -97,8 +97,8 @@ export function ChoiceChip({
       onClick={onClick}
       className={`rounded-full border px-4 py-2.5 text-sm font-semibold transition ${
         selected
-          ? 'border-[rgba(29,168,240,0.34)] bg-[var(--brand-100)] text-[var(--brand-900)]'
-          : 'border-[var(--line)] bg-white text-[var(--foreground)] hover:border-[rgba(29,168,240,0.22)]'
+          ? 'border-[rgba(230,57,70,0.34)] bg-[var(--brand-100)] text-[var(--brand-400)]'
+          : 'border-[var(--line)] bg-[var(--surface-strong)] text-[var(--foreground)] hover:border-[rgba(230,57,70,0.28)]'
       }`}
     >
       {label}

@@ -8,7 +8,7 @@ export default function PublicFooter() {
       className="border-t"
       style={{
         borderColor: 'var(--line)',
-        background: 'rgba(255,255,255,0.4)',
+        background: 'var(--surface-strong)',
         padding: '60px 32px',
       }}
     >

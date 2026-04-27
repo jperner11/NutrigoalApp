@@ -28,13 +28,13 @@ export default function BudgetStep({
         description="This gives us a realistic fit filter. It does not lock you in, but it helps us avoid showing coaches who are clearly outside your range."
       />
 
-      <div className="rounded-[28px] border border-[var(--line)] bg-[rgba(237,248,255,0.54)] p-6">
+      <div className="rounded-[28px] border border-[var(--line)] bg-[var(--panel)] p-6">
         <div className="grid gap-4 sm:grid-cols-2">
-          <div className="rounded-[22px] bg-white p-5">
+          <div className="rounded-[22px] bg-[var(--surface-strong)] p-5">
             <div className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-soft)]">Minimum</div>
             <div className="mt-2 font-display text-3xl font-bold text-[var(--foreground)]">{formatBudgetLabel(minValue)}</div>
           </div>
-          <div className="rounded-[22px] bg-white p-5">
+          <div className="rounded-[22px] bg-[var(--surface-strong)] p-5">
             <div className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-soft)]">Maximum</div>
             <div className="mt-2 font-display text-3xl font-bold text-[var(--foreground)]">{formatBudgetLabel(maxValue)}</div>
           </div>
@@ -75,7 +75,7 @@ export default function BudgetStep({
                   budget_max: nextMax,
                 })
               }}
-              className="h-2 w-full cursor-pointer accent-[var(--brand-900)]"
+              className="h-2 w-full cursor-pointer accent-[var(--brand-500)]"
             />
           </div>
         </div>

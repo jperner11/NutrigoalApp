@@ -48,10 +48,10 @@ export default function CoachResults({ answers, matches }: CoachResultsProps) {
 
   return (
     <div className="space-y-8">
-      <div className="rounded-[28px] border border-[rgba(29,168,240,0.18)] bg-[linear-gradient(135deg,rgba(237,248,255,0.96),rgba(255,255,255,0.98))] p-6 sm:p-8">
+      <div className="rounded-[28px] border border-[rgba(230,57,70,0.22)] bg-[linear-gradient(135deg,rgba(34,29,31,0.96),rgba(26,23,25,0.98))] p-6 sm:p-8">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--brand-700)]">
+            <div className="inline-flex items-center gap-2 rounded-full bg-[var(--brand-100)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--brand-400)]">
               <Sparkles className="h-3.5 w-3.5" />
               Matched coaches
             </div>
@@ -80,7 +80,7 @@ export default function CoachResults({ answers, matches }: CoachResultsProps) {
           ))}
         </div>
       ) : (
-        <div className="rounded-[28px] border border-dashed border-[var(--line-strong)] bg-white px-6 py-14 text-center">
+        <div className="rounded-[28px] border border-dashed border-[var(--line-strong)] bg-[var(--surface-strong)] px-6 py-14 text-center">
           <h3 className="text-2xl font-semibold text-[var(--foreground)]">No exact matches yet</h3>
           <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
             We’re still growing the network. Leave your email below and we’ll notify you when stronger coach matches join.
@@ -89,7 +89,7 @@ export default function CoachResults({ answers, matches }: CoachResultsProps) {
       )}
 
       {needsWaitlist ? (
-        <section className="rounded-[30px] border border-[var(--line)] bg-white p-6 sm:p-8">
+        <section className="rounded-[30px] border border-[var(--line)] bg-[var(--surface-strong)] p-6 sm:p-8">
           <div className="max-w-3xl">
             <div className="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--brand-700)]">Waitlist</div>
             <h3 className="mt-3 font-display text-3xl font-bold text-[var(--foreground)]">

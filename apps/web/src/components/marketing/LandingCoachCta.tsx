@@ -10,7 +10,7 @@ export default function LandingCoachCta() {
   const href = useMemo(() => `/find-coach?goal=${encodeURIComponent(goal)}`, [goal])
 
   return (
-    <div className="rounded-[28px] border border-[var(--line)] bg-[rgba(255,255,255,0.82)] p-4 shadow-[0_18px_36px_rgba(13,27,42,0.06)] sm:p-5">
+    <div className="rounded-[28px] border border-[var(--line)] bg-[var(--surface-strong)] p-4 shadow-[0_18px_36px_rgba(0,0,0,0.24)] sm:p-5">
       <div className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-soft)]">
         Find a coach
       </div>

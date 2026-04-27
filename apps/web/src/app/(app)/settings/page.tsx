@@ -57,7 +57,7 @@ const QUESTION_TYPE_OPTIONS: Array<{ value: CustomIntakeQuestionType; label: str
 
 const labelClass = 'mono mb-2 block'
 const fieldClass = 'w-full rounded-xl border border-[var(--line-2)] bg-[var(--ink-2)] px-3.5 py-3 text-sm text-[var(--fg)] outline-none transition focus:border-[var(--acc)]'
-const disabledFieldClass = 'w-full rounded-xl border border-[var(--line)] bg-[rgba(255,255,255,0.55)] px-3.5 py-3 text-sm text-[var(--fg-3)] outline-none'
+const disabledFieldClass = 'w-full rounded-xl border border-[var(--line)] bg-[var(--ink-2)] px-3.5 py-3 text-sm text-[var(--fg-3)] outline-none'
 const fieldStyle: React.CSSProperties = {
   borderColor: 'var(--line-2)',
 }

@@ -15,7 +15,7 @@ function TrialBanner({ trialEndsAt }: { trialEndsAt: string }) {
   if (daysLeft === 0) return null
 
   return (
-    <div className="border-b border-[rgba(77,196,255,0.2)] bg-[linear-gradient(90deg,#0d1b2a,#173149)] px-4 py-3 text-sm text-white">
+    <div className="border-b border-[rgba(230,57,70,0.24)] bg-[linear-gradient(90deg,#221d1f,#5a0f15)] px-4 py-3 text-sm text-white">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
         <div className="hidden lg:block">
           <BrandLogo href="/dashboard" compact light className="pointer-events-none" />
@@ -24,7 +24,7 @@ function TrialBanner({ trialEndsAt }: { trialEndsAt: string }) {
         <Sparkles className="h-4 w-4 flex-shrink-0" />
         <span>
           You&apos;re on a <strong>7-day Pro trial</strong> — {daysLeft} day{daysLeft !== 1 ? 's' : ''} left.{' '}
-            <Link href="/pricing" className="font-semibold text-sky-200 underline hover:text-white">
+            <Link href="/pricing" className="font-semibold text-[var(--brand-400)] underline hover:text-white">
             Upgrade to keep access →
           </Link>
         </span>
@@ -45,7 +45,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <div className="min-h-screen flex items-center justify-center app-bg">
         <div className="flex flex-col items-center space-y-4">
           <div className="brand-mark">
-            <div className="h-6 w-6 animate-spin rounded-full border-2 border-[var(--brand-900)] border-t-transparent" />
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-[var(--brand-500)] border-t-transparent" />
           </div>
           <p className="text-sm font-semibold text-[var(--muted)]">Loading your workspace...</p>
         </div>

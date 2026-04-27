@@ -101,7 +101,7 @@ export async function sendInviteEmail(
             Click the button below to create your account and get started.
           </p>
           <a href="${inviteUrl}"
-             style="display:inline-block;margin:24px 0;padding:14px 28px;background:#0ea5e9;color:#fff;text-decoration:none;border-radius:10px;font-weight:600">
+             style="display:inline-block;margin:24px 0;padding:14px 28px;background:#e63946;color:#f5f1ea;text-decoration:none;border-radius:10px;font-weight:600">
             Accept Invitation
           </a>
           <p style="color:#999;font-size:13px;line-height:1.5">

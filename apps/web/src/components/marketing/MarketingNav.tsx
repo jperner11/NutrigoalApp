@@ -17,7 +17,7 @@ export default function MarketingNav() {
   const pathname = usePathname()
 
   return (
-    <nav className="sticky top-0 z-40 border-b border-[var(--line)] bg-[rgba(251,253,255,0.78)] backdrop-blur-xl">
+    <nav className="sticky top-0 z-40 border-b border-[var(--line)] bg-[rgba(19,16,18,0.88)] backdrop-blur-xl">
       <div className="mx-auto flex max-w-[1320px] items-center justify-between px-8 py-5">
         <BrandLogo href="/" />
 

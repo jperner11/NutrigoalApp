@@ -148,7 +148,7 @@ export default function PricingPage() {
                     ? '1px solid var(--acc)'
                     : '1px solid var(--line-2)',
                   background: t.featured
-                    ? 'linear-gradient(180deg, rgba(29,168,240,0.08), transparent)'
+                    ? 'linear-gradient(180deg, rgba(230,57,70,0.12), transparent)'
                     : 'var(--ink-2)',
                 }}
               >

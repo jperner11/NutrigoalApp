@@ -9,7 +9,7 @@ function SummaryGroup({ label, items }: { label: string; items: string[] }) {
       <div className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-soft)]">{label}</div>
       <div className="flex flex-wrap gap-2">
         {items.map((item) => (
-          <span key={`${label}-${item}`} className="rounded-full bg-[var(--brand-100)] px-3 py-2 text-sm font-semibold text-[var(--brand-900)]">
+          <span key={`${label}-${item}`} className="rounded-full bg-[var(--brand-100)] px-3 py-2 text-sm font-semibold text-[var(--brand-400)]">
             {item}
           </span>
         ))}
@@ -47,7 +47,7 @@ export default function SummaryStep({
         description="This is the preference set we’ll use for matching. Add any extra context that would help a coach understand what a good fit really looks like."
       />
 
-      <div className="space-y-5 rounded-[28px] border border-[var(--line)] bg-[rgba(248,252,255,0.86)] p-6">
+      <div className="space-y-5 rounded-[28px] border border-[var(--line)] bg-[var(--panel)] p-6">
         {summaryBlocks.map(([label, items]) => (
           <SummaryGroup key={label} label={label} items={[...items]} />
         ))}
@@ -70,7 +70,7 @@ export default function SummaryStep({
         />
 
         {answers.context_text ? (
-          <div className="rounded-[22px] bg-white p-5">
+          <div className="rounded-[22px] bg-[var(--surface-strong)] p-5">
             <div className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-soft)]">Goal context</div>
             <p className="mt-3 text-sm leading-7 text-[var(--foreground)]">{answers.context_text}</p>
           </div>
@@ -92,7 +92,7 @@ export default function SummaryStep({
       </div>
 
       {statusMessage ? (
-        <div className="mt-5 rounded-[22px] border border-[rgba(29,168,240,0.18)] bg-[var(--brand-100)] px-5 py-4 text-sm leading-6 text-[var(--brand-900)]">
+        <div className="mt-5 rounded-[22px] border border-[rgba(230,57,70,0.24)] bg-[var(--brand-100)] px-5 py-4 text-sm leading-6 text-[var(--foreground)]">
           {statusMessage}
         </div>
       ) : null}

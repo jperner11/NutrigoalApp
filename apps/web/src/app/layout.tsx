@@ -1,15 +1,15 @@
 import type { Metadata } from "next"
-import { Manrope, Plus_Jakarta_Sans } from "next/font/google"
+import { Mulish, Bricolage_Grotesque } from "next/font/google"
 import "./globals.css"
 import { Toaster } from "react-hot-toast"
 import { BRAND_NAME } from '@/lib/site'
 
-const display = Plus_Jakarta_Sans({
+const display = Bricolage_Grotesque({
   subsets: ["latin"],
   variable: "--font-display",
 })
 
-const body = Manrope({
+const body = Mulish({
   subsets: ["latin"],
   variable: "--font-body",
 })
@@ -43,31 +43,31 @@ export default function RootLayout({
               fontSize: '14px',
               fontWeight: '600',
               maxWidth: '420px',
-              boxShadow: '0 18px 45px rgba(9, 26, 42, 0.18)',
-              border: '1px solid rgba(149, 176, 201, 0.28)',
-              background: '#fbfdff',
-              color: '#0d1b2a',
+              boxShadow: '0 18px 45px rgba(0, 0, 0, 0.45)',
+              border: '1px solid rgba(245, 241, 234, 0.16)',
+              background: '#1a1719',
+              color: '#f5f1ea',
             },
             success: {
               style: {
-                background: '#edf9ff',
-                color: '#0d1b2a',
-                border: '1px solid #b6ddf6',
+                background: 'rgba(26, 163, 122, 0.18)',
+                color: '#f5f1ea',
+                border: '1px solid rgba(26, 163, 122, 0.4)',
               },
               iconTheme: {
-                primary: '#1da8f0',
-                secondary: '#edf9ff',
+                primary: '#1aa37a',
+                secondary: '#1a1719',
               },
             },
             error: {
               style: {
-                background: '#fdf1f0',
-                color: '#7a2d20',
-                border: '1px solid #f1c7c0',
+                background: 'rgba(230, 57, 70, 0.18)',
+                color: '#f5f1ea',
+                border: '1px solid rgba(230, 57, 70, 0.42)',
               },
               iconTheme: {
-                primary: '#d45f48',
-                secondary: '#fdf1f0',
+                primary: '#e63946',
+                secondary: '#1a1719',
               },
             },
           }}

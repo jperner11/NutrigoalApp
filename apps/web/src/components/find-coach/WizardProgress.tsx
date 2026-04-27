@@ -17,13 +17,13 @@ export default function WizardProgress({ currentStep, totalSteps }: WizardProgre
             Step {currentStep} of {totalSteps}
           </div>
         </div>
-        <div className="text-sm font-semibold text-[var(--brand-900)]">
+        <div className="text-sm font-semibold text-[var(--brand-400)]">
           {Math.round((currentStep / totalSteps) * 100)}%
         </div>
       </div>
       <div className="mt-4 h-2.5 rounded-full bg-[var(--brand-100)]">
         <div
-          className="h-2.5 rounded-full bg-[linear-gradient(90deg,#0d1b2a,#1da8f0)] transition-all duration-300 ease-out"
+          className="h-2.5 rounded-full bg-[linear-gradient(90deg,#e63946,#f05661)] transition-all duration-300 ease-out"
           style={{ width: `${percentage}%` }}
         />
       </div>
