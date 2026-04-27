@@ -8,12 +8,24 @@ import { Plus, Camera, Trash2, X, ChevronLeft, ChevronRight } from 'lucide-react
 import Link from 'next/link'
 import Image from 'next/image'
 import type { ProgressPhoto, PhotoPose } from '@/lib/supabase/types'
+import AppPageHeader from '@/components/ui/AppPageHeader'
 
 const POSES: { value: PhotoPose; label: string }[] = [
   { value: 'front', label: 'Front' },
   { value: 'side', label: 'Side' },
   { value: 'back', label: 'Back' },
 ]
+
+const inputStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '10px 12px',
+  background: 'var(--ink-2)',
+  border: '1px solid var(--line-2)',
+  borderRadius: 10,
+  fontSize: 14,
+  color: 'var(--fg)',
+  outline: 'none',
+}
 
 export default function PhotosPage() {
   const { profile } = useUser()
@@ -87,7 +99,7 @@ export default function PhotosPage() {
     if (error) {
       toast.error('Failed to save photo record')
     } else {
-      toast.success('Photo uploaded!')
+      toast.success('Photo uploaded.')
       setShowForm(false)
       setSelectedFile(null)
       setPreview(null)
@@ -100,7 +112,6 @@ export default function PhotosPage() {
   async function handleDelete(photo: ProgressPhoto) {
     if (!window.confirm('Delete this photo? This action cannot be undone.')) return
     const supabase = createClient()
-    // Extract storage path from URL
     const urlParts = photo.photo_url.split('/progress-photos/')
     const storagePath = urlParts[1]
     if (storagePath) {
@@ -124,7 +135,7 @@ export default function PhotosPage() {
   }, {})
 
   // Lightbox navigation
-  const lightboxIndex = lightbox ? photos.findIndex(p => p.id === lightbox.id) : -1
+  const lightboxIndex = lightbox ? photos.findIndex((p) => p.id === lightbox.id) : -1
   function nextPhoto() {
     if (lightboxIndex < photos.length - 1) setLightbox(photos[lightboxIndex + 1])
   }
@@ -132,82 +143,135 @@ export default function PhotosPage() {
     if (lightboxIndex > 0) setLightbox(photos[lightboxIndex - 1])
   }
 
-  if (loading) return <div className="text-gray-500">Loading...</div>
+  if (loading) {
+    return (
+      <div className="card p-8">
+        <div
+          className="mono"
+          style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}
+        >
+          LOADING
+        </div>
+        <div className="serif mt-2" style={{ fontSize: 24, color: 'var(--fg)' }}>
+          Pulling your progress photos.
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <div className="max-w-3xl mx-auto">
-      {/* Tab nav */}
-      <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-6">
-        <Link href="/progress" className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-center text-gray-600 hover:text-gray-900">
-          Weight
+    <div className="mx-auto max-w-[920px]">
+      {/* Sub-tab nav */}
+      <div className="tab-row mb-6">
+        <Link href="/progress" className="tab">
+          WEIGHT
         </Link>
-        <Link href="/progress/measurements" className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-center text-gray-600 hover:text-gray-900">
-          Measurements
+        <Link href="/progress/measurements" className="tab">
+          MEASUREMENTS
         </Link>
-        <Link href="/progress/photos" className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-center bg-white text-purple-700 shadow-sm">
-          Photos
+        <Link href="/progress/photos" className="tab active">
+          PHOTOS
         </Link>
       </div>
 
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Progress Photos</h1>
-          <p className="text-gray-600 mt-1">Track your visual transformation over time.</p>
-        </div>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all"
-        >
-          <Plus className="h-4 w-4" />
-          Upload Photo
-        </button>
-      </div>
+      <AppPageHeader
+        eyebrow="Progress"
+        title="Progress"
+        accent="photos."
+        subtitle="Track your visual transformation over time."
+        actions={
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="btn btn-accent"
+          >
+            <Plus className="h-4 w-4" />
+            Upload photo
+          </button>
+        }
+      />
 
       {/* Upload Form */}
       {showForm && (
-        <div className="card p-6 mb-6">
-          <div className="grid grid-cols-2 gap-4 mb-4">
+        <div className="card mb-6 p-6">
+          <div
+            className="mono mb-4"
+            style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}
+          >
+            UPLOAD PHOTO
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+              <label
+                className="mono mb-2 block"
+                style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
+              >
+                DATE
+              </label>
               <input
                 type="date"
                 value={formDate}
                 onChange={(e) => setFormDate(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                style={inputStyle}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Pose</label>
-              <div className="flex gap-2">
-                {POSES.map(pose => (
-                  <button
-                    key={pose.value}
-                    onClick={() => setFormPose(pose.value)}
-                    className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium border transition-all ${
-                      formPose === pose.value
-                        ? 'bg-purple-50 border-purple-300 text-purple-700'
-                        : 'border-gray-200 text-gray-600 hover:border-gray-300'
-                    }`}
-                  >
-                    {pose.label}
-                  </button>
-                ))}
+              <label
+                className="mono mb-2 block"
+                style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
+              >
+                POSE
+              </label>
+              <div className="row gap-2">
+                {POSES.map((pose) => {
+                  const active = formPose === pose.value
+                  return (
+                    <button
+                      key={pose.value}
+                      onClick={() => setFormPose(pose.value)}
+                      className="flex-1 transition"
+                      style={{
+                        padding: '10px 12px',
+                        borderRadius: 10,
+                        fontSize: 13,
+                        fontWeight: active ? 600 : 500,
+                        background: active ? 'var(--ink-3)' : 'var(--ink-2)',
+                        border: active
+                          ? '1px solid var(--acc)'
+                          : '1px solid var(--line-2)',
+                        color: active ? 'var(--fg)' : 'var(--fg-2)',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {pose.label}
+                    </button>
+                  )
+                })}
               </div>
             </div>
           </div>
 
           {/* File picker */}
-          <div className="mb-4">
+          <div className="mt-4">
             {preview ? (
               <div className="relative inline-block">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={preview}
                   alt="Preview"
-                  className="h-48 rounded-lg object-cover"
+                  className="h-48 rounded-xl object-cover"
+                  style={{ border: '1px solid var(--line-2)' }}
                 />
                 <button
-                  onClick={() => { setSelectedFile(null); setPreview(null) }}
-                  className="absolute top-2 right-2 p-1 bg-black/50 rounded-full text-white hover:bg-black/70"
+                  onClick={() => {
+                    setSelectedFile(null)
+                    setPreview(null)
+                  }}
+                  className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full"
+                  style={{
+                    background: 'rgba(13, 27, 42, 0.6)',
+                    color: '#fff',
+                  }}
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -215,11 +279,34 @@ export default function PhotosPage() {
             ) : (
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-purple-400 transition-colors"
+                className="w-full transition"
+                style={{
+                  padding: '32px 24px',
+                  border: '2px dashed var(--line-2)',
+                  borderRadius: 14,
+                  background: 'var(--ink-2)',
+                  textAlign: 'center',
+                }}
               >
-                <Camera className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-sm text-gray-600">Click to select a photo</p>
-                <p className="text-xs text-gray-400 mt-1">JPG, PNG up to 10MB</p>
+                <Camera
+                  className="mx-auto mb-2 h-8 w-8"
+                  style={{ color: 'var(--fg-4)' }}
+                />
+                <div
+                  style={{ fontSize: 14, color: 'var(--fg-2)' }}
+                >
+                  Click to select a photo
+                </div>
+                <div
+                  className="mono mt-1"
+                  style={{
+                    fontSize: 10,
+                    color: 'var(--fg-4)',
+                    letterSpacing: '0.08em',
+                  }}
+                >
+                  JPG, PNG · UP TO 10MB
+                </div>
               </button>
             )}
             <input
@@ -231,28 +318,37 @@ export default function PhotosPage() {
             />
           </div>
 
-          <div className="mb-4">
-            <label className="block text-xs text-gray-600 mb-1">Notes</label>
+          <div className="mt-4">
+            <label
+              className="mono mb-2 block"
+              style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
+            >
+              NOTES
+            </label>
             <input
               type="text"
               value={formNotes}
               onChange={(e) => setFormNotes(e.target.value)}
-              className="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               placeholder="Optional notes"
+              style={inputStyle}
             />
           </div>
 
-          <div className="flex gap-2">
+          <div className="row mt-5 gap-2">
             <button
               onClick={handleUpload}
               disabled={!selectedFile || uploading}
-              className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all disabled:opacity-50"
+              className="btn btn-accent disabled:opacity-50"
             >
-              {uploading ? 'Uploading...' : 'Upload'}
+              {uploading ? 'Uploading…' : 'Upload'}
             </button>
             <button
-              onClick={() => { setShowForm(false); setSelectedFile(null); setPreview(null) }}
-              className="px-5 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100"
+              onClick={() => {
+                setShowForm(false)
+                setSelectedFile(null)
+                setPreview(null)
+              }}
+              className="btn btn-ghost"
             >
               Cancel
             </button>
@@ -262,33 +358,60 @@ export default function PhotosPage() {
 
       {/* Photo Grid grouped by date */}
       {Object.keys(grouped).length > 0 ? (
-        <div className="space-y-6">
+        <div className="col gap-7">
           {Object.entries(grouped).map(([date, datePhotos]) => (
             <div key={date}>
-              <h3 className="text-sm font-semibold text-gray-700 mb-3">
-                {new Date(date + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-              </h3>
-              <div className="grid grid-cols-3 gap-3">
-                {datePhotos.map(photo => (
+              <div
+                className="mono mb-3"
+                style={{
+                  fontSize: 11,
+                  color: 'var(--fg-3)',
+                  letterSpacing: '0.14em',
+                }}
+              >
+                {new Date(date + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase()}
+              </div>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                {datePhotos.map((photo) => (
                   <div
                     key={photo.id}
-                    className="group relative aspect-[3/4] bg-gray-100 rounded-xl overflow-hidden cursor-pointer"
+                    className="group relative aspect-[3/4] cursor-pointer overflow-hidden rounded-xl"
+                    style={{
+                      background: 'var(--ink-3)',
+                      border: '1px solid var(--line)',
+                    }}
                     onClick={() => setLightbox(photo)}
                   >
                     <Image
                       src={photo.photo_url}
                       alt={`${photo.pose} pose`}
                       fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                      sizes="(max-width: 768px) 33vw, 250px"
+                      className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      sizes="(max-width: 768px) 50vw, 280px"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <span className="absolute bottom-2 left-2 text-xs font-medium text-white bg-black/40 px-2 py-0.5 rounded-full capitalize">
+                    <div className="absolute inset-0 bg-gradient-to-t from-[rgba(13,27,42,0.55)] via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                    <span
+                      className="chip absolute bottom-2 left-2"
+                      style={{
+                        background: 'rgba(13, 27, 42, 0.55)',
+                        borderColor: 'rgba(255,255,255,0.18)',
+                        color: '#fff',
+                        textTransform: 'uppercase',
+                      }}
+                    >
                       {photo.pose}
                     </span>
                     <button
-                      onClick={(e) => { e.stopPropagation(); handleDelete(photo) }}
-                      className="absolute top-2 right-2 p-1.5 bg-black/40 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleDelete(photo)
+                      }}
+                      className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full opacity-0 transition group-hover:opacity-100"
+                      style={{
+                        background: 'rgba(13, 27, 42, 0.55)',
+                        color: '#fff',
+                      }}
+                      aria-label="Delete photo"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
@@ -300,15 +423,28 @@ export default function PhotosPage() {
         </div>
       ) : !showForm && (
         <div className="card p-12 text-center">
-          <Camera className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No photos yet</h3>
-          <p className="text-gray-500 mb-4">Upload progress photos to track your visual transformation.</p>
+          <Camera
+            className="mx-auto mb-3 h-10 w-10"
+            style={{ color: 'var(--fg-4)' }}
+          />
+          <div className="serif" style={{ fontSize: 22 }}>
+            No photos{' '}
+            <span className="italic-serif" style={{ color: 'var(--fg-3)' }}>
+              yet.
+            </span>
+          </div>
+          <p
+            className="mx-auto mt-2 max-w-[420px]"
+            style={{ fontSize: 13, color: 'var(--fg-2)' }}
+          >
+            Upload progress photos to track your visual transformation.
+          </p>
           <button
             onClick={() => setShowForm(true)}
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-medium"
+            className="btn btn-accent mt-5"
           >
             <Plus className="h-4 w-4" />
-            Upload First Photo
+            Upload first photo
           </button>
         </div>
       )}
@@ -316,20 +452,28 @@ export default function PhotosPage() {
       {/* Lightbox */}
       {lightbox && (
         <div
-          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{ background: 'rgba(13, 27, 42, 0.92)', backdropFilter: 'blur(6px)' }}
           onClick={() => setLightbox(null)}
         >
           <button
             onClick={() => setLightbox(null)}
-            className="absolute top-4 right-4 p-2 text-white/70 hover:text-white"
+            className="absolute right-4 top-4 p-2 transition"
+            style={{ color: 'rgba(255,255,255,0.7)' }}
+            aria-label="Close lightbox"
           >
             <X className="h-6 w-6" />
           </button>
 
           {lightboxIndex > 0 && (
             <button
-              onClick={(e) => { e.stopPropagation(); prevPhoto() }}
-              className="absolute left-4 p-2 text-white/70 hover:text-white"
+              onClick={(e) => {
+                e.stopPropagation()
+                prevPhoto()
+              }}
+              className="absolute left-4 p-2 transition"
+              style={{ color: 'rgba(255,255,255,0.7)' }}
+              aria-label="Previous photo"
             >
               <ChevronLeft className="h-8 w-8" />
             </button>
@@ -337,26 +481,64 @@ export default function PhotosPage() {
 
           {lightboxIndex < photos.length - 1 && (
             <button
-              onClick={(e) => { e.stopPropagation(); nextPhoto() }}
-              className="absolute right-4 p-2 text-white/70 hover:text-white"
+              onClick={(e) => {
+                e.stopPropagation()
+                nextPhoto()
+              }}
+              className="absolute right-4 p-2 transition"
+              style={{ color: 'rgba(255,255,255,0.7)' }}
+              aria-label="Next photo"
             >
               <ChevronRight className="h-8 w-8" />
             </button>
           )}
 
-          <div className="max-w-2xl max-h-[85vh] relative" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="relative max-h-[85vh] max-w-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={lightbox.photo_url}
               alt={`${lightbox.pose} pose`}
-              className="max-h-[85vh] rounded-lg object-contain"
+              className="max-h-[85vh] rounded-xl object-contain"
             />
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 rounded-b-lg">
-              <div className="flex items-center gap-3 text-white">
-                <span className="text-sm font-medium capitalize">{lightbox.pose}</span>
-                <span className="text-sm text-white/70">
-                  {new Date(lightbox.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+            <div
+              className="absolute bottom-0 left-0 right-0 rounded-b-xl p-4"
+              style={{
+                background:
+                  'linear-gradient(to top, rgba(13, 27, 42, 0.85), transparent)',
+              }}
+            >
+              <div className="row gap-3" style={{ color: '#fff' }}>
+                <span
+                  className="mono"
+                  style={{
+                    fontSize: 11,
+                    color: 'var(--acc)',
+                    letterSpacing: '0.14em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  {lightbox.pose}
                 </span>
-                {lightbox.notes && <span className="text-sm text-white/60">{lightbox.notes}</span>}
+                <span
+                  className="mono"
+                  style={{
+                    fontSize: 11,
+                    color: 'rgba(255,255,255,0.7)',
+                    letterSpacing: '0.08em',
+                  }}
+                >
+                  {new Date(lightbox.date + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase()}
+                </span>
+                {lightbox.notes && (
+                  <span
+                    style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}
+                  >
+                    · {lightbox.notes}
+                  </span>
+                )}
               </div>
             </div>
           </div>
