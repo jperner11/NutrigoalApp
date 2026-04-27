@@ -269,6 +269,7 @@ export default function MyNutritionistPage() {
             letterSpacing: '0.14em',
           }}
         >
+          <span style={{ color: 'var(--acc)', marginRight: 6 }}>✦</span>
           STAY IN TOUCH
         </div>
         <div className="col gap-3">

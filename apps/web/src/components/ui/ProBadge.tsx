@@ -2,7 +2,20 @@
 
 export default function ProBadge() {
   return (
-    <span className="ml-auto inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-gradient-to-r from-purple-500 to-indigo-500 text-white">
+    <span
+      className="mono ml-auto inline-flex items-center"
+      style={{
+        padding: '2px 7px',
+        borderRadius: 999,
+        fontSize: 9,
+        fontWeight: 700,
+        letterSpacing: '0.14em',
+        textTransform: 'uppercase',
+        background: 'var(--ink-3)',
+        color: 'var(--acc)',
+        border: '1px solid var(--acc)',
+      }}
+    >
       Pro
     </span>
   )

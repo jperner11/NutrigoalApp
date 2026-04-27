@@ -295,6 +295,7 @@ export default function TrainingPage() {
                 className="mono"
                 style={{ fontSize: 10, color: 'var(--fg-4)', letterSpacing: '0.12em' }}
               >
+                <span style={{ color: 'var(--acc)', marginRight: 6 }}>✦</span>
                 PLAN LIBRARY
               </div>
               <div className="col mt-4 gap-2">

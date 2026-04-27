@@ -13,6 +13,12 @@ import {
   Crown,
   Plus,
   RefreshCw,
+  Target,
+  TrendingUp,
+  Beef,
+  Wheat,
+  EggFried,
+  Scale,
 } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'react-hot-toast'
@@ -382,6 +388,9 @@ export default function DashboardPage() {
       <div className="mb-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatTile
           variant="card"
+          hero
+          icon={<Target className="h-3.5 w-3.5" />}
+          iconTone="acc"
           label="Calories"
           value={todayStats.caloriesConsumed}
           unit={profile.daily_calories ? `/ ${profile.daily_calories}` : undefined}
@@ -393,6 +402,7 @@ export default function DashboardPage() {
         />
         <StatTile
           variant="card"
+          icon={<Droplets className="h-3.5 w-3.5" />}
           label="Water"
           value={`${(todayStats.waterConsumed / 1000).toFixed(1)}L`}
           unit={
@@ -408,6 +418,7 @@ export default function DashboardPage() {
         />
         <StatTile
           variant="card"
+          icon={<Dumbbell className="h-3.5 w-3.5" />}
           label="Workouts today"
           value={todayStats.workoutsCompleted}
           unit={
@@ -418,6 +429,7 @@ export default function DashboardPage() {
         />
         <StatTile
           variant="card"
+          icon={<TrendingUp className="h-3.5 w-3.5" />}
           label="Goal"
           value={`${Math.round(calorieProgress)}%`}
           changeTone="acc"
@@ -435,6 +447,7 @@ export default function DashboardPage() {
       <div className="mb-3 grid grid-cols-3 gap-3">
         <StatTile
           size="sm"
+          icon={<Beef className="h-3 w-3" />}
           label="Protein"
           value={`${Math.round(todayStats.proteinConsumed)}g`}
           unit={profile.daily_protein ? `/ ${profile.daily_protein}g` : undefined}
@@ -446,6 +459,7 @@ export default function DashboardPage() {
         />
         <StatTile
           size="sm"
+          icon={<Wheat className="h-3 w-3" />}
           label="Carbs"
           value={`${Math.round(todayStats.carbsConsumed)}g`}
           unit={profile.daily_carbs ? `/ ${profile.daily_carbs}g` : undefined}
@@ -457,6 +471,7 @@ export default function DashboardPage() {
         />
         <StatTile
           size="sm"
+          icon={<EggFried className="h-3 w-3" />}
           label="Fat"
           value={`${Math.round(todayStats.fatConsumed)}g`}
           unit={profile.daily_fat ? `/ ${profile.daily_fat}g` : undefined}
@@ -529,6 +544,7 @@ export default function DashboardPage() {
           className="mono"
           style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}
         >
+          <span style={{ color: 'var(--acc)', marginRight: 6 }}>✦</span>
           QUICK ACTIONS
         </div>
       </div>
@@ -661,6 +677,7 @@ export default function DashboardPage() {
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             <StatTile
               variant="card"
+              icon={<Scale className="h-3.5 w-3.5" />}
               label="Weight"
               value={weightData.current ? `${weightData.current}kg` : '\u2014'}
               change={
@@ -678,6 +695,7 @@ export default function DashboardPage() {
             />
             <StatTile
               variant="card"
+              icon={<TrendingUp className="h-3.5 w-3.5" />}
               label="Avg. daily goal"
               value={
                 weeklyStats.avgGoalPct !== null
@@ -692,6 +710,7 @@ export default function DashboardPage() {
             />
             <StatTile
               variant="card"
+              icon={<Dumbbell className="h-3.5 w-3.5" />}
               label="Workouts this week"
               value={weeklyStats.workoutsThisWeek}
               unit={
@@ -711,6 +730,7 @@ export default function DashboardPage() {
             />
             <StatTile
               variant="card"
+              icon={<Droplets className="h-3.5 w-3.5" />}
               label="Avg. water intake"
               value={
                 weeklyStats.avgWaterMl !== null

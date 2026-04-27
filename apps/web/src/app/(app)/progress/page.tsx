@@ -15,6 +15,8 @@ import {
   Pencil,
   X,
   Check,
+  Hourglass,
+  Hash,
 } from 'lucide-react'
 import {
   AreaChart,
@@ -369,6 +371,9 @@ export default function ProgressPage() {
       <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
         <StatTile
           variant="card"
+          hero
+          icon={<Scale className="h-3.5 w-3.5" />}
+          iconTone="acc"
           label="Current"
           value={`${currentWeight}kg`}
           change={
@@ -381,11 +386,22 @@ export default function ProgressPage() {
         />
         <StatTile
           variant="card"
+          icon={<Hourglass className="h-3.5 w-3.5" />}
           label="Starting"
           value={`${startWeight}kg`}
         />
         <StatTile
           variant="card"
+          icon={
+            change > 0 ? (
+              <TrendingUp className="h-3.5 w-3.5" />
+            ) : change < 0 ? (
+              <TrendingDown className="h-3.5 w-3.5" />
+            ) : (
+              <Minus className="h-3.5 w-3.5" />
+            )
+          }
+          iconTone={change > 0 ? 'warn' : change < 0 ? 'ok' : 'muted'}
           label="Change"
           value={`${change > 0 ? '+' : ''}${change.toFixed(1)}kg`}
           change={
@@ -395,6 +411,7 @@ export default function ProgressPage() {
         />
         <StatTile
           variant="card"
+          icon={<Hash className="h-3.5 w-3.5" />}
           label="Entries"
           value={logs.length}
         />
