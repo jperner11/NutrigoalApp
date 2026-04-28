@@ -10,6 +10,7 @@ import Link from 'next/link'
 import type { Exercise, BodyPart, Equipment } from '@/lib/supabase/types'
 import { BODY_PARTS, EQUIPMENT_TYPES, DEFAULT_REST_SECONDS, DEFAULT_SETS, DEFAULT_REPS } from '@/lib/constants'
 import { isManagedClientRole } from '@nutrigoal/shared'
+import { AppHeroPanel, ListCard } from '@/components/ui/AppDesign'
 
 interface DayExercise {
   tempId: string
@@ -30,18 +31,18 @@ interface TrainingDay {
 function getBodyPartBadgeClass(bodyPart: string): string {
   const normalized = bodyPart.toLowerCase().replace('_', ' ')
   if (['chest', 'back', 'shoulders'].some((bp) => normalized.includes(bp))) {
-    return 'bg-purple-100 text-purple-700 border border-purple-200'
+    return 'border-[var(--brand-400)] bg-[var(--brand-100)] text-[var(--brand-400)]'
   }
   if (['biceps', 'triceps'].some((bp) => normalized.includes(bp))) {
-    return 'bg-indigo-100 text-indigo-700 border border-indigo-200'
+    return 'border-[var(--line-strong)] bg-[var(--ink-2)] text-[var(--fg-2)]'
   }
   if (normalized.includes('leg') || normalized.includes('quad') || normalized.includes('hamstring') || normalized.includes('glute') || normalized.includes('calf')) {
-    return 'bg-blue-100 text-blue-700 border border-blue-200'
+    return 'border-[var(--ok)] bg-[var(--success-bg)] text-[var(--ok)]'
   }
   if (normalized.includes('core') || normalized.includes('abs') || normalized.includes('abdominal')) {
-    return 'bg-amber-100 text-amber-700 border border-amber-200'
+    return 'border-[var(--warn)] bg-[var(--warning-bg)] text-[var(--warn)]'
   }
-  return 'bg-gray-100 text-gray-600 border border-gray-200'
+  return 'border-[var(--line)] bg-[var(--ink-2)] text-[var(--fg-3)]'
 }
 
 export default function NewTrainingPlanPage() {
@@ -340,74 +341,74 @@ export default function NewTrainingPlanPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto min-h-screen">
-      {/* Subtle background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-50/40 via-transparent to-indigo-50/30 pointer-events-none -z-10" />
-
-      {/* Header */}
-      <div className="flex items-center gap-4 mb-8">
-        <Link href="/training" className="p-2 rounded-lg hover:bg-gray-100 transition-colors">
-          <ArrowLeft className="h-5 w-5 text-gray-900" />
+    <div className="mx-auto max-w-[980px]">
+      <div className="mb-4">
+        <Link href="/training" className="btn btn-ghost inline-flex">
+          <ArrowLeft className="h-4 w-4" />
+          Back to training
         </Link>
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">New Training Plan</h1>
-          <p className="text-gray-800 mt-1">Design your perfect workout routine.</p>
-        </div>
       </div>
 
+      <AppHeroPanel
+        eyebrow="N° 03 · New program"
+        title="Training,"
+        accent="built."
+        subtitle="Design days, add exercises, and keep the working details dense without leaving the Ember workspace."
+      />
+
       {/* Plan Details */}
-      <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
+      <ListCard className="mb-6" eyebrow="PROGRAM DETAILS">
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-900 mb-1">Plan Name</label>
+            <label className="app-mono-label mb-2 block">Plan name</label>
             <input
               type="text"
               value={planName}
               onChange={(e) => setPlanName(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-shadow"
+              className="input-field"
               placeholder="e.g. Push Pull Legs"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-900 mb-1">
-              Description (optional)
+            <label className="app-mono-label mb-2 block">
+              Description
             </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-shadow"
+              className="input-field min-h-[92px]"
               rows={2}
               placeholder="Describe your training plan..."
             />
           </div>
         </div>
-      </div>
+      </ListCard>
 
       {/* Days */}
       <div className="space-y-4 mb-6">
         {days.map((day, dayIndex) => (
           <div
             key={day.tempId}
-            className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200"
+            className="card p-6 transition-all duration-200 hover:border-[var(--line-strong)]"
           >
             {/* Day Header */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 {/* Day Number Circle */}
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shadow-sm flex-shrink-0">
-                  <span className="text-white font-bold text-sm">{dayIndex + 1}</span>
+                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[var(--brand-100)] ring-1 ring-[var(--accentLine)]">
+                  <span className="text-sm font-bold text-[var(--brand-400)]">{dayIndex + 1}</span>
                 </div>
                 <input
                   type="text"
                   value={day.name}
                   onChange={(e) => updateDayName(dayIndex, e.target.value)}
-                  className="font-semibold text-gray-900 bg-transparent border-none focus:outline-none focus:ring-0 p-0 text-lg"
+                  className="bg-transparent p-0 text-lg font-semibold text-[var(--fg)] outline-none"
                   placeholder="Day name..."
                 />
               </div>
               <button
                 onClick={() => removeDay(dayIndex)}
-                className="p-1.5 text-gray-400 hover:text-red-500 transition-colors"
+                className="p-1.5 text-[var(--fg-4)] transition-colors hover:text-[var(--brand-400)]"
                 title="Remove day"
               >
                 <Trash2 className="h-4 w-4" />
@@ -420,16 +421,16 @@ export default function NewTrainingPlanPage() {
                 {day.exercises.map((ex, exIndex) => (
                   <div
                     key={ex.tempId}
-                    className="flex items-center gap-2 py-2 px-3 bg-gray-50/80 rounded-lg hover:bg-gray-100/80 transition-colors"
+                    className="flex items-center gap-2 rounded-lg bg-[var(--ink-2)] px-3 py-2 transition-colors hover:bg-[var(--ink-3)]"
                   >
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">
+                      <p className="truncate text-sm font-medium text-[var(--fg)]">
                         {ex.exerciseName}
                       </p>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
                       <div className="flex flex-col items-center">
-                        <label className="text-[10px] text-gray-500">Sets</label>
+                        <label className="text-[10px] text-[var(--fg-4)]">Sets</label>
                         <input
                           type="number"
                           value={ex.sets}
@@ -437,23 +438,23 @@ export default function NewTrainingPlanPage() {
                             updateExercise(dayIndex, exIndex, 'sets', parseInt(e.target.value) || 1)
                           }
                           min={1}
-                          className="w-14 px-1.5 py-1 border border-gray-300 rounded text-sm text-center focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          className="w-14 rounded border border-[var(--line-2)] bg-[var(--ink-2)] px-1.5 py-1 text-center text-sm text-[var(--fg)]"
                         />
                       </div>
                       <div className="flex flex-col items-center">
-                        <label className="text-[10px] text-gray-500">Reps</label>
+                        <label className="text-[10px] text-[var(--fg-4)]">Reps</label>
                         <input
                           type="text"
                           value={ex.reps}
                           onChange={(e) =>
                             updateExercise(dayIndex, exIndex, 'reps', e.target.value)
                           }
-                          className="w-16 px-1.5 py-1 border border-gray-300 rounded text-sm text-center focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          className="w-16 rounded border border-[var(--line-2)] bg-[var(--ink-2)] px-1.5 py-1 text-center text-sm text-[var(--fg)]"
                           placeholder="8-12"
                         />
                       </div>
                       <div className="flex flex-col items-center">
-                        <label className="text-[10px] text-gray-500">Rest (s)</label>
+                        <label className="text-[10px] text-[var(--fg-4)]">Rest (s)</label>
                         <input
                           type="number"
                           value={ex.rest_seconds}
@@ -467,12 +468,12 @@ export default function NewTrainingPlanPage() {
                           }
                           min={0}
                           step={15}
-                          className="w-16 px-1.5 py-1 border border-gray-300 rounded text-sm text-center focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          className="w-16 rounded border border-[var(--line-2)] bg-[var(--ink-2)] px-1.5 py-1 text-center text-sm text-[var(--fg)]"
                         />
                       </div>
                       <button
                         onClick={() => removeExerciseFromDay(dayIndex, exIndex)}
-                        className="p-1 text-gray-400 hover:text-red-500 transition-colors mt-3"
+                        className="mt-3 p-1 text-[var(--fg-4)] transition-colors hover:text-[var(--brand-400)]"
                         title="Remove exercise"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -485,16 +486,16 @@ export default function NewTrainingPlanPage() {
 
             {/* Exercise Picker */}
             {addingExerciseToDayIndex === dayIndex ? (
-              <div className="border-t border-gray-100 pt-4">
+              <div className="border-t border-[var(--line)] pt-4">
                 {/* Search and Filters */}
                 <div className="space-y-2 mb-3">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--fg-4)]" />
                     <input
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="input-field w-full pl-9"
                       placeholder="Search exercises..."
                       autoFocus
                     />
@@ -503,7 +504,7 @@ export default function NewTrainingPlanPage() {
                     <select
                       value={filterBodyPart}
                       onChange={(e) => setFilterBodyPart(e.target.value)}
-                      className="flex-1 px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="input-field flex-1 py-2 text-sm"
                     >
                       <option value="">All body parts</option>
                       {BODY_PARTS.map((bp) => (
@@ -515,7 +516,7 @@ export default function NewTrainingPlanPage() {
                     <select
                       value={filterEquipment}
                       onChange={(e) => setFilterEquipment(e.target.value)}
-                      className="flex-1 px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="input-field flex-1 py-2 text-sm"
                     >
                       <option value="">All equipment</option>
                       {EQUIPMENT_TYPES.map((eq) => (
@@ -530,12 +531,12 @@ export default function NewTrainingPlanPage() {
                 {/* Exercise Results */}
                 {loadingExercises ? (
                   <div className="flex items-center justify-center py-6">
-                    <Loader2 className="h-5 w-5 animate-spin text-purple-600" />
+                    <Loader2 className="h-5 w-5 animate-spin text-[var(--brand-400)]" />
                   </div>
                 ) : (
                   <div className="max-h-48 overflow-y-auto space-y-1 mb-3">
                     {filteredExercises.length === 0 ? (
-                      <p className="text-sm text-gray-500 text-center py-4">
+                      <p className="py-4 text-center text-sm text-[var(--fg-3)]">
                         No exercises found. Try a different search or add a custom exercise.
                       </p>
                     ) : (
@@ -543,15 +544,15 @@ export default function NewTrainingPlanPage() {
                         <button
                           key={exercise.id}
                           onClick={() => addExerciseToDay(dayIndex, exercise)}
-                          className="w-full text-left px-3 py-2 text-sm text-gray-900 hover:bg-purple-50 rounded-lg transition-colors flex items-center gap-2"
+                          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[var(--fg)] transition-colors hover:bg-[var(--ink-2)]"
                         >
-                          <Plus className="h-3 w-3 text-purple-600 flex-shrink-0" />
+                          <Plus className="h-3 w-3 flex-shrink-0 text-[var(--brand-400)]" />
                           <span className="flex-1 truncate">{exercise.name}</span>
                           <span className="flex items-center gap-1 flex-shrink-0">
                             <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full capitalize ${getBodyPartBadgeClass(exercise.body_part)}`}>
                               {BODY_PARTS.find((bp) => bp.value === exercise.body_part)?.label}
                             </span>
-                            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full capitalize bg-transparent text-gray-500 border border-gray-300">
+                            <span className="rounded-full border border-[var(--line)] bg-transparent px-1.5 py-0.5 text-[10px] font-medium capitalize text-[var(--fg-3)]">
                               {EQUIPMENT_TYPES.find((eq) => eq.value === exercise.equipment)?.label}
                             </span>
                           </span>
@@ -563,15 +564,15 @@ export default function NewTrainingPlanPage() {
 
                 {/* Custom Exercise */}
                 {showCustomExercise ? (
-                  <div className="bg-gray-50/80 rounded-lg p-3 space-y-2 mb-3 border border-gray-200/60">
-                    <p className="text-sm font-medium text-gray-900">Add Custom Exercise</p>
+                  <div className="mb-3 space-y-2 rounded-lg border border-[var(--line)] bg-[var(--ink-2)] p-3">
+                    <p className="text-sm font-medium text-[var(--fg)]">Add Custom Exercise</p>
                     <input
                       type="text"
                       value={customExercise.name}
                       onChange={(e) =>
                         setCustomExercise((prev) => ({ ...prev, name: e.target.value }))
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="input-field"
                       placeholder="Exercise name"
                     />
                     <div className="flex gap-2">
@@ -580,7 +581,7 @@ export default function NewTrainingPlanPage() {
                         onChange={(e) =>
                           setCustomExercise((prev) => ({ ...prev, body_part: e.target.value }))
                         }
-                        className="flex-1 px-2 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="input-field flex-1"
                       >
                         <option value="">Body part...</option>
                         {BODY_PARTS.map((bp) => (
@@ -594,7 +595,7 @@ export default function NewTrainingPlanPage() {
                         onChange={(e) =>
                           setCustomExercise((prev) => ({ ...prev, equipment: e.target.value }))
                         }
-                        className="flex-1 px-2 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="input-field flex-1"
                       >
                         <option value="">Equipment...</option>
                         {EQUIPMENT_TYPES.map((eq) => (
@@ -610,14 +611,14 @@ export default function NewTrainingPlanPage() {
                           setShowCustomExercise(false)
                           setCustomExercise({ name: '', body_part: '', equipment: '' })
                         }}
-                        className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800"
+                        className="btn btn-ghost px-3 py-1.5 text-sm"
                       >
                         Cancel
                       </button>
                       <button
                         onClick={saveCustomExercise}
                         disabled={savingCustom}
-                        className="flex items-center gap-1 px-3 py-1.5 bg-purple-600 text-white text-sm rounded-lg font-medium hover:bg-purple-700 disabled:opacity-50 transition-colors"
+                        className="btn btn-accent px-3 py-1.5 text-sm disabled:opacity-50"
                       >
                         {savingCustom && <Loader2 className="h-3 w-3 animate-spin" />}
                         Save & Add
@@ -627,16 +628,16 @@ export default function NewTrainingPlanPage() {
                 ) : (
                   <button
                     onClick={() => setShowCustomExercise(true)}
-                    className="text-sm text-purple-600 hover:text-purple-800 font-medium mb-3 transition-colors"
+                    className="mb-3 text-sm font-medium text-[var(--brand-400)] transition-colors hover:text-[var(--brand-500)]"
                   >
                     + Add Custom Exercise
                   </button>
                 )}
 
-                <div className="border-t border-gray-100 pt-2">
+                <div className="border-t border-[var(--line)] pt-2">
                   <button
                     onClick={closePicker}
-                    className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
+                    className="text-xs text-[var(--fg-3)] transition-colors hover:text-[var(--fg)]"
                   >
                     Close
                   </button>
@@ -645,7 +646,7 @@ export default function NewTrainingPlanPage() {
             ) : (
               <button
                 onClick={() => openPicker(dayIndex)}
-                className="flex items-center gap-1 text-sm text-purple-600 hover:text-purple-800 font-medium transition-colors"
+                className="flex items-center gap-1 text-sm font-medium text-[var(--brand-400)] transition-colors hover:text-[var(--brand-500)]"
               >
                 <Plus className="h-3 w-3" />
                 Add Exercise
@@ -658,7 +659,7 @@ export default function NewTrainingPlanPage() {
       {/* Add Day Button */}
       <button
         onClick={addDay}
-        className="w-full py-3 border-2 border-dashed border-gray-300 rounded-xl text-gray-800 hover:border-purple-400 hover:text-purple-600 hover:bg-purple-50/30 transition-all duration-200 flex items-center justify-center gap-2 mb-8"
+        className="mb-8 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-[var(--line-strong)] py-3 text-[var(--fg-2)] transition-all duration-200 hover:border-[var(--brand-400)] hover:text-[var(--brand-400)]"
       >
         <Plus className="h-4 w-4" />
         Add Day
@@ -668,14 +669,14 @@ export default function NewTrainingPlanPage() {
       <div className="flex gap-3 mb-8">
         <Link
           href="/training"
-          className="px-6 py-3 border border-gray-300 rounded-lg text-gray-800 font-medium hover:bg-gray-50 transition-all duration-200"
+          className="btn btn-secondary px-6 py-3"
         >
           Cancel
         </Link>
         <button
           onClick={savePlan}
           disabled={saving || days.length === 0}
-          className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-200 disabled:opacity-50"
+          className="btn btn-accent flex-1 justify-center py-3 disabled:opacity-50"
         >
           {saving ? (
             <Loader2 className="h-5 w-5 animate-spin" />
