@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { Session, User } from '@supabase/supabase-js'
+import * as Sentry from '@sentry/react-native'
 import type { UserProfile } from '@nutrigoal/shared'
 import { supabase } from '../lib/supabase'
 
@@ -54,8 +55,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(session)
       if (session?.user?.id) {
         fetchProfile(session.user.id)
+        Sentry.setUser({ id: session.user.id, email: session.user.email })
       } else {
         setProfile(null)
+        Sentry.setUser(null)
       }
     })
 
