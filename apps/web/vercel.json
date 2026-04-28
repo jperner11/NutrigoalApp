@@ -1,4 +1,5 @@
 {
+  "installCommand": "cd ../.. && rm -rf node_modules apps/*/node_modules packages/*/node_modules && npm ci",
   "crons": [
     {
       "path": "/api/cron/check-ins",
