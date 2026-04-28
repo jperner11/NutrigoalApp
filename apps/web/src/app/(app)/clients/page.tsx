@@ -7,8 +7,8 @@ import { Users, Plus, Mail, UserCheck, Clock3, Copy, Send, Ban, AlertCircle } fr
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { toast } from 'react-hot-toast'
-import AppPageHeader from '@/components/ui/AppPageHeader'
 import { isTrainerRole } from '@nutrigoal/shared'
+import { AppHeroPanel, AppSectionHeader, EmptyStateCard, MetricCard } from '@/components/ui/AppDesign'
 
 interface ActiveClientRow {
   id: string
@@ -156,7 +156,7 @@ export default function ClientsPage() {
     toast.success('Invite link copied.')
   }
 
-  if (loading) return <div className="text-gray-500">Loading clients...</div>
+  if (loading) return <div className="text-[var(--fg-3)]">Loading clients...</div>
 
   const needsAttentionCount = pendingInvites.filter((invite) => new Date(invite.expires_at).getTime() < Date.now()).length
   const missingPlanClients = activeClients.filter((client) => !client.hasDietPlan || !client.hasTrainingPlan)
@@ -164,11 +164,12 @@ export default function ClientsPage() {
   const totalNeedsAttention = needsAttentionCount + missingPlanClients.length + intakePendingClients.length
 
   return (
-    <div className="space-y-8">
-      <AppPageHeader
-        eyebrow={`${activeClients.length} active · ${pendingInvites.length} pending · ${totalNeedsAttention} need attention`}
-        title="Your"
-        accent="clients."
+    <div className="mx-auto max-w-[1100px] space-y-8">
+      <AppHeroPanel
+        eyebrow="N° 11 · Coach roster"
+        title="Clients,"
+        accent="in motion."
+        subtitle={`${activeClients.length} active · ${pendingInvites.length} pending · ${totalNeedsAttention} need attention`}
         actions={
           <Link href="/clients/invite" className="btn btn-accent">
             <Plus className="h-4 w-4" />
@@ -178,49 +179,42 @@ export default function ClientsPage() {
       />
 
       <div className="grid gap-4 md:grid-cols-3">
-        {[
-          ['Active clients', activeClients.length, 'Clients currently linked and manageable now.'],
-          ['Pending invites', pendingInvites.length, 'People who still need to accept their invite.'],
-          ['Needs attention', totalNeedsAttention, 'Expired invites and active clients who still need plans assigned.'],
-        ].map(([label, value, body]) => (
-          <div key={label} className="glass-card rounded-[28px] p-6">
-            <div className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--muted-soft)]">{label}</div>
-            <div className="mt-3 text-4xl font-bold text-[var(--foreground)]">{value}</div>
-            <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{body}</p>
-          </div>
-        ))}
+        <MetricCard label="Active clients" value={activeClients.length} footer="Linked and manageable now." icon={<Users className="h-4 w-4" />} />
+        <MetricCard label="Pending invites" value={pendingInvites.length} footer="Still waiting to accept." icon={<Mail className="h-4 w-4" />} tone="muted" />
+        <MetricCard label="Needs attention" value={totalNeedsAttention} footer="Expired invites or missing plans." icon={<AlertCircle className="h-4 w-4" />} tone={totalNeedsAttention > 0 ? 'warn' : 'success'} />
       </div>
 
       <section className="space-y-4">
-        <div>
-          <h2 className="text-xl font-bold text-gray-900">Needs attention</h2>
-          <p className="text-sm text-gray-600">The fastest way to unblock activation and client follow-through.</p>
-        </div>
+        <AppSectionHeader
+          index="01"
+          eyebrow="ROSTER ACTIONS"
+          title="Needs"
+          accent="attention."
+          summary="The fastest way to unblock activation and client follow-through."
+        />
 
         {totalNeedsAttention === 0 ? (
-          <div className="card p-10 text-center text-gray-500">
-            No urgent roster actions right now.
-          </div>
+          <EmptyStateCard title="No urgent roster actions right now." />
         ) : (
           <div className="space-y-3">
             {intakePendingClients.map((row) => (
               <Link
                 key={`intake-pending-${row.id}`}
                 href={row.client ? `/clients/${row.client.id}` : '#'}
-                className="card flex items-center justify-between gap-4 p-5 hover:shadow-md transition-shadow"
+                className="card flex items-center justify-between gap-4 p-5 transition hover:border-[var(--line-strong)]"
               >
                 <div className="flex items-start gap-4">
-                  <div className="rounded-full bg-sky-100 p-2">
-                    <AlertCircle className="h-5 w-5 text-sky-600" />
+                  <div className="rounded-full bg-[var(--brand-100)] p-2">
+                    <AlertCircle className="h-5 w-5 text-[var(--brand-400)]" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">{row.client?.full_name ?? row.invited_email ?? 'Client'}</h3>
-                    <p className="mt-1 text-sm text-gray-600">
+                    <h3 className="font-semibold text-[var(--fg)]">{row.client?.full_name ?? row.invited_email ?? 'Client'}</h3>
+                    <p className="mt-1 text-sm text-[var(--fg-3)]">
                       Invite accepted, but the coach intake is still incomplete.
                     </p>
                   </div>
                 </div>
-                <span className="rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700">
+                <span className="app-status-pill text-xs">
                   Intake pending
                 </span>
               </Link>
@@ -230,15 +224,15 @@ export default function ClientsPage() {
               <Link
                 key={`missing-plan-${row.id}`}
                 href={row.client ? `/clients/${row.client.id}` : '#'}
-                className="card flex items-center justify-between gap-4 p-5 hover:shadow-md transition-shadow"
+                className="card flex items-center justify-between gap-4 p-5 transition hover:border-[var(--line-strong)]"
               >
                 <div className="flex items-start gap-4">
-                  <div className="rounded-full bg-amber-100 p-2">
-                    <AlertCircle className="h-5 w-5 text-amber-600" />
+                  <div className="rounded-full bg-[var(--warning-bg)] p-2">
+                    <AlertCircle className="h-5 w-5 text-[var(--warn)]" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">{row.client?.full_name ?? row.invited_email ?? 'Client'}</h3>
-                    <p className="mt-1 text-sm text-gray-600">
+                    <h3 className="font-semibold text-[var(--fg)]">{row.client?.full_name ?? row.invited_email ?? 'Client'}</h3>
+                    <p className="mt-1 text-sm text-[var(--fg-3)]">
                       {!row.hasDietPlan && !row.hasTrainingPlan
                         ? 'No active diet or training plan assigned yet.'
                         : !row.hasDietPlan
@@ -247,7 +241,7 @@ export default function ClientsPage() {
                     </p>
                   </div>
                 </div>
-                <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">
+                <span className="app-status-pill text-xs" style={{ color: 'var(--warn)' }}>
                   Needs plan
                 </span>
               </Link>
@@ -258,18 +252,18 @@ export default function ClientsPage() {
               .map((invite) => (
                 <div key={`expired-${invite.id}`} className="card flex items-center justify-between gap-4 p-5">
                   <div className="flex items-start gap-4">
-                    <div className="rounded-full bg-amber-100 p-2">
-                      <Clock3 className="h-5 w-5 text-amber-600" />
+                    <div className="rounded-full bg-[var(--warning-bg)] p-2">
+                      <Clock3 className="h-5 w-5 text-[var(--warn)]" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">{invite.client_first_name || invite.invited_email}</h3>
-                      <p className="mt-1 text-sm text-gray-600">Invite expired. Resend to restart onboarding.</p>
+                      <h3 className="font-semibold text-[var(--fg)]">{invite.client_first_name || invite.invited_email}</h3>
+                      <p className="mt-1 text-sm text-[var(--fg-3)]">Invite expired. Resend to restart onboarding.</p>
                     </div>
                   </div>
                   <button
                     onClick={() => resendInvite(invite.id)}
                     disabled={workingId === invite.id}
-                    className="inline-flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-700"
+                    className="btn btn-secondary"
                   >
                     <Send className="h-4 w-4" />
                     Resend
@@ -281,56 +275,56 @@ export default function ClientsPage() {
       </section>
 
       <section className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-bold text-gray-900">Active clients</h2>
-            <p className="text-sm text-gray-600">Clients who have accepted and are part of your working roster.</p>
-          </div>
-        </div>
+        <AppSectionHeader
+          index="02"
+          eyebrow="ACTIVE ROSTER"
+          title="Active"
+          accent="clients."
+          summary="Clients who have accepted and are part of your working roster."
+        />
 
         {activeClients.length === 0 ? (
-          <div className="card p-12 text-center">
-            <Users className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No active clients yet</h3>
-            <p className="text-gray-500 mb-6">Send your first invite to start onboarding a client into the platform.</p>
-            <Link
-              href="/clients/invite"
-              className="inline-flex items-center space-x-2 bg-gradient-to-r from-sky-500 to-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:shadow-lg transition-all"
-            >
-              <Mail className="h-5 w-5" />
-              <span>Invite Client</span>
-            </Link>
-          </div>
+          <EmptyStateCard
+            icon={<Users className="h-7 w-7" />}
+            title="No active clients yet."
+            body="Send your first invite to start onboarding a client into the platform."
+            action={
+              <Link href="/clients/invite" className="btn btn-accent">
+                <Mail className="h-5 w-5" />
+                <span>Invite Client</span>
+              </Link>
+            }
+          />
         ) : (
           <div className="space-y-3">
             {activeClients.map((row) => (
               <Link
                 key={row.id}
                 href={row.client ? `/clients/${row.client.id}` : '#'}
-                className="card p-5 flex items-center justify-between hover:shadow-md transition-shadow block"
+                className="card flex items-center justify-between p-5 transition hover:border-[var(--line-strong)]"
               >
                 <div className="flex items-center space-x-4">
-                  <div className="rounded-full bg-sky-100 p-2">
-                    <UserCheck className="h-5 w-5 text-sky-600" />
+                  <div className="rounded-full bg-[var(--success-bg)] p-2">
+                    <UserCheck className="h-5 w-5 text-[var(--ok)]" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">
+                    <h3 className="font-semibold text-[var(--fg)]">
                       {row.client?.full_name ?? row.invited_email ?? 'Unknown'}
                     </h3>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-[var(--fg-3)]">
                       {row.client?.email ?? row.invited_email}
                     </p>
                     <div className="mt-2 flex flex-wrap gap-2">
-                      <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${row.hasDietPlan ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                      <span className="app-status-pill text-xs" style={{ color: row.hasDietPlan ? 'var(--ok)' : 'var(--warn)' }}>
                         {row.hasDietPlan ? 'Diet assigned' : 'Diet needed'}
                       </span>
-                      <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${row.hasTrainingPlan ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                      <span className="app-status-pill text-xs" style={{ color: row.hasTrainingPlan ? 'var(--ok)' : 'var(--warn)' }}>
                         {row.hasTrainingPlan ? 'Training assigned' : 'Training needed'}
                       </span>
                     </div>
                   </div>
                 </div>
-                <span className="text-xs font-medium px-3 py-1 rounded-full bg-sky-100 text-sky-700">
+                <span className="app-status-pill text-xs">
                   active
                 </span>
               </Link>
@@ -340,15 +334,16 @@ export default function ClientsPage() {
       </section>
 
       <section className="space-y-4">
-        <div>
-          <h2 className="text-xl font-bold text-gray-900">Pending invites</h2>
-          <p className="text-sm text-gray-600">These clients have been invited but have not accepted yet.</p>
-        </div>
+        <AppSectionHeader
+          index="03"
+          eyebrow="INVITES"
+          title="Pending"
+          accent="invites."
+          summary="Clients who have been invited but have not accepted yet."
+        />
 
         {pendingInvites.length === 0 ? (
-          <div className="card p-10 text-center text-gray-500">
-            No pending invites right now.
-          </div>
+          <EmptyStateCard title="No pending invites right now." />
         ) : (
           <div className="space-y-3">
             {pendingInvites.map((invite) => {
@@ -358,22 +353,22 @@ export default function ClientsPage() {
                 <div key={invite.id} className="card p-5">
                   <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                     <div className="flex items-start gap-4">
-                      <div className={`rounded-full p-2 ${expired ? 'bg-amber-100' : 'bg-slate-100'}`}>
+                      <div className={`rounded-full p-2 ${expired ? 'bg-[var(--warning-bg)]' : 'bg-[var(--ink-2)]'}`}>
                         {expired ? (
-                          <AlertCircle className="h-5 w-5 text-amber-600" />
+                          <AlertCircle className="h-5 w-5 text-[var(--warn)]" />
                         ) : (
-                          <Clock3 className="h-5 w-5 text-slate-500" />
+                          <Clock3 className="h-5 w-5 text-[var(--fg-3)]" />
                         )}
                       </div>
                       <div>
-                        <h3 className="font-semibold text-gray-900">
+                        <h3 className="font-semibold text-[var(--fg)]">
                           {invite.client_first_name || invite.invited_email}
                         </h3>
-                        <p className="text-sm text-gray-500">{invite.invited_email}</p>
-                        <div className="mt-2 flex flex-wrap gap-3 text-xs text-gray-500">
+                        <p className="text-sm text-[var(--fg-3)]">{invite.invited_email}</p>
+                        <div className="mt-2 flex flex-wrap gap-3 text-xs text-[var(--fg-4)]">
                           <span>Sent {new Date(invite.last_sent_at).toLocaleDateString('en-GB')}</span>
                           <span>Expires {new Date(invite.expires_at).toLocaleDateString('en-GB')}</span>
-                          <span className={expired ? 'text-amber-700 font-semibold' : ''}>{expired ? 'Needs attention' : 'Awaiting client acceptance'}</span>
+                          <span className={expired ? 'font-semibold text-[var(--warn)]' : ''}>{expired ? 'Needs attention' : 'Awaiting client acceptance'}</span>
                         </div>
                       </div>
                     </div>
@@ -382,14 +377,14 @@ export default function ClientsPage() {
                       <button
                         onClick={() => resendInvite(invite.id)}
                         disabled={workingId === invite.id}
-                        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-sky-200 hover:text-sky-700 disabled:opacity-50"
+                        className="btn btn-secondary disabled:opacity-50"
                       >
                         <Send className="h-4 w-4" />
                         Resend
                       </button>
                       <button
                         onClick={() => copyInviteLink(invite.invite_token)}
-                        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-sky-200 hover:text-sky-700"
+                        className="btn btn-secondary"
                       >
                         <Copy className="h-4 w-4" />
                         Copy invite link
@@ -397,7 +392,7 @@ export default function ClientsPage() {
                       <button
                         onClick={() => cancelInvite(invite.id)}
                         disabled={workingId === invite.id}
-                        className="inline-flex items-center gap-2 rounded-xl border border-red-200 px-3 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:opacity-50"
+                        className="btn btn-secondary text-[var(--brand-400)] disabled:opacity-50"
                       >
                         <Ban className="h-4 w-4" />
                         Cancel

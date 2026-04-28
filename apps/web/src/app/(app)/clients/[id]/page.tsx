@@ -13,6 +13,7 @@ import {
 import { toast } from 'react-hot-toast'
 import type { UserProfile, DietPlan, TrainingPlan } from '@/lib/supabase/types'
 import { isTrainerRole } from '@nutrigoal/shared'
+import { AppHeroPanel, AppSectionHeader, EmptyStateCard, MetricCard } from '@/components/ui/AppDesign'
 
 interface ClientOverviewState {
   lastMealDate: string | null
@@ -94,47 +95,36 @@ export default function ClientDetailPage() {
     load()
   }, [profile, id, router])
 
-  if (loading) return <div className="text-gray-500">Loading client...</div>
-  if (!client) return <div className="text-gray-500">Client not found</div>
+  if (loading) return <div className="text-[var(--fg-3)]">Loading client...</div>
+  if (!client) return <div className="text-[var(--fg-3)]">Client not found</div>
 
   return (
-    <div>
-      <Link href="/clients" className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 mb-6">
+    <div className="mx-auto max-w-[1100px]">
+      <Link href="/clients" className="btn btn-ghost mb-4 inline-flex">
         <ArrowLeft className="h-4 w-4" />
         <span>Back to Clients</span>
       </Link>
 
-      {/* Profile Card */}
-      <div className="card p-6 mb-6">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center text-2xl font-bold text-white">
-              {(client.full_name || '?')[0].toUpperCase()}
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">{client.full_name || 'Client'}</h1>
-              <p className="text-gray-500">{client.email}</p>
-              <p className="text-sm text-gray-400 mt-1">
-                {client.gender}, {client.age}y · {client.weight_kg}kg · {client.height_cm}cm
-                {client.goal && ` · ${client.goal}`}
-              </p>
-            </div>
-          </div>
-          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${
-            client.onboarding_completed
-              ? 'bg-emerald-100 text-emerald-700'
-              : 'bg-sky-100 text-sky-700'
-          }`}>
+      <AppHeroPanel
+        eyebrow="N° 12 · Client file"
+        title={client.full_name || 'Client'}
+        accent={client.onboarding_completed ? 'ready.' : 'intake pending.'}
+        subtitle={`${client.email} · ${client.gender}, ${client.age}y · ${client.weight_kg}kg · ${client.height_cm}cm${client.goal ? ` · ${client.goal}` : ''}`}
+        meta={
+          <span className="app-status-pill" style={{ color: client.onboarding_completed ? 'var(--ok)' : 'var(--warn)' }}>
             {client.onboarding_completed ? 'Intake complete' : 'Intake pending'}
           </span>
-        </div>
+        }
+      />
+
+      <div className="card mb-6 p-6">
 
         {/* Macro Targets */}
         <EditableMacros client={client} onUpdated={(updated) => setClient(updated)} />
 
         {/* Anamnesis Summary */}
         {(client.injuries?.length > 0 || client.medical_conditions?.length > 0 || client.dietary_restrictions?.length > 0 || client.food_dislikes?.length > 0) && (
-          <div className="border-t border-gray-100 mt-6 pt-4 space-y-2">
+          <div className="mt-6 space-y-2 border-t border-[var(--line)] pt-4">
             {client.injuries?.length > 0 && (
               <AnamnesisRow icon={<AlertTriangle className="h-4 w-4 text-red-500" />} label="Injuries" value={client.injuries.join(', ')} />
             )}
@@ -145,10 +135,10 @@ export default function ClientDetailPage() {
               <AnamnesisRow icon={<Leaf className="h-4 w-4 text-green-500" />} label="Diet Restrictions" value={client.dietary_restrictions.join(', ')} />
             )}
             {client.food_dislikes?.length > 0 && (
-              <AnamnesisRow icon={<ThumbsDown className="h-4 w-4 text-gray-500" />} label="Dislikes" value={client.food_dislikes.join(', ')} />
+              <AnamnesisRow icon={<ThumbsDown className="h-4 w-4 text-[var(--fg-3)]" />} label="Dislikes" value={client.food_dislikes.join(', ')} />
             )}
             {client.training_experience && (
-              <AnamnesisRow icon={<Activity className="h-4 w-4 text-purple-500" />} label="Experience" value={client.training_experience} />
+              <AnamnesisRow icon={<Activity className="h-4 w-4 text-[var(--brand-400)]" />} label="Experience" value={client.training_experience} />
             )}
             {client.equipment_access && (
               <AnamnesisRow icon={<Weight className="h-4 w-4 text-indigo-500" />} label="Equipment" value={client.equipment_access.replace(/_/g, ' ')} />
@@ -156,14 +146,14 @@ export default function ClientDetailPage() {
           </div>
         )}
 
-        <div className="border-t border-gray-100 mt-6 pt-4">
-          <h2 className="text-sm font-bold uppercase tracking-[0.16em] text-gray-500 mb-3">Coach intake summary</h2>
+        <div className="mt-6 border-t border-[var(--line)] pt-4">
+          <h2 className="app-mono-label mb-3">Coach intake summary</h2>
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             {client.desired_outcome && <AnamnesisRow icon={<Target className="h-4 w-4 text-blue-500" />} label="Desired outcome" value={client.desired_outcome} />}
             {client.past_dieting_challenges && <AnamnesisRow icon={<AlertTriangle className="h-4 w-4 text-amber-500" />} label="Past challenges" value={client.past_dieting_challenges} />}
             {client.weekly_derailers && <AnamnesisRow icon={<ClipboardList className="h-4 w-4 text-rose-500" />} label="Derailers" value={client.weekly_derailers} />}
             {client.equipment_access && <AnamnesisRow icon={<Weight className="h-4 w-4 text-indigo-500" />} label="Equipment" value={client.equipment_access.replace(/_/g, ' ')} />}
-            {client.workout_days_per_week && <AnamnesisRow icon={<Dumbbell className="h-4 w-4 text-purple-500" />} label="Training availability" value={`${client.workout_days_per_week} days / week`} />}
+            {client.workout_days_per_week && <AnamnesisRow icon={<Dumbbell className="h-4 w-4 text-[var(--brand-400)]" />} label="Training availability" value={`${client.workout_days_per_week} days / week`} />}
             {client.max_session_minutes && <AnamnesisRow icon={<Activity className="h-4 w-4 text-emerald-500" />} label="Session length" value={`${client.max_session_minutes} min`} />}
             {client.plan_preference && <AnamnesisRow icon={<ClipboardList className="h-4 w-4 text-cyan-500" />} label="Plan style" value={client.plan_preference.replace(/_/g, ' ')} />}
             {client.sleep_quality && <AnamnesisRow icon={<Stethoscope className="h-4 w-4 text-slate-500" />} label="Recovery context" value={`${client.sleep_quality}${client.stress_level ? ` · stress ${client.stress_level}` : ''}`} />}
@@ -171,8 +161,8 @@ export default function ClientDetailPage() {
         </div>
 
         {customResponses.length > 0 && (
-          <div className="border-t border-gray-100 mt-6 pt-4">
-            <h2 className="text-sm font-bold uppercase tracking-[0.16em] text-gray-500 mb-3">Custom intake answers</h2>
+          <div className="mt-6 border-t border-[var(--line)] pt-4">
+            <h2 className="app-mono-label mb-3">Custom intake answers</h2>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               {customResponses.map((response) => {
                 const value = Array.isArray(response.response_json)
@@ -194,39 +184,44 @@ export default function ClientDetailPage() {
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-4 mb-6 lg:grid-cols-4">
-        <OverviewCard label="Last meal log" value={overview.lastMealDate ? new Date(overview.lastMealDate).toLocaleDateString('en-GB') : 'No logs yet'} tone="blue" />
-        <OverviewCard label="Last workout" value={overview.lastWorkoutDate ? new Date(overview.lastWorkoutDate).toLocaleDateString('en-GB') : 'No logs yet'} tone="purple" />
-        <OverviewCard label="Latest weight" value={overview.latestWeight ? `${overview.latestWeight}kg` : 'No data'} tone="green" />
-        <OverviewCard label="Needs response" value={`${overview.pendingFeedbackCount + overview.unreadMessageCount}`} tone="amber" />
+      <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <MetricCard label="Last meal log" value={overview.lastMealDate ? new Date(overview.lastMealDate).toLocaleDateString('en-GB') : 'No logs'} tone="muted" />
+        <MetricCard label="Last workout" value={overview.lastWorkoutDate ? new Date(overview.lastWorkoutDate).toLocaleDateString('en-GB') : 'No logs'} tone="accent" />
+        <MetricCard label="Latest weight" value={overview.latestWeight ? `${overview.latestWeight}kg` : 'No data'} tone="success" />
+        <MetricCard label="Needs response" value={overview.pendingFeedbackCount + overview.unreadMessageCount} tone="warn" />
       </div>
 
       {/* Action Buttons */}
       <div className="grid grid-cols-2 gap-4 mb-6">
         <Link href={`/clients/${id}/messages`}
-          className="flex items-center justify-center space-x-2 card p-4 hover:shadow-md transition-shadow">
-          <MessageSquare className="h-5 w-5 text-blue-600" />
-          <span className="font-medium text-gray-900">Messages</span>
+          className="card flex items-center justify-center space-x-2 p-4 transition hover:border-[var(--line-strong)]">
+          <MessageSquare className="h-5 w-5 text-[var(--brand-400)]" />
+          <span className="font-medium text-[var(--fg)]">Messages</span>
         </Link>
         <Link href={`/clients/${id}/feedback`}
-          className="flex items-center justify-center space-x-2 card p-4 hover:shadow-md transition-shadow">
-          <ClipboardList className="h-5 w-5 text-purple-600" />
-          <span className="font-medium text-gray-900">Check-ins</span>
+          className="card flex items-center justify-center space-x-2 p-4 transition hover:border-[var(--line-strong)]">
+          <ClipboardList className="h-5 w-5 text-[var(--brand-400)]" />
+          <span className="font-medium text-[var(--fg)]">Check-ins</span>
         </Link>
       </div>
 
       {/* Diet Plans */}
       <div className="mb-6">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-bold text-gray-900">Diet Plans</h2>
+        <AppSectionHeader
+          index="01"
+          eyebrow="NUTRITION"
+          title="Diet"
+          accent="plans."
+          action={
           <Link href={`/clients/${id}/diet/new`}
-            className="flex items-center space-x-1 text-sm font-medium text-green-600 hover:text-green-700">
+            className="btn btn-secondary">
             <Plus className="h-4 w-4" />
             <span>New Plan</span>
           </Link>
-        </div>
+          }
+        />
         {dietPlans.length === 0 ? (
-          <p className="text-gray-400 text-sm italic">No diet plans yet</p>
+          <EmptyStateCard title="No diet plans yet." />
         ) : (
           <div className="space-y-2">
             {dietPlans.map(plan => (
@@ -234,14 +229,14 @@ export default function ClientDetailPage() {
                 <div className="flex items-center space-x-3">
                   <Utensils className="h-5 w-5 text-green-500" />
                   <div>
-                    <p className="font-semibold text-gray-900">{plan.name}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="font-semibold text-[var(--fg)]">{plan.name}</p>
+                    <p className="text-xs text-[var(--fg-3)]">
                       {plan.target_calories} kcal · P{plan.target_protein}g C{plan.target_carbs}g F{plan.target_fat}g
                     </p>
                   </div>
                 </div>
                 {plan.is_active && (
-                  <span className="text-xs font-medium px-3 py-1 rounded-full bg-green-100 text-green-700">Active</span>
+                  <span className="app-status-pill text-xs" style={{ color: 'var(--ok)' }}>Active</span>
                 )}
               </div>
             ))}
@@ -251,29 +246,34 @@ export default function ClientDetailPage() {
 
       {/* Training Plans */}
       <div>
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-bold text-gray-900">Training Plans</h2>
+        <AppSectionHeader
+          index="02"
+          eyebrow="TRAINING"
+          title="Training"
+          accent="plans."
+          action={
           <Link href={`/clients/${id}/training/new`}
-            className="flex items-center space-x-1 text-sm font-medium text-green-600 hover:text-green-700">
+            className="btn btn-secondary">
             <Plus className="h-4 w-4" />
             <span>New Plan</span>
           </Link>
-        </div>
+          }
+        />
         {trainingPlans.length === 0 ? (
-          <p className="text-gray-400 text-sm italic">No training plans yet</p>
+          <EmptyStateCard title="No training plans yet." />
         ) : (
           <div className="space-y-2">
             {trainingPlans.map(plan => (
               <div key={plan.id} className="card p-4 flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <Dumbbell className="h-5 w-5 text-purple-500" />
+                  <Dumbbell className="h-5 w-5 text-[var(--brand-400)]" />
                   <div>
-                    <p className="font-semibold text-gray-900">{plan.name}</p>
-                    <p className="text-xs text-gray-500">{plan.days_per_week}x/week{plan.description ? ` · ${plan.description}` : ''}</p>
+                    <p className="font-semibold text-[var(--fg)]">{plan.name}</p>
+                    <p className="text-xs text-[var(--fg-3)]">{plan.days_per_week}x/week{plan.description ? ` · ${plan.description}` : ''}</p>
                   </div>
                 </div>
                 {plan.is_active && (
-                  <span className="text-xs font-medium px-3 py-1 rounded-full bg-purple-100 text-purple-700">Active</span>
+                  <span className="app-status-pill text-xs">Active</span>
                 )}
               </div>
             ))}
@@ -324,66 +324,66 @@ function EditableMacros({ client, onUpdated }: { client: UserProfile; onUpdated:
     return (
       <div className="mt-6">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-semibold uppercase tracking-[0.12em] text-gray-500">Macro targets</span>
+          <span className="app-mono-label">Macro targets</span>
           <button onClick={() => setEditing(true)}
-            className="flex items-center gap-1 text-xs font-medium text-purple-600 hover:text-purple-700">
+            className="flex items-center gap-1 text-xs font-medium text-[var(--brand-400)] hover:text-[var(--brand-500)]">
             <Pencil className="h-3 w-3" />
             Edit
           </button>
         </div>
         <div className="grid grid-cols-4 gap-4">
-          <MacroPill label="Calories" value={client.daily_calories} unit="kcal" color="text-green-600" bg="bg-green-50" />
-          <MacroPill label="Protein" value={client.daily_protein} unit="g" color="text-blue-600" bg="bg-blue-50" />
-          <MacroPill label="Carbs" value={client.daily_carbs} unit="g" color="text-amber-600" bg="bg-amber-50" />
-          <MacroPill label="Fat" value={client.daily_fat} unit="g" color="text-red-600" bg="bg-red-50" />
+          <MacroPill label="Calories" value={client.daily_calories} unit="kcal" />
+          <MacroPill label="Protein" value={client.daily_protein} unit="g" />
+          <MacroPill label="Carbs" value={client.daily_carbs} unit="g" />
+          <MacroPill label="Fat" value={client.daily_fat} unit="g" />
         </div>
       </div>
     )
   }
 
   return (
-    <div className="mt-6 rounded-xl border-2 border-purple-200 bg-purple-50/50 p-4">
+    <div className="mt-6 rounded-xl border border-[var(--line)] bg-[var(--ink-2)] p-4">
       <div className="flex items-center justify-between mb-3">
-        <span className="text-xs font-semibold uppercase tracking-[0.12em] text-purple-700">Edit macro targets</span>
+        <span className="app-mono-label">Edit macro targets</span>
         <div className="flex items-center gap-2">
-          <button onClick={reset} className="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-white">
+          <button onClick={reset} className="rounded-lg p-1.5 text-[var(--fg-4)] hover:bg-[var(--ink-3)] hover:text-[var(--fg-2)]">
             <X className="h-4 w-4" />
           </button>
         </div>
       </div>
       <div className="grid grid-cols-4 gap-3">
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">Calories</label>
+          <label className="app-mono-label mb-1 block">Calories</label>
           <input type="number" value={calories} onChange={e => setCalories(e.target.value)}
-            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="input-field px-3 py-2 text-sm"
             placeholder="kcal" />
         </div>
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">Protein</label>
+          <label className="app-mono-label mb-1 block">Protein</label>
           <input type="number" value={protein} onChange={e => setProtein(e.target.value)}
-            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="input-field px-3 py-2 text-sm"
             placeholder="g" />
         </div>
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">Carbs</label>
+          <label className="app-mono-label mb-1 block">Carbs</label>
           <input type="number" value={carbs} onChange={e => setCarbs(e.target.value)}
-            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="input-field px-3 py-2 text-sm"
             placeholder="g" />
         </div>
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">Fat</label>
+          <label className="app-mono-label mb-1 block">Fat</label>
           <input type="number" value={fat} onChange={e => setFat(e.target.value)}
-            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="input-field px-3 py-2 text-sm"
             placeholder="g" />
         </div>
       </div>
       <div className="flex justify-end gap-2 mt-3">
         <button onClick={reset}
-          className="px-4 py-2 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-white">
+          className="btn btn-secondary px-4 py-2 text-sm">
           Cancel
         </button>
         <button onClick={handleSave} disabled={saving}
-          className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg hover:shadow-lg transition-all disabled:opacity-50">
+          className="btn btn-accent px-4 py-2 text-sm disabled:opacity-50">
           {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
           {saving ? 'Saving...' : 'Save'}
         </button>
@@ -392,27 +392,11 @@ function EditableMacros({ client, onUpdated }: { client: UserProfile; onUpdated:
   )
 }
 
-function MacroPill({ label, value, unit, color, bg }: { label: string; value: number | null; unit: string; color: string; bg: string }) {
+function MacroPill({ label, value, unit }: { label: string; value: number | null; unit: string }) {
   return (
-    <div className={`${bg} rounded-lg p-3 text-center`}>
-      <p className={`text-lg font-bold ${color}`}>{value ?? '—'}</p>
-      <p className="text-xs text-gray-500">{label}{value ? ` ${unit}` : ''}</p>
-    </div>
-  )
-}
-
-function OverviewCard({ label, value, tone }: { label: string; value: string; tone: 'blue' | 'purple' | 'green' | 'amber' }) {
-  const tones = {
-    blue: 'bg-blue-50 text-blue-700',
-    purple: 'bg-purple-50 text-purple-700',
-    green: 'bg-emerald-50 text-emerald-700',
-    amber: 'bg-amber-50 text-amber-700',
-  }
-
-  return (
-    <div className="card p-4">
-      <div className="text-xs font-semibold uppercase tracking-[0.12em] text-gray-500">{label}</div>
-      <div className={`mt-3 inline-flex rounded-full px-3 py-1 text-sm font-semibold ${tones[tone]}`}>{value}</div>
+    <div className="rounded-lg border border-[var(--line)] bg-[var(--ink-2)] p-3 text-center">
+      <p className="text-lg font-bold text-[var(--fg)]">{value ?? '—'}</p>
+      <p className="text-xs text-[var(--fg-3)]">{label}{value ? ` ${unit}` : ''}</p>
     </div>
   )
 }
@@ -421,8 +405,8 @@ function AnamnesisRow({ icon, label, value }: { icon: React.ReactNode; label: st
   return (
     <div className="flex items-center space-x-2">
       {icon}
-      <span className="text-xs font-semibold text-gray-500">{label}:</span>
-      <span className="text-xs text-gray-700">{value}</span>
+      <span className="text-xs font-semibold text-[var(--fg-3)]">{label}:</span>
+      <span className="text-xs text-[var(--fg-2)]">{value}</span>
     </div>
   )
 }
