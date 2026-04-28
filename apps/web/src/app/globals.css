@@ -830,6 +830,14 @@ input[type="range"] {
   color: var(--fg-3);
 }
 
+.app-section-header.app-section-compact {
+  margin: 0 0 18px;
+}
+
+.app-section-header.app-section-compact .app-section-title {
+  font-size: clamp(24px, 2.1vw, 32px);
+}
+
 .app-metric-card,
 .app-list-card,
 .app-empty-card {

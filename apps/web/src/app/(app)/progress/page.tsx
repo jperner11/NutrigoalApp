@@ -29,8 +29,8 @@ import {
   ReferenceLine,
 } from 'recharts'
 import type { WeightLog } from '@/lib/supabase/types'
-import AppPageHeader from '@/components/ui/AppPageHeader'
 import StatTile from '@/components/ui/StatTile'
+import { AppHeroPanel, AppSectionHeader, EmptyStateCard, ListCard } from '@/components/ui/AppDesign'
 
 type TimeRange = '7D' | '1M' | '3M' | '6M' | 'ALL'
 
@@ -209,17 +209,11 @@ export default function ProgressPage() {
 
   if (loading) {
     return (
-      <div className="card p-8">
-        <div
-          className="mono"
-          style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}
-        >
-          LOADING
+      <ListCard eyebrow="LOADING" title="Pulling your progress data.">
+        <div className="app-progress-track">
+          <div className="w-1/3 animate-pulse" />
         </div>
-        <div className="serif mt-2" style={{ fontSize: 24, color: 'var(--fg)' }}>
-          Pulling your progress data.
-        </div>
-      </div>
+      </ListCard>
     )
   }
 
@@ -238,18 +232,18 @@ export default function ProgressPage() {
         </Link>
       </div>
 
-      <AppPageHeader
-        eyebrow="Progress"
+      <AppHeroPanel
+        eyebrow="N° 07 · Progress"
         title="Weight"
         accent="over time."
-        subtitle="Track your weight and body composition."
+        subtitle="Track weight and body composition with the same sober rhythm as the rest of the workspace."
         actions={
           <button
             onClick={() => setShowForm(!showForm)}
-            className="btn btn-accent"
+            className={showForm ? 'btn btn-secondary' : 'btn btn-accent'}
           >
             <Plus className="h-4 w-4" />
-            Log weight
+            {showForm ? 'Close log' : 'Log weight'}
           </button>
         }
       />
@@ -367,6 +361,14 @@ export default function ProgressPage() {
         })}
       </div>
 
+      <AppSectionHeader
+        index="01"
+        eyebrow="BODY METRICS"
+        title="Current"
+        accent="signal."
+        summary={logs.length > 0 ? `${logs.length} weight entries` : 'No entries yet'}
+      />
+
       {/* Stats Row */}
       <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
         <StatTile
@@ -442,12 +444,13 @@ export default function ProgressPage() {
       {/* Chart */}
       {chartData.length >= 2 ? (
         <div className="card mb-6 p-6">
-          <div
-            className="mono mb-4"
-            style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}
-          >
-            WEIGHT OVER TIME
-          </div>
+          <AppSectionHeader
+            index="02"
+            eyebrow="WEIGHT OVER TIME"
+            title="Trend"
+            accent="line."
+            className="app-section-compact"
+          />
           <ResponsiveContainer width="100%" height={320}>
             <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <defs>
@@ -496,38 +499,17 @@ export default function ProgressPage() {
           </ResponsiveContainer>
         </div>
       ) : chartData.length === 1 ? (
-        <div className="card mb-6 p-12 text-center">
-          <Scale className="mx-auto mb-3 h-10 w-10" style={{ color: 'var(--fg-4)' }} />
-          <div className="serif" style={{ fontSize: 22 }}>
-            Log at least{' '}
-            <span className="italic-serif" style={{ color: 'var(--fg-3)' }}>
-              two entries
-            </span>{' '}
-            to see your chart.
-          </div>
-          <p
-            className="mt-2"
-            style={{ fontSize: 13, color: 'var(--fg-2)' }}
-          >
-            You have 1 entry so far — keep going.
-          </p>
-        </div>
+        <EmptyStateCard
+          icon={<Scale className="h-7 w-7" />}
+          title="Log at least two entries to see your chart."
+          body="You have 1 entry so far. Keep going."
+        />
       ) : (
-        <div className="card mb-6 p-12 text-center">
-          <Scale className="mx-auto mb-3 h-10 w-10" style={{ color: 'var(--fg-4)' }} />
-          <div className="serif" style={{ fontSize: 22 }}>
-            No entries{' '}
-            <span className="italic-serif" style={{ color: 'var(--fg-3)' }}>
-              yet.
-            </span>
-          </div>
-          <p
-            className="mt-2"
-            style={{ fontSize: 13, color: 'var(--fg-2)' }}
-          >
-            Click <span className="serif">Log weight</span> to start tracking your progress.
-          </p>
-        </div>
+        <EmptyStateCard
+          icon={<Scale className="h-7 w-7" />}
+          title="No entries yet."
+          body="Log weight to start tracking your progress."
+        />
       )}
 
       {/* Recent Entries */}
@@ -537,12 +519,13 @@ export default function ProgressPage() {
             className="px-6 py-4"
             style={{ borderBottom: '1px solid var(--line)' }}
           >
-            <div
-              className="mono"
-              style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}
-            >
-              ALL ENTRIES
-            </div>
+            <AppSectionHeader
+              index="03"
+              eyebrow="ALL ENTRIES"
+              title="History"
+              accent="logged."
+              className="app-section-compact"
+            />
           </div>
           <div>
             {[...logs].reverse().map((log, i, arr) => (

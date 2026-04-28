@@ -9,7 +9,7 @@ import Link from 'next/link'
 import { isFeatureLocked } from '@/lib/tierUtils'
 import { toast } from 'react-hot-toast'
 import type { CardioSession, CardioType } from '@/lib/supabase/types'
-import AppPageHeader from '@/components/ui/AppPageHeader'
+import { AppHeroPanel, AppSectionHeader, EmptyStateCard, ListCard } from '@/components/ui/AppDesign'
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
@@ -137,27 +137,21 @@ export default function CardioPage() {
 
   if (loading) {
     return (
-      <div className="card p-8">
-        <div
-          className="mono"
-          style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}
-        >
-          LOADING
+      <ListCard eyebrow="Loading" title="Pulling your cardio sessions.">
+        <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--line)]">
+          <div className="h-full w-1/3 animate-pulse rounded-full bg-[var(--acc)]" />
         </div>
-        <div className="serif mt-2" style={{ fontSize: 24, color: 'var(--fg)' }}>
-          Pulling your cardio sessions.
-        </div>
-      </div>
+      </ListCard>
     )
   }
 
   if (isFeatureLocked(profile?.role ?? 'free', 'cardio')) {
     return (
       <div className="mx-auto max-w-[520px]">
-        <AppPageHeader
-          eyebrow="Movement"
-          title="Cardio"
-          accent="sessions."
+        <AppHeroPanel
+          eyebrow="N° 04 · Movement"
+          title="Cardio,"
+          accent="measured."
           subtitle="Track sessions, monitor heart rate, and estimate calories burned."
         />
         <div className="card p-10 text-center">
@@ -189,42 +183,30 @@ export default function CardioPage() {
 
   return (
     <div className="mx-auto max-w-[1100px]">
-      <AppPageHeader
-        eyebrow="Movement"
-        title="Cardio"
-        accent="sessions."
-        subtitle="Track your cardiovascular sessions and calories burned."
+      <AppHeroPanel
+        eyebrow="N° 04 · Movement"
+        title="Cardio,"
+        accent="measured."
+        subtitle="Track cardiovascular work, heart rate, and energy output with a quiet session log."
       />
 
       <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
         {/* Sessions list */}
         <section>
-          <div
-            className="mono mb-3"
-            style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}
-          >
-            RECENT SESSIONS · LAST 20
-          </div>
+          <AppSectionHeader
+            index="1"
+            eyebrow="recent sessions"
+            title="Last"
+            accent="20."
+            summary={`${sessions.length} logged`}
+          />
 
           {sessions.length === 0 ? (
-            <div className="card p-10 text-center">
-              <HeartPulse
-                className="mx-auto mb-3 h-10 w-10"
-                style={{ color: 'var(--fg-4)' }}
-              />
-              <div className="serif" style={{ fontSize: 22 }}>
-                No sessions{' '}
-                <span className="italic-serif" style={{ color: 'var(--fg-3)' }}>
-                  yet.
-                </span>
-              </div>
-              <p
-                className="mx-auto mt-2 max-w-[360px]"
-                style={{ fontSize: 13, color: 'var(--fg-2)', lineHeight: 1.5 }}
-              >
-                Log your first session on the right to start tracking calories burned.
-              </p>
-            </div>
+            <EmptyStateCard
+              icon={<HeartPulse className="h-6 w-6" />}
+              title="No sessions yet."
+              body="Log your first session on the right to start tracking calories burned."
+            />
           ) : (
             <div className="col gap-2">
               {sessions.map((session) => (

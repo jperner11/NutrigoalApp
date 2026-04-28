@@ -15,21 +15,21 @@ export const brandColors = {
   brand700: '#a32530',
   brand500: '#e63946',
   brand400: '#f05661',
-  brand200: 'rgba(230, 57, 70, 0.22)',
-  brand100: 'rgba(230, 57, 70, 0.10)',
-  accentLine: 'rgba(230, 57, 70, 0.28)',
+  brand200: 'rgba(230, 57, 70, 0.14)',
+  brand100: 'rgba(230, 57, 70, 0.08)',
+  accentLine: 'rgba(230, 57, 70, 0.24)',
   success: '#1aa37a',
   successBg: 'rgba(26, 163, 122, 0.14)',
   danger: '#e63946',
-  dangerBg: 'rgba(230, 57, 70, 0.14)',
+  dangerBg: 'rgba(230, 57, 70, 0.10)',
   warning: '#df9a2b',
   warningBg: 'rgba(223, 154, 43, 0.14)',
 }
 
 export const brandShadow = {
   shadowColor: '#000000',
-  shadowOpacity: 0.18,
-  shadowRadius: 18,
-  shadowOffset: { width: 0, height: 10 },
+  shadowOpacity: 0.12,
+  shadowRadius: 12,
+  shadowOffset: { width: 0, height: 6 },
   elevation: 2,
 } as const

@@ -71,7 +71,10 @@ export default function TrainingScreen() {
   return (
     <SafeAreaView style={s.container}>
       <View style={s.header}>
-        <Text style={s.title}>Training Plans</Text>
+        <View>
+          <Text style={s.kicker}>N° 03 · STRENGTH</Text>
+          <Text style={s.title}>Training</Text>
+        </View>
         {!managedClient && (
           <TouchableOpacity style={s.addBtn} onPress={() => setScreen('create')}>
             <Ionicons name="add" size={24} color="#fff" />
@@ -79,6 +82,20 @@ export default function TrainingScreen() {
         )}
       </View>
       <ScrollView contentContainerStyle={s.content} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={brandColors.brand500} />}>
+        <View style={s.heroCard}>
+          <Text style={s.heroTitle}>
+            Training, <Text style={s.heroAccent}>kept honest.</Text>
+          </Text>
+          <Text style={s.heroCopy}>
+            Build, follow, and adjust your weekly routine from one focused place.
+          </Text>
+          <View style={s.heroMetaRow}>
+            <View style={s.metaPill}>
+              <Text style={s.metaPillText}>{plans.length} plan{plans.length === 1 ? '' : 's'}</Text>
+            </View>
+            {managedClient ? <Text style={s.managedText}>Coach-managed</Text> : null}
+          </View>
+        </View>
         {plans.length === 0 ? (
           <View style={s.empty}>
             <Ionicons name="barbell-outline" size={48} color={brandColors.textSubtle} />
@@ -616,9 +633,26 @@ function WorkoutSession({ dayId, user, profile, onDone }: any) {
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: brandColors.background },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 },
-  title: { fontSize: 24, fontWeight: '800', color: brandColors.foreground, letterSpacing: -0.6 },
-  addBtn: { backgroundColor: brandColors.brand500, borderRadius: 20, width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
+  kicker: { fontSize: 11, fontWeight: '800', color: brandColors.brand400, letterSpacing: 1.8 },
+  title: { marginTop: 4, fontSize: 28, fontWeight: '800', color: brandColors.foreground, letterSpacing: -0.5 },
+  addBtn: { backgroundColor: brandColors.brand500, borderRadius: 18, width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
   content: { padding: 20, paddingTop: 0 },
+  heroCard: {
+    backgroundColor: brandColors.surfaceStrong,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: brandColors.line,
+    padding: 20,
+    marginBottom: 16,
+    overflow: 'hidden',
+  },
+  heroTitle: { fontSize: 32, lineHeight: 36, fontWeight: '800', color: brandColors.foreground, letterSpacing: -0.8 },
+  heroAccent: { color: brandColors.brand400, fontStyle: 'italic' },
+  heroCopy: { marginTop: 10, fontSize: 15, lineHeight: 22, color: brandColors.textMuted },
+  heroMetaRow: { marginTop: 16, flexDirection: 'row', alignItems: 'center', gap: 10 },
+  metaPill: { borderWidth: 1, borderColor: brandColors.lineStrong, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 7, backgroundColor: brandColors.panelMuted },
+  metaPillText: { fontSize: 12, fontWeight: '700', color: brandColors.foregroundSoft },
+  managedText: { fontSize: 12, color: brandColors.textSubtle, fontWeight: '700' },
   empty: { alignItems: 'center', paddingTop: 80, gap: 8 },
   emptyText: { fontSize: 18, fontWeight: '600', color: brandColors.textMuted },
   emptyHint: { fontSize: 14, color: brandColors.textSubtle, textAlign: 'center', maxWidth: 280, lineHeight: 20 },

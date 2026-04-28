@@ -8,7 +8,7 @@ import { Plus, Camera, Trash2, X, ChevronLeft, ChevronRight } from 'lucide-react
 import Link from 'next/link'
 import Image from 'next/image'
 import type { ProgressPhoto, PhotoPose } from '@/lib/supabase/types'
-import AppPageHeader from '@/components/ui/AppPageHeader'
+import { AppHeroPanel, EmptyStateCard, ListCard } from '@/components/ui/AppDesign'
 
 const POSES: { value: PhotoPose; label: string }[] = [
   { value: 'front', label: 'Front' },
@@ -145,17 +145,11 @@ export default function PhotosPage() {
 
   if (loading) {
     return (
-      <div className="card p-8">
-        <div
-          className="mono"
-          style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}
-        >
-          LOADING
+      <ListCard eyebrow="LOADING" title="Pulling your progress photos.">
+        <div className="app-progress-track">
+          <div className="w-1/3 animate-pulse" />
         </div>
-        <div className="serif mt-2" style={{ fontSize: 24, color: 'var(--fg)' }}>
-          Pulling your progress photos.
-        </div>
-      </div>
+      </ListCard>
     )
   }
 
@@ -174,18 +168,18 @@ export default function PhotosPage() {
         </Link>
       </div>
 
-      <AppPageHeader
-        eyebrow="Progress"
+      <AppHeroPanel
+        eyebrow="N° 07 · Photos"
         title="Progress"
         accent="photos."
-        subtitle="Track your visual transformation over time."
+        subtitle="Keep visual checkpoints organized by date without breaking the dark workspace."
         actions={
           <button
             onClick={() => setShowForm(!showForm)}
-            className="btn btn-accent"
+            className={showForm ? 'btn btn-secondary' : 'btn btn-accent'}
           >
             <Plus className="h-4 w-4" />
-            Upload photo
+            {showForm ? 'Close upload' : 'Upload photo'}
           </button>
         }
       />
@@ -269,8 +263,8 @@ export default function PhotosPage() {
                   }}
                   className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full"
                   style={{
-                    background: 'rgba(13, 27, 42, 0.6)',
-                    color: '#fff',
+                    background: 'rgba(19, 16, 18, 0.72)',
+                    color: 'var(--foreground)',
                   }}
                 >
                   <X className="h-4 w-4" />
@@ -393,9 +387,9 @@ export default function PhotosPage() {
                     <span
                       className="chip absolute bottom-2 left-2"
                       style={{
-                        background: 'rgba(13, 27, 42, 0.55)',
-                        borderColor: 'rgba(255,255,255,0.18)',
-                        color: '#fff',
+                        background: 'rgba(19, 16, 18, 0.72)',
+                        borderColor: 'rgba(245, 241, 234, 0.18)',
+                        color: 'var(--foreground)',
                         textTransform: 'uppercase',
                       }}
                     >
@@ -408,8 +402,8 @@ export default function PhotosPage() {
                       }}
                       className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full opacity-0 transition group-hover:opacity-100"
                       style={{
-                        background: 'rgba(13, 27, 42, 0.55)',
-                        color: '#fff',
+                        background: 'rgba(19, 16, 18, 0.72)',
+                        color: 'var(--foreground)',
                       }}
                       aria-label="Delete photo"
                     >
@@ -422,44 +416,33 @@ export default function PhotosPage() {
           ))}
         </div>
       ) : !showForm && (
-        <div className="card p-12 text-center">
-          <Camera
-            className="mx-auto mb-3 h-10 w-10"
-            style={{ color: 'var(--fg-4)' }}
-          />
-          <div className="serif" style={{ fontSize: 22 }}>
-            No photos{' '}
-            <span className="italic-serif" style={{ color: 'var(--fg-3)' }}>
-              yet.
-            </span>
-          </div>
-          <p
-            className="mx-auto mt-2 max-w-[420px]"
-            style={{ fontSize: 13, color: 'var(--fg-2)' }}
-          >
-            Upload progress photos to track your visual transformation.
-          </p>
-          <button
-            onClick={() => setShowForm(true)}
-            className="btn btn-accent mt-5"
-          >
-            <Plus className="h-4 w-4" />
-            Upload first photo
-          </button>
-        </div>
+        <EmptyStateCard
+          icon={<Camera className="h-7 w-7" />}
+          title="No photos yet."
+          body="Upload progress photos to track visual change over time."
+          action={
+            <button
+              onClick={() => setShowForm(true)}
+              className="btn btn-accent"
+            >
+              <Plus className="h-4 w-4" />
+              Upload first photo
+            </button>
+          }
+        />
       )}
 
       {/* Lightbox */}
       {lightbox && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center"
-          style={{ background: 'rgba(13, 27, 42, 0.92)', backdropFilter: 'blur(6px)' }}
+          style={{ background: 'rgba(19, 16, 18, 0.92)', backdropFilter: 'blur(6px)' }}
           onClick={() => setLightbox(null)}
         >
           <button
             onClick={() => setLightbox(null)}
             className="absolute right-4 top-4 p-2 transition"
-            style={{ color: 'rgba(255,255,255,0.7)' }}
+            style={{ color: 'rgba(245, 241, 234, 0.7)' }}
             aria-label="Close lightbox"
           >
             <X className="h-6 w-6" />
@@ -472,7 +455,7 @@ export default function PhotosPage() {
                 prevPhoto()
               }}
               className="absolute left-4 p-2 transition"
-              style={{ color: 'rgba(255,255,255,0.7)' }}
+              style={{ color: 'rgba(245, 241, 234, 0.7)' }}
               aria-label="Previous photo"
             >
               <ChevronLeft className="h-8 w-8" />
@@ -486,7 +469,7 @@ export default function PhotosPage() {
                 nextPhoto()
               }}
               className="absolute right-4 p-2 transition"
-              style={{ color: 'rgba(255,255,255,0.7)' }}
+              style={{ color: 'rgba(245, 241, 234, 0.7)' }}
               aria-label="Next photo"
             >
               <ChevronRight className="h-8 w-8" />
@@ -507,10 +490,10 @@ export default function PhotosPage() {
               className="absolute bottom-0 left-0 right-0 rounded-b-xl p-4"
               style={{
                 background:
-                  'linear-gradient(to top, rgba(13, 27, 42, 0.85), transparent)',
+                  'linear-gradient(to top, rgba(19, 16, 18, 0.88), transparent)',
               }}
             >
-              <div className="row gap-3" style={{ color: '#fff' }}>
+              <div className="row gap-3" style={{ color: 'var(--foreground)' }}>
                 <span
                   className="mono"
                   style={{
@@ -526,7 +509,7 @@ export default function PhotosPage() {
                   className="mono"
                   style={{
                     fontSize: 11,
-                    color: 'rgba(255,255,255,0.7)',
+                    color: 'rgba(245, 241, 234, 0.7)',
                     letterSpacing: '0.08em',
                   }}
                 >
@@ -534,7 +517,7 @@ export default function PhotosPage() {
                 </span>
                 {lightbox.notes && (
                   <span
-                    style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}
+                    style={{ fontSize: 13, color: 'rgba(245, 241, 234, 0.6)' }}
                   >
                     · {lightbox.notes}
                   </span>

@@ -31,7 +31,7 @@ import { BaseClientIntakePreview } from '@/components/onboarding/BaseClientIntak
 import { SUPPORT_EMAIL } from '@/lib/site'
 import { COACH_MARKETPLACE_CURRENCIES, COACH_OFFER_BILLING_PERIODS, buildCoachProfileSlug, formatCoachPriceRange, formatOfferPrice } from '@/lib/coachMarketplace'
 import { isTrainerRole } from '@nutrigoal/shared'
-import AppPageHeader from '@/components/ui/AppPageHeader'
+import { AppHeroPanel } from '@/components/ui/AppDesign'
 
 const TABS = [
   { key: 'profile', label: 'Profile', icon: User },
@@ -842,11 +842,11 @@ export default function SettingsPage() {
 
   return (
     <div className="mx-auto max-w-[1100px]">
-      <AppPageHeader
-        eyebrow="Account"
+      <AppHeroPanel
+        eyebrow="N° 10 · Account"
         title="Settings"
         accent="control."
-        subtitle="Manage your profile, goals, coaching preferences, and subscription."
+        subtitle="Manage profile data, goals, coaching preferences, subscription, and the public coach surface from one calm control room."
       />
 
       {/* Subscription */}

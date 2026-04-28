@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Droplets, Plus, Minus } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { WATER_QUICK_ADD } from '@/lib/constants'
-import AppPageHeader from '@/components/ui/AppPageHeader'
+import { AppHeroPanel, AppSectionHeader, ListCard } from '@/components/ui/AppDesign'
 
 export default function WaterPage() {
   const { profile } = useUser()
@@ -58,17 +58,11 @@ export default function WaterPage() {
 
   if (loading) {
     return (
-      <div className="card p-8">
-        <div
-          className="mono"
-          style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}
-        >
-          LOADING
+      <ListCard eyebrow="Loading" title="Pulling your hydration log.">
+        <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--line)]">
+          <div className="h-full w-1/3 animate-pulse rounded-full bg-[var(--acc)]" />
         </div>
-        <div className="serif mt-2" style={{ fontSize: 24, color: 'var(--fg)' }}>
-          Pulling your hydration log.
-        </div>
-      </div>
+      </ListCard>
     )
   }
 
@@ -78,12 +72,12 @@ export default function WaterPage() {
   const dashOffset = circumference * (1 - progress / 100)
 
   return (
-    <div className="mx-auto max-w-[720px]">
-      <AppPageHeader
-        eyebrow="Hydration"
-        title="Water"
-        accent="today."
-        subtitle="Stay hydrated throughout the day."
+    <div className="mx-auto max-w-[900px]">
+      <AppHeroPanel
+        eyebrow="N° 05 · Hydration"
+        title="Water,"
+        accent="steady."
+        subtitle="Track today’s intake, keep the target visible, and add the next pour quickly."
       />
 
       {/* Progress ring */}
@@ -159,12 +153,7 @@ export default function WaterPage() {
 
       {/* Quick add */}
       <div className="card mb-5 p-6">
-        <div
-          className="mono mb-4"
-          style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}
-        >
-          QUICK ADD
-        </div>
+        <AppSectionHeader index="1" eyebrow="quick add" title="Tap to" accent="log." className="app-section-compact" />
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {WATER_QUICK_ADD.map(({ amount, label }) => (
             <button
@@ -182,12 +171,7 @@ export default function WaterPage() {
 
       {/* Custom amount */}
       <div className="card p-6">
-        <div
-          className="mono mb-4"
-          style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}
-        >
-          CUSTOM AMOUNT
-        </div>
+        <AppSectionHeader index="2" eyebrow="custom amount" title="Fine tune" accent="the pour." className="app-section-compact" />
         <div className="row flex-wrap gap-3">
           <div
             className="row gap-1.5"

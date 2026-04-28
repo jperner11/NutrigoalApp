@@ -22,6 +22,10 @@ import {
   COMMON_SUPPLEMENTS,
 } from '@nutrigoal/shared'
 import type { UserSupplement, SupplementLog } from '@/lib/supabase/types'
+import { AppHeroPanel, EmptyStateCard, ListCard } from '@/components/ui/AppDesign'
+
+const labelClass = 'mono mb-2 block text-[11px] tracking-[0.12em] text-[var(--fg-4)]'
+const fieldClass = 'w-full rounded-xl border border-[var(--line-2)] bg-[var(--ink-2)] px-3 py-2.5 text-sm text-[var(--fg)] outline-none transition focus:border-[var(--acc)]'
 
 export default function SupplementsPage() {
   const { profile } = useUser()
@@ -156,22 +160,20 @@ export default function SupplementsPage() {
 
   if (isFeatureLocked(profile.role, 'supplements')) {
     return (
-      <div className="max-w-3xl mx-auto">
-        <div className="card p-12 text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-purple-100 mb-4">
-            <Lock className="h-7 w-7 text-purple-600" />
-          </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Supplement Tracking</h2>
-          <p className="text-gray-500 mb-6 max-w-sm mx-auto">
-            Track your daily supplements and vitamins. Available on Pro plan and above.
-          </p>
+      <div className="mx-auto max-w-[900px]">
+        <EmptyStateCard
+          icon={<Lock className="h-7 w-7" />}
+          title="Supplement tracking is a Pro tool."
+          body="Track daily supplements and vitamins once your plan includes this module."
+          action={
           <Link
             href="/pricing"
-            className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
+            className="btn btn-accent"
           >
             <span>Upgrade to Pro</span>
           </Link>
-        </div>
+          }
+        />
       </div>
     )
   }
@@ -184,64 +186,71 @@ export default function SupplementsPage() {
   const timeLabel = (v: string) => SUPPLEMENT_TIMES.find(t => t.value === v)?.label ?? v
 
   return (
-    <div className="max-w-3xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Supplements</h1>
-          <p className="text-gray-500 mt-1">Track your daily supplement intake</p>
-        </div>
+    <div className="mx-auto max-w-[900px]">
+      <AppHeroPanel
+        eyebrow="N° 06 · Supplements"
+        title="Supplements,"
+        accent="accounted."
+        subtitle="Keep the daily stack visible, mark what is done, and make the routine feel boring in the best way."
+        actions={
         <button
           onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all"
+          className={showForm ? 'btn btn-secondary' : 'btn btn-accent'}
         >
           {showForm ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
           {showForm ? 'Cancel' : 'Add Supplement'}
         </button>
-      </div>
+        }
+        meta={
+          <div className="app-card-topline min-w-[160px]">
+            <span>TODAY</span>
+            <span style={{ color: 'var(--acc)' }}>{takenCount}/{totalActive}</span>
+          </div>
+        }
+      />
 
       {/* Today's Progress */}
       {totalActive > 0 && (
-        <div className="bg-gradient-to-br from-white to-green-50/40 rounded-xl p-5 shadow-sm border border-green-100/60 mb-6">
+        <ListCard className="mb-6" eyebrow="TODAY'S PROGRESS">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <Pill className="h-5 w-5 text-green-600" />
-              <h3 className="font-semibold text-gray-900 text-sm">Today&apos;s Progress</h3>
+              <Pill className="h-5 w-5 text-[var(--ok)]" />
+              <h3 className="text-sm font-semibold text-[var(--fg)]">Daily stack</h3>
             </div>
-            <span className="text-xs bg-green-100 text-green-700 px-2.5 py-1 rounded-full font-semibold">
+            <span className="app-status-pill text-xs" style={{ color: 'var(--ok)' }}>
               {takenCount}/{totalActive}
             </span>
           </div>
-          <div className="w-full bg-green-100/50 rounded-full h-2.5">
+          <div className="app-progress-track">
             <div
-              className="bg-gradient-to-r from-green-400 to-emerald-500 h-2.5 rounded-full transition-all duration-500 ease-out"
-              style={{ width: `${progress}%` }}
+              className="transition-all duration-500 ease-out"
+              style={{ width: `${progress}%`, background: 'var(--ok)' }}
             />
           </div>
-        </div>
+        </ListCard>
       )}
 
       {/* Add Form */}
       {showForm && (
-        <form onSubmit={handleAdd} className="card p-6 mb-6 space-y-4">
+        <form onSubmit={handleAdd} className="card mb-6 space-y-4 p-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Supplement name</label>
+            <label className={labelClass}>SUPPLEMENT NAME</label>
             <input
               type="text"
               value={form.name}
               onChange={(e) => setForm(f => ({ ...f, name: e.target.value }))}
               placeholder="e.g., Vitamin D"
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
+              className={fieldClass}
               required
             />
             {/* Quick picks */}
-            <div className="flex flex-wrap gap-1.5 mt-2">
+            <div className="mt-3 flex flex-wrap gap-1.5">
               {COMMON_SUPPLEMENTS.filter(s => !supplements.some(ex => ex.name === s)).slice(0, 10).map(s => (
                 <button
                   key={s}
                   type="button"
                   onClick={() => setForm(f => ({ ...f, name: s }))}
-                  className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full hover:bg-purple-100 hover:text-purple-700 transition-colors"
+                  className="chip text-xs"
                 >
                   {s}
                 </button>
@@ -249,88 +258,95 @@ export default function SupplementsPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid gap-3 sm:grid-cols-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Dosage</label>
+              <label className={labelClass}>DOSAGE</label>
               <input
                 type="text"
                 value={form.dosage}
                 onChange={(e) => setForm(f => ({ ...f, dosage: e.target.value }))}
                 placeholder="e.g., 1000 IU"
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
+                className={fieldClass}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Frequency</label>
+              <label className={labelClass}>FREQUENCY</label>
               <div className="relative">
                 <select
                   value={form.frequency}
                   onChange={(e) => setForm(f => ({ ...f, frequency: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none appearance-none"
+                  className={`${fieldClass} appearance-none`}
                 >
                   {SUPPLEMENT_FREQUENCIES.map(f => (
                     <option key={f.value} value={f.value}>{f.label}</option>
                   ))}
                 </select>
-                <ChevronDown className="absolute right-2 top-2.5 h-4 w-4 text-gray-400 pointer-events-none" />
+                <ChevronDown className="pointer-events-none absolute right-3 top-3 h-4 w-4 text-[var(--fg-3)]" />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Time</label>
+              <label className={labelClass}>TIME</label>
               <div className="relative">
                 <select
                   value={form.time_of_day}
                   onChange={(e) => setForm(f => ({ ...f, time_of_day: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none appearance-none"
+                  className={`${fieldClass} appearance-none`}
                 >
                   {SUPPLEMENT_TIMES.map(t => (
                     <option key={t.value} value={t.value}>{t.label}</option>
                   ))}
                 </select>
-                <ChevronDown className="absolute right-2 top-2.5 h-4 w-4 text-gray-400 pointer-events-none" />
+                <ChevronDown className="pointer-events-none absolute right-3 top-3 h-4 w-4 text-[var(--fg-3)]" />
               </div>
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Notes (optional)</label>
+            <label className={labelClass}>NOTES</label>
             <input
               type="text"
               value={form.notes}
               onChange={(e) => setForm(f => ({ ...f, notes: e.target.value }))}
               placeholder="e.g., Take with food"
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
+              className={fieldClass}
             />
           </div>
 
           <button
             type="submit"
             disabled={saving}
-            className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-2.5 rounded-lg text-sm font-medium hover:shadow-lg transition-all disabled:opacity-50"
+            className="btn btn-accent w-full disabled:opacity-50"
           >
-            {saving ? 'Adding...' : 'Add Supplement'}
+            {saving ? 'Adding...' : 'Add supplement'}
           </button>
         </form>
       )}
 
       {/* Supplement List */}
       {loading ? (
-        <div className="flex items-center justify-center py-20">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600" />
-        </div>
+        <ListCard eyebrow="LOADING" title="Pulling your supplement stack.">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--ink-2)]">
+            <div
+              className="h-full w-1/3 animate-pulse rounded-full"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </ListCard>
       ) : supplements.length === 0 ? (
-        <div className="card p-12 text-center">
-          <Pill className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No supplements yet</h3>
-          <p className="text-gray-500 mb-4">Add your supplements to track daily intake.</p>
-          <button
-            onClick={() => setShowForm(true)}
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all"
-          >
-            <Plus className="h-4 w-4" />
-            Add Your First Supplement
-          </button>
-        </div>
+        <EmptyStateCard
+          icon={<Pill className="h-7 w-7" />}
+          title="No supplements yet."
+          body="Add your stack to track the routine from here."
+          action={
+            <button
+              onClick={() => setShowForm(true)}
+              className="btn btn-accent"
+            >
+              <Plus className="h-4 w-4" />
+              Add your first supplement
+            </button>
+          }
+        />
       ) : (
         <div className="space-y-3">
           {supplements.map(sup => {
@@ -339,34 +355,34 @@ export default function SupplementsPage() {
             return (
               <div
                 key={sup.id}
-                className={`bg-white rounded-xl shadow-sm border overflow-hidden transition-all hover:shadow-md ${
-                  isTaken ? 'border-green-200 bg-green-50/30' : 'border-gray-200'
-                }`}
+                className="card-flat overflow-hidden transition hover:border-[var(--line-strong)]"
+                style={isTaken ? { borderColor: 'rgba(26, 163, 122, 0.42)', background: 'rgba(26, 163, 122, 0.08)' } : undefined}
               >
                 <div className="flex items-center p-4">
                   <button
                     onClick={() => toggleLog(sup)}
-                    className={`flex-shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center transition-colors mr-4 ${
-                      isTaken
-                        ? 'bg-green-500 border-green-500 text-white'
-                        : 'border-gray-300 hover:border-green-400'
-                    }`}
+                    className="mr-4 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 transition-colors"
+                    style={{
+                      borderColor: isTaken ? 'var(--ok)' : 'var(--line-2)',
+                      background: isTaken ? 'var(--ok)' : 'transparent',
+                      color: isTaken ? '#131012' : 'var(--fg-3)',
+                    }}
                   >
                     {isTaken && <Check className="h-4 w-4" />}
                   </button>
 
-                  <div className="flex-1 min-w-0">
+                  <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <h3 className={`font-semibold ${isTaken ? 'text-green-800' : 'text-gray-900'}`}>
+                      <h3 className="font-semibold text-[var(--fg)]">
                         {sup.name}
                       </h3>
                       {sup.dosage && (
-                        <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                        <span className="app-status-pill text-xs">
                           {sup.dosage}
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-3 text-xs text-gray-500 mt-0.5">
+                    <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-[var(--fg-3)]">
                       <span className="flex items-center gap-1">
                         <Clock className="h-3 w-3" />
                         {timeLabel(sup.time_of_day)}
@@ -378,7 +394,7 @@ export default function SupplementsPage() {
 
                   <button
                     onClick={() => handleDelete(sup)}
-                    className="flex-shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors ml-2"
+                    className="btn btn-ghost ml-2 flex-shrink-0 p-2 text-[var(--fg-3)] hover:text-[var(--brand-400)]"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>

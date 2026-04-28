@@ -7,7 +7,7 @@ import { toast } from 'react-hot-toast'
 import { Plus, Ruler, TrendingDown, TrendingUp, Minus } from 'lucide-react'
 import Link from 'next/link'
 import type { BodyMeasurement } from '@/lib/supabase/types'
-import AppPageHeader from '@/components/ui/AppPageHeader'
+import { AppHeroPanel, AppSectionHeader, EmptyStateCard, ListCard } from '@/components/ui/AppDesign'
 
 const MEASUREMENT_FIELDS: { key: keyof BodyMeasurement; label: string; group: string }[] = [
   { key: 'neck', label: 'Neck', group: 'Upper Body' },
@@ -117,17 +117,11 @@ export default function MeasurementsPage() {
 
   if (loading) {
     return (
-      <div className="card p-8">
-        <div
-          className="mono"
-          style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}
-        >
-          LOADING
+      <ListCard eyebrow="LOADING" title="Pulling your measurement history.">
+        <div className="app-progress-track">
+          <div className="w-1/3 animate-pulse" />
         </div>
-        <div className="serif mt-2" style={{ fontSize: 24, color: 'var(--fg)' }}>
-          Pulling your measurement history.
-        </div>
-      </div>
+      </ListCard>
     )
   }
 
@@ -149,18 +143,18 @@ export default function MeasurementsPage() {
         </Link>
       </div>
 
-      <AppPageHeader
-        eyebrow="Progress"
+      <AppHeroPanel
+        eyebrow="N° 07 · Measurements"
         title="Body"
         accent="measurements."
-        subtitle="Track your circumferences over time."
+        subtitle="Track circumference changes with compact history and latest-vs-previous context."
         actions={
           <button
             onClick={() => setShowForm(!showForm)}
-            className="btn btn-accent"
+            className={showForm ? 'btn btn-secondary' : 'btn btn-accent'}
           >
             <Plus className="h-4 w-4" />
-            Log measurements
+            {showForm ? 'Close log' : 'Log measurements'}
           </button>
         }
       />
@@ -267,33 +261,15 @@ export default function MeasurementsPage() {
       {/* Latest Comparison Card */}
       {latest && (
         <div className="card mb-6 p-6">
-          <div className="row mb-4 flex-wrap items-baseline gap-2">
-            <div className="row gap-2">
-              <Ruler className="h-4 w-4" style={{ color: 'var(--acc)' }} />
-              <div
-                className="mono"
-                style={{
-                  fontSize: 11,
-                  color: 'var(--fg-4)',
-                  letterSpacing: '0.14em',
-                }}
-              >
-                LATEST · {new Date(latest.date + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase()}
-              </div>
-            </div>
-            {previous && (
-              <span
-                className="mono"
-                style={{
-                  fontSize: 10,
-                  color: 'var(--fg-4)',
-                  letterSpacing: '0.08em',
-                }}
-              >
-                VS {new Date(previous.date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }).toUpperCase()}
-              </span>
-            )}
-          </div>
+          <AppSectionHeader
+            index="01"
+            eyebrow={`LATEST · ${new Date(latest.date + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase()}`}
+            title="Latest"
+            accent="snapshot."
+            className="app-section-compact"
+            summary={previous ? `vs ${new Date(previous.date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}` : undefined}
+            action={<Ruler className="h-4 w-4 text-[var(--acc)]" />}
+          />
 
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {MEASUREMENT_FIELDS.map((field) => {
@@ -350,12 +326,13 @@ export default function MeasurementsPage() {
             className="px-5 py-4"
             style={{ borderBottom: '1px solid var(--line)' }}
           >
-            <div
-              className="mono"
-              style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}
-            >
-              HISTORY
-            </div>
+            <AppSectionHeader
+              index="02"
+              eyebrow="HISTORY"
+              title="Earlier"
+              accent="logs."
+              className="app-section-compact"
+            />
           </div>
           <div>
             {measurements.slice(1).map((m, idx, arr) => {
@@ -409,31 +386,20 @@ export default function MeasurementsPage() {
       )}
 
       {measurements.length === 0 && !showForm && (
-        <div className="card p-12 text-center">
-          <Ruler
-            className="mx-auto mb-3 h-10 w-10"
-            style={{ color: 'var(--fg-4)' }}
-          />
-          <div className="serif" style={{ fontSize: 22 }}>
-            No measurements{' '}
-            <span className="italic-serif" style={{ color: 'var(--fg-3)' }}>
-              yet.
-            </span>
-          </div>
-          <p
-            className="mx-auto mt-2 max-w-[420px]"
-            style={{ fontSize: 13, color: 'var(--fg-2)' }}
-          >
-            Start tracking your body measurements to see changes over time.
-          </p>
-          <button
-            onClick={() => setShowForm(true)}
-            className="btn btn-accent mt-5"
-          >
-            <Plus className="h-4 w-4" />
-            Log first measurement
-          </button>
-        </div>
+        <EmptyStateCard
+          icon={<Ruler className="h-7 w-7" />}
+          title="No measurements yet."
+          body="Start tracking body measurements to see changes over time."
+          action={
+            <button
+              onClick={() => setShowForm(true)}
+              className="btn btn-accent"
+            >
+              <Plus className="h-4 w-4" />
+              Log first measurement
+            </button>
+          }
+        />
       )}
     </div>
   )

@@ -4,12 +4,12 @@ import { useState, useEffect } from 'react'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
 import {
-  Utensils, Plus, Sparkles, Lightbulb, TrendingUp,
+  Utensils, Plus, Lightbulb, TrendingUp,
   Droplets, ArrowRightLeft, Pill, X,
 } from 'lucide-react'
 import Link from 'next/link'
 import type { DietPlan, DietPlanMeal } from '@/lib/supabase/types'
-import AppPageHeader from '@/components/ui/AppPageHeader'
+import { AppHeroPanel, AppSectionHeader, EmptyStateCard, ListCard } from '@/components/ui/AppDesign'
 import { isManagedClientRole } from '@nutrigoal/shared'
 
 const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const
@@ -143,14 +143,11 @@ export default function DietPage() {
 
   if (loading) {
     return (
-      <div className="card p-8">
-        <div className="mono" style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}>
-          LOADING
+      <ListCard eyebrow="Loading" title="Preparing your diet plans.">
+        <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--line)]">
+          <div className="h-full w-1/3 animate-pulse rounded-full bg-[var(--acc)]" />
         </div>
-        <div className="serif mt-2" style={{ fontSize: 24, color: 'var(--fg)' }}>
-          Preparing your diet plans.
-        </div>
-      </div>
+      </ListCard>
     )
   }
 
@@ -162,10 +159,11 @@ export default function DietPage() {
 
   return (
     <div>
-      <AppPageHeader
-        eyebrow="Nutrition"
-        title="Diet"
-        subtitle="Manage your meal plans and track your nutrition."
+      <AppHeroPanel
+        eyebrow="N° 02 · Nutrition"
+        title="Plan,"
+        accent="plated."
+        subtitle="Manage the week’s meals, grocery cues, and nutrition context without losing the thread."
         actions={
           !managedClient ? (
             <Link href="/diet/new" className="btn btn-accent">
@@ -177,58 +175,40 @@ export default function DietPage() {
       />
 
       {plans.length === 0 ? (
-        <div className="card p-8 text-center sm:p-12">
-          <div
-            className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl"
-            style={{ background: 'var(--ink-3)', color: 'var(--acc)' }}
-          >
-            <Utensils className="h-6 w-6" />
-          </div>
-          <h3 className="serif" style={{ fontSize: 28, color: 'var(--fg)' }}>
-            No diet plans yet.
-          </h3>
-          <p
-            className="mx-auto mt-2 max-w-[520px]"
-            style={{ fontSize: 14, color: 'var(--fg-2)', lineHeight: 1.6 }}
-          >
-            {managedClient
-              ? 'Your trainer has not assigned a diet plan yet. It will appear here as soon as it is ready.'
-              : 'Create your first diet plan to start tracking your nutrition.'}
-          </p>
-          {!managedClient && (
-            <Link href="/diet/new" className="btn btn-accent mt-6">
-              <Plus className="h-4 w-4" />
-              <span>Create diet plan</span>
-            </Link>
-          )}
+        <div className="mt-8">
+          <EmptyStateCard
+            icon={<Utensils className="h-6 w-6" />}
+            title="No diet plans yet."
+            body={
+              managedClient
+                ? 'Your trainer has not assigned a diet plan yet. It will appear here as soon as it is ready.'
+                : 'Create your first diet plan to start tracking your nutrition.'
+            }
+            action={
+              !managedClient ? (
+                <Link href="/diet/new" className="btn btn-accent">
+                  <Plus className="h-4 w-4" />
+                  <span>Create diet plan</span>
+                </Link>
+              ) : null
+            }
+          />
         </div>
       ) : activePlan ? (
         <>
           <div className="grid gap-5 lg:grid-cols-[2fr_1fr]">
             <section>
-              <div className="row mb-3 flex-wrap justify-between gap-3">
-                <div>
-                  <div
-                    className="mono"
-                    style={{ fontSize: 10, color: 'var(--fg-4)', letterSpacing: '0.12em' }}
-                  >
-                    WEEK PLAN
-                  </div>
-                  <div className="serif mt-1" style={{ fontSize: 24, lineHeight: 1.15 }}>
-                    {activePlan.name}{' '}
-                    <span className="italic-serif" style={{ color: 'var(--fg-3)' }}>
-                      this week.
-                    </span>
-                  </div>
-                </div>
-                <Link
-                  href={`/diet/${activePlan.id}`}
-                  className="mono"
-                  style={{ fontSize: 10, color: 'var(--acc)', letterSpacing: '0.1em' }}
-                >
-                  OPEN PLAN -&gt;
-                </Link>
-              </div>
+              <AppSectionHeader
+                index="1"
+                eyebrow="week plan"
+                title={activePlan.name}
+                accent="this week."
+                action={
+                  <Link href={`/diet/${activePlan.id}`} className="btn btn-secondary">
+                    Open plan →
+                  </Link>
+                }
+              />
 
               <div className="col gap-2">
                 {DAY_LABELS.map((day, index) => {
@@ -346,15 +326,13 @@ export default function DietPage() {
 
           {companion && (
             <section className="mt-8">
-              <div className="row mb-3 gap-2">
-                <Sparkles className="h-4 w-4" style={{ color: 'var(--acc)' }} />
-                <div
-                  className="mono"
-                  style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}
-                >
-                  COACHING INSIGHTS
-                </div>
-              </div>
+              <AppSectionHeader
+                index="2"
+                eyebrow="coaching insights"
+                title="Useful"
+                accent="context."
+                summary="Targets, rules, swaps, hydration, and supplement notes."
+              />
 
               <div className="grid gap-4 lg:grid-cols-2">
                 {companion.nutritionist_summary && (
