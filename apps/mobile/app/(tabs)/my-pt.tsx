@@ -154,7 +154,7 @@ export default function MyPTScreen() {
           {unreadCount > 0 && (
             <View style={s.badge}><Text style={s.badgeText}>{unreadCount}</Text></View>
           )}
-          <Ionicons name="chevron-forward" size={20} color="#d1d5db" />
+          <Ionicons name="chevron-forward" size={20} color={brandColors.textSubtle} />
         </TouchableOpacity>
 
         <TouchableOpacity style={s.actionCard} onPress={() => setScreen('feedback-list')}>
@@ -168,7 +168,7 @@ export default function MyPTScreen() {
           {pendingFeedbackCount > 0 && (
             <View style={[s.badge, { backgroundColor: brandColors.brand500 }]}><Text style={s.badgeText}>{pendingFeedbackCount}</Text></View>
           )}
-          <Ionicons name="chevron-forward" size={20} color="#d1d5db" />
+          <Ionicons name="chevron-forward" size={20} color={brandColors.textSubtle} />
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
@@ -394,17 +394,17 @@ const s = StyleSheet.create({
   emptyText: { fontSize: 18, fontWeight: '600', color: brandColors.textMuted },
   emptyHint: { fontSize: 14, color: brandColors.textSubtle, textAlign: 'center' },
   // PT card
-  ptCard: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 24, borderWidth: 1, borderColor: brandColors.line, padding: 24, alignItems: 'center', marginBottom: 20, ...brandShadow },
+  ptCard: { backgroundColor: brandColors.panel, borderRadius: 24, borderWidth: 1, borderColor: brandColors.line, padding: 24, alignItems: 'center', marginBottom: 20, ...brandShadow },
   ptAvatar: { width: 64, height: 64, borderRadius: 32, backgroundColor: brandColors.brand100, alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
   ptAvatarText: { fontSize: 28, fontWeight: '700', color: brandColors.brand500 },
   ptName: { fontSize: 22, fontWeight: '800', color: brandColors.foreground },
   ptLabel: { fontSize: 13, color: brandColors.textSubtle, marginTop: 4 },
   planStatusRow: { flexDirection: 'row', gap: 12, marginBottom: 20 },
-  planStatusCard: { flex: 1, backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, ...brandShadow },
+  planStatusCard: { flex: 1, backgroundColor: brandColors.panel, borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, ...brandShadow },
   planStatusLabel: { fontSize: 12, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, color: brandColors.textSubtle },
   planStatusValue: { fontSize: 14, fontWeight: '600', color: brandColors.foregroundSoft, marginTop: 8, lineHeight: 20 },
   // Action cards
-  actionCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 10, ...brandShadow },
+  actionCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: brandColors.panel, borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 10, ...brandShadow },
   actionIcon: { width: 48, height: 48, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   actionTitle: { fontSize: 16, fontWeight: '700', color: brandColors.foregroundSoft },
   actionSub: { fontSize: 13, color: brandColors.textSubtle, marginTop: 2 },
@@ -414,38 +414,38 @@ const s = StyleSheet.create({
   chatHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 },
   chatTitle: { fontSize: 18, fontWeight: '700', color: brandColors.foreground },
   msgBubble: { maxWidth: '80%', borderRadius: 16, padding: 12, marginBottom: 8 },
-  msgMe: { backgroundColor: brandColors.brand900, alignSelf: 'flex-end', borderBottomRightRadius: 4 },
-  msgThem: { backgroundColor: 'rgba(255,255,255,0.92)', alignSelf: 'flex-start', borderBottomLeftRadius: 4, borderWidth: 1, borderColor: brandColors.line },
+  msgMe: { backgroundColor: brandColors.brand500, alignSelf: 'flex-end', borderBottomRightRadius: 4 },
+  msgThem: { backgroundColor: brandColors.panel, alignSelf: 'flex-start', borderBottomLeftRadius: 4, borderWidth: 1, borderColor: brandColors.line },
   msgText: { fontSize: 15, color: brandColors.foregroundSoft, lineHeight: 20 },
   msgTime: { fontSize: 10, color: brandColors.textSubtle, marginTop: 4, alignSelf: 'flex-end' },
-  inputBar: { flexDirection: 'row', padding: 12, gap: 8, borderTopWidth: 1, borderTopColor: brandColors.line, backgroundColor: 'rgba(255,255,255,0.92)' },
+  inputBar: { flexDirection: 'row', padding: 12, gap: 8, borderTopWidth: 1, borderTopColor: brandColors.line, backgroundColor: brandColors.panel },
   msgInput: { flex: 1, backgroundColor: brandColors.panelMuted, borderRadius: 20, paddingHorizontal: 16, paddingVertical: 10, fontSize: 15, color: brandColors.foreground, maxHeight: 100 },
-  sendBtn: { backgroundColor: brandColors.brand900, width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  sendBtn: { backgroundColor: brandColors.brand500, width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   // Feedback list
-  fbCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 8, ...brandShadow },
+  fbCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: brandColors.panel, borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 8, ...brandShadow },
   fbTitle: { fontSize: 16, fontWeight: '600', color: brandColors.foregroundSoft },
   fbDate: { fontSize: 12, color: brandColors.textSubtle, marginTop: 2 },
-  fbBadge: { backgroundColor: '#fff3d9', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 },
+  fbBadge: { backgroundColor: brandColors.warningBg, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 },
   fbBadgeDone: { backgroundColor: brandColors.brand100 },
   fbBadgeText: { fontSize: 11, fontWeight: '600', color: brandColors.warning },
   fbBadgeTextDone: { color: brandColors.brand500 },
   // Feedback respond
-  questionCard: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 12, ...brandShadow },
+  questionCard: { backgroundColor: brandColors.panel, borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 12, ...brandShadow },
   questionText: { fontSize: 16, fontWeight: '600', color: brandColors.foregroundSoft, marginBottom: 4 },
   questionType: { fontSize: 12, color: brandColors.textSubtle, marginBottom: 12 },
   answerInput: { backgroundColor: brandColors.panelMuted, borderWidth: 1, borderColor: brandColors.lineStrong, borderRadius: 12, padding: 12, fontSize: 15, color: brandColors.foreground, minHeight: 60, textAlignVertical: 'top' },
   answerBox: { backgroundColor: brandColors.panelMuted, borderRadius: 12, padding: 12 },
   answerText: { fontSize: 15, color: brandColors.foregroundSoft },
   ratingRow: { flexDirection: 'row', gap: 10 },
-  ratingBtn: { width: 44, height: 44, borderRadius: 22, borderWidth: 1, borderColor: brandColors.lineStrong, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.84)' },
-  ratingBtnActive: { backgroundColor: brandColors.brand900, borderColor: brandColors.brand900 },
+  ratingBtn: { width: 44, height: 44, borderRadius: 22, borderWidth: 1, borderColor: brandColors.lineStrong, alignItems: 'center', justifyContent: 'center', backgroundColor: brandColors.panelMuted },
+  ratingBtnActive: { backgroundColor: brandColors.brand500, borderColor: brandColors.brand500 },
   ratingText: { fontSize: 18, fontWeight: '700', color: brandColors.textSubtle },
   ratingTextActive: { color: '#fff' },
   yesNoRow: { flexDirection: 'row', gap: 12 },
-  yesNoBtn: { flex: 1, paddingVertical: 14, borderRadius: 14, borderWidth: 1, borderColor: brandColors.lineStrong, alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.84)' },
-  yesNoBtnActive: { backgroundColor: brandColors.brand900, borderColor: brandColors.brand900 },
+  yesNoBtn: { flex: 1, paddingVertical: 14, borderRadius: 14, borderWidth: 1, borderColor: brandColors.lineStrong, alignItems: 'center', backgroundColor: brandColors.panelMuted },
+  yesNoBtnActive: { backgroundColor: brandColors.brand500, borderColor: brandColors.brand500 },
   yesNoText: { fontSize: 16, fontWeight: '600', color: brandColors.textSubtle },
   yesNoTextActive: { color: '#fff' },
-  submitBtn: { backgroundColor: brandColors.brand900, borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginTop: 8 },
+  submitBtn: { backgroundColor: brandColors.brand500, borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginTop: 8 },
   submitBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
 })

@@ -202,7 +202,7 @@ export default function SettingsScreen() {
         </View>
 
         <TouchableOpacity style={styles.signOutBtn} onPress={signOut}>
-          <Ionicons name="log-out-outline" size={20} color="#ef4444" />
+          <Ionicons name="log-out-outline" size={20} color={brandColors.danger} />
           <Text style={styles.signOutText}>Sign Out</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -224,31 +224,31 @@ const styles = StyleSheet.create({
   header: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12, gap: 8 },
   title: { fontSize: 24, fontWeight: '800', color: brandColors.foreground, letterSpacing: -0.6 },
   content: { padding: 20, paddingTop: 0 },
-  profileCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 20, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 16, ...brandShadow },
+  profileCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: brandColors.panel, borderRadius: 20, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 16, ...brandShadow },
   avatar: { width: 56, height: 56, borderRadius: 28, backgroundColor: brandColors.brand100, alignItems: 'center', justifyContent: 'center' },
   name: { fontSize: 18, fontWeight: '700', color: brandColors.foreground },
   email: { fontSize: 13, color: brandColors.textMuted, marginTop: 2 },
   tierBadge: { backgroundColor: brandColors.brand100, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 },
   tierText: { fontSize: 12, fontWeight: '700', color: brandColors.brand500 },
-  card: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 20, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 16, ...brandShadow },
+  card: { backgroundColor: brandColors.panel, borderRadius: 20, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 16, ...brandShadow },
   cardTitle: { fontSize: 16, fontWeight: '700', color: brandColors.foregroundSoft, marginBottom: 12 },
   cardBody: { fontSize: 14, lineHeight: 22, color: brandColors.textMuted },
   supportCategoryRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 14 },
-  categoryChip: { borderWidth: 1, borderColor: brandColors.lineStrong, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: 'rgba(255,255,255,0.84)' },
+  categoryChip: { borderWidth: 1, borderColor: brandColors.lineStrong, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: brandColors.panelMuted },
   categoryChipActive: { backgroundColor: brandColors.brand100, borderColor: brandColors.brand500 },
   categoryChipText: { fontSize: 13, fontWeight: '600', color: brandColors.textMuted },
   categoryChipTextActive: { color: brandColors.brand500 },
-  supportInput: { marginTop: 12, borderWidth: 1, borderColor: brandColors.lineStrong, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.92)', paddingHorizontal: 14, paddingVertical: 12, fontSize: 14, color: brandColors.foregroundSoft },
+  supportInput: { marginTop: 12, borderWidth: 1, borderColor: brandColors.lineStrong, borderRadius: 14, backgroundColor: brandColors.panel, paddingHorizontal: 14, paddingVertical: 12, fontSize: 14, color: brandColors.foregroundSoft },
   supportTextarea: { minHeight: 110, paddingTop: 12 },
   statRow: { flexDirection: 'row', justifyContent: 'space-around' },
   statItem: { alignItems: 'center' },
   statValue: { fontSize: 20, fontWeight: '800', color: brandColors.brand500 },
   statLabel: { fontSize: 12, color: brandColors.textMuted, marginTop: 2 },
-  supportBtn: { marginTop: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: brandColors.brand900, borderRadius: 14, paddingVertical: 14 },
+  supportBtn: { marginTop: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: brandColors.brand500, borderRadius: 14, paddingVertical: 14 },
   supportBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
   supportEmail: { marginTop: 10, fontSize: 12, color: brandColors.textSubtle, textAlign: 'center' },
   supportHistoryList: { marginTop: 14, gap: 10 },
-  supportHistoryItem: { flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1, borderColor: brandColors.line, borderRadius: 14, backgroundColor: 'rgba(248,250,252,0.92)', padding: 12 },
+  supportHistoryItem: { flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1, borderColor: brandColors.line, borderRadius: 14, backgroundColor: brandColors.panelMuted, padding: 12 },
   supportHistorySubject: { fontSize: 14, fontWeight: '700', color: brandColors.foregroundSoft },
   supportHistoryMeta: { marginTop: 4, fontSize: 12, color: brandColors.textMuted, textTransform: 'capitalize' },
   supportHistoryEmpty: { marginTop: 14, fontSize: 13, color: brandColors.textMuted },

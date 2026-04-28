@@ -107,7 +107,7 @@ export default function DietScreen() {
       <ScrollView contentContainerStyle={s.content} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={brandColors.brand500} />}>
         {plans.length === 0 ? (
           <View style={s.empty}>
-            <Ionicons name="restaurant-outline" size={48} color="#d1d5db" />
+            <Ionicons name="restaurant-outline" size={48} color={brandColors.textSubtle} />
             <Text style={s.emptyText}>{managedClient ? 'No diet plan assigned yet' : 'No diet plans yet'}</Text>
             {managedClient ? (
               <Text style={s.emptyHint}>Your trainer will assign a meal plan here once it&apos;s ready.</Text>
@@ -139,7 +139,7 @@ export default function DietScreen() {
 
         {supplements.length === 0 ? (
           <TouchableOpacity style={s.supEmptyCard} onPress={() => setScreen('supplements')}>
-            <Ionicons name="medical-outline" size={24} color="#d1d5db" />
+            <Ionicons name="medical-outline" size={24} color={brandColors.textSubtle} />
             <Text style={s.supEmptyText}>Track your vitamins & supplements</Text>
           </TouchableOpacity>
         ) : (
@@ -417,7 +417,7 @@ function ManageSupplements({ user, onDone, onCancel }: any) {
       <ScrollView contentContainerStyle={s.modalContent}>
         {supplements.length === 0 && !showAdd && (
           <View style={s.empty}>
-            <Ionicons name="medical-outline" size={48} color="#d1d5db" />
+            <Ionicons name="medical-outline" size={48} color={brandColors.textSubtle} />
             <Text style={s.emptyText}>No supplements added</Text>
             <TouchableOpacity onPress={() => setShowAdd(true)}>
               <Text style={s.emptyLink}>Add your first supplement</Text>
@@ -437,7 +437,7 @@ function ManageSupplements({ user, onDone, onCancel }: any) {
               {sup.notes && <Text style={s.supMgmtNotes}>{sup.notes}</Text>}
             </View>
             <TouchableOpacity onPress={() => handleDelete(sup)}>
-              <Ionicons name="trash-outline" size={20} color="#ef4444" />
+              <Ionicons name="trash-outline" size={20} color={brandColors.danger} />
             </TouchableOpacity>
           </View>
         ))}
@@ -454,10 +454,10 @@ function ManageSupplements({ user, onDone, onCancel }: any) {
                 </TouchableOpacity>
               ))}
             </View>
-            <TextInput style={[s.input, { marginTop: 8 }]} value={name} onChangeText={setName} placeholder="Or type custom name" placeholderTextColor="#9ca3af" />
+            <TextInput style={[s.input, { marginTop: 8 }]} value={name} onChangeText={setName} placeholder="Or type custom name" placeholderTextColor={brandColors.textSubtle} />
 
             <Text style={s.label}>Dosage (optional)</Text>
-            <TextInput style={s.input} value={dosage} onChangeText={setDosage} placeholder="e.g. 1000mg, 2 capsules" placeholderTextColor="#9ca3af" />
+            <TextInput style={s.input} value={dosage} onChangeText={setDosage} placeholder="e.g. 1000mg, 2 capsules" placeholderTextColor={brandColors.textSubtle} />
 
             <Text style={s.label}>Frequency</Text>
             <View style={s.chipGrid}>
@@ -478,7 +478,7 @@ function ManageSupplements({ user, onDone, onCancel }: any) {
             </View>
 
             <Text style={s.label}>Notes (optional)</Text>
-            <TextInput style={s.input} value={notes} onChangeText={setNotes} placeholder="e.g. Take with food" placeholderTextColor="#9ca3af" />
+            <TextInput style={s.input} value={notes} onChangeText={setNotes} placeholder="e.g. Take with food" placeholderTextColor={brandColors.textSubtle} />
 
             <View style={{ flexDirection: 'row', gap: 12, marginTop: 16 }}>
               <TouchableOpacity style={s.supCancelBtn} onPress={() => setShowAdd(false)}>
@@ -600,14 +600,14 @@ function CreateDietPlan({ user, profile, onDone, onCancel }: any) {
       </View>
       <ScrollView contentContainerStyle={s.modalContent}>
         <Text style={s.label}>Plan Name</Text>
-        <TextInput style={s.input} value={planName} onChangeText={setPlanName} placeholder="e.g. Cutting Plan" placeholderTextColor="#9ca3af" />
+        <TextInput style={s.input} value={planName} onChangeText={setPlanName} placeholder="e.g. Cutting Plan" placeholderTextColor={brandColors.textSubtle} />
 
         {/* Macro Summary */}
         <View style={s.macroSummary}>
           <MacroBox label="Cals" value={totalCals} unit="" color={brandColors.brand500} />
-          <MacroBox label="Protein" value={totalProtein} unit="g" color="#3b82f6" />
-          <MacroBox label="Carbs" value={totalCarbs} unit="g" color="#f59e0b" />
-          <MacroBox label="Fat" value={totalFat} unit="g" color="#ef4444" />
+          <MacroBox label="Protein" value={totalProtein} unit="g" color={brandColors.brand400} />
+          <MacroBox label="Carbs" value={totalCarbs} unit="g" color={brandColors.warning} />
+          <MacroBox label="Fat" value={totalFat} unit="g" color={brandColors.danger} />
         </View>
 
         {meals.map((meal, mi) => (
@@ -622,7 +622,7 @@ function CreateDietPlan({ user, profile, onDone, onCancel }: any) {
                   <Text style={s.foodName}>{food.name}</Text>
                   <Text style={s.foodMacros}>{food.amount}{food.unit} · {food.calories}kcal · P{food.protein} C{food.carbs} F{food.fat}</Text>
                 </View>
-                <TouchableOpacity onPress={() => removeFood(mi, fi)}><Ionicons name="close-circle" size={20} color="#d1d5db" /></TouchableOpacity>
+                <TouchableOpacity onPress={() => removeFood(mi, fi)}><Ionicons name="close-circle" size={20} color={brandColors.textSubtle} /></TouchableOpacity>
               </View>
             ))}
             <TouchableOpacity style={s.addFoodBtn} onPress={() => { setSearchMealIdx(mi); setShowFoodSearch(true); setSearchQuery(''); setSearchResults([]) }}>
@@ -652,7 +652,7 @@ function CreateDietPlan({ user, profile, onDone, onCancel }: any) {
           </View>
           <View style={{ padding: 16 }}>
             <View style={s.searchRow}>
-              <TextInput style={[s.input, { flex: 1 }]} value={searchQuery} onChangeText={setSearchQuery} placeholder="e.g. chicken breast, rice..." placeholderTextColor="#9ca3af" returnKeyType="search" onSubmitEditing={searchFood} />
+              <TextInput style={[s.input, { flex: 1 }]} value={searchQuery} onChangeText={setSearchQuery} placeholder="e.g. chicken breast, rice..." placeholderTextColor={brandColors.textSubtle} returnKeyType="search" onSubmitEditing={searchFood} />
               <TouchableOpacity style={s.searchBtn} onPress={searchFood}>
                 {searching ? <ActivityIndicator color="#fff" size="small" /> : <Ionicons name="search" size={20} color="#fff" />}
               </TouchableOpacity>
@@ -783,7 +783,7 @@ function LogMeal({ user, onDone, onCancel }: any) {
               value={freeformText}
               onChangeText={setFreeformText}
               placeholder='e.g. "chicken breast with rice and salad"'
-              placeholderTextColor="#9ca3af"
+              placeholderTextColor={brandColors.textSubtle}
               returnKeyType="send"
               onSubmitEditing={parseFreeform}
             />
@@ -799,21 +799,21 @@ function LogMeal({ user, onDone, onCancel }: any) {
               <Text style={s.foodName}>{f.name}</Text>
               <Text style={s.foodMacros}>{f.amount}{f.unit} · {f.calories}kcal · P{f.protein} C{f.carbs} F{f.fat}</Text>
             </View>
-            <TouchableOpacity onPress={() => setFoods(foods.filter((_, idx) => idx !== i))}><Ionicons name="close-circle" size={20} color="#d1d5db" /></TouchableOpacity>
+            <TouchableOpacity onPress={() => setFoods(foods.filter((_, idx) => idx !== i))}><Ionicons name="close-circle" size={20} color={brandColors.textSubtle} /></TouchableOpacity>
           </View>
         ))}
 
         <TouchableOpacity style={s.addFoodBtn} onPress={() => { setShowSearch(true); setSearchQuery(''); setSearchResults([]) }}>
-          <Ionicons name="search" size={18} color="#6b7280" />
+          <Ionicons name="search" size={18} color={brandColors.textMuted} />
           <Text style={[s.addFoodText, { color: brandColors.textMuted }]}>Or search database</Text>
         </TouchableOpacity>
 
         {foods.length > 0 && (
           <View style={s.macroSummary}>
             <MacroBox label="Cals" value={foods.reduce((s, f) => s + f.calories, 0)} unit="" color={brandColors.brand500} />
-            <MacroBox label="P" value={foods.reduce((s, f) => s + f.protein, 0)} unit="g" color="#3b82f6" />
-            <MacroBox label="C" value={foods.reduce((s, f) => s + f.carbs, 0)} unit="g" color="#f59e0b" />
-            <MacroBox label="F" value={foods.reduce((s, f) => s + f.fat, 0)} unit="g" color="#ef4444" />
+            <MacroBox label="P" value={foods.reduce((s, f) => s + f.protein, 0)} unit="g" color={brandColors.brand400} />
+            <MacroBox label="C" value={foods.reduce((s, f) => s + f.carbs, 0)} unit="g" color={brandColors.warning} />
+            <MacroBox label="F" value={foods.reduce((s, f) => s + f.fat, 0)} unit="g" color={brandColors.danger} />
           </View>
         )}
 
@@ -831,7 +831,7 @@ function LogMeal({ user, onDone, onCancel }: any) {
           </View>
           <View style={{ padding: 16 }}>
             <View style={s.searchRow}>
-              <TextInput style={[s.input, { flex: 1 }]} value={searchQuery} onChangeText={setSearchQuery} placeholder="e.g. chicken, rice..." placeholderTextColor="#9ca3af" returnKeyType="search" onSubmitEditing={searchFood} />
+              <TextInput style={[s.input, { flex: 1 }]} value={searchQuery} onChangeText={setSearchQuery} placeholder="e.g. chicken, rice..." placeholderTextColor={brandColors.textSubtle} returnKeyType="search" onSubmitEditing={searchFood} />
               <TouchableOpacity style={s.searchBtn} onPress={searchFood}>
                 {searching ? <ActivityIndicator color="#fff" size="small" /> : <Ionicons name="search" size={20} color="#fff" />}
               </TouchableOpacity>
@@ -864,15 +864,15 @@ const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: brandColors.background },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 },
   title: { fontSize: 24, fontWeight: '800', color: brandColors.foreground, letterSpacing: -0.6 },
-  addBtn: { backgroundColor: brandColors.brand900, borderRadius: 20, width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
-  logBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, borderWidth: 1, borderColor: 'rgba(29, 168, 240, 0.36)', backgroundColor: 'rgba(255,255,255,0.84)', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 8 },
+  addBtn: { backgroundColor: brandColors.brand500, borderRadius: 20, width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
+  logBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, borderWidth: 1, borderColor: brandColors.accentLine, backgroundColor: brandColors.panelMuted, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 8 },
   logBtnText: { fontSize: 13, fontWeight: '600', color: brandColors.brand500 },
   content: { padding: 20, paddingTop: 0 },
   empty: { alignItems: 'center', paddingTop: 80, gap: 8 },
   emptyText: { fontSize: 18, fontWeight: '600', color: brandColors.textMuted },
   emptyHint: { fontSize: 14, color: brandColors.textSubtle, textAlign: 'center', maxWidth: 280, lineHeight: 20 },
   emptyLink: { fontSize: 15, fontWeight: '600', color: brandColors.brand500, marginTop: 4 },
-  card: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 10, ...brandShadow },
+  card: { backgroundColor: brandColors.panel, borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 10, ...brandShadow },
   cardRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   cardTitle: { fontSize: 16, fontWeight: '700', color: brandColors.foregroundSoft },
   cardSub: { fontSize: 13, color: brandColors.textMuted, marginTop: 4 },
@@ -886,14 +886,14 @@ const s = StyleSheet.create({
   modalTitle: { fontSize: 18, fontWeight: '700', color: brandColors.foreground },
   modalContent: { padding: 20 },
   label: { fontSize: 14, fontWeight: '600', color: brandColors.foregroundSoft, marginTop: 12, marginBottom: 6 },
-  input: { backgroundColor: 'rgba(255,255,255,0.92)', borderWidth: 1, borderColor: brandColors.lineStrong, borderRadius: 16, paddingHorizontal: 16, paddingVertical: 14, fontSize: 16, color: brandColors.foreground },
+  input: { backgroundColor: brandColors.panel, borderWidth: 1, borderColor: brandColors.lineStrong, borderRadius: 16, paddingHorizontal: 16, paddingVertical: 14, fontSize: 16, color: brandColors.foreground },
   // Macros
-  macroSummary: { flexDirection: 'row', justifyContent: 'space-around', backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginTop: 16, ...brandShadow },
+  macroSummary: { flexDirection: 'row', justifyContent: 'space-around', backgroundColor: brandColors.panel, borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginTop: 16, ...brandShadow },
   macroBox: { alignItems: 'center' },
   macroValue: { fontSize: 18, fontWeight: '800' },
   macroLabel: { fontSize: 11, color: brandColors.textMuted, marginTop: 2 },
   // Meal card
-  mealCard: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginTop: 16, ...brandShadow },
+  mealCard: { backgroundColor: brandColors.panel, borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginTop: 16, ...brandShadow },
   mealHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
   mealName: { fontSize: 16, fontWeight: '700', color: brandColors.foregroundSoft },
   mealCals: { fontSize: 13, fontWeight: '600', color: brandColors.brand500 },
@@ -906,35 +906,35 @@ const s = StyleSheet.create({
   addMealText: { fontSize: 15, fontWeight: '600', color: brandColors.brand500 },
   // Type chips
   typeRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
-  typeChip: { borderWidth: 1, borderColor: brandColors.line, backgroundColor: 'rgba(255,255,255,0.84)', borderRadius: 14, paddingVertical: 8, paddingHorizontal: 14 },
-  typeChipActive: { borderColor: 'rgba(29, 168, 240, 0.4)', backgroundColor: brandColors.brand100 },
+  typeChip: { borderWidth: 1, borderColor: brandColors.line, backgroundColor: brandColors.panelMuted, borderRadius: 14, paddingVertical: 8, paddingHorizontal: 14 },
+  typeChipActive: { borderColor: brandColors.accentLine, backgroundColor: brandColors.brand100 },
   typeChipText: { fontSize: 14, fontWeight: '600', color: brandColors.textMuted },
   typeChipTextActive: { color: brandColors.brand500 },
   // Search
   searchRow: { flexDirection: 'row', gap: 8 },
-  searchBtn: { backgroundColor: brandColors.brand900, borderRadius: 16, width: 50, alignItems: 'center', justifyContent: 'center' },
+  searchBtn: { backgroundColor: brandColors.brand500, borderRadius: 16, width: 50, alignItems: 'center', justifyContent: 'center' },
   foodSearchItem: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: brandColors.line },
   foodSearchName: { fontSize: 15, fontWeight: '600', color: brandColors.foregroundSoft, textTransform: 'capitalize' },
   emptySearch: { textAlign: 'center', color: brandColors.textSubtle, marginTop: 40 },
-  saveBtn: { backgroundColor: brandColors.brand900, borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginTop: 24 },
+  saveBtn: { backgroundColor: brandColors.brand500, borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginTop: 24 },
   saveBtnDisabled: { opacity: 0.6 },
   saveBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
   // Freeform AI
-  freeformCard: { backgroundColor: brandColors.brand100, borderRadius: 18, borderWidth: 1, borderColor: 'rgba(77, 196, 255, 0.2)', padding: 16, marginTop: 12, marginBottom: 8 },
+  freeformCard: { backgroundColor: brandColors.brand100, borderRadius: 18, borderWidth: 1, borderColor: brandColors.accentLine, padding: 16, marginTop: 12, marginBottom: 8 },
   freeformHeader: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 },
-  freeformTitle: { fontSize: 14, fontWeight: '700', color: '#0f4262' },
-  freeformHint: { fontSize: 12, color: '#0f4262', marginBottom: 10 },
+  freeformTitle: { fontSize: 14, fontWeight: '700', color: brandColors.foregroundSoft },
+  freeformHint: { fontSize: 12, color: brandColors.foregroundSoft, marginBottom: 10 },
   // Supplements - list view
   supHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 24, marginBottom: 10 },
   supTitle: { fontSize: 18, fontWeight: '700', color: brandColors.foreground },
   supManage: { fontSize: 14, fontWeight: '600', color: brandColors.brand500 },
-  supEmptyCard: { backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: 18, padding: 20, alignItems: 'center', gap: 8, borderWidth: 1, borderColor: brandColors.line, borderStyle: 'dashed' },
+  supEmptyCard: { backgroundColor: brandColors.panel, borderRadius: 18, padding: 20, alignItems: 'center', gap: 8, borderWidth: 1, borderColor: brandColors.line, borderStyle: 'dashed' },
   supEmptyText: { fontSize: 14, color: brandColors.textSubtle },
-  supCard: { flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 14, marginBottom: 8, alignItems: 'center', gap: 12, ...brandShadow },
-  planSummaryCard: { backgroundColor: brandColors.brand100, borderRadius: 18, borderWidth: 1, borderColor: 'rgba(77, 196, 255, 0.2)', padding: 16, marginBottom: 14 },
-  planSummaryTitle: { fontSize: 16, fontWeight: '700', color: '#0f4262' },
+  supCard: { flexDirection: 'row', backgroundColor: brandColors.panel, borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 14, marginBottom: 8, alignItems: 'center', gap: 12, ...brandShadow },
+  planSummaryCard: { backgroundColor: brandColors.brand100, borderRadius: 18, borderWidth: 1, borderColor: brandColors.accentLine, padding: 16, marginBottom: 14 },
+  planSummaryTitle: { fontSize: 16, fontWeight: '700', color: brandColors.foregroundSoft },
   planSummaryText: { fontSize: 13, color: brandColors.textMuted, marginTop: 4 },
-  coachCard: { backgroundColor: 'rgba(255,255,255,0.94)', borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 14, ...brandShadow },
+  coachCard: { backgroundColor: brandColors.panel, borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 14, ...brandShadow },
   coachTitle: { fontSize: 17, fontWeight: '800', color: brandColors.foregroundSoft, marginBottom: 8 },
   coachSection: { fontSize: 14, fontWeight: '700', color: brandColors.foregroundSoft, marginTop: 14, marginBottom: 6 },
   coachBody: { fontSize: 13, lineHeight: 21, color: brandColors.textMuted },
@@ -945,33 +945,33 @@ const s = StyleSheet.create({
   supplementInsightMeta: { fontSize: 12, fontWeight: '600', color: '#b45309', marginTop: 2 },
   supplementInsightBody: { fontSize: 13, lineHeight: 20, color: brandColors.textMuted, marginTop: 8 },
   supplementInsightBudget: { fontSize: 12, color: brandColors.textSubtle, marginTop: 8 },
-  mealTrackCard: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 12, ...brandShadow },
+  mealTrackCard: { backgroundColor: brandColors.panel, borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 12, ...brandShadow },
   mealTrackCardDone: { borderColor: 'rgba(31, 157, 115, 0.24)', backgroundColor: '#f4fcf8' },
   mealTrackHeader: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   mealTrackName: { fontSize: 16, fontWeight: '700', color: brandColors.foregroundSoft },
   mealTrackMeta: { fontSize: 12, color: brandColors.textMuted, marginTop: 4 },
   mealTrackBody: { marginTop: 12, borderTopWidth: 1, borderTopColor: brandColors.line, paddingTop: 6 },
-  mealToggleBtn: { marginTop: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderRadius: 14, borderWidth: 1, borderColor: 'rgba(29, 168, 240, 0.24)', paddingVertical: 12, backgroundColor: 'rgba(255,255,255,0.82)' },
+  mealToggleBtn: { marginTop: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderRadius: 14, borderWidth: 1, borderColor: brandColors.accentLine, paddingVertical: 12, backgroundColor: brandColors.panel },
   mealToggleBtnDone: { backgroundColor: brandColors.success, borderColor: brandColors.success },
   mealToggleText: { fontSize: 14, fontWeight: '700', color: brandColors.brand500 },
   mealToggleTextDone: { color: '#fff' },
   supCheck: { width: 28, height: 28, borderRadius: 14, borderWidth: 1, borderColor: brandColors.lineStrong, alignItems: 'center', justifyContent: 'center' },
-  supCheckDone: { backgroundColor: brandColors.brand900, borderColor: brandColors.brand900 },
+  supCheckDone: { backgroundColor: brandColors.brand500, borderColor: brandColors.brand500 },
   supName: { fontSize: 15, fontWeight: '600', color: brandColors.foregroundSoft },
   supNameDone: { textDecorationLine: 'line-through', color: brandColors.textSubtle },
   supDosage: { fontSize: 12, color: brandColors.textSubtle, marginTop: 2 },
   // Supplements - manage screen
-  supMgmtCard: { flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 8, alignItems: 'center', gap: 12, ...brandShadow },
+  supMgmtCard: { flexDirection: 'row', backgroundColor: brandColors.panel, borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 8, alignItems: 'center', gap: 12, ...brandShadow },
   supMgmtName: { fontSize: 16, fontWeight: '700', color: brandColors.foregroundSoft },
   supMgmtInfo: { fontSize: 13, color: brandColors.textMuted, marginTop: 2 },
   supMgmtNotes: { fontSize: 12, color: brandColors.textSubtle, fontStyle: 'italic', marginTop: 2 },
-  addSupCard: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 18, marginTop: 8, ...brandShadow },
+  addSupCard: { backgroundColor: brandColors.panel, borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 18, marginTop: 8, ...brandShadow },
   addSupTitle: { fontSize: 17, fontWeight: '700', color: brandColors.foreground, marginBottom: 4 },
   chipGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   supChip: { backgroundColor: brandColors.panelMuted, borderWidth: 1, borderColor: brandColors.line, borderRadius: 14, paddingVertical: 8, paddingHorizontal: 12 },
-  supChipActive: { borderColor: 'rgba(29, 168, 240, 0.4)', backgroundColor: brandColors.brand100 },
+  supChipActive: { borderColor: brandColors.accentLine, backgroundColor: brandColors.brand100 },
   supChipText: { fontSize: 13, fontWeight: '600', color: brandColors.textMuted },
   supChipTextActive: { color: brandColors.brand500 },
-  supCancelBtn: { flex: 1, borderWidth: 1, borderColor: brandColors.lineStrong, borderRadius: 14, paddingVertical: 14, alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.84)' },
+  supCancelBtn: { flex: 1, borderWidth: 1, borderColor: brandColors.lineStrong, borderRadius: 14, paddingVertical: 14, alignItems: 'center', backgroundColor: brandColors.panelMuted },
   supCancelText: { fontSize: 15, fontWeight: '600', color: brandColors.textMuted },
 })

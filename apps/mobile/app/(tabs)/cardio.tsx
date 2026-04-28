@@ -95,7 +95,7 @@ export default function CardioScreen() {
       >
         {sessions.length === 0 ? (
           <View style={styles.empty}>
-            <Ionicons name="heart-outline" size={48} color="#d1d5db" />
+            <Ionicons name="heart-outline" size={48} color={brandColors.textSubtle} />
             <Text style={styles.emptyText}>No cardio sessions yet</Text>
             <TouchableOpacity onPress={() => setShowForm(true)}>
               <Text style={styles.emptyLink}>Log your first session</Text>
@@ -192,9 +192,9 @@ const styles = StyleSheet.create({
   empty: { alignItems: 'center', paddingTop: 80, gap: 8 },
   emptyText: { fontSize: 18, fontWeight: '600', color: brandColors.textMuted },
   emptyLink: { fontSize: 15, fontWeight: '600', color: brandColors.danger, marginTop: 4 },
-  card: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 10, ...brandShadow },
+  card: { backgroundColor: brandColors.panel, borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 10, ...brandShadow },
   cardRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  cardIconBox: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#fff0ef', alignItems: 'center', justifyContent: 'center' },
+  cardIconBox: { width: 40, height: 40, borderRadius: 20, backgroundColor: brandColors.dangerBg, alignItems: 'center', justifyContent: 'center' },
   cardTitle: { fontSize: 16, fontWeight: '700', color: brandColors.foregroundSoft },
   cardDate: { fontSize: 12, color: brandColors.textSubtle, marginTop: 2 },
   cardCalories: { fontSize: 15, fontWeight: '700', color: brandColors.danger },
@@ -206,14 +206,14 @@ const styles = StyleSheet.create({
   modalTitle: { fontSize: 18, fontWeight: '700', color: brandColors.foreground },
   modalContent: { padding: 20, gap: 4 },
   label: { fontSize: 14, fontWeight: '600', color: brandColors.foregroundSoft, marginTop: 12, marginBottom: 6 },
-  input: { backgroundColor: 'rgba(255,255,255,0.92)', borderWidth: 1, borderColor: brandColors.lineStrong, borderRadius: 16, paddingHorizontal: 16, paddingVertical: 14, fontSize: 16, color: brandColors.foreground },
+  input: { backgroundColor: brandColors.panel, borderWidth: 1, borderColor: brandColors.lineStrong, borderRadius: 16, paddingHorizontal: 16, paddingVertical: 14, fontSize: 16, color: brandColors.foreground },
   typeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  typeBtn: { backgroundColor: 'rgba(255,255,255,0.88)', borderWidth: 1, borderColor: brandColors.line, borderRadius: 14, paddingVertical: 10, paddingHorizontal: 14 },
-  typeBtnActive: { borderColor: 'rgba(217, 92, 87, 0.35)', backgroundColor: '#fff0ef' },
+  typeBtn: { backgroundColor: brandColors.panel, borderWidth: 1, borderColor: brandColors.line, borderRadius: 14, paddingVertical: 10, paddingHorizontal: 14 },
+  typeBtnActive: { borderColor: brandColors.accentLine, backgroundColor: brandColors.dangerBg },
   typeBtnText: { fontSize: 14, fontWeight: '600', color: brandColors.textMuted },
   typeBtnTextActive: { color: brandColors.danger },
-  previewCard: { backgroundColor: '#fff0ef', borderRadius: 18, padding: 16, alignItems: 'center', marginTop: 16, borderWidth: 1, borderColor: 'rgba(217, 92, 87, 0.14)' },
-  previewLabel: { fontSize: 13, color: '#8f3f3b' },
+  previewCard: { backgroundColor: brandColors.dangerBg, borderRadius: 18, padding: 16, alignItems: 'center', marginTop: 16, borderWidth: 1, borderColor: brandColors.accentLine },
+  previewLabel: { fontSize: 13, color: brandColors.textMuted },
   previewValue: { fontSize: 28, fontWeight: '800', color: brandColors.danger, marginTop: 4 },
   saveBtn: { backgroundColor: brandColors.danger, borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginTop: 24 },
   saveBtnDisabled: { opacity: 0.6 },

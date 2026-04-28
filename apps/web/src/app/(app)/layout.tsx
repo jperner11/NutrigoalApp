@@ -65,7 +65,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <div className="md:ml-64">
         {showTrial && <TrialBanner trialEndsAt={profile!.trial_ends_at!} />}
         <main className="min-h-screen pt-16 md:pt-0">
-          <div className="mx-auto max-w-7xl px-4 py-8 md:px-6">
+          <div className="app-workspace">
             {children}
           </div>
         </main>

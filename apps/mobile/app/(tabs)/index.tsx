@@ -193,7 +193,7 @@ function ClientHome({ userId }: { userId: string | null }) {
             <Text style={styles.cardValue}>{mealCalories} / {calTarget}</Text>
           </View>
           <View style={styles.progressBg}>
-            <View style={[styles.progressFill, { width: `${calPercent}%`, backgroundColor: brandColors.brand900 }]} />
+            <View style={[styles.progressFill, { width: `${calPercent}%`, backgroundColor: brandColors.brand500 }]} />
           </View>
           <View style={styles.macroRow}>
             <MacroPill label="Protein" value={mealProtein} target={profile?.daily_protein ?? 150} color={brandColors.success} unit="g" />
@@ -418,7 +418,9 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     padding: 22,
     marginBottom: 18,
-    backgroundColor: brandColors.brand900,
+    backgroundColor: brandColors.surfaceStrong,
+    borderWidth: 1,
+    borderColor: brandColors.line,
     overflow: 'hidden',
   },
   heroGlow: {
@@ -428,7 +430,7 @@ const styles = StyleSheet.create({
     width: 160,
     height: 160,
     borderRadius: 80,
-    backgroundColor: 'rgba(77, 196, 255, 0.2)',
+    backgroundColor: brandColors.brand100,
   },
   heroHeader: {
     flexDirection: 'row',
@@ -456,7 +458,7 @@ const styles = StyleSheet.create({
   },
   date: { fontSize: 14, color: 'rgba(255,255,255,0.72)', marginTop: 14 },
   card: {
-    backgroundColor: 'rgba(255,255,255,0.9)',
+    backgroundColor: brandColors.panel,
     borderRadius: 24,
     borderWidth: 1,
     borderColor: brandColors.line,
@@ -486,14 +488,14 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(77, 196, 255, 0.2)',
+    borderColor: brandColors.accentLine,
   },
   waterBtnText: { fontSize: 13, fontWeight: '700', color: brandColors.brand500 },
   sectionTitle: { fontSize: 18, fontWeight: '700', color: brandColors.foreground, marginBottom: 12, marginTop: 8 },
   actionsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   actionCard: {
     width: '47%',
-    backgroundColor: 'rgba(255,255,255,0.82)',
+    backgroundColor: brandColors.panel,
     borderRadius: 20,
     borderWidth: 1,
     borderColor: brandColors.line,
@@ -505,7 +507,7 @@ const styles = StyleSheet.create({
   planStatusRow: { flexDirection: 'row', gap: 12, marginBottom: 16 },
   planStatusCard: {
     flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.88)',
+    backgroundColor: brandColors.panel,
     borderRadius: 20,
     borderWidth: 1,
     borderColor: brandColors.line,
@@ -519,7 +521,7 @@ const styles = StyleSheet.create({
   trainerStatsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 16 },
   trainerStatCard: {
     width: '47%',
-    backgroundColor: 'rgba(255,255,255,0.88)',
+    backgroundColor: brandColors.panel,
     borderRadius: 20,
     borderWidth: 1,
     borderColor: brandColors.line,
@@ -536,7 +538,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     borderWidth: 1,
     borderColor: brandColors.line,
-    backgroundColor: 'rgba(255,255,255,0.76)',
+    backgroundColor: brandColors.panelMuted,
     paddingHorizontal: 14,
     paddingVertical: 12,
   },
@@ -549,5 +551,5 @@ const styles = StyleSheet.create({
     backgroundColor: brandColors.brand100,
     alignItems: 'center',
   },
-  taskBadgeText: { fontSize: 12, fontWeight: '700', color: brandColors.brand900 },
+  taskBadgeText: { fontSize: 12, fontWeight: '700', color: brandColors.brand400 },
 })

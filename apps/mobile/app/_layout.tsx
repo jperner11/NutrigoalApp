@@ -42,7 +42,7 @@ export default function RootLayout() {
   return (
     <AuthProvider>
       <AuthGuard>
-        <StatusBar style="dark" backgroundColor={brandColors.background} />
+        <StatusBar style="light" backgroundColor={brandColors.background} />
         <Stack
           screenOptions={{
             headerShown: false,

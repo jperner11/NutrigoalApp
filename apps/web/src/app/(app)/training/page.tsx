@@ -4,11 +4,26 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
-import { Dumbbell, Plus, Sparkles } from 'lucide-react'
+import {
+  Activity,
+  CalendarDays,
+  Dumbbell,
+  Plus,
+  Sparkles,
+  Zap,
+} from 'lucide-react'
 import Link from 'next/link'
 import type { Exercise, TrainingPlan, TrainingPlanDay, TrainingPlanExercise } from '@/lib/supabase/types'
 import ProgressCheckIn from '@/components/training/ProgressCheckIn'
-import AppPageHeader from '@/components/ui/AppPageHeader'
+import {
+  AppHeroPanel,
+  AppSectionHeader,
+  EmptyStateCard,
+  HeartbeatLine,
+  ListCard,
+  MetricCard,
+  StatusPill,
+} from '@/components/ui/AppDesign'
 import { isManagedClientRole } from '@nutrigoal/shared'
 
 type ExercisePreview = TrainingPlanExercise & { exercises: Exercise | null }
@@ -35,6 +50,26 @@ function effortLabel(exercise: ExercisePreview) {
   return 'RPE -'
 }
 
+function formatPlanDate(date: string | null) {
+  if (!date) return 'No sessions yet'
+  return `Last ${new Date(date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`
+}
+
+function getRecentPr(workout?: WorkoutPreview) {
+  const exercise = workout?.exercises.find((item) => item.sets || item.reps)
+  if (!exercise) {
+    return {
+      title: 'No recent PR yet',
+      meta: 'Start logging sessions to surface momentum.',
+    }
+  }
+
+  return {
+    title: exercise.exercises?.name ?? 'Recent lift',
+    meta: `${exercise.sets ?? 0} x ${exercise.reps ?? '-'} · active plan`,
+  }
+}
+
 export default function TrainingPage() {
   const { profile } = useUser()
   const router = useRouter()
@@ -58,7 +93,6 @@ export default function TrainingPage() {
         return
       }
 
-      // Get day counts, workout previews, and last workout for each plan
       const enriched = await Promise.all(
         rawPlans.map(async (plan) => {
           const { data: days } = await supabase
@@ -90,7 +124,6 @@ export default function TrainingPage() {
             .order('date', { ascending: false })
             .limit(1)
 
-          // Check if the last log's plan_day belongs to this plan
           let lastWorkout: string | null = null
           if (lastLog && lastLog.length > 0) {
             const { data: dayCheck } = await supabase
@@ -123,213 +156,226 @@ export default function TrainingPage() {
 
   if (loading) {
     return (
-      <div className="card p-8">
-        <div className="mono" style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}>
-          LOADING
+      <ListCard eyebrow="Loading" title="Preparing your training plans.">
+        <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--line)]">
+          <div className="h-full w-1/3 animate-pulse rounded-full bg-[var(--acc)]" />
         </div>
-        <div className="serif mt-2" style={{ fontSize: 24, color: 'var(--fg)' }}>
-          Preparing your training plans.
-        </div>
-      </div>
+      </ListCard>
     )
   }
 
   const managedClient = isManagedClientRole(profile?.role)
   const activePlan = plans.find(plan => plan.is_active) ?? plans[0]
+  const activeWorkouts = activePlan?.workouts ?? []
+  const recentPr = getRecentPr(activeWorkouts[0])
+  const planProgress = activePlan?.dayCount ? Math.min((activeWorkouts.length || 0) / activePlan.dayCount, 1) : 0
+  const totalMinutes = activeWorkouts.reduce((sum, workout) => sum + estimateDurationMinutes(workout.exercises), 0)
 
   return (
     <div>
-      <AppPageHeader
-        eyebrow="Strength & cardio"
-        title="Training"
-        subtitle="Build and manage your workout routines."
+      <AppHeroPanel
+        eyebrow={
+          <span className="inline-flex items-center gap-2">
+            <Dumbbell className="h-3.5 w-3.5" />
+            N° 03 · Strength & cardio
+          </span>
+        }
+        title="Training,"
+        accent="kept honest."
+        subtitle="Build, follow, and adjust your weekly routine with less noise and clearer momentum."
         actions={
-          !managedClient ? (
-            <Link href="/training/new" className="btn btn-accent">
-              <Plus className="h-4 w-4" />
-              <span>New plan</span>
+          <>
+            <Link href="/training" className="btn btn-ghost">
+              <CalendarDays className="h-4 w-4" />
+              Schedule
             </Link>
-          ) : null
+            {!managedClient ? (
+              <Link href="/training/new" className="btn btn-accent">
+                <Plus className="h-4 w-4" />
+                New plan
+              </Link>
+            ) : null}
+          </>
         }
       />
 
       {profile && (
-        <ProgressCheckIn
-          userId={profile.id}
-          onPlanRegenerate={() => router.push('/generate-plans')}
-        />
+        <div className="mt-6">
+          <ProgressCheckIn
+            userId={profile.id}
+            onPlanRegenerate={() => router.push('/generate-plans')}
+          />
+        </div>
       )}
 
       {plans.length === 0 ? (
-        <div className="card p-8 text-center sm:p-12">
-          <div
-            className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl"
-            style={{ background: 'var(--ink-3)', color: 'var(--acc)' }}
-          >
-            <Dumbbell className="h-6 w-6" />
-          </div>
-          <h3 className="serif" style={{ fontSize: 28, color: 'var(--fg)' }}>
-            Ready to build your first workout?
-          </h3>
-          <p
-            className="mx-auto mt-2 max-w-[520px]"
-            style={{ fontSize: 14, color: 'var(--fg-2)', lineHeight: 1.6 }}
-          >
-            {managedClient
-              ? 'Your trainer has not assigned a training plan yet. It will show up here as soon as your programme is ready.'
-              : 'Create a training plan to organize your exercises, track progress, and crush your fitness goals.'}
-          </p>
-          {!managedClient && (
-            <Link href="/training/new" className="btn btn-accent mt-6">
-              <Sparkles className="h-4 w-4" />
-              <span>Create first plan</span>
-            </Link>
-          )}
+        <div className="mt-8">
+          <EmptyStateCard
+            icon={<Dumbbell className="h-6 w-6" />}
+            title="Ready to build your first workout?"
+            body={
+              managedClient
+                ? 'Your trainer has not assigned a training plan yet. It will show up here as soon as your programme is ready.'
+                : 'Create a training plan to organize your exercises, track progress, and keep your weekly structure visible.'
+            }
+            action={!managedClient ? (
+              <Link href="/training/new" className="btn btn-accent">
+                <Sparkles className="h-4 w-4" />
+                Create first plan
+              </Link>
+            ) : null}
+          />
         </div>
       ) : activePlan ? (
-        <div className="grid gap-5 lg:grid-cols-[1.6fr_0.85fr]">
-          <section>
-            <div className="row mb-3 flex-wrap justify-between gap-3">
-              <div>
-                <div
-                  className="mono"
-                  style={{ fontSize: 10, color: 'var(--fg-4)', letterSpacing: '0.12em' }}
-                >
-                  ACTIVE PROGRAM
-                </div>
-                <div className="serif mt-1" style={{ fontSize: 24, lineHeight: 1.15 }}>
-                  {activePlan.name}{' '}
-                  <span className="italic-serif" style={{ color: 'var(--fg-3)' }}>
-                    this week.
-                  </span>
-                </div>
-              </div>
-              <Link
-                href={`/training/${activePlan.id}`}
-                className="mono"
-                style={{ fontSize: 10, color: 'var(--acc)', letterSpacing: '0.1em' }}
-              >
-                OPEN PLAN -&gt;
+        <>
+          <div className="mt-8 grid gap-5 xl:grid-cols-[1.4fr_1fr]">
+            <MetricCard
+              label="This week · volume"
+              value={`${activeWorkouts.length || activePlan.dayCount}`}
+              unit={`/ ${activePlan.dayCount || activeWorkouts.length || 0}`}
+              icon={<Activity className="h-4 w-4" />}
+              progress={planProgress}
+              footer={`${activePlan.dayCount || activeWorkouts.length || 0} sessions structured · ${totalMinutes || 0} min under tension`}
+              tone="accent"
+            />
+
+            <ListCard
+              eyebrow="Recent PR"
+              title={<>{recentPr.title} <span className="text-[var(--acc)]">+</span></>}
+              meta={recentPr.meta}
+            >
+              <HeartbeatLine />
+            </ListCard>
+          </div>
+
+          <ListCard
+            className="mt-6"
+            eyebrow="Active program · week 3 of 8"
+            title={
+              <>
+                {activePlan.name}{' '}
+                <span className="italic-serif text-[var(--fg-3)]">Hybrid Cut.</span>
+              </>
+            }
+            meta={`${activeWorkouts.length} of ${activePlan.dayCount || activeWorkouts.length} sessions available · ${totalMinutes || 0} min under tension · ${formatPlanDate(activePlan.lastWorkout)}`}
+            action={
+              <Link href={`/training/${activePlan.id}`} className="btn btn-ghost">
+                Open plan -&gt;
               </Link>
+            }
+          >
+            <div className="app-progress-track">
+              <div style={{ width: `${Math.max(8, planProgress * 100)}%` }} />
             </div>
+          </ListCard>
 
-            <div className="col gap-4">
-              {activePlan.workouts.length === 0 ? (
-                <div className="card-2 p-5">
-                  <div className="serif" style={{ fontSize: 20, color: 'var(--fg)' }}>
-                    No workout days yet.
-                  </div>
-                  <p className="mt-2" style={{ fontSize: 13, color: 'var(--fg-2)', lineHeight: 1.6 }}>
-                    Open this plan to add training days and exercises.
-                  </p>
-                </div>
-              ) : (
-                activePlan.workouts.map(workout => (
-                  <div key={workout.id} className="card-2 p-5">
-                    <div className="row justify-between gap-4">
-                      <div
-                        className="mono"
-                        style={{ fontSize: 11, color: 'var(--acc)', letterSpacing: '0.14em' }}
-                      >
-                        {workout.name.toUpperCase()} · DAY {workout.day_number}
-                      </div>
-                      <span className="chip">
-                        {estimateDurationMinutes(workout.exercises)} min
-                      </span>
-                    </div>
+          <div className="grid gap-6 xl:grid-cols-[1.45fr_0.9fr]">
+            <section>
+              <AppSectionHeader
+                index={4}
+                eyebrow="Today's work"
+                title="Sessions,"
+                accent="on deck."
+                summary={`${activeWorkouts.length} sessions in this plan`}
+              />
 
-                    <div className="mt-3">
-                      {workout.exercises.length === 0 ? (
-                        <p style={{ fontSize: 13, color: 'var(--fg-3)', lineHeight: 1.6 }}>
-                          No exercises added to this workout yet.
-                        </p>
-                      ) : (
-                        workout.exercises.slice(0, 6).map((exercise, index) => (
-                          <div
-                            key={exercise.id}
-                            className="row justify-between gap-4"
-                            style={{
-                              padding: '12px 0',
-                              borderBottom:
-                                index < Math.min(workout.exercises.length, 6) - 1
-                                  ? '1px solid var(--line)'
-                                  : 'none',
-                            }}
-                          >
-                            <span style={{ fontSize: 14, color: 'var(--fg)' }}>
-                              {exercise.exercises?.name ?? 'Exercise'}
-                            </span>
-                            <div className="row shrink-0 gap-16">
-                              <span className="mono" style={{ fontSize: 11, color: 'var(--fg-3)' }}>
+              <div className="grid gap-5">
+                {activeWorkouts.length === 0 ? (
+                  <EmptyStateCard
+                    title="No workout days yet."
+                    body="Open this plan to add training days and exercises."
+                    action={<Link href={`/training/${activePlan.id}`} className="btn btn-ghost">Open plan</Link>}
+                  />
+                ) : (
+                  activeWorkouts.map((workout, workoutIndex) => (
+                    <ListCard
+                      key={workout.id}
+                      tone={workoutIndex === 0 ? 'accent' : 'default'}
+                      eyebrow={`${workout.name} · day ${workout.day_number}`}
+                      title={workoutIndex === 0 ? 'Heavy push, controlled tempo.' : workout.name}
+                      action={
+                        <StatusPill>
+                          {estimateDurationMinutes(workout.exercises)} min
+                        </StatusPill>
+                      }
+                    >
+                      <div className="divide-y divide-[var(--line)]">
+                        {workout.exercises.length === 0 ? (
+                          <p className="py-4 text-sm text-[var(--fg-3)]">No exercises added to this workout yet.</p>
+                        ) : (
+                          workout.exercises.slice(0, 7).map((exercise) => (
+                            <div key={exercise.id} className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-5 py-4">
+                              <div className="flex min-w-0 items-center gap-4">
+                                <span className="h-7 w-7 shrink-0 rounded-full border border-[var(--line-strong)]" />
+                                <span className="truncate text-[var(--foreground)]">
+                                  {exercise.exercises?.name ?? 'Exercise'}
+                                </span>
+                              </div>
+                              <span className="mono text-xs text-[var(--fg-3)]">
                                 {exercise.sets} × {exercise.reps}
                               </span>
-                              <span className="mono" style={{ fontSize: 11, color: 'var(--fg-4)' }}>
+                              <span className="mono text-xs text-[var(--fg-4)]">
                                 {effortLabel(exercise)}
                               </span>
                             </div>
+                          ))
+                        )}
+                      </div>
+
+                      {workout.exercises.length > 7 ? (
+                        <div className="mono mt-4 text-xs text-[var(--fg-4)]">
+                          +{workout.exercises.length - 7} more exercise
+                          {workout.exercises.length - 7 === 1 ? '' : 's'}
+                        </div>
+                      ) : null}
+
+                      <Link href={`/training/session/${workout.id}`} className="btn btn-accent mt-6">
+                        <Zap className="h-4 w-4" />
+                        Start session
+                      </Link>
+                    </ListCard>
+                  ))
+                )}
+              </div>
+            </section>
+
+            <aside>
+              <AppSectionHeader
+                index={5}
+                eyebrow="Plan library"
+                title="Choose"
+                accent="structure."
+              />
+              <div className="grid gap-4">
+                {plans.map(plan => {
+                  const selected = plan.id === activePlan.id
+                  return (
+                    <Link
+                      key={plan.id}
+                      href={`/training/${plan.id}`}
+                      className={`app-list-card block transition hover:border-[var(--line-2)] ${selected ? 'is-accent' : ''}`}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <div className="app-mono-label">
+                            {plan.dayCount || 0} days / week
                           </div>
-                        ))
-                      )}
-                      {workout.exercises.length > 6 && (
-                        <div
-                          className="mono mt-3 text-center"
-                          style={{ fontSize: 10, color: 'var(--fg-4)', letterSpacing: '0.1em' }}
-                        >
-                          +{workout.exercises.length - 6} MORE
+                          <h3>{plan.name}</h3>
                         </div>
+                        {plan.is_active ? <StatusPill tone="accent">Active</StatusPill> : null}
+                      </div>
+                      {plan.description ? (
+                        <p className="mt-4 line-clamp-3 text-sm">{plan.description}</p>
+                      ) : (
+                        <p className="mt-4 text-sm">No description yet.</p>
                       )}
-                    </div>
-
-                    <Link href={`/training/session/${workout.id}`} className="btn btn-accent mt-4">
-                      Start session -&gt;
                     </Link>
-                  </div>
-                ))
-              )}
-            </div>
-          </section>
-
-          <aside className="col gap-4">
-            <div className="card p-5">
-              <div
-                className="mono"
-                style={{ fontSize: 10, color: 'var(--fg-4)', letterSpacing: '0.12em' }}
-              >
-                <span style={{ color: 'var(--acc)', marginRight: 6 }}>✦</span>
-                PLAN LIBRARY
+                  )
+                })}
               </div>
-              <div className="col mt-4 gap-2">
-                {plans.map(plan => (
-                  <Link key={plan.id} href={`/training/${plan.id}`} className="card-2 p-3">
-                    <div className="row justify-between gap-3">
-                      <div className="min-w-0">
-                        <div className="serif truncate" style={{ fontSize: 15, color: 'var(--fg)' }}>
-                          {plan.name}
-                        </div>
-                        <div
-                          className="mono mt-1"
-                          style={{ fontSize: 10, color: 'var(--fg-4)', letterSpacing: '0.08em' }}
-                        >
-                          {plan.dayCount} DAYS
-                          {plan.lastWorkout ? ` · LAST ${new Date(plan.lastWorkout).toLocaleDateString()}` : ''}
-                        </div>
-                      </div>
-                      <div className="row shrink-0 gap-1">
-                        {plan.created_by !== profile?.id && <span className="chip">FROM PT</span>}
-                        {plan.is_active && <span className="chip" style={{ color: 'var(--acc)' }}>ACTIVE</span>}
-                      </div>
-                    </div>
-                    {plan.description && (
-                      <p className="mt-2 line-clamp-2" style={{ fontSize: 12, color: 'var(--fg-3)', lineHeight: 1.5 }}>
-                        {plan.description}
-                      </p>
-                    )}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </aside>
-        </div>
+            </aside>
+          </div>
+        </>
       ) : null}
     </div>
   )

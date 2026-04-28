@@ -20,33 +20,21 @@ export default function AppPageHeader({
   className = '',
 }: AppPageHeaderProps) {
   return (
-    <div
-      className={`row mb-8 flex-wrap justify-between gap-4 ${className}`.trim()}
-    >
+    <div className={`app-section-header ${className}`.trim()}>
       <div className="flex-1 min-w-0">
         {eyebrow ? (
-          <div
-            className="mono"
-            style={{
-              fontSize: 11,
-              color: 'var(--fg-4)',
-              letterSpacing: '0.14em',
-            }}
-          >
+          <div className="app-mono-label">
             {typeof eyebrow === 'string' ? eyebrow.toUpperCase() : eyebrow}
           </div>
         ) : null}
 
         <div className="row mt-1.5 flex-wrap items-baseline gap-3">
-          <h1 className="serif" style={{ fontSize: 36, lineHeight: 1.05 }}>
+          <h1 className="app-section-title">
             {title}
             {accent ? (
               <>
                 {' '}
-                <span
-                  className="italic-serif"
-                  style={{ color: 'var(--fg-3)' }}
-                >
+                <span>
                   {accent}
                 </span>
               </>
@@ -66,7 +54,7 @@ export default function AppPageHeader({
       </div>
 
       {actions ? (
-        <div className="row flex-wrap gap-2 self-start">{actions}</div>
+        <div className="app-section-aside">{actions}</div>
       ) : null}
     </div>
   )

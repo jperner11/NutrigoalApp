@@ -19,7 +19,7 @@ const CLIENT_MENU_ITEMS: MenuItem[] = [
   { icon: 'water', label: 'Water Tracking', route: '/(tabs)/water', color: brandColors.brand500 },
   { icon: 'sparkles', label: 'AI Generate Plans', route: '/(tabs)/ai-generate', color: brandColors.brand500 },
   { icon: 'sparkles', label: 'AI Suggestions', route: '/(tabs)/ai', color: brandColors.brand400 },
-  { icon: 'chatbubbles', label: 'My Trainer / Messages', route: '/(tabs)/my-pt', color: '#3b82f6', roles: ['free', 'pro', 'personal_trainer_client', 'nutritionist_client'] },
+  { icon: 'chatbubbles', label: 'My Trainer / Messages', route: '/(tabs)/my-pt', color: brandColors.brand400, roles: ['free', 'pro', 'personal_trainer_client', 'nutritionist_client'] },
   { icon: 'people', label: 'Clients', route: '/(tabs)/clients', color: '#df9a2b', roles: ['personal_trainer', 'nutritionist'] },
   { icon: 'settings-sharp', label: 'Settings', route: '/(tabs)/settings', color: brandColors.textMuted },
 ]
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.9)',
+    backgroundColor: brandColors.panel,
     borderRadius: 18,
     borderWidth: 1,
     borderColor: brandColors.line,

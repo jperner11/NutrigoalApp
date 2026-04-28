@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     width: 280,
     height: 280,
     borderRadius: 140,
-    backgroundColor: 'rgba(77, 196, 255, 0.22)',
+    backgroundColor: brandColors.brand100,
   },
   sideGlow: {
     position: 'absolute',
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     width: 220,
     height: 220,
     borderRadius: 110,
-    backgroundColor: 'rgba(216, 239, 251, 0.9)',
+    backgroundColor: 'rgba(245, 241, 234, 0.04)',
   },
   scrollContent: {
     flexGrow: 1,
@@ -146,13 +146,13 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: 'rgba(77, 196, 255, 0.34)',
+    borderColor: brandColors.accentLine,
     backgroundColor: brandColors.brand100,
     paddingHorizontal: 12,
     paddingVertical: 7,
   },
   eyebrowText: {
-    color: '#0f4262',
+    color: brandColors.foregroundSoft,
     fontSize: 12,
     fontWeight: '600',
   },
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
   },
   formCard: {
     borderRadius: 28,
-    backgroundColor: 'rgba(255,255,255,0.92)',
+    backgroundColor: brandColors.panel,
     borderWidth: 1,
     borderColor: brandColors.line,
     padding: 20,
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
     color: brandColors.foreground,
   },
   button: {
-    backgroundColor: brandColors.brand900,
+    backgroundColor: brandColors.brand500,
     borderRadius: 18,
     paddingVertical: 16,
     alignItems: 'center',

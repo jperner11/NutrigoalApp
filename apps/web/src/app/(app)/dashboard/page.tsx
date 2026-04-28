@@ -29,9 +29,9 @@ import TodayTrainingPreview from '@/components/dashboard/TodayTrainingPreview'
 import QuickWeightLog from '@/components/dashboard/QuickWeightLog'
 import SupplementWidget from '@/components/dashboard/SupplementWidget'
 import TrainerDashboard from '@/components/dashboard/TrainerDashboard'
-import AppPageHeader from '@/components/ui/AppPageHeader'
 import StatTile from '@/components/ui/StatTile'
 import AINudgeCard from '@/components/ui/AINudgeCard'
+import { AppHeroPanel, AppSectionHeader, HeartbeatLine } from '@/components/ui/AppDesign'
 import { isManagedClientRole, isTrainerRole } from '@nutrigoal/shared'
 
 function getGreeting(): string {
@@ -296,18 +296,40 @@ export default function DashboardPage() {
 
   return (
     <div className="-m-4 p-4 sm:-m-6 sm:p-6 lg:-m-8 lg:p-8">
-      <AppPageHeader
-        eyebrow={dateLabel}
-        title={`${greeting}, ${firstName}`}
-        accent="."
-        actions={
-          profile.role === 'free' ? (
-            <Link href="/pricing" className="btn btn-accent">
-              <Crown className="h-4 w-4" />
-              <span>Upgrade</span>
-            </Link>
-          ) : null
+      <AppHeroPanel
+        eyebrow={`${dateLabel} · today`}
+        title={`${greeting},`}
+        accent={`${firstName}.`}
+        subtitle={
+          <>
+            You have <span className="text-[var(--acc)]">{todayStats.caloriesConsumed} kcal</span> logged
+            {todayStats.workoutsCompleted > 0 ? (
+              <> and <span className="text-[var(--acc)]">{todayStats.workoutsCompleted} session{todayStats.workoutsCompleted === 1 ? '' : 's'}</span> complete.</>
+            ) : (
+              <> and <span className="text-[var(--acc)]">your next session</span> waiting.</>
+            )}{' '}
+            Let&apos;s keep moving.
+          </>
         }
+        actions={
+          <>
+            <Link href="/progress" className="btn btn-secondary">
+              <Scale className="h-4 w-4" />
+              <span>Log weight</span>
+            </Link>
+            <Link href="/training" className="btn btn-accent">
+              <Sparkles className="h-4 w-4" />
+              <span>View today&apos;s plan</span>
+            </Link>
+            {profile.role === 'free' ? (
+              <Link href="/pricing" className="btn btn-secondary">
+                <Crown className="h-4 w-4" />
+                <span>Upgrade</span>
+              </Link>
+            ) : null}
+          </>
+        }
+        meta={<HeartbeatLine />}
       />
 
       {/* Onboarding prompt */}
@@ -383,6 +405,14 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
+
+      <AppSectionHeader
+        index="1"
+        eyebrow="today"
+        title="How you're"
+        accent="tracking."
+        summary={`${Math.round(calorieProgress)}% of calorie target · ${weeklyStats.workoutsThisWeek} workouts this week`}
+      />
 
       {/* Today's KPIs \u2014 single editorial row */}
       <div className="mb-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -538,16 +568,7 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Quick Actions */}
-      <div className="mb-3">
-        <div
-          className="mono"
-          style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.14em' }}
-        >
-          <span style={{ color: 'var(--acc)', marginRight: 6 }}>✦</span>
-          QUICK ACTIONS
-        </div>
-      </div>
+      <AppSectionHeader index="3" eyebrow="shortcuts" title="Quick" accent="moves." />
       <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {[
           { href: '/diet', label: 'Log a meal', sub: 'Track your food intake', icon: Utensils },

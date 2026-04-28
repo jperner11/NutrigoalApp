@@ -81,7 +81,7 @@ export default function TrainingScreen() {
       <ScrollView contentContainerStyle={s.content} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={brandColors.brand500} />}>
         {plans.length === 0 ? (
           <View style={s.empty}>
-            <Ionicons name="barbell-outline" size={48} color="#d1d5db" />
+            <Ionicons name="barbell-outline" size={48} color={brandColors.textSubtle} />
             <Text style={s.emptyText}>{managedClient ? 'No training plan assigned yet' : 'No training plans yet'}</Text>
             {managedClient ? (
               <Text style={s.emptyHint}>Your trainer will assign your workouts here when your programme is ready.</Text>
@@ -98,7 +98,7 @@ export default function TrainingScreen() {
               </View>
               {p.created_by !== user?.id && <View style={s.ptBadge}><Text style={s.ptBadgeText}>From PT</Text></View>}
               {p.is_active && <View style={s.activeBadge}><Text style={s.badgeText}>Active</Text></View>}
-              <Ionicons name="chevron-forward" size={20} color="#d1d5db" />
+              <Ionicons name="chevron-forward" size={20} color={brandColors.textSubtle} />
             </View>
           </TouchableOpacity>
         ))}
@@ -184,13 +184,13 @@ function CreatePlan({ user, profile, onDone, onCancel }: any) {
       </View>
       <ScrollView contentContainerStyle={s.modalContent}>
         <Text style={s.label}>Plan Name</Text>
-        <TextInput style={s.input} value={planName} onChangeText={setPlanName} placeholder="e.g. Push Pull Legs" placeholderTextColor="#9ca3af" />
+        <TextInput style={s.input} value={planName} onChangeText={setPlanName} placeholder="e.g. Push Pull Legs" placeholderTextColor={brandColors.textSubtle} />
 
         {days.map((day, di) => (
           <View key={di} style={s.dayCard}>
             <View style={s.dayHeader}>
               <TextInput style={s.dayNameInput} value={day.name} onChangeText={(t) => { const u = [...days]; u[di].name = t; setDays(u) }} />
-              {days.length > 1 && <TouchableOpacity onPress={() => removeDay(di)}><Ionicons name="trash-outline" size={20} color="#ef4444" /></TouchableOpacity>}
+              {days.length > 1 && <TouchableOpacity onPress={() => removeDay(di)}><Ionicons name="trash-outline" size={20} color={brandColors.danger} /></TouchableOpacity>}
             </View>
             {day.exercises.map((ex, ei) => (
               <View key={ei} style={s.exerciseRow}>
@@ -198,7 +198,7 @@ function CreatePlan({ user, profile, onDone, onCancel }: any) {
                   <Text style={s.exerciseName}>{ex.exercise.name}</Text>
                   <Text style={s.exerciseMeta}>{ex.sets} sets × {ex.reps} · {ex.rest_seconds}s rest</Text>
                 </View>
-                <TouchableOpacity onPress={() => removeExercise(di, ei)}><Ionicons name="close-circle" size={22} color="#d1d5db" /></TouchableOpacity>
+                <TouchableOpacity onPress={() => removeExercise(di, ei)}><Ionicons name="close-circle" size={22} color={brandColors.textSubtle} /></TouchableOpacity>
               </View>
             ))}
             <TouchableOpacity style={s.addExBtn} onPress={() => { setPickerDayIdx(di); setShowPicker(true); setSearch(''); setFilterBody('') }}>
@@ -227,7 +227,7 @@ function CreatePlan({ user, profile, onDone, onCancel }: any) {
             <View style={{ width: 60 }} />
           </View>
           <View style={{ padding: 16, gap: 8 }}>
-            <TextInput style={s.input} placeholder="Search exercises..." placeholderTextColor="#9ca3af" value={search} onChangeText={setSearch} />
+            <TextInput style={s.input} placeholder="Search exercises..." placeholderTextColor={brandColors.textSubtle} value={search} onChangeText={setSearch} />
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6 }}>
               <TouchableOpacity style={[s.filterChip, !filterBody && s.filterChipActive]} onPress={() => setFilterBody('')}><Text style={[s.filterChipText, !filterBody && s.filterChipTextActive]}>All</Text></TouchableOpacity>
               {BODY_PARTS.map(bp => (
@@ -296,9 +296,9 @@ function PlanDetail({ planId, user, onBack, onStartSession }: any) {
   return (
     <SafeAreaView style={s.container}>
       <View style={s.modalHeader}>
-        <TouchableOpacity onPress={onBack}><Ionicons name="arrow-back" size={24} color="#374151" /></TouchableOpacity>
+        <TouchableOpacity onPress={onBack}><Ionicons name="arrow-back" size={24} color={brandColors.foreground} /></TouchableOpacity>
         <Text style={s.modalTitle}>{plan.name}</Text>
-        <TouchableOpacity onPress={handleDelete}><Ionicons name="trash-outline" size={22} color="#ef4444" /></TouchableOpacity>
+        <TouchableOpacity onPress={handleDelete}><Ionicons name="trash-outline" size={22} color={brandColors.danger} /></TouchableOpacity>
       </View>
       <ScrollView contentContainerStyle={s.content}>
         {days.map((day) => (
@@ -307,7 +307,7 @@ function PlanDetail({ planId, user, onBack, onStartSession }: any) {
               <Text style={s.dayNameDisplay}>{day.name}</Text>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                 <Text style={s.exerciseCount}>{day.exercises.length} exercises</Text>
-                <Ionicons name={expandedDay === day.id ? 'chevron-up' : 'chevron-down'} size={20} color="#9ca3af" />
+                <Ionicons name={expandedDay === day.id ? 'chevron-up' : 'chevron-down'} size={20} color={brandColors.textSubtle} />
               </View>
             </TouchableOpacity>
             {expandedDay === day.id && day.exercises.map((ex) => (
@@ -496,7 +496,7 @@ function WorkoutSession({ dayId, user, profile, onDone }: any) {
     <SafeAreaView style={s.container}>
       <View style={s.modalHeader}>
         <TouchableOpacity onPress={() => Alert.alert('Quit?', 'Your progress will be lost', [{ text: 'Stay' }, { text: 'Quit', style: 'destructive', onPress: onDone }])}>
-          <Ionicons name="close" size={24} color="#374151" />
+          <Ionicons name="close" size={24} color={brandColors.foreground} />
         </TouchableOpacity>
         <Text style={s.modalTitle}>{currentIdx + 1} / {exercises.length}</Text>
         <View style={{ width: 24 }} />
@@ -582,7 +582,7 @@ function WorkoutSession({ dayId, user, profile, onDone }: any) {
         ))}
 
         <TouchableOpacity style={s.addSetBtn} onPress={addSet}>
-          <Ionicons name="add" size={18} color="#6b7280" />
+          <Ionicons name="add" size={18} color={brandColors.textMuted} />
           <Text style={s.addSetText}>Add Set</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -617,13 +617,13 @@ const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: brandColors.background },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 },
   title: { fontSize: 24, fontWeight: '800', color: brandColors.foreground, letterSpacing: -0.6 },
-  addBtn: { backgroundColor: brandColors.brand900, borderRadius: 20, width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
+  addBtn: { backgroundColor: brandColors.brand500, borderRadius: 20, width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
   content: { padding: 20, paddingTop: 0 },
   empty: { alignItems: 'center', paddingTop: 80, gap: 8 },
   emptyText: { fontSize: 18, fontWeight: '600', color: brandColors.textMuted },
   emptyHint: { fontSize: 14, color: brandColors.textSubtle, textAlign: 'center', maxWidth: 280, lineHeight: 20 },
   emptyLink: { fontSize: 15, fontWeight: '600', color: brandColors.brand500, marginTop: 4 },
-  card: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 10, ...brandShadow },
+  card: { backgroundColor: brandColors.panel, borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 10, ...brandShadow },
   cardRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   cardTitle: { fontSize: 16, fontWeight: '700', color: brandColors.foregroundSoft },
   cardSub: { fontSize: 13, color: brandColors.textMuted, marginTop: 2 },
@@ -637,9 +637,9 @@ const s = StyleSheet.create({
   modalTitle: { fontSize: 18, fontWeight: '700', color: brandColors.foreground },
   modalContent: { padding: 20 },
   label: { fontSize: 14, fontWeight: '600', color: brandColors.foregroundSoft, marginTop: 12, marginBottom: 6 },
-  input: { backgroundColor: 'rgba(255,255,255,0.92)', borderWidth: 1, borderColor: brandColors.lineStrong, borderRadius: 16, paddingHorizontal: 16, paddingVertical: 14, fontSize: 16, color: brandColors.foreground },
+  input: { backgroundColor: brandColors.panel, borderWidth: 1, borderColor: brandColors.lineStrong, borderRadius: 16, paddingHorizontal: 16, paddingVertical: 14, fontSize: 16, color: brandColors.foreground },
   // Day card
-  dayCard: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginTop: 16, ...brandShadow },
+  dayCard: { backgroundColor: brandColors.panel, borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginTop: 16, ...brandShadow },
   dayHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   dayNameInput: { fontSize: 16, fontWeight: '700', color: brandColors.foregroundSoft, flex: 1 },
   dayNameDisplay: { fontSize: 16, fontWeight: '700', color: brandColors.foregroundSoft },
@@ -651,14 +651,14 @@ const s = StyleSheet.create({
   addExText: { fontSize: 14, fontWeight: '600', color: brandColors.brand500 },
   addDayBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 16, marginTop: 8 },
   addDayText: { fontSize: 15, fontWeight: '600', color: brandColors.brand500 },
-  startBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, backgroundColor: brandColors.brand900, borderRadius: 14, paddingVertical: 12, marginTop: 12 },
+  startBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, backgroundColor: brandColors.brand500, borderRadius: 14, paddingVertical: 12, marginTop: 12 },
   startBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
-  saveBtn: { backgroundColor: brandColors.brand900, borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginTop: 24 },
+  saveBtn: { backgroundColor: brandColors.brand500, borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginTop: 24 },
   saveBtnDisabled: { opacity: 0.6 },
   saveBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
   // Picker
-  filterChip: { backgroundColor: 'rgba(255,255,255,0.84)', borderWidth: 1, borderColor: brandColors.line, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6 },
-  filterChipActive: { backgroundColor: brandColors.brand900, borderColor: brandColors.brand900 },
+  filterChip: { backgroundColor: brandColors.panelMuted, borderWidth: 1, borderColor: brandColors.line, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6 },
+  filterChipActive: { backgroundColor: brandColors.brand500, borderColor: brandColors.brand500 },
   filterChipText: { fontSize: 13, fontWeight: '600', color: brandColors.textMuted },
   filterChipTextActive: { color: '#fff' },
   pickItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: brandColors.line },
@@ -667,14 +667,14 @@ const s = StyleSheet.create({
   // Session
   sessionExName: { fontSize: 22, fontWeight: '800', color: brandColors.foreground, textAlign: 'center' },
   sessionExMeta: { fontSize: 14, color: brandColors.textMuted, textAlign: 'center', marginTop: 4, marginBottom: 16 },
-  suggestionCard: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: brandColors.brand100, borderRadius: 14, borderWidth: 1, borderColor: 'rgba(77, 196, 255, 0.2)', padding: 12, marginBottom: 16 },
-  suggestionText: { fontSize: 13, color: '#0f4262', flex: 1 },
-  overloadBanner: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#fff6dd', borderRadius: 14, borderWidth: 1, borderColor: '#f3d27a', padding: 12, marginBottom: 14 },
-  overloadBannerText: { fontSize: 13, color: '#7a5813', fontWeight: '600', flex: 1 },
-  lastSessionCard: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 14, borderWidth: 1, borderColor: brandColors.line, padding: 12, marginBottom: 12 },
+  suggestionCard: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: brandColors.brand100, borderRadius: 14, borderWidth: 1, borderColor: brandColors.accentLine, padding: 12, marginBottom: 16 },
+  suggestionText: { fontSize: 13, color: brandColors.foregroundSoft, flex: 1 },
+  overloadBanner: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: brandColors.warningBg, borderRadius: 14, borderWidth: 1, borderColor: '#f3d27a', padding: 12, marginBottom: 14 },
+  overloadBannerText: { fontSize: 13, color: brandColors.foregroundSoft, fontWeight: '600', flex: 1 },
+  lastSessionCard: { backgroundColor: brandColors.panel, borderRadius: 14, borderWidth: 1, borderColor: brandColors.line, padding: 12, marginBottom: 12 },
   lastSessionLabel: { fontSize: 12, fontWeight: '700', color: brandColors.textMuted, textTransform: 'uppercase', letterSpacing: 0.4 },
   lastSessionValue: { fontSize: 14, color: brandColors.foregroundSoft, marginTop: 4, fontWeight: '600' },
-  restTimerCard: { backgroundColor: brandColors.brand900, borderRadius: 18, padding: 16, marginBottom: 16 },
+  restTimerCard: { backgroundColor: brandColors.brand500, borderRadius: 18, padding: 16, marginBottom: 16 },
   restTimerTopRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   restTimerTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   restTimerTitle: { color: '#fff', fontSize: 15, fontWeight: '700' },
@@ -686,12 +686,12 @@ const s = StyleSheet.create({
   setCol: { flex: 1, fontSize: 12, fontWeight: '700', color: brandColors.textMuted, textAlign: 'center' },
   setRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 6 },
   setRowDone: { backgroundColor: brandColors.panelMuted, borderRadius: 8 },
-  setInput: { flex: 1, backgroundColor: 'rgba(255,255,255,0.9)', borderWidth: 1, borderColor: brandColors.line, borderRadius: 10, paddingVertical: 10, paddingHorizontal: 12, fontSize: 16, textAlign: 'center', color: brandColors.foreground, marginHorizontal: 4 },
+  setInput: { flex: 1, backgroundColor: brandColors.panel, borderWidth: 1, borderColor: brandColors.line, borderRadius: 10, paddingVertical: 10, paddingHorizontal: 12, fontSize: 16, textAlign: 'center', color: brandColors.foreground, marginHorizontal: 4 },
   checkBtn: { flex: 0.5, alignItems: 'center' },
   checkBtnDone: {},
   addSetBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, paddingVertical: 12 },
   addSetText: { fontSize: 14, color: brandColors.textMuted },
   sessionNav: { flexDirection: 'row', padding: 20, gap: 12, borderTopWidth: 1, borderTopColor: brandColors.line },
-  prevBtn: { flex: 1, borderWidth: 1, borderColor: brandColors.lineStrong, borderRadius: 16, paddingVertical: 16, alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.84)' },
+  prevBtn: { flex: 1, borderWidth: 1, borderColor: brandColors.lineStrong, borderRadius: 16, paddingVertical: 16, alignItems: 'center', backgroundColor: brandColors.panelMuted },
   prevBtnText: { fontSize: 16, fontWeight: '600', color: brandColors.textMuted },
 })

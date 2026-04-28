@@ -129,7 +129,7 @@ export default function SignupScreen() {
                 style={[styles.roleCard, role === 'free' && styles.roleCardActive]}
                 onPress={() => setRole('free')}
               >
-                <Ionicons name="person-outline" size={22} color={role === 'free' ? brandColors.brand900 : brandColors.textMuted} />
+                <Ionicons name="person-outline" size={22} color={role === 'free' ? brandColors.brand500 : brandColors.textMuted} />
                 <Text style={styles.roleTitle}>Individual</Text>
                 <Text style={styles.roleBody}>Self-serve progress with Discover Coaches included.</Text>
               </TouchableOpacity>
@@ -137,7 +137,7 @@ export default function SignupScreen() {
                 style={[styles.roleCard, role === 'personal_trainer' && styles.roleCardActive]}
                 onPress={() => setRole('personal_trainer')}
               >
-                <Ionicons name="people-outline" size={22} color={role === 'personal_trainer' ? brandColors.brand900 : brandColors.textMuted} />
+                <Ionicons name="people-outline" size={22} color={role === 'personal_trainer' ? brandColors.brand500 : brandColors.textMuted} />
                 <Text style={styles.roleTitle}>Coach / PT</Text>
                 <Text style={styles.roleBody}>Client management, coaching, and marketplace visibility.</Text>
               </TouchableOpacity>
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
     width: 280,
     height: 280,
     borderRadius: 140,
-    backgroundColor: 'rgba(77, 196, 255, 0.18)',
+    backgroundColor: brandColors.brand100,
   },
   sideGlow: {
     position: 'absolute',
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     width: 210,
     height: 210,
     borderRadius: 105,
-    backgroundColor: 'rgba(216, 239, 251, 0.95)',
+    backgroundColor: 'rgba(245, 241, 234, 0.04)',
   },
   scrollContent: {
     flexGrow: 1,
@@ -250,13 +250,13 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: 'rgba(77, 196, 255, 0.34)',
+    borderColor: brandColors.accentLine,
     backgroundColor: brandColors.brand100,
     paddingHorizontal: 12,
     paddingVertical: 7,
   },
   eyebrowText: {
-    color: '#0f4262',
+    color: brandColors.foregroundSoft,
     fontSize: 12,
     fontWeight: '600',
   },
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
   },
   formCard: {
     borderRadius: 28,
-    backgroundColor: 'rgba(255,255,255,0.92)',
+    backgroundColor: brandColors.panel,
     borderWidth: 1,
     borderColor: brandColors.line,
     padding: 20,
@@ -297,12 +297,12 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     borderWidth: 1,
     borderColor: brandColors.line,
-    backgroundColor: 'rgba(255,255,255,0.72)',
+    backgroundColor: brandColors.panel,
     padding: 14,
     gap: 6,
   },
   roleCardActive: {
-    borderColor: 'rgba(29, 168, 240, 0.34)',
+    borderColor: brandColors.accentLine,
     backgroundColor: brandColors.brand100,
   },
   roleTitle: {
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
     color: brandColors.foreground,
   },
   button: {
-    backgroundColor: brandColors.brand900,
+    backgroundColor: brandColors.brand500,
     borderRadius: 18,
     paddingVertical: 16,
     alignItems: 'center',

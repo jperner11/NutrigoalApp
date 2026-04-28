@@ -45,14 +45,14 @@ export default function StatTile({
   // Hero treatment: subtle accent tint to lift one tile above the others
   const heroStyles: React.CSSProperties = hero
     ? {
-        background: 'var(--acc-soft)',
-        borderColor: 'var(--acc)',
+        background: 'rgba(230, 57, 70, 0.08)',
+        borderColor: 'rgba(230, 57, 70, 0.32)',
       }
     : {}
 
   return (
     <div
-      className={`${variant} ${className}`.trim()}
+      className={`app-metric-card ${variant} ${className}`.trim()}
       style={{ padding, ...heroStyles }}
     >
       <div className="row items-center gap-1.5">
