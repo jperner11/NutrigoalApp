@@ -9,6 +9,7 @@ import { toast } from 'react-hot-toast'
 import Link from 'next/link'
 import type { FoodItem, MealType, UserProfile } from '@/lib/supabase/types'
 import { isTrainerRole } from '@nutrigoal/shared'
+import { AppHeroPanel, ListCard, MetricCard } from '@/components/ui/AppDesign'
 
 interface MealEntry {
   meal_type: MealType
@@ -65,7 +66,7 @@ export default function NewClientDietPlanPage() {
     })
   }, [profile, id, router])
 
-  if (!profile || !client) return <div className="text-gray-500">Loading...</div>
+  if (!profile || !client) return <div className="text-[var(--fg-3)]">Loading...</div>
 
   const totalCals = meals.reduce((s, m) => s + m.foods.reduce((a, f) => a + f.calories, 0), 0)
   const totalProtein = meals.reduce((s, m) => s + m.foods.reduce((a, f) => a + f.protein, 0), 0)
@@ -222,70 +223,76 @@ export default function NewClientDietPlanPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <Link href={`/clients/${id}`} className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 mb-6">
+    <div className="mx-auto max-w-[980px]">
+      <Link href={`/clients/${id}`} className="btn btn-ghost mb-4 inline-flex">
         <ArrowLeft className="h-4 w-4" />
         <span>Back to {client.full_name || 'Client'}</span>
       </Link>
 
-      <h1 className="text-2xl font-bold text-gray-900 mb-2">New Diet Plan</h1>
-      <p className="text-gray-500 mb-6">for {client.full_name} · Target: {client.daily_calories ?? '—'} kcal</p>
+      <AppHeroPanel
+        eyebrow="N° 12 · Client diet"
+        title="Diet,"
+        accent="assigned."
+        subtitle={`Create a coach-built meal plan for ${client.full_name || 'this client'} · target ${client.daily_calories ?? '—'} kcal.`}
+      />
 
       {(client.dietary_restrictions?.length > 0 || client.food_dislikes?.length > 0 || client.allergies?.length > 0) && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-6 text-sm">
-          {client.allergies?.length > 0 && <p className="text-red-700 font-medium">Allergies: {client.allergies.join(', ')}</p>}
-          {client.dietary_restrictions?.length > 0 && <p className="text-amber-700">Restrictions: {client.dietary_restrictions.join(', ')}</p>}
-          {client.food_dislikes?.length > 0 && <p className="text-gray-600">Dislikes: {client.food_dislikes.join(', ')}</p>}
-        </div>
+        <ListCard className="mb-6" eyebrow="CLIENT CONTEXT">
+          <div className="space-y-1 text-sm text-[var(--fg-2)]">
+            {client.allergies?.length > 0 && <p className="font-medium text-[var(--brand-400)]">Allergies: {client.allergies.join(', ')}</p>}
+            {client.dietary_restrictions?.length > 0 && <p className="text-[var(--warn)]">Restrictions: {client.dietary_restrictions.join(', ')}</p>}
+            {client.food_dislikes?.length > 0 && <p>Dislikes: {client.food_dislikes.join(', ')}</p>}
+          </div>
+        </ListCard>
       )}
 
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-1">Plan Name</label>
+      <ListCard className="mb-6" eyebrow="PLAN DETAILS">
+        <label className="app-mono-label mb-2 block">Plan name</label>
         <input type="text" value={planName} onChange={e => setPlanName(e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          className="input-field"
           placeholder="e.g. Cutting Plan - Week 1" />
-      </div>
+      </ListCard>
 
       <div className="grid grid-cols-4 gap-3 mb-6">
-        <MacroCard label="Calories" value={totalCals} target={client.daily_calories} color="text-green-600" />
-        <MacroCard label="Protein" value={totalProtein} target={client.daily_protein} unit="g" color="text-blue-600" />
-        <MacroCard label="Carbs" value={totalCarbs} target={client.daily_carbs} unit="g" color="text-amber-600" />
-        <MacroCard label="Fat" value={totalFat} target={client.daily_fat} unit="g" color="text-red-600" />
+        <MetricCard label="Calories" value={totalCals} footer={client.daily_calories ? `${Math.round((totalCals / client.daily_calories) * 100)}% of ${client.daily_calories}` : undefined} tone="accent" />
+        <MetricCard label="Protein" value={totalProtein} unit="g" footer={client.daily_protein ? `${Math.round((totalProtein / client.daily_protein) * 100)}% of ${client.daily_protein}g` : undefined} tone="success" />
+        <MetricCard label="Carbs" value={totalCarbs} unit="g" footer={client.daily_carbs ? `${Math.round((totalCarbs / client.daily_carbs) * 100)}% of ${client.daily_carbs}g` : undefined} tone="warn" />
+        <MetricCard label="Fat" value={totalFat} unit="g" footer={client.daily_fat ? `${Math.round((totalFat / client.daily_fat) * 100)}% of ${client.daily_fat}g` : undefined} tone="danger" />
       </div>
 
       {meals.map((meal, mi) => (
         <div key={mi} className="card p-5 mb-4">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-semibold text-gray-900">{meal.meal_name}</h3>
-            <span className="text-sm text-green-600 font-medium">{meal.foods.reduce((s, f) => s + f.calories, 0)} kcal</span>
+          <div className="mb-3 flex items-center justify-between">
+            <h3 className="font-semibold text-[var(--fg)]">{meal.meal_name}</h3>
+            <span className="text-sm font-medium text-[var(--ok)]">{meal.foods.reduce((s, f) => s + f.calories, 0)} kcal</span>
           </div>
 
           {meal.foods.map((food, fi) => (
-            <div key={fi} className="flex items-center justify-between py-2 border-t border-gray-50">
+            <div key={fi} className="flex items-center justify-between border-t border-[var(--line)] py-2">
               <div>
-                <p className="text-sm font-medium text-gray-900">{food.name}</p>
-                <p className="text-xs text-gray-500">
+                <p className="text-sm font-medium text-[var(--fg)]">{food.name}</p>
+                <p className="text-xs text-[var(--fg-3)]">
                   {food.amount}{food.unit} · {food.calories}kcal · P{food.protein} C{food.carbs} F{food.fat}
-                  {food.source && <span className="ml-1 text-gray-400">· {food.source === 'ai_parsed' ? 'AI' : food.source === 'custom' ? '★' : food.source === 'openfoodfacts' ? 'OFF' : 'SP'}</span>}
+                  {food.source && <span className="ml-1 text-[var(--fg-4)]">· {food.source === 'ai_parsed' ? 'AI' : food.source === 'custom' ? '★' : food.source === 'openfoodfacts' ? 'OFF' : 'SP'}</span>}
                 </p>
               </div>
-              <button onClick={() => removeFood(mi, fi)} className="text-gray-300 hover:text-red-500">
+              <button onClick={() => removeFood(mi, fi)} className="text-[var(--fg-4)] hover:text-[var(--brand-400)]">
                 <Trash2 className="h-4 w-4" />
               </button>
             </div>
           ))}
 
           {selectedMealIndex === mi ? (
-            <div className="mt-3 border-t border-gray-100 pt-3 space-y-3">
+            <div className="mt-3 space-y-3 border-t border-[var(--line)] pt-3">
               <div className="flex gap-2">
                 <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && searchFood(searchQuery)}
-                  className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg" placeholder="Search food..." />
+                  className="input-field flex-1 px-3 py-2 text-sm" placeholder="Search food..." />
                 <input type="number" value={foodAmount} onChange={e => setFoodAmount(Number(e.target.value))}
-                  className="w-20 px-3 py-2 text-sm border border-gray-300 rounded-lg text-center" />
-                <span className="self-center text-xs text-gray-500">g</span>
+                  className="input-field w-20 px-3 py-2 text-center text-sm" />
+                <span className="self-center text-xs text-[var(--fg-3)]">g</span>
                 <button onClick={() => searchFood(searchQuery)}
-                  className="px-3 py-2 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700">
+                  className="btn btn-accent px-3 py-2 text-sm">
                   {searching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
                 </button>
               </div>
@@ -294,33 +301,33 @@ export default function NewClientDietPlanPage() {
                 <div className="max-h-48 overflow-y-auto">
                   {searchResults.map(food => (
                     <button key={food.id} onClick={() => addFoodToMeal(mi, food)} disabled={loadingNutrition}
-                      className="w-full text-left px-3 py-2 text-sm hover:bg-purple-50 rounded flex justify-between items-center">
+                      className="flex w-full items-center justify-between rounded px-3 py-2 text-left text-sm hover:bg-[var(--ink-2)]">
                       <div>
-                        <span>{food.name}</span>
+                        <span className="text-[var(--fg)]">{food.name}</span>
                         {food.calories_per_100g !== undefined && (
-                          <span className="text-xs text-gray-400 ml-2">
+                          <span className="ml-2 text-xs text-[var(--fg-4)]">
                             {food.calories_per_100g}kcal/100g
                           </span>
                         )}
-                        <span className="text-xs text-gray-300 ml-1">
+                        <span className="ml-1 text-xs text-[var(--fg-4)]">
                           {food.source === 'local' ? '★' : food.source === 'openfoodfacts' ? 'OFF' : 'SP'}
                         </span>
                       </div>
-                      {loadingNutrition ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3 text-purple-600" />}
+                      {loadingNutrition ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3 text-[var(--brand-400)]" />}
                     </button>
                   ))}
                 </div>
               )}
 
-              <div className="border-t border-gray-100 pt-3">
-                <label className="block text-xs font-medium text-gray-500 mb-1">Or describe a meal in plain text</label>
+              <div className="border-t border-[var(--line)] pt-3">
+                <label className="app-mono-label mb-1 block">Or describe a meal in plain text</label>
                 <div className="flex gap-2">
                   <input type="text" value={freeText} onChange={e => setFreeText(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && handleParseFreeText(mi)}
-                    className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg"
+                    className="input-field flex-1 px-3 py-2 text-sm"
                     placeholder="e.g. 200g chicken breast, 150g rice, salad" />
                   <button onClick={() => handleParseFreeText(mi)} disabled={parsingFreeText}
-                    className="px-3 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 whitespace-nowrap">
+                    className="btn btn-secondary whitespace-nowrap px-3 py-2 text-sm">
                     {parsingFreeText ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Parse'}
                   </button>
                 </div>
@@ -328,54 +335,54 @@ export default function NewClientDietPlanPage() {
 
               <div className="flex items-center justify-between">
                 <button onClick={() => setShowCustomForm(!showCustomForm)}
-                  className="flex items-center gap-1 text-xs text-purple-600 hover:text-purple-700">
+                  className="flex items-center gap-1 text-xs text-[var(--brand-400)] hover:text-[var(--brand-500)]">
                   <PlusCircle className="h-3.5 w-3.5" />
                   {showCustomForm ? 'Hide custom food form' : 'Create custom food'}
                 </button>
                 <button onClick={() => { setSelectedMealIndex(null); setSearchResults([]); setShowCustomForm(false) }}
-                  className="text-xs text-gray-500 hover:text-gray-700">Close</button>
+                  className="text-xs text-[var(--fg-3)] hover:text-[var(--fg)]">Close</button>
               </div>
 
               {showCustomForm && (
-                <div className="rounded-lg border border-purple-200 bg-purple-50/50 p-4 space-y-3">
+                <div className="space-y-3 rounded-lg border border-[var(--line)] bg-[var(--ink-2)] p-4">
                   <input type="text" value={customFood.name} onChange={e => setCustomFood(p => ({ ...p, name: e.target.value }))}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg" placeholder="Food name" />
+                    className="input-field w-full px-3 py-2 text-sm" placeholder="Food name" />
                   <div className="grid grid-cols-4 gap-2">
                     <div>
-                      <label className="block text-xs text-gray-500 mb-1">Cal/100g</label>
+                      <label className="app-mono-label mb-1 block">Cal/100g</label>
                       <input type="number" value={customFood.calories_per_100g} onChange={e => setCustomFood(p => ({ ...p, calories_per_100g: e.target.value }))}
-                        className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded" />
+                        className="input-field w-full px-2 py-1.5 text-sm" />
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-500 mb-1">P/100g</label>
+                      <label className="app-mono-label mb-1 block">P/100g</label>
                       <input type="number" value={customFood.protein_per_100g} onChange={e => setCustomFood(p => ({ ...p, protein_per_100g: e.target.value }))}
-                        className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded" />
+                        className="input-field w-full px-2 py-1.5 text-sm" />
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-500 mb-1">C/100g</label>
+                      <label className="app-mono-label mb-1 block">C/100g</label>
                       <input type="number" value={customFood.carbs_per_100g} onChange={e => setCustomFood(p => ({ ...p, carbs_per_100g: e.target.value }))}
-                        className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded" />
+                        className="input-field w-full px-2 py-1.5 text-sm" />
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-500 mb-1">F/100g</label>
+                      <label className="app-mono-label mb-1 block">F/100g</label>
                       <input type="number" value={customFood.fat_per_100g} onChange={e => setCustomFood(p => ({ ...p, fat_per_100g: e.target.value }))}
-                        className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded" />
+                        className="input-field w-full px-2 py-1.5 text-sm" />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="block text-xs text-gray-500 mb-1">Default amount</label>
+                      <label className="app-mono-label mb-1 block">Default amount</label>
                       <input type="number" value={customFood.default_amount} onChange={e => setCustomFood(p => ({ ...p, default_amount: e.target.value }))}
-                        className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded" />
+                        className="input-field w-full px-2 py-1.5 text-sm" />
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-500 mb-1">Unit</label>
+                      <label className="app-mono-label mb-1 block">Unit</label>
                       <input type="text" value={customFood.default_unit} onChange={e => setCustomFood(p => ({ ...p, default_unit: e.target.value }))}
-                        className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded" />
+                        className="input-field w-full px-2 py-1.5 text-sm" />
                     </div>
                   </div>
                   <button onClick={handleSaveCustomFood} disabled={savingCustom}
-                    className="w-full py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 disabled:opacity-50">
+                    className="btn btn-accent w-full justify-center py-2 text-sm disabled:opacity-50">
                     {savingCustom ? 'Saving...' : 'Save Custom Food'}
                   </button>
                 </div>
@@ -383,7 +390,7 @@ export default function NewClientDietPlanPage() {
             </div>
           ) : (
             <button onClick={() => { setSelectedMealIndex(mi); setSearchQuery(''); setSearchResults([]) }}
-              className="flex items-center space-x-1 text-sm text-green-600 hover:text-green-700 mt-3">
+              className="mt-3 flex items-center space-x-1 text-sm text-[var(--brand-400)] hover:text-[var(--brand-500)]">
               <Search className="h-4 w-4" />
               <span>Search & Add Food</span>
             </button>
@@ -392,25 +399,14 @@ export default function NewClientDietPlanPage() {
       ))}
 
       <button onClick={addSnack}
-        className="w-full py-3 border-2 border-dashed border-gray-200 rounded-xl text-sm font-medium text-green-600 hover:border-green-300 hover:bg-green-50 transition-colors mb-6">
+        className="mb-6 w-full rounded-xl border-2 border-dashed border-[var(--line-strong)] py-3 text-sm font-medium text-[var(--fg-2)] transition-colors hover:border-[var(--brand-400)] hover:text-[var(--brand-400)]">
         + Add Snack
       </button>
 
       <button onClick={handleSave} disabled={saving}
-        className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-xl font-medium hover:shadow-lg transition-all disabled:opacity-50">
+        className="btn btn-accent w-full justify-center py-3 disabled:opacity-50">
         {saving ? 'Creating...' : 'Create Diet Plan'}
       </button>
-    </div>
-  )
-}
-
-function MacroCard({ label, value, target, unit, color }: { label: string; value: number; target: number | null; unit?: string; color: string }) {
-  const pct = target ? Math.round((value / target) * 100) : 0
-  return (
-    <div className="bg-white rounded-lg p-3 shadow-sm border border-gray-200 text-center">
-      <p className={`text-lg font-bold ${color}`}>{value}{unit}</p>
-      <p className="text-xs text-gray-500">{label}</p>
-      {target && <p className="text-xs text-gray-400 mt-1">{pct}% of {target}{unit}</p>}
     </div>
   )
 }

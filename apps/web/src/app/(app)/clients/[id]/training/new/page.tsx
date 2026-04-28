@@ -10,6 +10,7 @@ import Link from 'next/link'
 import type { Exercise, UserProfile } from '@/lib/supabase/types'
 import { BODY_PARTS, DEFAULT_REST_SECONDS, DEFAULT_SETS, DEFAULT_REPS } from '@/lib/constants'
 import { isTrainerRole } from '@nutrigoal/shared'
+import { AppHeroPanel, ListCard } from '@/components/ui/AppDesign'
 
 interface DayExercise {
   tempId: string
@@ -67,7 +68,7 @@ export default function NewClientTrainingPlanPage() {
     })
   }, [exercises, searchQuery, filterBodyPart])
 
-  if (!profile || !client) return <div className="text-gray-500">Loading...</div>
+  if (!profile || !client) return <div className="text-[var(--fg-3)]">Loading...</div>
 
   function addDay() {
     setDays(prev => [...prev, { tempId: crypto.randomUUID(), name: `Day ${prev.length + 1}`, exercises: [] }])
@@ -147,74 +148,82 @@ export default function NewClientTrainingPlanPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <Link href={`/clients/${id}`} className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 mb-6">
+    <div className="mx-auto max-w-[980px]">
+      <Link href={`/clients/${id}`} className="btn btn-ghost mb-4 inline-flex">
         <ArrowLeft className="h-4 w-4" />
         <span>Back to {client.full_name || 'Client'}</span>
       </Link>
 
-      <h1 className="text-2xl font-bold text-gray-900 mb-2">New Training Plan</h1>
-      <p className="text-gray-500 mb-6">for {client.full_name}</p>
+      <AppHeroPanel
+        eyebrow="N° 12 · Client training"
+        title="Training,"
+        accent="assigned."
+        subtitle={`Create a coach-built program for ${client.full_name || 'this client'}.`}
+      />
 
       {/* Client fitness info */}
       {(client.injuries?.length > 0 || client.training_experience || client.equipment_access) && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-6 text-sm space-y-1">
-          {client.training_experience && <p className="text-gray-700">Experience: <strong>{client.training_experience}</strong></p>}
-          {client.equipment_access && <p className="text-gray-700">Equipment: <strong>{client.equipment_access.replace(/_/g, ' ')}</strong></p>}
-          {client.injuries?.length > 0 && <p className="text-red-700 font-medium">Injuries: {client.injuries.join(', ')}</p>}
-          {client.medical_conditions?.length > 0 && <p className="text-orange-700">Conditions: {client.medical_conditions.join(', ')}</p>}
-        </div>
+        <ListCard className="mb-6" eyebrow="CLIENT CONTEXT">
+          <div className="space-y-1 text-sm text-[var(--fg-2)]">
+            {client.training_experience && <p>Experience: <strong>{client.training_experience}</strong></p>}
+            {client.equipment_access && <p>Equipment: <strong>{client.equipment_access.replace(/_/g, ' ')}</strong></p>}
+            {client.injuries?.length > 0 && <p className="font-medium text-[var(--brand-400)]">Injuries: {client.injuries.join(', ')}</p>}
+            {client.medical_conditions?.length > 0 && <p className="text-[var(--warn)]">Conditions: {client.medical_conditions.join(', ')}</p>}
+          </div>
+        </ListCard>
       )}
 
       {/* Plan Name & Description */}
-      <div className="space-y-4 mb-6">
+      <ListCard className="mb-6" eyebrow="PROGRAM DETAILS">
+        <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Plan Name</label>
+          <label className="app-mono-label mb-2 block">Plan name</label>
           <input type="text" value={planName} onChange={e => setPlanName(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="input-field"
             placeholder="e.g. Push Pull Legs" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Description (optional)</label>
+          <label className="app-mono-label mb-2 block">Description</label>
           <input type="text" value={description} onChange={e => setDescription(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="input-field"
             placeholder="e.g. 4-week hypertrophy focus" />
         </div>
-      </div>
+        </div>
+      </ListCard>
 
       {/* Days */}
       {days.map((day, di) => (
-        <div key={day.tempId} className="card p-5 mb-4">
+        <div key={day.tempId} className="card mb-4 p-5">
           <div className="flex items-center justify-between mb-3">
             <input type="text" value={day.name} onChange={e => {
               setDays(prev => { const u = [...prev]; u[di].name = e.target.value; return u })
-            }} className="text-lg font-semibold text-gray-900 bg-transparent border-none outline-none" />
+            }} className="bg-transparent text-lg font-semibold text-[var(--fg)] outline-none" />
             {days.length > 1 && (
-              <button onClick={() => removeDay(di)} className="text-red-400 hover:text-red-600">
+              <button onClick={() => removeDay(di)} className="text-[var(--brand-400)] hover:text-[var(--brand-500)]">
                 <Trash2 className="h-4 w-4" />
               </button>
             )}
           </div>
 
           {day.exercises.map((ex, ei) => (
-            <div key={ex.tempId} className="flex items-center gap-3 py-3 border-t border-gray-50">
+            <div key={ex.tempId} className="flex items-center gap-3 border-t border-[var(--line)] py-3">
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900">{ex.exerciseName}</p>
-                <span className="text-xs text-gray-400">{ex.bodyPart}</span>
+                <p className="text-sm font-medium text-[var(--fg)]">{ex.exerciseName}</p>
+                <span className="text-xs text-[var(--fg-4)]">{ex.bodyPart}</span>
               </div>
               <div className="flex items-center gap-2">
-                <label className="text-xs text-gray-500">Sets</label>
+                <label className="text-xs text-[var(--fg-4)]">Sets</label>
                 <input type="number" value={ex.sets} onChange={e => updateExercise(di, ei, 'sets', e.target.value)}
-                  className="w-14 px-2 py-1 text-sm border border-gray-200 rounded text-center" />
-                <label className="text-xs text-gray-500">Reps</label>
+                  className="w-14 rounded border border-[var(--line)] bg-[var(--ink-2)] px-2 py-1 text-center text-sm text-[var(--fg)]" />
+                <label className="text-xs text-[var(--fg-4)]">Reps</label>
                 <input type="text" value={ex.reps} onChange={e => updateExercise(di, ei, 'reps', e.target.value)}
-                  className="w-16 px-2 py-1 text-sm border border-gray-200 rounded text-center" />
-                <label className="text-xs text-gray-500">Rest</label>
+                  className="w-16 rounded border border-[var(--line)] bg-[var(--ink-2)] px-2 py-1 text-center text-sm text-[var(--fg)]" />
+                <label className="text-xs text-[var(--fg-4)]">Rest</label>
                 <input type="number" value={ex.rest_seconds} onChange={e => updateExercise(di, ei, 'rest_seconds', e.target.value)}
-                  className="w-14 px-2 py-1 text-sm border border-gray-200 rounded text-center" />
-                <span className="text-xs text-gray-400">s</span>
+                  className="w-14 rounded border border-[var(--line)] bg-[var(--ink-2)] px-2 py-1 text-center text-sm text-[var(--fg)]" />
+                <span className="text-xs text-[var(--fg-4)]">s</span>
               </div>
-              <button onClick={() => removeExercise(di, ei)} className="text-gray-300 hover:text-red-500">
+              <button onClick={() => removeExercise(di, ei)} className="text-[var(--fg-4)] hover:text-[var(--brand-400)]">
                 <Trash2 className="h-4 w-4" />
               </button>
             </div>
@@ -222,12 +231,12 @@ export default function NewClientTrainingPlanPage() {
 
           {/* Inline exercise picker */}
           {addingToDayIndex === di ? (
-            <div className="mt-3 border-t border-gray-100 pt-3">
+            <div className="mt-3 border-t border-[var(--line)] pt-3">
               <div className="flex gap-2 mb-2">
                 <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                  className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg" placeholder="Search exercises..." />
+                  className="input-field flex-1 px-3 py-2 text-sm" placeholder="Search exercises..." />
                 <select value={filterBodyPart} onChange={e => setFilterBodyPart(e.target.value)}
-                  className="px-3 py-2 text-sm border border-gray-300 rounded-lg">
+                  className="input-field px-3 py-2 text-sm">
                   <option value="">All muscles</option>
                   {BODY_PARTS.map(bp => <option key={bp.value} value={bp.value}>{bp.label}</option>)}
                 </select>
@@ -236,21 +245,21 @@ export default function NewClientTrainingPlanPage() {
                 {loadingExercises ? <Loader2 className="h-4 w-4 animate-spin mx-auto my-4" /> :
                   filteredExercises.slice(0, 15).map(ex => (
                     <button key={ex.id} onClick={() => { addExercisesToDay(di, ex); setAddingToDayIndex(null) }}
-                      className="w-full text-left px-3 py-2 text-sm hover:bg-purple-50 rounded flex justify-between items-center">
+                      className="flex w-full items-center justify-between rounded px-3 py-2 text-left text-sm hover:bg-[var(--ink-2)]">
                       <div>
-                        <span className="font-medium">{ex.name}</span>
-                        <span className="text-xs text-gray-400 ml-2">{ex.body_part} · {ex.equipment}</span>
+                        <span className="font-medium text-[var(--fg)]">{ex.name}</span>
+                        <span className="ml-2 text-xs text-[var(--fg-4)]">{ex.body_part} · {ex.equipment}</span>
                       </div>
-                      <Plus className="h-3 w-3 text-purple-600" />
+                      <Plus className="h-3 w-3 text-[var(--brand-400)]" />
                     </button>
                   ))
                 }
               </div>
-              <button onClick={() => setAddingToDayIndex(null)} className="text-xs text-gray-500 hover:text-gray-700 mt-2">Close</button>
+              <button onClick={() => setAddingToDayIndex(null)} className="mt-2 text-xs text-[var(--fg-3)] hover:text-[var(--fg)]">Close</button>
             </div>
           ) : (
             <button onClick={() => { setAddingToDayIndex(di); setSearchQuery(''); setFilterBodyPart('') }}
-              className="flex items-center space-x-1 text-sm text-green-600 hover:text-green-700 mt-3">
+              className="mt-3 flex items-center space-x-1 text-sm text-[var(--brand-400)] hover:text-[var(--brand-500)]">
               <Plus className="h-4 w-4" />
               <span>Add Exercise</span>
             </button>
@@ -259,12 +268,12 @@ export default function NewClientTrainingPlanPage() {
       ))}
 
       <button onClick={addDay}
-        className="w-full py-3 border-2 border-dashed border-gray-200 rounded-xl text-sm font-medium text-green-600 hover:border-green-300 hover:bg-green-50 transition-colors mb-6">
+        className="mb-6 w-full rounded-xl border-2 border-dashed border-[var(--line-strong)] py-3 text-sm font-medium text-[var(--fg-2)] transition-colors hover:border-[var(--brand-400)] hover:text-[var(--brand-400)]">
         + Add Day
       </button>
 
       <button onClick={handleSave} disabled={saving}
-        className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-xl font-medium hover:shadow-lg transition-all disabled:opacity-50">
+        className="btn btn-accent w-full justify-center py-3 disabled:opacity-50">
         {saving ? 'Creating...' : 'Create Training Plan'}
       </button>
     </div>
