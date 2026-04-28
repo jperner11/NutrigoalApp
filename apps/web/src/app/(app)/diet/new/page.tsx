@@ -11,6 +11,7 @@ import { MEAL_TYPES } from '@/lib/constants'
 import type { FoodItem, MealType } from '@/lib/supabase/types'
 import { canAccess } from '@/lib/tierUtils'
 import { isManagedClientRole } from '@nutrigoal/shared'
+import { AppHeroPanel, ListCard, MetricCard } from '@/components/ui/AppDesign'
 
 interface MealEntry {
   meal_type: MealType
@@ -365,51 +366,55 @@ export default function NewDietPlanPage() {
   const totalFat = meals.reduce((s, m) => s + m.total_fat, 0)
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <div className="flex items-center gap-4 mb-8">
-        <Link href="/diet" className="p-2 rounded-lg hover:bg-gray-100">
-          <ArrowLeft className="h-5 w-5 text-gray-900" />
+    <div className="mx-auto max-w-[980px]">
+      <div className="mb-4">
+        <Link href="/diet" className="btn btn-ghost inline-flex">
+          <ArrowLeft className="h-4 w-4" />
+          Back to diet
         </Link>
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">New Diet Plan</h1>
-          <p className="text-gray-800 mt-1">Create a meal plan based on your goals.</p>
-        </div>
       </div>
 
+      <AppHeroPanel
+        eyebrow="N° 02 · New plan"
+        title="Plan,"
+        accent="assembled."
+        subtitle="Generate a meal plan or build one manually while keeping targets visible."
+      />
+
       {/* Plan Name & Notes — FIRST */}
-      <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
+      <ListCard className="mb-6" eyebrow="PLAN DETAILS">
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-900 mb-1">Plan Name</label>
+            <label className="app-mono-label mb-2 block">Plan name</label>
             <input
               type="text"
               value={planName}
               onChange={(e) => setPlanName(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="input-field"
               placeholder="e.g. My Cutting Plan"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-900 mb-1">Notes (optional)</label>
+            <label className="app-mono-label mb-2 block">Notes</label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="input-field min-h-[92px]"
               rows={2}
               placeholder="Any notes about this plan..."
             />
           </div>
         </div>
-      </div>
+      </ListCard>
 
       {/* Auto-Generate with Preferences */}
       {canAccess(profile.role, 'ai_suggestions') ? (
-      <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-6 border border-purple-200 mb-8">
+      <ListCard className="mb-8" eyebrow="AI GENERATOR" tone="accent">
         <div className="flex items-center gap-2 mb-4">
-          <Sparkles className="h-5 w-5 text-purple-600" />
-          <h3 className="font-semibold text-gray-900">Auto-Generate Plan</h3>
+          <Sparkles className="h-5 w-5 text-[var(--brand-400)]" />
+          <h3 className="font-semibold text-[var(--fg)]">Auto-generate plan</h3>
         </div>
-        <p className="text-sm text-gray-800 mb-4">
+        <p className="mb-4 text-sm text-[var(--fg-2)]">
           Target: {targetCalories} cal · {targetProtein}g protein · {targetCarbs}g carbs · {targetFat}g fat. Tell us what ingredients you like for each meal.
         </p>
 
@@ -420,12 +425,12 @@ export default function NewDietPlanPage() {
             { key: 'dinner', label: 'Dinner', placeholder: 'e.g. salmon, sweet potato, asparagus' },
           ].map(slot => (
             <div key={slot.key}>
-              <label className="block text-sm font-medium text-gray-900 mb-1">{slot.label} ingredients</label>
+              <label className="app-mono-label mb-2 block">{slot.label} ingredients</label>
               <input
                 type="text"
                 value={mealPrefs[slot.key as keyof typeof mealPrefs]}
                 onChange={(e) => setMealPrefs(prev => ({ ...prev, [slot.key]: e.target.value }))}
-                className="w-full px-3 py-2 border border-purple-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="input-field"
                 placeholder={slot.placeholder}
               />
             </div>
@@ -435,10 +440,10 @@ export default function NewDietPlanPage() {
             <button
               type="button"
               onClick={() => setIncludeSnack(!includeSnack)}
-              className={`flex items-center gap-2 text-sm font-medium px-3 py-1.5 rounded-lg transition-colors ${
+              className={`chip flex items-center gap-2 text-sm font-medium transition-colors ${
                 includeSnack
-                  ? 'bg-purple-100 text-purple-700'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  ? 'border-[var(--brand-400)] bg-[var(--brand-100)] text-[var(--brand-400)]'
+                  : ''
               }`}
             >
               <Plus className="h-3 w-3" />
@@ -448,12 +453,12 @@ export default function NewDietPlanPage() {
 
           {includeSnack && (
             <div>
-              <label className="block text-sm font-medium text-gray-900 mb-1">Snack ingredients</label>
+              <label className="app-mono-label mb-2 block">Snack ingredients</label>
               <input
                 type="text"
                 value={mealPrefs.snack}
                 onChange={(e) => setMealPrefs(prev => ({ ...prev, snack: e.target.value }))}
-                className="w-full px-3 py-2 border border-purple-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="input-field"
                 placeholder="e.g. nuts, protein bar, fruit, cheese"
               />
             </div>
@@ -463,7 +468,7 @@ export default function NewDietPlanPage() {
         <button
           onClick={generatePlan}
           disabled={generating}
-          className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-5 py-2.5 rounded-lg font-medium hover:shadow-lg transition-all disabled:opacity-50"
+          className="btn btn-accent w-full disabled:opacity-50"
         >
           {generating ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -472,72 +477,45 @@ export default function NewDietPlanPage() {
           )}
           <span>{generating ? 'Generating meals...' : 'Generate Meal Plan'}</span>
         </button>
-      </div>
+      </ListCard>
       ) : (
-      <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 mb-8">
+      <ListCard className="mb-8" eyebrow="AI GENERATOR">
         <div className="flex items-center gap-2 mb-2">
-          <Lock className="h-5 w-5 text-gray-400" />
-          <h3 className="font-semibold text-gray-700">Auto-Generate Plan</h3>
+          <Lock className="h-5 w-5 text-[var(--fg-4)]" />
+          <h3 className="font-semibold text-[var(--fg)]">Auto-generate plan</h3>
         </div>
-        <p className="text-sm text-gray-500 mb-3">
+        <p className="mb-3 text-sm text-[var(--fg-3)]">
           AI meal plan generation is a Pro feature. You can still manually build your plan below using the food search.
         </p>
         <Link
           href="/pricing"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-purple-600 hover:text-purple-800"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--brand-400)]"
         >
           Upgrade to Pro
         </Link>
-      </div>
+      </ListCard>
       )}
 
       {/* Macro Summary */}
       {meals.length > 0 && (
-        <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
-          <h3 className="font-semibold text-gray-900 mb-3">Daily Totals</h3>
-          <div className="grid grid-cols-4 gap-3">
-            <div className="bg-purple-50 rounded-lg p-3 text-center">
-              <p className="text-xs text-gray-800 mb-1">Calories</p>
-              <p className={`text-lg font-bold ${Math.abs(totalCalories - targetCalories) < targetCalories * 0.1 ? 'text-purple-700' : 'text-red-600'}`}>
-                {Math.round(totalCalories)}
-              </p>
-              <p className="text-xs text-gray-500">/ {targetCalories}</p>
-            </div>
-            <div className="bg-green-50 rounded-lg p-3 text-center">
-              <p className="text-xs text-gray-800 mb-1">Protein</p>
-              <p className={`text-lg font-bold ${Math.abs(totalProtein - targetProtein) < targetProtein * 0.15 ? 'text-green-700' : 'text-red-600'}`}>
-                {Math.round(totalProtein)}g
-              </p>
-              <p className="text-xs text-gray-500">/ {targetProtein}g</p>
-            </div>
-            <div className="bg-amber-50 rounded-lg p-3 text-center">
-              <p className="text-xs text-gray-800 mb-1">Carbs</p>
-              <p className={`text-lg font-bold ${Math.abs(totalCarbs - targetCarbs) < targetCarbs * 0.15 ? 'text-amber-700' : 'text-red-600'}`}>
-                {Math.round(totalCarbs)}g
-              </p>
-              <p className="text-xs text-gray-500">/ {targetCarbs}g</p>
-            </div>
-            <div className="bg-rose-50 rounded-lg p-3 text-center">
-              <p className="text-xs text-gray-800 mb-1">Fat</p>
-              <p className={`text-lg font-bold ${Math.abs(totalFat - targetFat) < targetFat * 0.15 ? 'text-rose-700' : 'text-red-600'}`}>
-                {Math.round(totalFat)}g
-              </p>
-              <p className="text-xs text-gray-500">/ {targetFat}g</p>
-            </div>
-          </div>
+        <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+          <MetricCard label="Calories" value={Math.round(totalCalories)} footer={`/ ${targetCalories}`} tone={Math.abs(totalCalories - targetCalories) < targetCalories * 0.1 ? 'accent' : 'danger'} />
+          <MetricCard label="Protein" value={Math.round(totalProtein)} unit="g" footer={`/ ${targetProtein}g`} tone={Math.abs(totalProtein - targetProtein) < targetProtein * 0.15 ? 'success' : 'danger'} />
+          <MetricCard label="Carbs" value={Math.round(totalCarbs)} unit="g" footer={`/ ${targetCarbs}g`} tone={Math.abs(totalCarbs - targetCarbs) < targetCarbs * 0.15 ? 'warn' : 'danger'} />
+          <MetricCard label="Fat" value={Math.round(totalFat)} unit="g" footer={`/ ${targetFat}g`} tone={Math.abs(totalFat - targetFat) < targetFat * 0.15 ? 'danger' : 'muted'} />
         </div>
       )}
 
       {/* Meals */}
       <div className="space-y-4 mb-6">
         {meals.map((meal, mealIndex) => (
-          <div key={mealIndex} className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div key={mealIndex} className="card overflow-hidden">
             {/* Meal Header */}
-            <div className="bg-gradient-to-r from-purple-50 to-indigo-50 px-6 py-4">
+            <div className="border-b border-[var(--line)] bg-[var(--ink-2)] px-6 py-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="bg-purple-100 rounded-lg p-2">
-                    <Utensils className="h-4 w-4 text-purple-600" />
+                  <div className="rounded-lg bg-[var(--brand-100)] p-2">
+                    <Utensils className="h-4 w-4 text-[var(--brand-400)]" />
                   </div>
                   <div>
                     <input
@@ -550,7 +528,7 @@ export default function NewDietPlanPage() {
                           return updated
                         })
                       }}
-                      className="font-semibold text-gray-900 bg-transparent border-none focus:outline-none focus:ring-0 p-0 text-lg"
+                      className="bg-transparent p-0 text-lg font-semibold text-[var(--fg)] outline-none"
                     />
                     <div className="flex gap-2 mt-0.5">
                       <select
@@ -562,7 +540,7 @@ export default function NewDietPlanPage() {
                             return updated
                           })
                         }}
-                        className="text-xs text-gray-500 bg-transparent border-none focus:outline-none p-0"
+                        className="bg-transparent p-0 text-xs text-[var(--fg-3)] outline-none"
                       >
                         {MEAL_TYPES.map(mt => (
                           <option key={mt.value} value={mt.value}>{mt.label}</option>
@@ -577,7 +555,7 @@ export default function NewDietPlanPage() {
                     <button
                       onClick={() => rerollMeal(mealIndex)}
                       disabled={rerollingMeal !== null || rerollsUsed >= MAX_REROLLS}
-                      className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg bg-white border border-purple-200 text-purple-600 hover:bg-purple-50 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="app-status-pill flex items-center gap-1.5 text-xs disabled:cursor-not-allowed disabled:opacity-40"
                       title={rerollsUsed >= MAX_REROLLS ? 'No re-rolls left' : `${MAX_REROLLS - rerollsUsed} re-rolls remaining`}
                     >
                       {rerollingMeal === mealIndex ? (
@@ -589,8 +567,8 @@ export default function NewDietPlanPage() {
                     </button>
                   )}
                   <div className="text-right">
-                    <p className="text-sm font-bold text-gray-900">{Math.round(meal.total_calories)} cal</p>
-                    <p className="text-xs text-gray-600">
+                    <p className="text-sm font-bold text-[var(--fg)]">{Math.round(meal.total_calories)} cal</p>
+                    <p className="text-xs text-[var(--fg-3)]">
                       {Math.round(meal.total_protein)}P · {Math.round(meal.total_carbs)}C · {Math.round(meal.total_fat)}F
                     </p>
                   </div>
@@ -603,7 +581,7 @@ export default function NewDietPlanPage() {
               {meal.foods.length > 0 && (
                 <div className="space-y-2 mb-4">
                   {/* Header row */}
-                  <div className="grid grid-cols-12 gap-2 text-xs text-gray-500 font-medium px-2 pb-1 border-b border-gray-100">
+                  <div className="app-mono-label grid grid-cols-12 gap-2 border-b border-[var(--line)] px-2 pb-2">
                     <div className="col-span-5">Ingredient</div>
                     <div className="col-span-2 text-right">Cal</div>
                     <div className="col-span-1 text-right">P</div>
@@ -612,18 +590,18 @@ export default function NewDietPlanPage() {
                     <div className="col-span-2"></div>
                   </div>
                   {meal.foods.map((food, foodIndex) => (
-                    <div key={foodIndex} className="grid grid-cols-12 gap-2 items-center py-2 px-2 rounded-lg hover:bg-gray-50 transition-colors group">
+                    <div key={foodIndex} className="group grid grid-cols-12 items-center gap-2 rounded-lg px-2 py-2 transition-colors hover:bg-[var(--ink-2)]">
                       <div className="col-span-5">
-                        <p className="text-sm font-medium text-gray-900">{food.amount} {food.unit} {food.name}</p>
+                        <p className="text-sm font-medium text-[var(--fg)]">{food.amount} {food.unit} {food.name}</p>
                       </div>
-                      <div className="col-span-2 text-right text-sm text-gray-700">{food.calories}</div>
-                      <div className="col-span-1 text-right text-sm text-green-700">{food.protein}g</div>
-                      <div className="col-span-1 text-right text-sm text-amber-700">{food.carbs}g</div>
-                      <div className="col-span-1 text-right text-sm text-rose-700">{food.fat}g</div>
+                      <div className="col-span-2 text-right text-sm text-[var(--fg-2)]">{food.calories}</div>
+                      <div className="col-span-1 text-right text-sm text-[var(--ok)]">{food.protein}g</div>
+                      <div className="col-span-1 text-right text-sm text-[var(--warn)]">{food.carbs}g</div>
+                      <div className="col-span-1 text-right text-sm text-[var(--brand-400)]">{food.fat}g</div>
                       <div className="col-span-2 text-right">
                         <button
                           onClick={() => removeFoodFromMeal(mealIndex, foodIndex)}
-                          className="p-1 text-gray-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                          className="p-1 text-[var(--fg-4)] opacity-0 transition-colors hover:text-[var(--brand-400)] group-hover:opacity-100"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
@@ -635,14 +613,14 @@ export default function NewDietPlanPage() {
 
               {/* Add food search */}
               {selectedMealIndex === mealIndex ? (
-                <div className="border-t border-gray-100 pt-4">
+                <div className="border-t border-[var(--line)] pt-4">
                   <div className="flex gap-2 mb-2">
                     <input
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && searchFood(searchQuery)}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="input-field flex-1"
                       placeholder="Search foods (e.g. chicken breast, rice)..."
                       autoFocus
                     />
@@ -650,14 +628,14 @@ export default function NewDietPlanPage() {
                       type="number"
                       value={foodAmount}
                       onChange={(e) => setFoodAmount(parseInt(e.target.value) || 100)}
-                      className="w-20 px-2 py-2 border border-gray-300 rounded-lg text-sm text-center focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="input-field w-20 text-center"
                       min={1}
                     />
-                    <span className="flex items-center text-sm text-gray-500">g</span>
+                    <span className="flex items-center text-sm text-[var(--fg-3)]">g</span>
                     <button
                       onClick={() => searchFood(searchQuery)}
                       disabled={searching}
-                      className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 disabled:opacity-50"
+                      className="btn btn-accent disabled:opacity-50"
                     >
                       {searching ? '...' : 'Search'}
                     </button>
@@ -670,18 +648,18 @@ export default function NewDietPlanPage() {
                           key={result.id}
                           onClick={() => addFoodToMeal(mealIndex, result)}
                           disabled={loadingNutrition}
-                          className="w-full text-left px-3 py-2 text-sm text-gray-900 hover:bg-purple-50 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
+                          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[var(--fg)] transition-colors hover:bg-[var(--ink-2)] disabled:opacity-50"
                         >
                           {loadingNutrition ? (
-                            <Loader2 className="h-3 w-3 animate-spin text-purple-600" />
+                            <Loader2 className="h-3 w-3 animate-spin text-[var(--brand-400)]" />
                           ) : (
-                            <Plus className="h-3 w-3 text-purple-600" />
+                            <Plus className="h-3 w-3 text-[var(--brand-400)]" />
                           )}
                           <span>{result.name}</span>
                           {result.calories_per_100g !== undefined && (
-                            <span className="text-xs text-gray-400">{result.calories_per_100g}kcal/100g</span>
+                            <span className="text-xs text-[var(--fg-4)]">{result.calories_per_100g}kcal/100g</span>
                           )}
-                          <span className="text-xs text-gray-300">
+                          <span className="text-xs text-[var(--fg-4)]">
                             {result.source === 'local' ? '★' : result.source === 'openfoodfacts' ? 'OFF' : 'SP'}
                           </span>
                         </button>
@@ -695,7 +673,7 @@ export default function NewDietPlanPage() {
                       setSearchQuery('')
                       setSearchResults([])
                     }}
-                    className="text-xs text-gray-500 hover:text-gray-700 mt-2"
+                    className="mt-2 text-xs text-[var(--fg-3)] hover:text-[var(--fg)]"
                   >
                     Cancel
                   </button>
@@ -703,7 +681,7 @@ export default function NewDietPlanPage() {
               ) : (
                 <button
                   onClick={() => setSelectedMealIndex(mealIndex)}
-                  className="flex items-center gap-1 text-sm text-purple-600 hover:text-purple-800 font-medium"
+                  className="flex items-center gap-1 text-sm font-medium text-[var(--brand-400)] hover:text-[var(--brand-500)]"
                 >
                   <Plus className="h-3 w-3" />
                   Add Food
@@ -716,7 +694,7 @@ export default function NewDietPlanPage() {
 
       {/* Re-roll counter */}
       {meals.length > 0 && (
-        <p className="text-center text-xs text-gray-500 mb-4">
+        <p className="mb-4 text-center text-xs text-[var(--fg-3)]">
           {MAX_REROLLS - rerollsUsed} surprise re-roll{MAX_REROLLS - rerollsUsed !== 1 ? 's' : ''} remaining for this plan
         </p>
       )}
@@ -724,7 +702,7 @@ export default function NewDietPlanPage() {
       {/* Add Meal Button */}
       <button
         onClick={addMeal}
-        className="w-full py-3 border-2 border-dashed border-gray-300 rounded-xl text-gray-800 hover:border-purple-400 hover:text-purple-600 transition-colors flex items-center justify-center gap-2 mb-8"
+        className="mb-8 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-[var(--line-strong)] py-3 text-[var(--fg-2)] transition-colors hover:border-[var(--brand-400)] hover:text-[var(--brand-400)]"
       >
         <Plus className="h-4 w-4" />
         Add Meal
@@ -734,14 +712,14 @@ export default function NewDietPlanPage() {
       <div className="flex gap-3 mb-8">
         <Link
           href="/diet"
-          className="px-6 py-3 border border-gray-300 rounded-lg text-gray-800 font-medium hover:bg-gray-50 transition-colors"
+          className="btn btn-secondary px-6 py-3"
         >
           Cancel
         </Link>
         <button
           onClick={savePlan}
           disabled={saving || meals.length === 0}
-          className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+          className="btn btn-accent flex-1 justify-center py-3 disabled:opacity-50"
         >
           {saving ? (
             <Loader2 className="h-5 w-5 animate-spin" />

@@ -27,6 +27,7 @@ import PlanChat from '@/components/diet/PlanChat'
 import UpgradeModal from '@/components/ui/UpgradeModal'
 import WeekDayTabs from '@/components/diet/WeekDayTabs'
 import type { DaySummary } from '@/components/diet/WeekDayTabs'
+import { AppHeroPanel, EmptyStateCard, ListCard, MetricCard } from '@/components/ui/AppDesign'
 
 interface FoodItemExtended {
   spoonacular_id?: number
@@ -240,9 +241,11 @@ export default function DietPlanDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600" />
-      </div>
+      <ListCard eyebrow="LOADING" title="Opening your diet plan.">
+        <div className="app-progress-track">
+          <div className="w-1/3 animate-pulse" />
+        </div>
+      </ListCard>
     )
   }
 
@@ -254,35 +257,26 @@ export default function DietPlanDetailPage() {
   const totalFat = filteredMeals.reduce((s, m) => s + (m.total_fat ?? 0), 0)
 
   return (
-    <div className="max-w-3xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-4">
-          <Link href="/diet" className="p-2 rounded-lg hover:bg-gray-100 transition-colors">
-            <ArrowLeft className="h-5 w-5 text-gray-600" />
-          </Link>
-          <div>
-            <div className="flex items-center space-x-3">
-              <h1 className="text-3xl font-bold text-gray-900">{plan.name}</h1>
-              {plan.is_active && (
-                <span className="inline-flex items-center space-x-1 text-xs bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-700 px-2.5 py-1 rounded-full font-medium">
-                  <Shield className="h-3 w-3" />
-                  <span>Active</span>
-                </span>
-              )}
-            </div>
-            {plan.notes && !plan.notes.startsWith('{') && (
-              <p className="text-gray-600 mt-1">{plan.notes}</p>
-            )}
-          </div>
-        </div>
+    <div className="mx-auto max-w-[980px]">
+      <div className="mb-4">
+        <Link href="/diet" className="btn btn-ghost inline-flex">
+          <ArrowLeft className="h-4 w-4" />
+          Back to diet
+        </Link>
+      </div>
 
-        <div className="flex items-center space-x-2">
+      <AppHeroPanel
+        eyebrow="N° 02 · Diet plan"
+        title={plan.name}
+        accent={plan.is_active ? 'active.' : 'review.'}
+        subtitle={plan.notes && !plan.notes.startsWith('{') ? plan.notes : 'Meals, macros, water target, and substitutions for the selected day.'}
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
           {!plan.is_active && (
             <button
               onClick={handleSetActive}
               disabled={activating}
-              className="flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all disabled:opacity-50"
+              className="btn btn-accent disabled:opacity-50"
             >
               <Shield className="h-4 w-4" />
               <span>{activating ? 'Activating...' : 'Set as Active'}</span>
@@ -291,13 +285,20 @@ export default function DietPlanDetailPage() {
           <button
             onClick={handleDelete}
             disabled={deleting}
-            className="flex items-center space-x-2 bg-white border border-red-200 text-red-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-50 transition-all disabled:opacity-50"
+            className="btn btn-secondary disabled:opacity-50"
           >
             <Trash2 className="h-4 w-4" />
             <span>{deleting ? 'Deleting...' : 'Delete'}</span>
           </button>
-        </div>
-      </div>
+          </div>
+        }
+        meta={plan.is_active ? (
+          <div className="app-status-pill">
+            <Shield className="h-3 w-3" />
+            Active plan
+          </div>
+        ) : undefined}
+      />
 
       {/* Week Day Tabs */}
       {hasMultipleDays && (
@@ -309,56 +310,39 @@ export default function DietPlanDetailPage() {
       )}
 
       {/* Daily Totals */}
-      <div className="bg-white/80 backdrop-blur-sm rounded-xl p-5 shadow-sm border border-gray-200 mb-6">
-        <div className="flex items-center gap-2 mb-3">
-          <Flame className="h-4 w-4 text-purple-600" />
-          <h3 className="font-semibold text-gray-900 text-sm">Daily Totals</h3>
-        </div>
-        <div className="grid grid-cols-4 gap-3">
-          <div className="bg-purple-50 rounded-lg p-3 text-center">
-            <p className="text-xs text-gray-600 mb-0.5">Calories</p>
-            <p className={`text-lg font-bold ${plan.target_calories && Math.abs(totalCalories - plan.target_calories) < plan.target_calories * 0.1 ? 'text-purple-700' : 'text-gray-900'}`}>
-              {Math.round(totalCalories)}
-            </p>
-            {plan.target_calories && <p className="text-xs text-gray-400">/ {plan.target_calories}</p>}
-          </div>
-          <div className="bg-green-50 rounded-lg p-3 text-center">
-            <p className="text-xs text-gray-600 mb-0.5">Protein</p>
-            <p className="text-lg font-bold text-green-700">{Math.round(totalProtein)}g</p>
-          </div>
-          <div className="bg-amber-50 rounded-lg p-3 text-center">
-            <p className="text-xs text-gray-600 mb-0.5">Carbs</p>
-            <p className="text-lg font-bold text-amber-700">{Math.round(totalCarbs)}g</p>
-          </div>
-          <div className="bg-rose-50 rounded-lg p-3 text-center">
-            <p className="text-xs text-gray-600 mb-0.5">Fat</p>
-            <p className="text-lg font-bold text-rose-700">{Math.round(totalFat)}g</p>
-          </div>
-        </div>
+      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+        <MetricCard
+          label="Calories"
+          value={Math.round(totalCalories)}
+          icon={<Flame className="h-4 w-4" />}
+          tone="accent"
+          footer={plan.target_calories ? `/ ${plan.target_calories}` : undefined}
+        />
+        <MetricCard label="Protein" value={Math.round(totalProtein)} unit="g" tone="success" />
+        <MetricCard label="Carbs" value={Math.round(totalCarbs)} unit="g" tone="warn" />
+        <MetricCard label="Fat" value={Math.round(totalFat)} unit="g" tone="danger" />
       </div>
 
       {/* Water Target */}
       {profile?.daily_water_ml && (
-        <div className="bg-blue-50/60 rounded-xl p-4 border border-blue-100 mb-6 flex items-center gap-3">
-          <Droplets className="h-5 w-5 text-blue-500" />
-          <div>
-            <span className="text-sm font-medium text-blue-800">Water Goal</span>
-            <span className="text-sm text-blue-600 ml-2">{(profile.daily_water_ml / 1000).toFixed(1)}L / day</span>
+        <ListCard className="mb-6" eyebrow="WATER GOAL">
+          <div className="flex items-center gap-3">
+            <Droplets className="h-5 w-5 text-[var(--brand-400)]" />
+            <div>
+              <span className="text-sm font-medium text-[var(--fg)]">Hydration target</span>
+              <span className="ml-2 text-sm text-[var(--fg-3)]">{(profile.daily_water_ml / 1000).toFixed(1)}L / day</span>
+            </div>
           </div>
-        </div>
+        </ListCard>
       )}
 
       {/* Meals */}
       {filteredMeals.length === 0 ? (
-        <div className="card p-12 text-center">
-          <Utensils className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            {hasMultipleDays && meals.length > 0 ? 'No meals for this day' : 'No meals in this plan'}
-          </h3>
-          <p className="text-gray-500">
-            {hasMultipleDays && meals.length > 0 ? 'Select a different day to view meals.' : "This plan doesn't have any meals yet."}
-          </p>
-        </div>
+        <EmptyStateCard
+          icon={<Utensils className="h-7 w-7" />}
+          title={hasMultipleDays && meals.length > 0 ? 'No meals for this day.' : 'No meals in this plan.'}
+          body={hasMultipleDays && meals.length > 0 ? 'Select a different day to view meals.' : "This plan doesn't have any meals yet."}
+        />
       ) : (
         <div className="space-y-4">
           {filteredMeals.map((meal) => {
@@ -369,8 +353,8 @@ export default function DietPlanDetailPage() {
             return (
               <div
                 key={meal.id}
-                className={`relative bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200 overflow-hidden transition-all ${
-                  isLocked ? '' : 'hover:shadow-md'
+                className={`card overflow-hidden transition-all ${
+                  isLocked ? 'opacity-80' : 'hover:border-[var(--line-strong)]'
                 }`}
               >
                 {/* Meal Header — always visible */}
@@ -378,26 +362,26 @@ export default function DietPlanDetailPage() {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       {meta.label && (
-                        <span className="text-xs font-semibold uppercase tracking-wide text-purple-600 mb-0.5 block">
+                        <span className="app-mono-label mb-1 block">
                           {meta.label}
                         </span>
                       )}
                       <div className="flex items-center gap-2">
-                        <h3 className="text-xl font-bold text-gray-900">{meal.meal_name}</h3>
-                        {isLocked && <Lock className="h-4 w-4 text-gray-400" />}
+                        <h3 className="text-xl font-bold text-[var(--fg)]">{meal.meal_name}</h3>
+                        {isLocked && <Lock className="h-4 w-4 text-[var(--fg-4)]" />}
                       </div>
                       {!isLocked && (
                         <div className="flex items-center gap-3 mt-1">
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-[var(--fg-3)]">
                             {Math.round(meal.total_calories ?? 0)} cal
-                            <span className="mx-1.5 text-gray-300">|</span>
+                            <span className="mx-1.5 text-[var(--fg-4)]">|</span>
                             {Math.round(meal.total_protein ?? 0)}P · {Math.round(meal.total_carbs ?? 0)}C · {Math.round(meal.total_fat ?? 0)}F
                           </p>
                         </div>
                       )}
                     </div>
                     {meta.time && (
-                      <span className="flex items-center gap-1.5 text-sm text-gray-500 bg-gray-100 px-3 py-1.5 rounded-full font-medium">
+                      <span className="app-status-pill flex items-center gap-1.5 text-sm">
                         <Clock className="h-3.5 w-3.5" />
                         {meta.time}
                       </span>
@@ -407,7 +391,7 @@ export default function DietPlanDetailPage() {
                   {isLocked ? (
                     <button
                       onClick={() => setShowUpgradeModal(true)}
-                      className="flex items-center gap-1.5 text-sm font-medium text-purple-600 hover:text-purple-800 mt-3 transition-colors"
+                      className="mt-3 flex items-center gap-1.5 text-sm font-medium text-[var(--brand-400)] transition-colors hover:text-[var(--brand-500)]"
                     >
                       <Lock className="h-3.5 w-3.5" />
                       <span>Upgrade to see this meal</span>
@@ -415,7 +399,7 @@ export default function DietPlanDetailPage() {
                   ) : (
                     <button
                       onClick={() => toggleMeal(meal.id)}
-                      className="flex items-center gap-1 text-sm font-medium text-purple-600 hover:text-purple-800 mt-3 transition-colors"
+                      className="mt-3 flex items-center gap-1 text-sm font-medium text-[var(--brand-400)] transition-colors hover:text-[var(--brand-500)]"
                     >
                       {isExpanded ? (
                         <>
@@ -434,16 +418,16 @@ export default function DietPlanDetailPage() {
 
                 {/* Expanded Content — only for unlocked meals */}
                 {isExpanded && !isLocked && (
-                  <div className="border-t border-gray-100">
+                  <div className="border-t border-[var(--line)]">
                     {/* Notes / Observations */}
                     {(meta.notes || meta.timing_note) && (
-                      <div className="px-5 py-4 bg-gray-50/80 border-b border-gray-100">
-                        <h4 className="text-sm font-semibold text-gray-800 mb-2">Notes</h4>
+                      <div className="border-b border-[var(--line)] bg-[var(--ink-2)] px-5 py-4">
+                        <h4 className="mb-2 text-sm font-semibold text-[var(--fg)]">Notes</h4>
                         {meta.timing_note && (
-                          <p className="text-sm text-gray-600 mb-1">{meta.timing_note}</p>
+                          <p className="mb-1 text-sm text-[var(--fg-2)]">{meta.timing_note}</p>
                         )}
                         {meta.notes && (
-                          <p className="text-sm text-gray-600 whitespace-pre-line">{meta.notes}</p>
+                          <p className="whitespace-pre-line text-sm text-[var(--fg-2)]">{meta.notes}</p>
                         )}
                       </div>
                     )}
@@ -454,15 +438,15 @@ export default function DietPlanDetailPage() {
                         <div className="space-y-1">
                           {items.map((food, idx) => (
                             <div key={idx} className="flex items-center gap-3 py-2.5">
-                              <div className="flex-shrink-0 w-7 h-7 rounded-full bg-purple-100 flex items-center justify-center">
-                                <Check className="h-4 w-4 text-purple-600" />
+                              <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-[var(--brand-100)]">
+                                <Check className="h-4 w-4 text-[var(--brand-400)]" />
                               </div>
 
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-gray-900">
+                                <p className="text-sm font-medium text-[var(--fg)]">
                                   {food.amount}{food.unit} {food.name}
                                 </p>
-                                <p className="text-xs text-gray-400">
+                                <p className="text-xs text-[var(--fg-4)]">
                                   {Math.round(food.calories)} cal · {Math.round(food.protein)}P · {Math.round(food.carbs)}C · {Math.round(food.fat)}F
                                 </p>
                               </div>
@@ -475,7 +459,7 @@ export default function DietPlanDetailPage() {
                                     unit: food.unit,
                                     alternatives: food.alternatives!,
                                   })}
-                                  className="flex-shrink-0 flex items-center gap-1 text-xs font-medium text-purple-700 bg-purple-50 border border-purple-200 px-3 py-1.5 rounded-lg hover:bg-purple-100 transition-colors"
+                                  className="app-status-pill flex flex-shrink-0 items-center gap-1 text-xs"
                                 >
                                   <RefreshCw className="h-3 w-3" />
                                   Alternatives
@@ -497,10 +481,10 @@ export default function DietPlanDetailPage() {
       {/* Free User Meal Picker Modal */}
       {showMealPicker && isFreeUser && (
         <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl">
-            <div className="px-6 py-5 border-b border-gray-100">
-              <h3 className="text-lg font-bold text-gray-900">Choose a meal to unlock</h3>
-              <p className="text-sm text-gray-500 mt-1">
+          <div className="panel-strong w-full max-w-md overflow-hidden">
+            <div className="border-b border-[var(--line)] px-6 py-5">
+              <h3 className="text-lg font-bold text-[var(--fg)]">Choose a meal to unlock</h3>
+              <p className="mt-1 text-sm text-[var(--fg-3)]">
                 Free plan includes 1 meal. Pick the one you&apos;d like to see in full detail.
               </p>
             </div>
@@ -511,17 +495,17 @@ export default function DietPlanDetailPage() {
                   <button
                     key={meal.id}
                     onClick={() => handleSelectFreeMeal(meal.id)}
-                    className="w-full flex items-center gap-3 p-3 rounded-xl border border-gray-200 hover:border-purple-300 hover:bg-purple-50/50 transition-all text-left"
+                    className="flex w-full items-center gap-3 rounded-xl border border-[var(--line)] bg-[var(--ink-2)] p-3 text-left transition-all hover:border-[var(--brand-400)]"
                   >
-                    <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
-                      <Utensils className="h-4 w-4 text-purple-600" />
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[var(--brand-100)]">
+                      <Utensils className="h-4 w-4 text-[var(--brand-400)]" />
                     </div>
                     <div className="flex-1 min-w-0">
                       {meta.label && (
-                        <p className="text-xs font-semibold text-purple-600">{meta.label}</p>
+                        <p className="text-xs font-semibold text-[var(--brand-400)]">{meta.label}</p>
                       )}
-                      <p className="font-medium text-gray-900">{meal.meal_name}</p>
-                      <p className="text-xs text-gray-500">
+                      <p className="font-medium text-[var(--fg)]">{meal.meal_name}</p>
+                      <p className="text-xs text-[var(--fg-3)]">
                         {Math.round(meal.total_calories ?? 0)} cal
                         {meta.time && ` · ${meta.time}`}
                       </p>
@@ -531,7 +515,7 @@ export default function DietPlanDetailPage() {
               })}
             </div>
             <div className="px-6 pb-5">
-              <p className="text-xs text-gray-400 text-center">
+              <p className="text-center text-xs text-[var(--fg-4)]">
                 Upgrade to Pro to see all meals
               </p>
             </div>
@@ -549,19 +533,19 @@ export default function DietPlanDetailPage() {
       {/* Alternatives Modal */}
       {alternativesModal && (
         <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md max-h-[80vh] overflow-y-auto shadow-2xl">
+          <div className="panel-strong max-h-[80vh] w-full max-w-md overflow-y-auto">
             {/* Modal header */}
-            <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 rounded-t-2xl">
+            <div className="sticky top-0 border-b border-[var(--line)] bg-[var(--panel-strong)] px-6 py-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-bold text-gray-900">Alternatives</h3>
+                <h3 className="text-lg font-bold text-[var(--fg)]">Alternatives</h3>
                 <button
                   onClick={() => setAlternativesModal(null)}
-                  className="p-1 rounded-lg hover:bg-gray-100 transition-colors"
+                  className="rounded-lg p-1 text-[var(--fg-3)] transition-colors hover:bg-[var(--ink-2)]"
                 >
-                  <X className="h-5 w-5 text-gray-500" />
+                  <X className="h-5 w-5" />
                 </button>
               </div>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="mt-1 text-sm text-[var(--fg-3)]">
                 You can substitute {alternativesModal.amount}{alternativesModal.unit} {alternativesModal.foodName} with:
               </p>
             </div>
@@ -570,10 +554,10 @@ export default function DietPlanDetailPage() {
             <div className="px-6 py-4 space-y-3">
               {alternativesModal.alternatives.map((alt, idx) => (
                 <div key={idx} className="flex items-center gap-3">
-                  <div className="flex-shrink-0 w-7 h-7 rounded-full bg-green-100 flex items-center justify-center">
-                    <Check className="h-4 w-4 text-green-600" />
+                  <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-[var(--success-bg)]">
+                    <Check className="h-4 w-4 text-[var(--ok)]" />
                   </div>
-                  <p className="text-sm font-medium text-gray-900">
+                  <p className="text-sm font-medium text-[var(--fg)]">
                     {alt.amount}{alt.unit} {alt.name}
                   </p>
                 </div>
@@ -584,7 +568,7 @@ export default function DietPlanDetailPage() {
             <div className="px-6 pb-6">
               <button
                 onClick={() => setAlternativesModal(null)}
-                className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-xl text-sm font-semibold hover:shadow-lg transition-all"
+                className="btn btn-accent w-full"
               >
                 Got it
               </button>
