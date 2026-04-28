@@ -28,8 +28,23 @@ const TRAINER_TABS: TabConfig[] = [
   { name: 'more', title: 'More', icon: 'ellipsis-horizontal', iconFocused: 'ellipsis-horizontal' },
 ]
 
-// Hidden tabs accessible via navigation but not in tab bar
-const HIDDEN_TABS = ['onboarding', 'water', 'ai', 'ai-generate', 'clients', 'my-pt', 'settings']
+// All screens that exist under (tabs)/. Anything not in the active tab set
+// for the current role is rendered with href: null so it stays routable but
+// doesn't appear in the tab bar.
+const ALL_SCREENS = [
+  'index',
+  'diet',
+  'training',
+  'cardio',
+  'water',
+  'more',
+  'clients',
+  'my-pt',
+  'ai',
+  'ai-generate',
+  'onboarding',
+  'settings',
+]
 
 export default function TabLayout() {
   const { profile } = useAuth()
@@ -80,7 +95,7 @@ export default function TabLayout() {
           />
         )
       })}
-      {HIDDEN_TABS.map((name) => (
+      {ALL_SCREENS.filter((name) => !tabs.some((t) => t.name === name)).map((name) => (
         <Tabs.Screen
           key={name}
           name={name}
