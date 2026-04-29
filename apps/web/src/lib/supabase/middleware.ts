@@ -64,7 +64,6 @@ export async function updateSession(request: NextRequest) {
     pathname.startsWith('/auth/') ||
     pathname.startsWith('/invite/') ||
     pathname.startsWith('/find-coach/') ||
-    pathname.startsWith('/sentry-test') ||
     isInvitePublicApi
 
   // If not authenticated and trying to access protected route, redirect to login
