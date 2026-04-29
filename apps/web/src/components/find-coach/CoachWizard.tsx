@@ -31,6 +31,7 @@ import {
 import CoachResults from './CoachResults'
 import WizardProgress from './WizardProgress'
 import WizardShell from './WizardShell'
+import { apiFetch, ApiError } from '@/lib/apiClient'
 import GoalStep from './steps/GoalStep'
 import TimelineStep from './steps/TimelineStep'
 import ExperienceStep from './steps/ExperienceStep'
@@ -224,17 +225,17 @@ export default function CoachWizard({ initialGoal = null }: { initialGoal?: stri
     setStatusMessage(null)
     setMatches([])
 
-    const response = await fetch(`/api/coach-match?q=${encodeURIComponent(encodeAnswers(answers))}`)
-    const payload = await response.json().catch(() => null)
-
-    if (!response.ok) {
+    try {
+      const payload = await apiFetch<{ matches?: MatchedCoachResult[] }>(
+        `/api/coach-match?q=${encodeURIComponent(encodeAnswers(answers))}`,
+        { context: { feature: 'find-coach', action: 'match' } },
+      )
+      setMatches(payload?.matches ?? [])
+      setPhase('results')
+    } catch (err) {
       setPhase('questions')
-      setStatusMessage(payload?.error ?? 'We could not match coaches right now. Please try again.')
-      return
+      setStatusMessage(err instanceof ApiError ? err.message : 'We could not match coaches right now. Please try again.')
     }
-
-    setMatches((payload?.matches as MatchedCoachResult[]) ?? [])
-    setPhase('results')
   }
 
   function handleContinue() {

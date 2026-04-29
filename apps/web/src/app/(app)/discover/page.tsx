@@ -16,6 +16,7 @@ import {
 import { isManagedClientRole, isTrainerRole } from '@nutrigoal/shared'
 import AppPageHeader from '@/components/ui/AppPageHeader'
 import Portrait from '@/components/ui/Portrait'
+import { apiFetch, ApiError } from '@/lib/apiClient'
 
 interface DiscoverCoach {
   coach_id: string
@@ -97,16 +98,16 @@ export default function DiscoverPage() {
 
   useEffect(() => {
     async function loadCoaches() {
-      const response = await fetch('/api/coach-profiles')
-      const payload = await response.json().catch(() => null)
-      if (!response.ok) {
-        toast.error(payload?.error ?? 'Failed to load coaches.')
+      try {
+        const payload = await apiFetch<{ profiles?: DiscoverCoach[] }>('/api/coach-profiles', {
+          context: { feature: 'discover', action: 'list-coaches' },
+        })
+        setCoaches(payload?.profiles ?? [])
+      } catch (err) {
+        toast.error(err instanceof ApiError ? err.message : 'Failed to load coaches.')
+      } finally {
         setLoading(false)
-        return
       }
-
-      setCoaches((payload?.profiles as DiscoverCoach[]) ?? [])
-      setLoading(false)
     }
 
     loadCoaches()
@@ -144,35 +145,32 @@ export default function DiscoverPage() {
     }
 
     setSubmitting(true)
-    const response = await fetch('/api/coach-leads', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        coach_id: selectedCoach.coach_id,
-        goal_summary: leadForm.goal_summary,
-        preferred_format: leadForm.preferred_format,
-        budget_label: leadForm.budget_label,
-        message: leadForm.message,
-        selected_offer_id: leadForm.selected_offer_id || null,
-        wizard_preferences: leadWizardPreferences,
-      }),
-    })
-
-    const payload = await response.json().catch(() => null)
-    setSubmitting(false)
-
-    if (!response.ok) {
-      toast.error(payload?.error ?? 'Failed to send request.')
-      return
+    try {
+      await apiFetch('/api/coach-leads', {
+        method: 'POST',
+        body: {
+          coach_id: selectedCoach.coach_id,
+          goal_summary: leadForm.goal_summary,
+          preferred_format: leadForm.preferred_format,
+          budget_label: leadForm.budget_label,
+          message: leadForm.message,
+          selected_offer_id: leadForm.selected_offer_id || null,
+          wizard_preferences: leadWizardPreferences,
+        },
+        context: { feature: 'discover', action: 'submit-lead', extra: { coachId: selectedCoach.coach_id } },
+      })
+      toast.success('Coaching request sent.')
+      if (leadWizardPreferences) {
+        clearLeadWizardPreferences()
+        setLeadWizardPreferences(null)
+      }
+      setSelectedCoach(null)
+      setLeadForm({ goal_summary: '', preferred_format: '', budget_label: '', message: '', selected_offer_id: '' })
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Failed to send request.')
+    } finally {
+      setSubmitting(false)
     }
-
-    toast.success('Coaching request sent.')
-    if (leadWizardPreferences) {
-      clearLeadWizardPreferences()
-      setLeadWizardPreferences(null)
-    }
-    setSelectedCoach(null)
-    setLeadForm({ goal_summary: '', preferred_format: '', budget_label: '', message: '', selected_offer_id: '' })
   }
 
   if (loading) {

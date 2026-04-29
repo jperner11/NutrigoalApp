@@ -32,6 +32,7 @@ import { SUPPORT_EMAIL } from '@/lib/site'
 import { COACH_MARKETPLACE_CURRENCIES, COACH_OFFER_BILLING_PERIODS, buildCoachProfileSlug, formatCoachPriceRange, formatOfferPrice } from '@/lib/coachMarketplace'
 import { isTrainerRole } from '@nutrigoal/shared'
 import { AppHeroPanel } from '@/components/ui/AppDesign'
+import { apiFetch, ApiError } from '@/lib/apiClient'
 
 const TABS = [
   { key: 'profile', label: 'Profile', icon: User },
@@ -366,15 +367,17 @@ export default function SettingsPage() {
   async function handleManageSubscription() {
     setManagingSubscription(true)
     try {
-      const res = await fetch('/api/stripe/portal', { method: 'POST' })
-      const data = await res.json()
-      if (data.url) {
+      const data = await apiFetch<{ url?: string; message?: string }>('/api/stripe/portal', {
+        method: 'POST',
+        context: { feature: 'settings', action: 'open-billing-portal' },
+      })
+      if (data?.url) {
         window.location.href = data.url
       } else {
-        toast.error(data.message || 'Could not open billing portal')
+        toast.error(data?.message || 'Could not open billing portal')
       }
-    } catch {
-      toast.error('Something went wrong')
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Something went wrong')
     }
     setManagingSubscription(false)
   }

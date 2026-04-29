@@ -8,6 +8,7 @@ import { toast } from 'react-hot-toast'
 import { useUser } from '@/hooks/useUser'
 import { COACH_LEAD_STAGES, formatLeadStage } from '@/lib/coachMarketplace'
 import { isTrainerRole } from '@nutrigoal/shared'
+import { apiFetch, ApiError } from '@/lib/apiClient'
 
 interface LeadRecord {
   id: string
@@ -50,16 +51,16 @@ export default function LeadsPage() {
 
   useEffect(() => {
     async function loadLeads() {
-      const response = await fetch('/api/coach-leads')
-      const payload = await response.json().catch(() => null)
-      if (!response.ok) {
-        toast.error(payload?.error ?? 'Failed to load leads.')
+      try {
+        const payload = await apiFetch<{ leads?: LeadRecord[] }>('/api/coach-leads', {
+          context: { feature: 'leads', action: 'list' },
+        })
+        setLeads(payload?.leads ?? [])
+      } catch (err) {
+        toast.error(err instanceof ApiError ? err.message : 'Failed to load leads.')
+      } finally {
         setLoading(false)
-        return
       }
-
-      setLeads((payload?.leads as LeadRecord[]) ?? [])
-      setLoading(false)
     }
 
     loadLeads()
@@ -70,48 +71,43 @@ export default function LeadsPage() {
 
   async function handleLead(id: string, action: 'accept' | 'decline') {
     setWorkingId(id)
-    const response = await fetch(`/api/coach-leads/${id}/respond`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action }),
-    })
-    const payload = await response.json().catch(() => null)
-    setWorkingId(null)
-
-    if (!response.ok) {
-      toast.error(payload?.error ?? `Failed to ${action} lead.`)
-      return
+    try {
+      await apiFetch(`/api/coach-leads/${id}/respond`, {
+        method: 'POST',
+        body: { action },
+        context: { feature: 'leads', action: `respond-${action}`, extra: { leadId: id } },
+      })
+      toast.success(action === 'accept' ? 'Lead accepted and added to your client roster.' : 'Lead declined.')
+      setLeads((prev) => prev.map((lead) => lead.id === id ? {
+        ...lead,
+        status: action === 'accept' ? 'accepted' : 'declined',
+        stage: action === 'accept' ? 'won' : 'lost',
+        responded_at: new Date().toISOString(),
+      } : lead))
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : `Failed to ${action} lead.`)
+    } finally {
+      setWorkingId(null)
     }
-
-    toast.success(action === 'accept' ? 'Lead accepted and added to your client roster.' : 'Lead declined.')
-    setLeads((prev) => prev.map((lead) => lead.id === id ? {
-      ...lead,
-      status: action === 'accept' ? 'accepted' : 'declined',
-      stage: action === 'accept' ? 'won' : 'lost',
-      responded_at: new Date().toISOString(),
-    } : lead))
   }
 
   async function updateLeadStage(id: string, stage: LeadRecord['stage']) {
     const previousLead = leads.find((lead) => lead.id === id)
     setLeads((prev) => prev.map((lead) => lead.id === id ? { ...lead, stage } : lead))
 
-    const response = await fetch(`/api/coach-leads/${id}/stage`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ stage }),
-    })
-    const payload = await response.json().catch(() => null)
-
-    if (!response.ok) {
-      toast.error(payload?.error ?? 'Failed to update lead stage.')
+    try {
+      await apiFetch(`/api/coach-leads/${id}/stage`, {
+        method: 'PATCH',
+        body: { stage },
+        context: { feature: 'leads', action: 'update-stage', extra: { leadId: id, stage } },
+      })
+      toast.success(`Lead moved to ${formatLeadStage(stage)}.`)
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Failed to update lead stage.')
       if (previousLead) {
         setLeads((prev) => prev.map((lead) => lead.id === id ? previousLead : lead))
       }
-      return
     }
-
-    toast.success(`Lead moved to ${formatLeadStage(stage)}.`)
   }
 
   if (loading) {

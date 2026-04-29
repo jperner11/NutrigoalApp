@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { MessageSquare, Send, X, ChevronDown, Sparkles, Loader2 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
+import { apiFetch, ApiError } from '@/lib/apiClient'
 
 interface ChatMessage {
   role: 'user' | 'assistant'
@@ -62,38 +63,24 @@ export default function PlanChat({ planId, meals, targets, userProfile, dayOfWee
     setIsLoading(true)
 
     try {
-      const res = await fetch('/api/ai/modify-meal-plan', {
+      const data = await apiFetch<{ message?: string; meals?: Record<string, unknown>[] }>('/api/ai/modify-meal-plan', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userMessage: text,
-          currentMeals: meals,
-          targets,
-          userProfile,
-        }),
+        body: { userMessage: text, currentMeals: meals, targets, userProfile },
+        context: { feature: 'plan-chat', action: 'modify-meal-plan' },
       })
-
-      if (!res.ok) {
-        const err = await res.json()
-        setMessages(prev => [...prev, { role: 'assistant', content: err.message || 'Something went wrong. Try again.' }])
-        setIsLoading(false)
-        return
-      }
-
-      const data = await res.json()
 
       setMessages(prev => [...prev, {
         role: 'assistant',
         content: data.message || 'Plan updated successfully.',
       }])
 
-      // Save modified meals to DB
       if (data.meals && data.meals.length > 0) {
         await saveMealsToDb(data.meals)
         onMealsUpdated()
       }
-    } catch {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Failed to connect to AI. Please try again.' }])
+    } catch (err) {
+      const fallback = err instanceof ApiError ? err.message : 'Failed to connect to AI. Please try again.'
+      setMessages(prev => [...prev, { role: 'assistant', content: fallback }])
     } finally {
       setIsLoading(false)
     }

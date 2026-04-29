@@ -6,6 +6,7 @@ import { Loader2, Mail, Sparkles } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { type CoachWizardAnswers, type MatchedCoachResult } from '@/lib/findCoach'
 import MatchedCoachCard from './MatchedCoachCard'
+import { apiFetch, ApiError } from '@/lib/apiClient'
 
 interface CoachResultsProps {
   answers: CoachWizardAnswers
@@ -25,25 +26,19 @@ export default function CoachResults({ answers, matches }: CoachResultsProps) {
     }
 
     setSubmitting(true)
-    const response = await fetch('/api/coach-waitlist', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email,
-        answers,
-      }),
-    })
-
-    const payload = await response.json().catch(() => null)
-    setSubmitting(false)
-
-    if (!response.ok) {
-      toast.error(payload?.error ?? 'Failed to join the waitlist.')
-      return
+    try {
+      await apiFetch('/api/coach-waitlist', {
+        method: 'POST',
+        body: { email, answers },
+        context: { feature: 'find-coach', action: 'waitlist-submit' },
+      })
+      toast.success('You’re on the waitlist. We’ll let you know when stronger coach matches join.')
+      setEmail('')
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Failed to join the waitlist.')
+    } finally {
+      setSubmitting(false)
     }
-
-    toast.success('You’re on the waitlist. We’ll let you know when stronger coach matches join.')
-    setEmail('')
   }
 
   return (

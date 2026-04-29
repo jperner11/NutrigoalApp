@@ -9,6 +9,7 @@ import { Sparkles, Dumbbell, Utensils, CheckCircle2, AlertCircle, Loader2, Pill,
 import { toast } from 'react-hot-toast'
 import { checkRegenEligibility, getRegenCooldownDays } from '@/lib/tierUtils'
 import { isManagedClientRole } from '@nutrigoal/shared'
+import { apiFetch } from '@/lib/apiClient'
 
 type StepStatus = 'pending' | 'loading' | 'done' | 'error'
 
@@ -220,10 +221,10 @@ export default function GeneratePlansPage() {
   }
 
   async function generateTrainingPlan() {
-    const res = await fetch('/api/ai/generate-training-plan', {
+    return apiFetch<TrainingPlanResponse>('/api/ai/generate-training-plan', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+      context: { feature: 'generate-plans', action: 'generate-training' },
+      body: {
         goal: profile!.goal ?? 'maintenance',
         daysPerWeek: profile!.workout_days_per_week ?? 4,
         gender: profile!.gender ?? 'male',
@@ -251,20 +252,17 @@ export default function GeneratePlansPage() {
         weeklyDerailers: profile!.weekly_derailers ?? '',
         planPreference: profile!.plan_preference ?? 'balanced',
         harderDays: profile!.harder_days ?? 'weekends',
-      }),
+      },
     })
-
-    if (!res.ok) throw new Error('Training plan generation failed')
-    return res.json()
   }
 
   const DAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
   async function generateMealPlanDay(dayIndex: number) {
-    const res = await fetch('/api/ai/generate-meal-plan', {
+    return apiFetch<{ meals: MealPlanMeal[]; supplements?: { name: string; dose: string; timing: string; reason: string }[] }>('/api/ai/generate-meal-plan', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+      context: { feature: 'generate-plans', action: 'generate-meal-day', extra: { dayIndex } },
+      body: {
         calories: profile!.daily_calories,
         protein: profile!.daily_protein,
         carbs: profile!.daily_carbs,
@@ -313,11 +311,8 @@ export default function GeneratePlansPage() {
         height_cm: profile!.height_cm,
         dayName: DAY_NAMES[dayIndex],
         dayIndex,
-      }),
+      },
     })
-
-    if (!res.ok) throw new Error(`Meal plan generation failed for ${DAY_NAMES[dayIndex]}`)
-    return res.json()
   }
 
   const [aiSupplements, setAiSupplements] = useState<{ name: string; dose: string; timing: string; reason: string }[] | null>(null)
@@ -465,10 +460,10 @@ interface SavedSupplementRecommendation {
 }
 
   async function generateCompanionContent(): Promise<CompanionContent> {
-    const res = await fetch('/api/ai/meal-plan-companion', {
+    return apiFetch<CompanionContent>('/api/ai/meal-plan-companion', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+      context: { feature: 'generate-plans', action: 'generate-companion' },
+      body: {
         calories: profile!.daily_calories,
         protein: profile!.daily_protein,
         carbs: profile!.daily_carbs,
@@ -505,11 +500,8 @@ interface SavedSupplementRecommendation {
         planPreference: profile!.plan_preference ?? 'balanced',
         harderDays: profile!.harder_days ?? 'weekends',
         eatingOutFrequency: profile!.eating_out_frequency ?? 'sometimes',
-      }),
+      },
     })
-
-    if (!res.ok) throw new Error('Companion content generation failed')
-    return res.json()
   }
 
   interface MealPlanMeal {

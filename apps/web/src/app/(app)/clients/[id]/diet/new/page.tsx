@@ -10,6 +10,7 @@ import Link from 'next/link'
 import type { FoodItem, MealType, UserProfile } from '@/lib/supabase/types'
 import { isTrainerRole } from '@nutrigoal/shared'
 import { AppHeroPanel, ListCard, MetricCard } from '@/components/ui/AppDesign'
+import { apiFetch, ApiError } from '@/lib/apiClient'
 
 interface MealEntry {
   meal_type: MealType
@@ -77,10 +78,14 @@ export default function NewClientDietPlanPage() {
     if (!query.trim()) return
     setSearching(true)
     try {
-      const res = await fetch(`/api/food/search?query=${encodeURIComponent(query)}&number=10`)
-      const data = await res.json()
-      setSearchResults(data.results ?? [])
-    } catch { toast.error('Failed to search foods') }
+      const data = await apiFetch<{ results?: SearchResult[] }>(
+        `/api/food/search?query=${encodeURIComponent(query)}&number=10`,
+        { context: { feature: 'client-diet-new', action: 'search-food' } },
+      )
+      setSearchResults(data?.results ?? [])
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Failed to search foods')
+    }
     setSearching(false)
   }
 
@@ -114,8 +119,17 @@ export default function NewClientDietPlanPage() {
 
       const sourceParam = food.source === 'openfoodfacts' ? 'openfoodfacts' : 'spoonacular'
       const idParam = food.external_id ?? food.id
-      const res = await fetch(`/api/food/nutrition?id=${idParam}&amount=${amt}&unit=g&source=${sourceParam}`)
-      const data = await res.json()
+      const data = await apiFetch<{
+        spoonacular_id?: number
+        food_id?: string
+        name?: string
+        calories: number
+        protein: number
+        carbs: number
+        fat: number
+      }>(`/api/food/nutrition?id=${idParam}&amount=${amt}&unit=g&source=${sourceParam}`, {
+        context: { feature: 'client-diet-new', action: 'get-nutrition' },
+      })
       const foodItem: FoodItem = {
         spoonacular_id: data.spoonacular_id,
         food_id: data.food_id,
@@ -134,7 +148,9 @@ export default function NewClientDietPlanPage() {
         return updated
       })
       setFoodAmount(100)
-    } catch { toast.error('Failed to get nutrition info') }
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Failed to get nutrition info')
+    }
     setLoadingNutrition(false)
   }
 
@@ -154,18 +170,18 @@ export default function NewClientDietPlanPage() {
     if (!customFood.name.trim()) { toast.error('Enter a food name'); return }
     setSavingCustom(true)
     try {
-      const res = await fetch('/api/food/custom', {
+      const data = await apiFetch<{ food: { name: string } }>('/api/food/custom', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(customFood),
+        body: customFood,
+        context: { feature: 'client-diet-new', action: 'save-custom-food' },
       })
-      const data = await res.json()
-      if (!res.ok) { toast.error(data.message); setSavingCustom(false); return }
       toast.success(`"${data.food.name}" saved to your foods`)
       setShowCustomForm(false)
       setCustomFood({ name: '', calories_per_100g: '', protein_per_100g: '', carbs_per_100g: '', fat_per_100g: '', default_amount: '100', default_unit: 'g' })
       if (searchQuery) searchFood(searchQuery)
-    } catch { toast.error('Failed to save custom food') }
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Failed to save custom food')
+    }
     setSavingCustom(false)
   }
 
@@ -173,14 +189,12 @@ export default function NewClientDietPlanPage() {
     if (!freeText.trim()) return
     setParsingFreeText(true)
     try {
-      const res = await fetch('/api/ai/parse-meal', {
+      const data = await apiFetch<{ foods?: FoodItem[] }>('/api/ai/parse-meal', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: freeText, mealType: meals[mealIndex].meal_name }),
+        body: { text: freeText, mealType: meals[mealIndex].meal_name },
+        context: { feature: 'client-diet-new', action: 'parse-free-text' },
       })
-      const data = await res.json()
-      if (!res.ok) { toast.error(data.message); setParsingFreeText(false); return }
-      const parsed: FoodItem[] = (data.foods ?? []).map((f: FoodItem) => ({ ...f, source: 'ai_parsed' as const }))
+      const parsed: FoodItem[] = (data?.foods ?? []).map((f) => ({ ...f, source: 'ai_parsed' as const }))
       setMeals(prev => {
         const updated = [...prev]
         updated[mealIndex].foods.push(...parsed)
@@ -188,7 +202,9 @@ export default function NewClientDietPlanPage() {
       })
       toast.success(`Parsed ${parsed.length} item${parsed.length === 1 ? '' : 's'}`)
       setFreeText('')
-    } catch { toast.error('Failed to parse meal') }
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Failed to parse meal')
+    }
     setParsingFreeText(false)
   }
 

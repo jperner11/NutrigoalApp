@@ -5,6 +5,7 @@ import { useUser } from '@/hooks/useUser'
 import { Sparkles, Send, Lock } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { isManagedClientRole } from '@nutrigoal/shared'
+import { apiFetch, ApiError } from '@/lib/apiClient'
 
 export default function AISuggestPage() {
   const { profile } = useUser()
@@ -30,10 +31,9 @@ export default function AISuggestPage() {
     setResponse('')
 
     try {
-      const res = await fetch('/api/ai/suggest', {
+      const data = await apiFetch<{ suggestion: string }>('/api/ai/suggest', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+        body: {
           prompt: prompt.trim(),
           userId: profile.id,
           userProfile: {
@@ -45,21 +45,13 @@ export default function AISuggestPage() {
             allergies: profile.allergies,
             goal: profile.goal,
           },
-        }),
+        },
+        context: { feature: 'ai-suggest', action: 'submit' },
       })
-
-      if (!res.ok) {
-        const error = await res.json()
-        toast.error(error.message ?? 'Failed to get suggestion')
-        setIsLoading(false)
-        return
-      }
-
-      const data = await res.json()
       setResponse(data.suggestion)
       toast.success('Suggestion generated!')
-    } catch {
-      toast.error('Failed to get suggestion')
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Failed to get suggestion')
     } finally {
       setIsLoading(false)
     }

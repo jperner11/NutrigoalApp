@@ -8,6 +8,7 @@ import {
   Calendar, Dumbbell, Target,
 } from 'lucide-react'
 import type { ExerciseProgress } from '@nutrigoal/shared'
+import { apiFetch } from '@/lib/apiClient'
 
 interface CheckInResult {
   exerciseProgress: ExerciseProgress[]
@@ -74,14 +75,12 @@ export default function ProgressCheckIn({ userId, onPlanRegenerate }: ProgressCh
   async function runCheckIn() {
     setLoading(true)
     try {
-      const res = await fetch('/api/ai/training-check-in', {
+      const data = await apiFetch<CheckInResult>('/api/ai/training-check-in', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId }),
+        body: { userId },
+        context: { feature: 'training', action: 'check-in', extra: { userId } },
       })
-
-      if (!res.ok) throw new Error('Check-in failed')
-      setResult(await res.json())
+      setResult(data)
       setEligible(false)
     } catch (err) {
       console.error('Check-in error:', err)

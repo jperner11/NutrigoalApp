@@ -12,6 +12,7 @@ import type { FoodItem, MealType } from '@/lib/supabase/types'
 import { canAccess } from '@/lib/tierUtils'
 import { isManagedClientRole } from '@nutrigoal/shared'
 import { AppHeroPanel, ListCard, MetricCard } from '@/components/ui/AppDesign'
+import { apiFetch, ApiError } from '@/lib/apiClient'
 
 interface MealEntry {
   meal_type: MealType
@@ -73,11 +74,13 @@ export default function NewDietPlanPage() {
     if (!query.trim()) return
     setSearching(true)
     try {
-      const res = await fetch(`/api/food/search?query=${encodeURIComponent(query)}&number=8`)
-      const data = await res.json()
-      setSearchResults(data.results ?? [])
-    } catch {
-      toast.error('Failed to search foods')
+      const data = await apiFetch<{ results?: Array<{ id: string; name: string; source: string }> }>(
+        `/api/food/search?query=${encodeURIComponent(query)}&number=8`,
+        { context: { feature: 'diet-new', action: 'search-food', extra: { query } } },
+      )
+      setSearchResults((data?.results ?? []) as typeof searchResults)
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Failed to search foods')
     }
     setSearching(false)
   }
@@ -100,8 +103,17 @@ export default function NewDietPlanPage() {
       } else {
         const sourceParam = food.source === 'openfoodfacts' ? 'openfoodfacts' : 'spoonacular'
         const idParam = food.external_id ?? food.id
-        const res = await fetch(`/api/food/nutrition?id=${idParam}&amount=${amt}&unit=g&source=${sourceParam}`)
-        const data = await res.json()
+        const data = await apiFetch<{
+          spoonacular_id?: number
+          food_id?: string
+          name?: string
+          calories: number
+          protein: number
+          carbs: number
+          fat: number
+        }>(`/api/food/nutrition?id=${idParam}&amount=${amt}&unit=g&source=${sourceParam}`, {
+          context: { feature: 'diet-new', action: 'get-nutrition', extra: { source: sourceParam } },
+        })
         foodItem = {
           spoonacular_id: data.spoonacular_id, food_id: data.food_id,
           source: food.source === 'openfoodfacts' ? 'openfoodfacts' : 'spoonacular',
@@ -217,13 +229,9 @@ export default function NewDietPlanPage() {
         }
       })
 
-      const res = await fetch(`/api/food/mealplan?${params.toString()}`)
-      if (!res.ok) {
-        const err = await res.json().catch(() => null)
-        throw new Error(err?.message || 'Failed to generate')
-      }
-
-      const data = await res.json()
+      const data = await apiFetch<{ meals: APIMeal[] }>(`/api/food/mealplan?${params.toString()}`, {
+        context: { feature: 'diet-new', action: 'generate-plan' },
+      })
 
       const generatedMeals: MealEntry[] = data.meals.map(
         (meal: APIMeal, index: number) => {
@@ -258,25 +266,18 @@ export default function NewDietPlanPage() {
       const mealCarbs = Math.round(targetCarbs * slot.share)
       const mealFat = Math.round(targetFat * slot.share)
 
-      const res = await fetch('/api/food/mealplan', {
+      const meal = await apiFetch<APIMeal>('/api/food/mealplan', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+        body: {
           mealType: slot.key,
           targetCalories: mealCalories,
           targetProtein: mealProtein,
           targetCarbs: mealCarbs,
           targetFat: mealFat,
           ingredients: mealPrefs[slot.key as keyof typeof mealPrefs] || '',
-        }),
+        },
+        context: { feature: 'diet-new', action: 'reroll-meal', extra: { mealType: slot.key } },
       })
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => null)
-        throw new Error(err?.message || 'Failed to regenerate')
-      }
-
-      const meal: APIMeal = await res.json()
 
       setMeals(prev => {
         const updated = [...prev]

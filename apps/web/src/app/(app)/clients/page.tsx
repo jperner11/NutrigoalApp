@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'react-hot-toast'
 import { isTrainerRole } from '@nutrigoal/shared'
 import { AppHeroPanel, AppSectionHeader, EmptyStateCard, MetricCard } from '@/components/ui/AppDesign'
+import { apiFetch, ApiError } from '@/lib/apiClient'
 
 interface ActiveClientRow {
   id: string
@@ -122,32 +123,34 @@ export default function ClientsPage() {
 
   async function resendInvite(inviteId: string) {
     setWorkingId(inviteId)
-    const response = await fetch(`/api/personal-trainer/invites/${inviteId}/resend`, { method: 'POST' })
-    const payload = await response.json().catch(() => null)
-    setWorkingId(null)
-
-    if (!response.ok) {
-      toast.error(payload?.error ?? 'Failed to resend invite.')
-      return
+    try {
+      await apiFetch(`/api/personal-trainer/invites/${inviteId}/resend`, {
+        method: 'POST',
+        context: { feature: 'clients', action: 'resend-invite', extra: { inviteId } },
+      })
+      toast.success('Invite resent.')
+      await refreshInvites()
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Failed to resend invite.')
+    } finally {
+      setWorkingId(null)
     }
-
-    toast.success('Invite resent.')
-    await refreshInvites()
   }
 
   async function cancelInvite(inviteId: string) {
     setWorkingId(inviteId)
-    const response = await fetch(`/api/personal-trainer/invites/${inviteId}/cancel`, { method: 'POST' })
-    const payload = await response.json().catch(() => null)
-    setWorkingId(null)
-
-    if (!response.ok) {
-      toast.error(payload?.error ?? 'Failed to cancel invite.')
-      return
+    try {
+      await apiFetch(`/api/personal-trainer/invites/${inviteId}/cancel`, {
+        method: 'POST',
+        context: { feature: 'clients', action: 'cancel-invite', extra: { inviteId } },
+      })
+      toast.success('Invite canceled.')
+      setPendingInvites((prev) => prev.filter((invite) => invite.id !== inviteId))
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Failed to cancel invite.')
+    } finally {
+      setWorkingId(null)
     }
-
-    toast.success('Invite canceled.')
-    setPendingInvites((prev) => prev.filter((invite) => invite.id !== inviteId))
   }
 
   async function copyInviteLink(token: string) {

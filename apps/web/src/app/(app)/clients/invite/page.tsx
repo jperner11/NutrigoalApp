@@ -7,6 +7,12 @@ import { toast } from 'react-hot-toast'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { isTrainerRole } from '@nutrigoal/shared'
+import { apiFetch, ApiError } from '@/lib/apiClient'
+
+type InviteResponse = {
+  invite?: { share_url?: string; delivery_method?: string }
+  message?: string
+}
 
 export default function InviteClientPage() {
   const { profile } = useUser()
@@ -22,31 +28,28 @@ export default function InviteClientPage() {
     if (!profile || !email) return
 
     setIsLoading(true)
-    const response = await fetch('/api/personal-trainer/invites', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: email.trim().toLowerCase(),
-        clientFirstName: clientFirstName.trim(),
-      }),
-    })
+    try {
+      const payload = await apiFetch<InviteResponse>('/api/personal-trainer/invites', {
+        method: 'POST',
+        body: {
+          email: email.trim().toLowerCase(),
+          clientFirstName: clientFirstName.trim(),
+        },
+        context: { feature: 'clients', action: 'create-invite' },
+      })
 
-    const payload = await response.json().catch(() => null)
-
-    if (!response.ok) {
-      toast.error(payload?.error ?? 'Failed to invite client')
+      if (payload?.invite?.share_url && payload?.invite?.delivery_method === 'magiclink') {
+        setShareUrl(payload.invite.share_url)
+        toast.success('Invite created! Share the link below with your client.')
+      } else {
+        toast.success(payload?.message ?? `Invite sent to ${email}`)
+        router.push('/clients')
+      }
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Failed to invite client')
+    } finally {
       setIsLoading(false)
-      return
     }
-
-    if (payload?.invite?.share_url && payload?.invite?.delivery_method === 'magiclink') {
-      setShareUrl(payload.invite.share_url)
-      toast.success('Invite created! Share the link below with your client.')
-    } else {
-      toast.success(payload?.message ?? `Invite sent to ${email}`)
-      router.push('/clients')
-    }
-    setIsLoading(false)
   }
 
   const handleCopyLink = () => {

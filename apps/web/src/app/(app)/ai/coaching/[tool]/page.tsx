@@ -14,6 +14,7 @@ import {
 import Link from 'next/link'
 import type { CoachingTool } from '@/lib/coachingPrompts'
 import AppPageHeader from '@/components/ui/AppPageHeader'
+import { apiFetch, ApiError } from '@/lib/apiClient'
 
 interface FieldDef {
   key: string
@@ -143,25 +144,18 @@ export default function CoachingToolPage() {
     setResponse(null)
 
     try {
-      const res = await fetch('/api/ai/coaching', {
+      const data = await apiFetch<{ response: string }>('/api/ai/coaching', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+        body: {
           toolType: toolSlug as CoachingTool,
           userId: profile.id,
           additionalInputs: inputs,
-        }),
+        },
+        context: { feature: 'ai-coaching', action: 'submit', extra: { tool: toolSlug } },
       })
-
-      if (!res.ok) {
-        const data = await res.json()
-        throw new Error(data.message || 'Failed to get coaching response')
-      }
-
-      const data = await res.json()
       setResponse(data.response)
     } catch (err) {
-      setResponse(`Error: ${err instanceof Error ? err.message : 'Something went wrong. Please try again.'}`)
+      setResponse(`Error: ${err instanceof ApiError ? err.message : err instanceof Error ? err.message : 'Something went wrong. Please try again.'}`)
     } finally {
       setLoading(false)
     }

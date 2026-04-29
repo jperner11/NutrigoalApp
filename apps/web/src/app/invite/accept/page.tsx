@@ -7,6 +7,7 @@ import { Mail, UserCheck, XCircle } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import BrandLogo from '@/components/brand/BrandLogo'
 import { createClient } from '@/lib/supabase/client'
+import { apiFetch, ApiError, reportClientError } from '@/lib/apiClient'
 
 interface InvitePayload {
   token?: string
@@ -162,6 +163,11 @@ export default function AcceptInvitePage() {
       }
 
       const errorMessage = payload && 'error' in payload ? payload.error : null
+      reportClientError(new Error(`Invite load failed: ${errorMessage ?? 'unknown'}`), {
+        feature: 'invite-accept',
+        action: 'load',
+        extra: { status: response.status, token: resolvedToken, inviteId: resolvedInviteId },
+      })
       toast.error(errorMessage ?? 'Could not load invite.')
       setLoading(false)
     }
@@ -177,23 +183,20 @@ export default function AcceptInvitePage() {
     if (!token) return
     setSubmitting(action)
 
-    const response = await fetch(`/api/personal-trainer/invites/token/${encodeURIComponent(token)}/respond`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action }),
-    })
-
-    const payload = await response.json().catch(() => null)
-    setSubmitting(null)
-
-    if (!response.ok) {
-      toast.error(payload?.error ?? `Failed to ${action} invite.`)
-      return
+    try {
+      await apiFetch(`/api/personal-trainer/invites/token/${encodeURIComponent(token)}/respond`, {
+        method: 'POST',
+        body: { action },
+        context: { feature: 'invite-accept', action: `respond-${action}` },
+      })
+      toast.success(action === 'accept' ? 'Trainer connected. Let’s finish your intake.' : 'Invite declined.')
+      router.push(action === 'accept' ? '/onboarding' : '/login')
+      router.refresh()
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : `Failed to ${action} invite.`)
+    } finally {
+      setSubmitting(null)
     }
-
-    toast.success(action === 'accept' ? 'Trainer connected. Let’s finish your intake.' : 'Invite declined.')
-    router.push(action === 'accept' ? '/onboarding' : '/login')
-    router.refresh()
   }
 
   const invite = data?.invite

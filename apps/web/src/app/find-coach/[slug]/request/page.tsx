@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { toast } from 'react-hot-toast'
+import { apiFetch, ApiError } from '@/lib/apiClient'
 
 const STEPS = ['Goal', 'Logistics', 'Message', 'Review'] as const
 type Step = (typeof STEPS)[number]
@@ -40,11 +41,12 @@ export default function RequestCoachingPage() {
 
   useEffect(() => {
     if (!slug) return
-    fetch('/api/coach-profiles')
-      .then((r) => r.json())
+    type Row = { slug: string; coach_id: string; coach: { full_name: string | null } | { full_name: string | null }[] | null }
+    apiFetch<{ profiles?: Row[] } | Row[]>('/api/coach-profiles', {
+      context: { feature: 'find-coach-request', action: 'load-coach', extra: { slug } },
+    })
       .then((data) => {
-        type Row = { slug: string; coach_id: string; coach: { full_name: string | null } | { full_name: string | null }[] | null }
-        const list: Row[] = data?.profiles ?? data ?? []
+        const list: Row[] = Array.isArray(data) ? data : (data?.profiles ?? [])
         const found = list.find((p) => p.slug === slug)
         if (found) {
           const c = Array.isArray(found.coach) ? found.coach[0] : found.coach
@@ -72,33 +74,25 @@ export default function RequestCoachingPage() {
     if (!coach) return
     setSubmitting(true)
     try {
-      const res = await fetch('/api/coach-leads', {
+      await apiFetch('/api/coach-leads', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+        body: {
           coach_id: coach.coach_id,
           goal_summary: goal,
           message,
           budget_label: budget,
           preferred_format: format,
-        }),
+        },
+        context: { feature: 'find-coach-request', action: 'send', extra: { slug } },
       })
-      if (res.status === 401) {
-        router.push(
-          `/signup?next=${encodeURIComponent(`/find-coach/${slug}/request`)}`,
-        )
-        return
-      }
-      const data = await res.json().catch(() => ({}))
-      if (!res.ok) {
-        toast.error(data?.error || 'Could not send request.')
-        setSubmitting(false)
-        return
-      }
       toast.success('Request sent.')
       router.push('/dashboard')
-    } catch {
-      toast.error('Something went wrong.')
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
+        router.push(`/signup?next=${encodeURIComponent(`/find-coach/${slug}/request`)}`)
+        return
+      }
+      toast.error(err instanceof ApiError ? err.message : 'Something went wrong.')
       setSubmitting(false)
     }
   }

@@ -5,6 +5,7 @@ import { X, Sparkles, Loader2 } from 'lucide-react'
 import { PRICING } from '@/lib/constants'
 import { toast } from 'react-hot-toast'
 import { useUser } from '@/hooks/useUser'
+import { apiFetch, ApiError } from '@/lib/apiClient'
 
 interface UpgradeModalProps {
   isOpen: boolean
@@ -29,27 +30,26 @@ export default function UpgradeModal({ isOpen, onClose, feature }: UpgradeModalP
   async function handleUpgrade(plan: string) {
     setLoadingPlan(plan)
     try {
-      const res = await fetch('/api/stripe/checkout', {
+      const data = await apiFetch<{ url?: string; message?: string }>('/api/stripe/checkout', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan }),
+        body: { plan },
+        context: { feature: 'upgrade-modal', action: 'checkout', extra: { plan } },
       })
-      const data = await res.json()
-      if (res.status === 401) {
+      if (data?.url) {
+        window.location.href = data.url
+      } else {
+        toast.error(data?.message || 'Failed to start checkout')
+      }
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
         window.location.href = plan === 'personal_trainer' ? '/signup?role=personal_trainer' : '/signup?role=free'
         return
       }
-      if (res.status === 503) {
-        handleCheckoutFallback(data)
+      if (err instanceof ApiError && err.status === 503) {
+        handleCheckoutFallback(err.payload as { message?: string; fallbackPath?: string } | null)
         return
       }
-      if (data.url) {
-        window.location.href = data.url
-      } else {
-        toast.error(data.message || 'Failed to start checkout')
-      }
-    } catch {
-      toast.error('Something went wrong')
+      toast.error(err instanceof ApiError ? err.message : 'Something went wrong')
     }
     setLoadingPlan(null)
   }
@@ -62,24 +62,23 @@ export default function UpgradeModal({ isOpen, onClose, feature }: UpgradeModalP
 
     setLoadingPlan('pro')
     try {
-      const res = await fetch('/api/trial/start', { method: 'POST' })
-      const data = await res.json().catch(() => ({}))
-
-      if (res.ok) {
-        toast.success('Your 7-day Pro trial is live.')
-        window.location.href = '/dashboard'
-        return
+      await apiFetch('/api/trial/start', {
+        method: 'POST',
+        context: { feature: 'upgrade-modal', action: 'start-trial' },
+      })
+      toast.success('Your 7-day Pro trial is live.')
+      window.location.href = '/dashboard'
+      return
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 400) {
+        const payload = err.payload as { message?: string } | null
+        if (payload?.message === 'Trial not applicable') {
+          setLoadingPlan(null)
+          await handleUpgrade('pro')
+          return
+        }
       }
-
-      if (res.status === 400 && data.message === 'Trial not applicable') {
-        setLoadingPlan(null)
-        await handleUpgrade('pro')
-        return
-      }
-
-      toast.error(data.message || 'Failed to start trial')
-    } catch {
-      toast.error('Something went wrong')
+      toast.error(err instanceof ApiError ? err.message : 'Something went wrong')
     }
 
     setLoadingPlan(null)

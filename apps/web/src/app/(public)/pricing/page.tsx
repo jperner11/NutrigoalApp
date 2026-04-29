@@ -7,6 +7,7 @@ import { toast } from 'react-hot-toast'
 import MarketingNav from '@/components/marketing/MarketingNav'
 import PublicFooter from '@/components/marketing/PublicFooter'
 import { PRICING } from '@/lib/constants'
+import { apiFetch, ApiError } from '@/lib/apiClient'
 
 const formatPrice = (price: number) =>
   price === 0 ? '$0' : `$${price.toFixed(price % 1 === 0 ? 0 : 2)}`
@@ -61,27 +62,26 @@ export default function PricingPage() {
   async function handleCheckout(plan: string) {
     setLoadingPlan(plan)
     try {
-      const res = await fetch('/api/stripe/checkout', {
+      const data = await apiFetch<{ url?: string; message?: string }>('/api/stripe/checkout', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan }),
+        body: { plan },
+        context: { feature: 'pricing', action: 'checkout', extra: { plan } },
       })
-      const data = await res.json()
-      if (res.status === 401) {
+      if (data?.url) {
+        window.location.href = data.url
+      } else {
+        toast.error(data?.message || 'Failed to start checkout')
+      }
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
         window.location.href = getSignupHref(plan)
         return
       }
-      if (res.status === 503) {
-        handleCheckoutFallback(data)
+      if (err instanceof ApiError && err.status === 503) {
+        handleCheckoutFallback(err.payload as { message?: string; fallbackPath?: string } | null)
         return
       }
-      if (data.url) {
-        window.location.href = data.url
-      } else {
-        toast.error(data.message || 'Failed to start checkout')
-      }
-    } catch {
-      toast.error('Something went wrong')
+      toast.error(err instanceof ApiError ? err.message : 'Something went wrong')
     }
     setLoadingPlan(null)
   }
@@ -89,26 +89,27 @@ export default function PricingPage() {
   async function handleStartTrial() {
     setLoadingPlan('pro')
     try {
-      const res = await fetch('/api/trial/start', { method: 'POST' })
-      const data = await res.json().catch(() => ({}))
-
-      if (res.status === 401) {
+      await apiFetch('/api/trial/start', {
+        method: 'POST',
+        context: { feature: 'pricing', action: 'start-trial' },
+      })
+      toast.success('Your 7-day Pro trial is live.')
+      window.location.href = '/dashboard'
+      return
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
         window.location.href = getSignupHref('free')
         return
       }
-      if (res.ok) {
-        toast.success('Your 7-day Pro trial is live.')
-        window.location.href = '/dashboard'
-        return
+      if (err instanceof ApiError && err.status === 400) {
+        const payload = err.payload as { message?: string } | null
+        if (payload?.message === 'Trial not applicable') {
+          setLoadingPlan(null)
+          await handleCheckout('pro')
+          return
+        }
       }
-      if (res.status === 400 && data.message === 'Trial not applicable') {
-        setLoadingPlan(null)
-        await handleCheckout('pro')
-        return
-      }
-      toast.error(data.message || 'Failed to start trial')
-    } catch {
-      toast.error('Something went wrong')
+      toast.error(err instanceof ApiError ? err.message : 'Something went wrong')
     }
     setLoadingPlan(null)
   }
