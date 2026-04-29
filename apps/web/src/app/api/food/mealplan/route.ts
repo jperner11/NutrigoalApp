@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import OpenAI from 'openai'
 
 export async function GET(request: Request) {
@@ -136,6 +137,7 @@ Return the JSON array only.`
 
     return NextResponse.json({ meals })
   } catch (err) {
+    Sentry.captureException(err, { tags: { kind: 'api-route', route: 'food/mealplan' } })
     const message = err instanceof Error ? err.message : 'Internal server error'
     return NextResponse.json({ message }, { status: 500 })
   }
@@ -241,6 +243,7 @@ Return JSON only.`
       fat: Math.round(totalFat),
     })
   } catch (err) {
+    Sentry.captureException(err, { tags: { kind: 'api-route', route: 'food/mealplan' } })
     const message = err instanceof Error ? err.message : 'Internal server error'
     return NextResponse.json({ message }, { status: 500 })
   }

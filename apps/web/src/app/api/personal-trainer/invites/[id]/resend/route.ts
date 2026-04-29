@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import {
@@ -65,6 +66,7 @@ export async function POST(
       })
       .eq('id', invite.id)
   } catch (error) {
+    Sentry.captureException(error, { tags: { kind: 'api-route', route: 'personal-trainer/invites/resend' } })
     const message = error instanceof Error ? error.message : 'Failed to resend invite.'
     return NextResponse.json({ error: message }, { status: 400 })
   }

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { calculateSuggestion } from '@nutrigoal/shared'
 import type { WorkoutSetLog } from '@nutrigoal/shared'
 
@@ -93,6 +94,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ suggestions: merged })
   } catch (error) {
+    Sentry.captureException(error, { tags: { kind: 'api-route', route: 'ai/training-overload' } })
     const message = error instanceof Error ? error.message : 'Internal server error'
     return NextResponse.json({ message }, { status: 500 })
   }

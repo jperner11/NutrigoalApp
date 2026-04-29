@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { rateLimit, getClientIp } from '@/lib/rateLimit'
 
 interface MealForContext {
@@ -163,6 +164,7 @@ Format:
       tokensUsed,
     })
   } catch (err) {
+    Sentry.captureException(err, { tags: { kind: 'api-route', route: 'ai/modify-meal-plan' } })
     const message = err instanceof Error ? err.message : 'Internal server error'
     return NextResponse.json({ message }, { status: 500 })
   }

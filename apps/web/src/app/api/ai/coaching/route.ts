@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { createClient } from '@supabase/supabase-js'
 import { rateLimit, getClientIp } from '@/lib/rateLimit'
 import { buildCoachingPrompt, type CoachingTool } from '@/lib/coachingPrompts'
@@ -101,6 +102,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ response })
   } catch (err) {
+    Sentry.captureException(err, { tags: { kind: 'api-route', route: 'ai/coaching' } })
     const message = err instanceof Error ? err.message : 'Internal server error'
     return NextResponse.json({ message }, { status: 500 })
   }

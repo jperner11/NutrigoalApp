@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { rateLimit, getClientIp } from '@/lib/rateLimit'
 
 export async function POST(request: Request) {
@@ -91,6 +92,7 @@ Return ONLY valid JSON array:
 
     return NextResponse.json({ foods, totals })
   } catch (err) {
+    Sentry.captureException(err, { tags: { kind: 'api-route', route: 'ai/parse-meal' } })
     const message = err instanceof Error ? err.message : 'Internal server error'
     return NextResponse.json({ message }, { status: 500 })
   }

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import {
@@ -42,6 +43,7 @@ export async function GET() {
 
     return NextResponse.json({ invites: invites ?? [] })
   } catch (error) {
+    Sentry.captureException(error, { tags: { kind: 'api-route', route: 'personal-trainer/invites:GET' } })
     const message = error instanceof Error ? error.message : 'Failed to load invites.'
     return NextResponse.json({ error: message }, { status: 403 })
   }
@@ -150,6 +152,7 @@ export async function POST(request: Request) {
         })
         .eq('id', invite.id)
     } catch (error) {
+      Sentry.captureException(error, { tags: { kind: 'api-route', route: 'personal-trainer/invites:POST', step: 'send-email' } })
       await admin.from('personal_trainer_invites').delete().eq('id', invite.id)
       const message = error instanceof Error ? error.message : 'Failed to send invite email.'
       return NextResponse.json({ error: message }, { status: 400 })
@@ -165,6 +168,7 @@ export async function POST(request: Request) {
       message: 'Invite sent. The client must accept before they appear as active.',
     })
   } catch (error) {
+    Sentry.captureException(error, { tags: { kind: 'api-route', route: 'personal-trainer/invites:POST' } })
     const message = error instanceof Error ? error.message : 'Failed to create invite.'
     return NextResponse.json({ error: message }, { status: 403 })
   }

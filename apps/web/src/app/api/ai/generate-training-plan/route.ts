@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { rateLimit, getClientIp } from '@/lib/rateLimit'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -306,6 +307,7 @@ PROGRAMMING RULES:
 
     return NextResponse.json(parsed)
   } catch (err) {
+    Sentry.captureException(err, { tags: { kind: 'api-route', route: 'ai/generate-training-plan' } })
     const message = err instanceof Error ? err.message : 'Internal server error'
     return NextResponse.json({ message }, { status: 500 })
   }

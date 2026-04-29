@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { rateLimit, getClientIp } from '@/lib/rateLimit'
 import { calculateBMR, calculateTDEE, adjustCaloriesForGoal } from '@nutrigoal/shared'
 
@@ -227,6 +228,7 @@ Return JSON only.`
       hydration_target_litres: (dailyWaterMl / 1000).toFixed(1),
     })
   } catch (err) {
+    Sentry.captureException(err, { tags: { kind: 'api-route', route: 'ai/meal-plan-companion' } })
     const message = err instanceof Error ? err.message : 'Internal server error'
     return NextResponse.json({ message }, { status: 500 })
   }
