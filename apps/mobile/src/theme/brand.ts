@@ -3,12 +3,13 @@
 // - Light mode: white + black + acid lime (matches web light palette)
 // - Acid lime accent (#cdf24e) is shared across modes
 //
-// React Native StyleSheets are evaluated once at module load, so for parity
-// with the web theme we expose both palettes plus a `useBrandColors()` hook
-// for components that want runtime theme switching, while `brandColors`
-// remains a stable export for existing call sites (currently graphite/dark).
+// React Native StyleSheets are normally evaluated once at module load, which
+// freezes them on the dark palette. Components consume the runtime palette
+// via `useBrandColors()` and use `useThemedStyles((c) => ({...}))` to build
+// per-render StyleSheets that flip with system appearance.
 
-import { useColorScheme } from 'react-native'
+import { useMemo } from 'react'
+import { StyleSheet, useColorScheme } from 'react-native'
 
 const ACID_LIME_500 = '#cdf24e'
 const ACID_LIME_400 = '#d6ff4e'
@@ -39,13 +40,16 @@ export const darkBrandColors = {
   accentLine: 'rgba(205, 242, 78, 0.38)',
   // Accent text (lime fills want black text for contrast)
   onAccent: '#0a0a0a',
+  // Brand affordance accent (acid lime). Used for save/add buttons,
+  // type pills, cardio "+" button, fat macro pills, etc. Matches web.
+  accent: ACID_LIME_500,
+  accentBg: 'rgba(205, 242, 78, 0.14)',
   success: '#1aa37a',
   successBg: 'rgba(26, 163, 122, 0.14)',
-  // "danger" historically meant the brand red. Map it to the acid lime
-  // accent for parity with the web rebrand (which dropped the ember palette
-  // and routes brand-coloured affordances to the lime accent).
-  danger: ACID_LIME_500,
-  dangerBg: 'rgba(205, 242, 78, 0.14)',
+  // True destructive / error semantic — kept separate from `accent`
+  // so Sign Out, delete buttons, and validation errors still read as red.
+  error: '#ef5b5b',
+  errorBg: 'rgba(239, 91, 91, 0.14)',
   warning: '#df9a2b',
   warningBg: 'rgba(223, 154, 43, 0.14)',
 }
@@ -72,10 +76,13 @@ export const lightBrandColors = {
   brand100: 'rgba(205, 242, 78, 0.16)',
   accentLine: 'rgba(205, 242, 78, 0.45)',
   onAccent: '#0a0a0a',
+  accent: ACID_LIME_500,
+  accentBg: 'rgba(205, 242, 78, 0.18)',
   success: '#1aa37a',
   successBg: 'rgba(26, 163, 122, 0.12)',
-  danger: ACID_LIME_500,
-  dangerBg: 'rgba(205, 242, 78, 0.18)',
+  // Slightly deeper red for legibility on the white background.
+  error: '#c0322b',
+  errorBg: 'rgba(192, 50, 43, 0.10)',
   warning: '#c4791c',
   warningBg: 'rgba(196, 121, 28, 0.14)',
 }
@@ -83,16 +90,26 @@ export const lightBrandColors = {
 export type BrandColors = typeof darkBrandColors
 
 /**
- * Default static palette — graphite (dark). Existing StyleSheet.create call
- * sites import this; they will continue to render the dark sequence.
- * For new components that want to follow the device theme, use
- * `useBrandColors()` instead.
+ * Runtime palette selector — tracks `useColorScheme()` and returns the
+ * matching palette. All theme-dependent styling in the app must go through
+ * this hook (or `useThemedStyles`) so screens flip with system appearance.
  */
-export const brandColors: BrandColors = darkBrandColors
-
 export function useBrandColors(): BrandColors {
   const scheme = useColorScheme()
   return scheme === 'light' ? lightBrandColors : darkBrandColors
+}
+
+/**
+ * Builds a memoised StyleSheet from a factory that receives the current
+ * palette. Use this in place of the module-level `StyleSheet.create({...})`
+ * pattern so every theme token in the stylesheet stays in sync with the
+ * device color scheme.
+ */
+export function useThemedStyles<T extends StyleSheet.NamedStyles<T> | StyleSheet.NamedStyles<unknown>>(
+  factory: (colors: BrandColors) => T,
+): T {
+  const colors = useBrandColors()
+  return useMemo(() => StyleSheet.create(factory(colors)), [colors])
 }
 
 export const brandShadow = {
