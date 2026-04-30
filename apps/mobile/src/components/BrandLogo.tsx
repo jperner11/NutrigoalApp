@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native'
-import { brandColors } from '../theme/brand'
+import { useBrandColors } from '../theme/brand'
 
 interface BrandLogoProps {
   /** Kept for API compatibility; the simplified wordmark has no compact variant yet. */
@@ -19,8 +19,9 @@ export function BrandLogo({
   tagline = false,
   size = 28,
 }: BrandLogoProps) {
-  const wordColor = light ? '#ffffff' : brandColors.foreground
-  const tagColor = light ? 'rgba(255,255,255,0.74)' : brandColors.textSubtle
+  const colors = useBrandColors()
+  const wordColor = light ? '#ffffff' : colors.foreground
+  const tagColor = light ? 'rgba(255,255,255,0.74)' : colors.textSubtle
 
   return (
     <View style={styles.row}>

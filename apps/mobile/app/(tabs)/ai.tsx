@@ -4,9 +4,25 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
-import { brandColors, brandShadow } from '../../src/theme/brand'
+import { useBrandColors, useThemedStyles, brandShadow } from '../../src/theme/brand'
 
 export default function AIScreen() {
+  const colors = useBrandColors()
+  const styles = useThemedStyles((c) => ({
+  container: { flex: 1, backgroundColor: c.background },
+  header: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 },
+  title: { fontSize: 24, fontWeight: '800', color: c.foreground, letterSpacing: -0.6 },
+  content: { padding: 20, paddingTop: 0 },
+  card: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: c.brand100, borderRadius: 18, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: c.accentLine },
+  cardText: { flex: 1, fontSize: 14, color: c.textMuted, lineHeight: 20 },
+  input: { backgroundColor: c.panel, borderWidth: 1, borderColor: c.lineStrong, borderRadius: 18, padding: 16, fontSize: 16, color: c.foreground, minHeight: 96, textAlignVertical: 'top', marginBottom: 12 },
+  button: { backgroundColor: c.brand500, borderRadius: 18, paddingVertical: 16, alignItems: 'center' },
+  buttonDisabled: { opacity: 0.6 },
+  buttonText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  responseCard: { backgroundColor: c.panel, borderRadius: 20, borderWidth: 1, borderColor: c.line, padding: 16, marginTop: 16, ...brandShadow },
+  responseText: { fontSize: 15, color: c.foregroundSoft, lineHeight: 22 },
+}))
+
   const { profile } = useAuth()
   const [prompt, setPrompt] = useState('')
   const [response, setResponse] = useState('')
@@ -51,7 +67,7 @@ export default function AIScreen() {
       </View>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.card}>
-          <Ionicons name="sparkles" size={24} color={brandColors.brand500} />
+          <Ionicons name="sparkles" size={24} color={colors.brand500} />
           <Text style={styles.cardText}>
             Ask for meal ideas, nutrition advice, or workout suggestions tailored to your goals.
           </Text>
@@ -60,7 +76,7 @@ export default function AIScreen() {
         <TextInput
           style={styles.input}
           placeholder="e.g., Suggest a high-protein breakfast under 400 calories"
-          placeholderTextColor={brandColors.textSubtle}
+          placeholderTextColor={colors.textSubtle}
           value={prompt}
           onChangeText={setPrompt}
           multiline
@@ -89,17 +105,3 @@ export default function AIScreen() {
   )
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: brandColors.background },
-  header: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 },
-  title: { fontSize: 24, fontWeight: '800', color: brandColors.foreground, letterSpacing: -0.6 },
-  content: { padding: 20, paddingTop: 0 },
-  card: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: brandColors.brand100, borderRadius: 18, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: brandColors.accentLine },
-  cardText: { flex: 1, fontSize: 14, color: brandColors.textMuted, lineHeight: 20 },
-  input: { backgroundColor: brandColors.panel, borderWidth: 1, borderColor: brandColors.lineStrong, borderRadius: 18, padding: 16, fontSize: 16, color: brandColors.foreground, minHeight: 96, textAlignVertical: 'top', marginBottom: 12 },
-  button: { backgroundColor: brandColors.brand500, borderRadius: 18, paddingVertical: 16, alignItems: 'center' },
-  buttonDisabled: { opacity: 0.6 },
-  buttonText: { color: '#fff', fontSize: 16, fontWeight: '700' },
-  responseCard: { backgroundColor: brandColors.panel, borderRadius: 20, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginTop: 16, ...brandShadow },
-  responseText: { fontSize: 15, color: brandColors.foregroundSoft, lineHeight: 22 },
-})

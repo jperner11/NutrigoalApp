@@ -21,7 +21,7 @@ import {
 } from '@nutrigoal/shared'
 import type { UserMetrics } from '@nutrigoal/shared'
 import { BrandLogo } from '../../src/components/BrandLogo'
-import { brandColors, brandShadow } from '../../src/theme/brand'
+import { useBrandColors, useThemedStyles, brandShadow, type BrandColors } from '../../src/theme/brand'
 
 const STEPS = ['Stats', 'Lifestyle', 'Food', 'Snacks', 'Health', 'Training', 'Goals', 'Schedule', 'Review']
 
@@ -41,6 +41,9 @@ function fmt12(t: string) {
 }
 
 export default function OnboardingScreen() {
+  const colors = useBrandColors()
+  const st = useThemedStyles(makeStyles)
+
   const { user, profile, refreshProfile } = useAuth()
   const router = useRouter()
   const [step, setStep] = useState(0)
@@ -274,7 +277,7 @@ export default function OnboardingScreen() {
             <Text style={st.subtitle}>These basics give your nutritionist logic a strong starting point before we tailor everything else around your lifestyle.</Text>
 
             <Text style={st.label}>Full Name</Text>
-            <TextInput style={st.input} placeholder="Your name" placeholderTextColor={brandColors.textSubtle} value={fullName} onChangeText={setFullName} />
+            <TextInput style={st.input} placeholder="Your name" placeholderTextColor={colors.textSubtle} value={fullName} onChangeText={setFullName} />
 
             <Text style={st.label}>Gender</Text>
             <View style={st.optionRow}>
@@ -286,17 +289,17 @@ export default function OnboardingScreen() {
             </View>
 
             <Text style={st.label}>Age</Text>
-            <TextInput style={st.input} placeholder="Years" placeholderTextColor={brandColors.textSubtle} value={age} onChangeText={setAge} keyboardType="numeric" />
+            <TextInput style={st.input} placeholder="Years" placeholderTextColor={colors.textSubtle} value={age} onChangeText={setAge} keyboardType="numeric" />
 
             <Text style={st.label}>Height (cm)</Text>
-            <TextInput style={st.input} placeholder="cm" placeholderTextColor={brandColors.textSubtle} value={height} onChangeText={setHeight} keyboardType="numeric" />
+            <TextInput style={st.input} placeholder="cm" placeholderTextColor={colors.textSubtle} value={height} onChangeText={setHeight} keyboardType="numeric" />
 
             <Text style={st.label}>Weight (kg)</Text>
-            <TextInput style={st.input} placeholder="kg" placeholderTextColor={brandColors.textSubtle} value={weight} onChangeText={setWeight} keyboardType="numeric" />
+            <TextInput style={st.input} placeholder="kg" placeholderTextColor={colors.textSubtle} value={weight} onChangeText={setWeight} keyboardType="numeric" />
 
             <Text style={st.label}>Body fat % (optional)</Text>
             <Text style={st.hint}>Helpful if you know it. Leave blank if you don't.</Text>
-            <TextInput style={st.input} placeholder="e.g. 18" placeholderTextColor={brandColors.textSubtle} value={bodyFatPct} onChangeText={setBodyFatPct} keyboardType="numeric" />
+            <TextInput style={st.input} placeholder="e.g. 18" placeholderTextColor={colors.textSubtle} value={bodyFatPct} onChangeText={setBodyFatPct} keyboardType="numeric" />
           </View>
         )}
 
@@ -324,7 +327,7 @@ export default function OnboardingScreen() {
             ))}
 
             <Text style={st.label}>Hours of sleep per night</Text>
-            <TextInput style={st.input} placeholder="e.g. 7" placeholderTextColor={brandColors.textSubtle} value={sleepHours} onChangeText={setSleepHours} keyboardType="numeric" />
+            <TextInput style={st.input} placeholder="e.g. 7" placeholderTextColor={colors.textSubtle} value={sleepHours} onChangeText={setSleepHours} keyboardType="numeric" />
 
             <Text style={st.label}>Sleep quality</Text>
             <View style={st.optionRow}>
@@ -352,7 +355,7 @@ export default function OnboardingScreen() {
               </TouchableOpacity>
             ))}
             {alcoholFrequency !== 'none' && (
-              <TextInput style={st.input} placeholder="e.g. a few beers at weekends, wine with dinner" placeholderTextColor={brandColors.textSubtle} value={alcoholDetails} onChangeText={setAlcoholDetails} />
+              <TextInput style={st.input} placeholder="e.g. a few beers at weekends, wine with dinner" placeholderTextColor={colors.textSubtle} value={alcoholDetails} onChangeText={setAlcoholDetails} />
             )}
           </View>
         )}
@@ -368,7 +371,7 @@ export default function OnboardingScreen() {
               style={[st.input, st.textarea]}
               multiline
               placeholder="e.g. tacos, pasta carbonara, chicken stir-fry, salmon with rice, burrito bowls"
-              placeholderTextColor={brandColors.textSubtle}
+              placeholderTextColor={colors.textSubtle}
               value={favouriteFoods}
               onChangeText={setFavouriteFoods}
             />
@@ -393,7 +396,7 @@ export default function OnboardingScreen() {
             </View>
 
             <Text style={st.label}>Food allergies (optional)</Text>
-            <TextInput style={st.input} placeholder="e.g. peanuts, shellfish" placeholderTextColor={brandColors.textSubtle} value={allergies} onChangeText={setAllergies} />
+            <TextInput style={st.input} placeholder="e.g. peanuts, shellfish" placeholderTextColor={colors.textSubtle} value={allergies} onChangeText={setAllergies} />
 
             <Text style={st.label}>Cooking skill</Text>
             <View style={st.chipGrid}>
@@ -438,7 +441,7 @@ export default function OnboardingScreen() {
               style={[st.input, st.textarea]}
               multiline
               placeholder="e.g. crisps, chocolate, biscuits, protein bars, fruit, yogurt"
-              placeholderTextColor={brandColors.textSubtle}
+              placeholderTextColor={colors.textSubtle}
               value={currentSnacks}
               onChangeText={setCurrentSnacks}
             />
@@ -498,7 +501,7 @@ export default function OnboardingScreen() {
               style={[st.input, st.textarea]}
               multiline
               placeholder="e.g. stressful work days, social drinks, skipping meals then overeating later"
-              placeholderTextColor={brandColors.textSubtle}
+              placeholderTextColor={colors.textSubtle}
               value={weeklyDerailers}
               onChangeText={setWeeklyDerailers}
             />
@@ -520,7 +523,7 @@ export default function OnboardingScreen() {
                 </TouchableOpacity>
               ))}
             </View>
-            <TextInput style={st.input} placeholder="Other injury (optional)" placeholderTextColor={brandColors.textSubtle} value={customInjury} onChangeText={setCustomInjury} />
+            <TextInput style={st.input} placeholder="Other injury (optional)" placeholderTextColor={colors.textSubtle} value={customInjury} onChangeText={setCustomInjury} />
 
             <Text style={st.label}>Medical conditions?</Text>
             <Text style={st.hint}>Select any that apply</Text>
@@ -533,7 +536,7 @@ export default function OnboardingScreen() {
             </View>
 
             <Text style={st.label}>Current medications (optional)</Text>
-            <TextInput style={st.input} placeholder="e.g. Metformin, Levothyroxine" placeholderTextColor={brandColors.textSubtle} value={medications} onChangeText={setMedications} />
+            <TextInput style={st.input} placeholder="e.g. Metformin, Levothyroxine" placeholderTextColor={colors.textSubtle} value={medications} onChangeText={setMedications} />
           </View>
         )}
 
@@ -552,7 +555,7 @@ export default function OnboardingScreen() {
             ))}
 
             <Text style={st.label}>Years training (optional)</Text>
-            <TextInput style={st.input} placeholder="e.g. 3" placeholderTextColor={brandColors.textSubtle} value={yearsTraining} onChangeText={setYearsTraining} keyboardType="numeric" />
+            <TextInput style={st.input} placeholder="e.g. 3" placeholderTextColor={colors.textSubtle} value={yearsTraining} onChangeText={setYearsTraining} keyboardType="numeric" />
 
             <Text style={st.label}>Equipment access</Text>
             {EQUIPMENT_ACCESS.map((eq) => (
@@ -590,10 +593,10 @@ export default function OnboardingScreen() {
             </View>
 
             <Text style={st.label}>Estimated 1-rep maxes (optional)</Text>
-            <TextInput style={st.input} placeholder="Squat (kg)" placeholderTextColor={brandColors.textSubtle} value={squat1rm} onChangeText={setSquat1rm} keyboardType="numeric" />
-            <TextInput style={st.input} placeholder="Bench press (kg)" placeholderTextColor={brandColors.textSubtle} value={bench1rm} onChangeText={setBench1rm} keyboardType="numeric" />
-            <TextInput style={st.input} placeholder="Deadlift (kg)" placeholderTextColor={brandColors.textSubtle} value={deadlift1rm} onChangeText={setDeadlift1rm} keyboardType="numeric" />
-            <TextInput style={st.input} placeholder="Overhead press (kg)" placeholderTextColor={brandColors.textSubtle} value={ohp1rm} onChangeText={setOhp1rm} keyboardType="numeric" />
+            <TextInput style={st.input} placeholder="Squat (kg)" placeholderTextColor={colors.textSubtle} value={squat1rm} onChangeText={setSquat1rm} keyboardType="numeric" />
+            <TextInput style={st.input} placeholder="Bench press (kg)" placeholderTextColor={colors.textSubtle} value={bench1rm} onChangeText={setBench1rm} keyboardType="numeric" />
+            <TextInput style={st.input} placeholder="Deadlift (kg)" placeholderTextColor={colors.textSubtle} value={deadlift1rm} onChangeText={setDeadlift1rm} keyboardType="numeric" />
+            <TextInput style={st.input} placeholder="Overhead press (kg)" placeholderTextColor={colors.textSubtle} value={ohp1rm} onChangeText={setOhp1rm} keyboardType="numeric" />
 
             <Text style={st.label}>Do you do cardio?</Text>
             <View style={st.optionRow}>
@@ -653,7 +656,7 @@ export default function OnboardingScreen() {
 
             <Text style={st.label}>Target weight (optional)</Text>
             <Text style={st.hint}>Leave this blank if you're aiming more for a look, feel, or performance outcome than a specific number.</Text>
-            <TextInput style={st.input} placeholder="kg" placeholderTextColor={brandColors.textSubtle} value={targetWeight} onChangeText={setTargetWeight} keyboardType="numeric" />
+            <TextInput style={st.input} placeholder="kg" placeholderTextColor={colors.textSubtle} value={targetWeight} onChangeText={setTargetWeight} keyboardType="numeric" />
 
             <Text style={st.label}>Timeline</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={st.timeScroll}>
@@ -681,7 +684,7 @@ export default function OnboardingScreen() {
               style={[st.input, st.textarea]}
               multiline
               placeholder="e.g. feel leaner and more confident, perform better in the gym, have steadier energy"
-              placeholderTextColor={brandColors.textSubtle}
+              placeholderTextColor={colors.textSubtle}
               value={desiredOutcome}
               onChangeText={setDesiredOutcome}
             />
@@ -691,7 +694,7 @@ export default function OnboardingScreen() {
               style={[st.input, st.textarea]}
               multiline
               placeholder="e.g. plans were too rigid, meals took too long, weekends always derailed me"
-              placeholderTextColor={brandColors.textSubtle}
+              placeholderTextColor={colors.textSubtle}
               value={pastDietingChallenges}
               onChangeText={setPastDietingChallenges}
             />
@@ -913,6 +916,8 @@ export default function OnboardingScreen() {
 }
 
 function ReviewRow({ label, value }: { label: string; value: string }) {
+  const st = useThemedStyles(makeStyles)
+
   return (
     <View style={st.reviewRow}>
       <Text style={st.reviewLabel}>{label}</Text>
@@ -921,16 +926,16 @@ function ReviewRow({ label, value }: { label: string; value: string }) {
   )
 }
 
-const st = StyleSheet.create({
-  container: { flex: 1, backgroundColor: brandColors.background },
+const makeStyles = (c: BrandColors) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: c.background },
   hero: {
     marginHorizontal: 18,
     marginTop: 10,
     borderRadius: 28,
     padding: 20,
-    backgroundColor: brandColors.surfaceStrong,
+    backgroundColor: c.surfaceStrong,
     borderWidth: 1,
-    borderColor: brandColors.line,
+    borderColor: c.line,
     overflow: 'hidden',
   },
   heroGlow: {
@@ -940,7 +945,7 @@ const st = StyleSheet.create({
     width: 160,
     height: 160,
     borderRadius: 80,
-    backgroundColor: brandColors.brand100,
+    backgroundColor: c.brand100,
   },
   heroTitle: {
     marginTop: 20,
@@ -958,23 +963,23 @@ const st = StyleSheet.create({
   },
   progressRow: { flexDirection: 'row', justifyContent: 'center', gap: 6, paddingTop: 18 },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: 'rgba(127, 147, 167, 0.34)' },
-  dotActive: { backgroundColor: brandColors.brand500, width: 20 },
-  stepLabel: { textAlign: 'center', fontSize: 13, color: brandColors.textMuted, marginTop: 8 },
+  dotActive: { backgroundColor: c.brand500, width: 20 },
+  stepLabel: { textAlign: 'center', fontSize: 13, color: c.textMuted, marginTop: 8 },
   content: { padding: 24, paddingBottom: 40 },
   stepContent: { gap: 6 },
-  question: { fontSize: 24, fontWeight: '800', color: brandColors.foreground, marginBottom: 4, letterSpacing: -0.6 },
-  subtitle: { fontSize: 14, color: brandColors.textMuted, marginBottom: 8 },
-  label: { fontSize: 14, fontWeight: '700', color: brandColors.foregroundSoft, marginTop: 14, marginBottom: 6 },
-  hint: { fontSize: 12, color: brandColors.textSubtle, marginBottom: 6, marginTop: -4 },
+  question: { fontSize: 24, fontWeight: '800', color: c.foreground, marginBottom: 4, letterSpacing: -0.6 },
+  subtitle: { fontSize: 14, color: c.textMuted, marginBottom: 8 },
+  label: { fontSize: 14, fontWeight: '700', color: c.foregroundSoft, marginTop: 14, marginBottom: 6 },
+  hint: { fontSize: 12, color: c.textSubtle, marginBottom: 6, marginTop: -4 },
   input: {
-    backgroundColor: brandColors.panel,
+    backgroundColor: c.panel,
     borderWidth: 1,
-    borderColor: brandColors.lineStrong,
+    borderColor: c.lineStrong,
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 16,
-    color: brandColors.foreground,
+    color: c.foreground,
   },
   textarea: {
     minHeight: 92,
@@ -982,54 +987,55 @@ const st = StyleSheet.create({
   },
   // Two-option row
   optionRow: { flexDirection: 'row', gap: 10 },
-  optionBtn: { flex: 1, backgroundColor: brandColors.panel, borderWidth: 1, borderColor: brandColors.line, borderRadius: 16, paddingVertical: 14, alignItems: 'center' },
-  optionActive: { borderColor: brandColors.accentLine, backgroundColor: brandColors.brand100 },
-  optionText: { fontSize: 16, fontWeight: '600', color: brandColors.textMuted },
-  optionTextActive: { color: brandColors.brand500 },
+  optionBtn: { flex: 1, backgroundColor: c.panel, borderWidth: 1, borderColor: c.line, borderRadius: 16, paddingVertical: 14, alignItems: 'center' },
+  optionActive: { borderColor: c.accentLine, backgroundColor: c.brand100 },
+  optionText: { fontSize: 16, fontWeight: '600', color: c.textMuted },
+  optionTextActive: { color: c.brand500 },
   // List options
-  listOption: { backgroundColor: brandColors.panel, borderWidth: 1, borderColor: brandColors.line, borderRadius: 18, padding: 14, marginBottom: 8 },
-  listOptionActive: { borderColor: brandColors.accentLine, backgroundColor: brandColors.brand100, ...brandShadow },
-  listOptionTitle: { fontSize: 15, fontWeight: '700', color: brandColors.foregroundSoft },
-  listOptionTitleActive: { color: brandColors.brand500 },
-  listOptionDesc: { fontSize: 12, color: brandColors.textMuted, marginTop: 2 },
+  listOption: { backgroundColor: c.panel, borderWidth: 1, borderColor: c.line, borderRadius: 18, padding: 14, marginBottom: 8 },
+  listOptionActive: { borderColor: c.accentLine, backgroundColor: c.brand100, ...brandShadow },
+  listOptionTitle: { fontSize: 15, fontWeight: '700', color: c.foregroundSoft },
+  listOptionTitleActive: { color: c.brand500 },
+  listOptionDesc: { fontSize: 12, color: c.textMuted, marginTop: 2 },
   // Chip grid (multi-select)
   chipGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  chip: { backgroundColor: brandColors.panel, borderWidth: 1, borderColor: brandColors.line, borderRadius: 14, paddingVertical: 9, paddingHorizontal: 14 },
+  chip: { backgroundColor: c.panel, borderWidth: 1, borderColor: c.line, borderRadius: 14, paddingVertical: 9, paddingHorizontal: 14 },
   chipWide: { width: '100%' as unknown as number },
-  chipActive: { borderColor: brandColors.accentLine, backgroundColor: brandColors.brand100 },
-  chipText: { fontSize: 13, fontWeight: '600', color: brandColors.textMuted },
-  chipTextActive: { color: brandColors.brand500 },
-  chipDesc: { fontSize: 11, color: brandColors.textSubtle, marginTop: 2 },
-  numberChip: { width: 42, height: 42, borderRadius: 21, backgroundColor: brandColors.panel, borderWidth: 1, borderColor: brandColors.line, alignItems: 'center', justifyContent: 'center' },
-  numberChipActive: { borderColor: brandColors.accentLine, backgroundColor: brandColors.brand100 },
-  numberChipText: { fontSize: 15, fontWeight: '700', color: brandColors.textMuted },
-  numberChipTextActive: { color: brandColors.brand500 },
+  chipActive: { borderColor: c.accentLine, backgroundColor: c.brand100 },
+  chipText: { fontSize: 13, fontWeight: '600', color: c.textMuted },
+  chipTextActive: { color: c.brand500 },
+  chipDesc: { fontSize: 11, color: c.textSubtle, marginTop: 2 },
+  numberChip: { width: 42, height: 42, borderRadius: 21, backgroundColor: c.panel, borderWidth: 1, borderColor: c.line, alignItems: 'center', justifyContent: 'center' },
+  numberChipActive: { borderColor: c.accentLine, backgroundColor: c.brand100 },
+  numberChipText: { fontSize: 15, fontWeight: '700', color: c.textMuted },
+  numberChipTextActive: { color: c.brand500 },
   // Time pickers
   timeScroll: { marginBottom: 4 },
   timeRow: { flexDirection: 'row', gap: 8, paddingVertical: 4 },
-  timeBtn: { backgroundColor: brandColors.panel, borderWidth: 1, borderColor: brandColors.line, borderRadius: 14, paddingVertical: 10, paddingHorizontal: 14 },
-  timeBtnActive: { borderColor: brandColors.accentLine, backgroundColor: brandColors.brand100 },
-  timeBtnText: { fontSize: 14, fontWeight: '600', color: brandColors.textMuted },
-  timeBtnTextActive: { color: brandColors.brand500 },
+  timeBtn: { backgroundColor: c.panel, borderWidth: 1, borderColor: c.line, borderRadius: 14, paddingVertical: 10, paddingHorizontal: 14 },
+  timeBtnActive: { borderColor: c.accentLine, backgroundColor: c.brand100 },
+  timeBtnText: { fontSize: 14, fontWeight: '600', color: c.textMuted },
+  timeBtnTextActive: { color: c.brand500 },
   // Day pickers
   daysRow: { flexDirection: 'row', gap: 10, marginTop: 4 },
-  dayBtn: { width: 48, height: 48, borderRadius: 24, backgroundColor: brandColors.panel, borderWidth: 1, borderColor: brandColors.line, alignItems: 'center', justifyContent: 'center' },
-  dayBtnActive: { borderColor: brandColors.accentLine, backgroundColor: brandColors.brand100 },
-  dayBtnText: { fontSize: 18, fontWeight: '700', color: brandColors.textMuted },
-  dayBtnTextActive: { color: brandColors.brand500 },
+  dayBtn: { width: 48, height: 48, borderRadius: 24, backgroundColor: c.panel, borderWidth: 1, borderColor: c.line, alignItems: 'center', justifyContent: 'center' },
+  dayBtnActive: { borderColor: c.accentLine, backgroundColor: c.brand100 },
+  dayBtnText: { fontSize: 18, fontWeight: '700', color: c.textMuted },
+  dayBtnTextActive: { color: c.brand500 },
   // Review
-  reviewCard: { backgroundColor: brandColors.panel, borderRadius: 22, borderWidth: 1, borderColor: brandColors.line, padding: 18, gap: 10, marginBottom: 12, ...brandShadow },
-  reviewSection: { fontSize: 14, fontWeight: '700', color: brandColors.brand500, marginBottom: 2 },
+  reviewCard: { backgroundColor: c.panel, borderRadius: 22, borderWidth: 1, borderColor: c.line, padding: 18, gap: 10, marginBottom: 12, ...brandShadow },
+  reviewSection: { fontSize: 14, fontWeight: '700', color: c.brand500, marginBottom: 2 },
   reviewRow: { flexDirection: 'row', justifyContent: 'space-between' },
-  reviewLabel: { fontSize: 14, color: brandColors.textMuted, flex: 1 },
-  reviewValue: { fontSize: 14, fontWeight: '700', color: brandColors.foreground, flex: 1, textAlign: 'right' },
-  aiNote: { flexDirection: 'row', backgroundColor: brandColors.brand100, borderRadius: 18, padding: 14, gap: 10, marginTop: 8, alignItems: 'flex-start', borderWidth: 1, borderColor: brandColors.accentLine },
-  aiNoteText: { fontSize: 13, color: brandColors.foregroundSoft, flex: 1, lineHeight: 18 },
+  reviewLabel: { fontSize: 14, color: c.textMuted, flex: 1 },
+  reviewValue: { fontSize: 14, fontWeight: '700', color: c.foreground, flex: 1, textAlign: 'right' },
+  aiNote: { flexDirection: 'row', backgroundColor: c.brand100, borderRadius: 18, padding: 14, gap: 10, marginTop: 8, alignItems: 'flex-start', borderWidth: 1, borderColor: c.accentLine },
+  aiNoteText: { fontSize: 13, color: c.foregroundSoft, flex: 1, lineHeight: 18 },
   // Nav
   navRow: { flexDirection: 'row', paddingHorizontal: 24, paddingBottom: 32, gap: 12 },
-  backBtn: { flex: 1, borderWidth: 1, borderColor: brandColors.lineStrong, borderRadius: 16, paddingVertical: 16, alignItems: 'center', backgroundColor: brandColors.panelMuted },
-  backText: { fontSize: 16, fontWeight: '600', color: brandColors.textMuted },
-  nextBtn: { flex: 2, backgroundColor: brandColors.brand500, borderRadius: 16, paddingVertical: 16, alignItems: 'center' },
+  backBtn: { flex: 1, borderWidth: 1, borderColor: c.lineStrong, borderRadius: 16, paddingVertical: 16, alignItems: 'center', backgroundColor: c.panelMuted },
+  backText: { fontSize: 16, fontWeight: '600', color: c.textMuted },
+  nextBtn: { flex: 2, backgroundColor: c.brand500, borderRadius: 16, paddingVertical: 16, alignItems: 'center' },
   nextText: { color: '#fff', fontSize: 16, fontWeight: '700' },
   btnDisabled: { opacity: 0.5 },
 })
+

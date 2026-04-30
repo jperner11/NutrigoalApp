@@ -14,7 +14,7 @@ import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
 import { WATER_QUICK_ADD, isManagedClientRole, isTrainerRole } from '@nutrigoal/shared'
 import { BrandLogo } from '../../src/components/BrandLogo'
-import { brandColors, brandShadow } from '../../src/theme/brand'
+import { useBrandColors, useThemedStyles, brandShadow, type BrandColors } from '../../src/theme/brand'
 
 interface TrainerInfo {
   id: string
@@ -45,6 +45,9 @@ export default function DashboardScreen() {
 }
 
 function ClientHome({ userId }: { userId: string | null }) {
+  const colors = useBrandColors()
+  const styles = useThemedStyles(makeStyles)
+
   const { profile } = useAuth()
   const router = useRouter()
   const [refreshing, setRefreshing] = useState(false)
@@ -131,7 +134,7 @@ function ClientHome({ userId }: { userId: string | null }) {
     <SafeAreaView style={styles.container}>
       <ScrollView
         contentContainerStyle={styles.content}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={brandColors.brand500} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.brand500} />}
       >
         <View style={styles.hero}>
           <View style={styles.heroGlow} />
@@ -166,7 +169,7 @@ function ClientHome({ userId }: { userId: string | null }) {
               </Text>
               <TouchableOpacity style={styles.inlineLink} onPress={() => router.push('/(tabs)/my-pt')}>
                 <Text style={styles.inlineLinkText}>Open My Trainer</Text>
-                <Ionicons name="chevron-forward" size={16} color={brandColors.brand500} />
+                <Ionicons name="chevron-forward" size={16} color={colors.brand500} />
               </TouchableOpacity>
             </View>
 
@@ -193,12 +196,12 @@ function ClientHome({ userId }: { userId: string | null }) {
             <Text style={styles.cardValue}>{mealCalories} / {calTarget}</Text>
           </View>
           <View style={styles.progressBg}>
-            <View style={[styles.progressFill, { width: `${calPercent}%`, backgroundColor: brandColors.brand500 }]} />
+            <View style={[styles.progressFill, { width: `${calPercent}%`, backgroundColor: colors.brand500 }]} />
           </View>
           <View style={styles.macroRow}>
-            <MacroPill label="Protein" value={mealProtein} target={profile?.daily_protein ?? 150} color={brandColors.success} unit="g" />
-            <MacroPill label="Carbs" value={mealCarbs} target={profile?.daily_carbs ?? 250} color={brandColors.warning} unit="g" />
-            <MacroPill label="Fat" value={mealFat} target={profile?.daily_fat ?? 65} color={brandColors.danger} unit="g" />
+            <MacroPill label="Protein" value={mealProtein} target={profile?.daily_protein ?? 150} color={colors.success} unit="g" />
+            <MacroPill label="Carbs" value={mealCarbs} target={profile?.daily_carbs ?? 250} color={colors.warning} unit="g" />
+            <MacroPill label="Fat" value={mealFat} target={profile?.daily_fat ?? 65} color={colors.accent} unit="g" />
           </View>
         </View>
 
@@ -210,7 +213,7 @@ function ClientHome({ userId }: { userId: string | null }) {
             </Text>
           </View>
           <View style={styles.progressBg}>
-            <View style={[styles.progressFill, { width: `${waterPercent}%`, backgroundColor: brandColors.brand500 }]} />
+            <View style={[styles.progressFill, { width: `${waterPercent}%`, backgroundColor: colors.brand500 }]} />
           </View>
           <View style={styles.waterButtons}>
             {WATER_QUICK_ADD.map((opt) => (
@@ -234,6 +237,9 @@ function ClientHome({ userId }: { userId: string | null }) {
 }
 
 function TrainerHome() {
+  const colors = useBrandColors()
+  const styles = useThemedStyles(makeStyles)
+
   const { user, profile } = useAuth()
   const router = useRouter()
   const [refreshing, setRefreshing] = useState(false)
@@ -317,7 +323,7 @@ function TrainerHome() {
     <SafeAreaView style={styles.container}>
       <ScrollView
         contentContainerStyle={styles.content}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={brandColors.brand500} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.brand500} />}
       >
         <View style={styles.hero}>
           <View style={styles.heroGlow} />
@@ -362,6 +368,8 @@ function TrainerHome() {
 }
 
 function MacroPill({ label, value, target, color, unit }: { label: string; value: number; target: number; color: string; unit: string }) {
+  const styles = useThemedStyles(makeStyles)
+
   return (
     <View style={styles.macroPill}>
       <View style={[styles.macroDot, { backgroundColor: color }]} />
@@ -372,6 +380,8 @@ function MacroPill({ label, value, target, color, unit }: { label: string; value
 }
 
 function PlanStatusCard({ label, ready, readyText, waitingText }: { label: string; ready: boolean; readyText: string; waitingText: string }) {
+  const styles = useThemedStyles(makeStyles)
+
   return (
     <View style={styles.planStatusCard}>
       <Text style={styles.planStatusLabel}>{label}</Text>
@@ -383,15 +393,20 @@ function PlanStatusCard({ label, ready, readyText, waitingText }: { label: strin
 }
 
 function QuickAction({ icon, label, onPress }: { icon: string; label: string; onPress: () => void }) {
+  const colors = useBrandColors()
+  const styles = useThemedStyles(makeStyles)
+
   return (
     <TouchableOpacity style={styles.actionCard} onPress={onPress}>
-      <Ionicons name={icon as never} size={24} color={brandColors.brand500} />
+      <Ionicons name={icon as never} size={24} color={colors.brand500} />
       <Text style={styles.actionLabel}>{label}</Text>
     </TouchableOpacity>
   )
 }
 
 function TrainerStatCard({ label, value }: { label: string; value: number }) {
+  const styles = useThemedStyles(makeStyles)
+
   return (
     <View style={styles.trainerStatCard}>
       <Text style={styles.trainerStatValue}>{value}</Text>
@@ -401,6 +416,8 @@ function TrainerStatCard({ label, value }: { label: string; value: number }) {
 }
 
 function TaskLine({ label, value }: { label: string; value: number }) {
+  const styles = useThemedStyles(makeStyles)
+
   return (
     <View style={styles.taskLine}>
       <Text style={styles.taskLabel}>{label}</Text>
@@ -411,16 +428,16 @@ function TaskLine({ label, value }: { label: string; value: number }) {
   )
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: brandColors.background },
+const makeStyles = (c: BrandColors) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: c.background },
   content: { padding: 20, paddingBottom: 32 },
   hero: {
     borderRadius: 28,
     padding: 22,
     marginBottom: 18,
-    backgroundColor: brandColors.surfaceStrong,
+    backgroundColor: c.surfaceStrong,
     borderWidth: 1,
-    borderColor: brandColors.line,
+    borderColor: c.line,
     overflow: 'hidden',
   },
   heroGlow: {
@@ -453,83 +470,83 @@ const styles = StyleSheet.create({
     fontSize: 30,
     lineHeight: 34,
     fontWeight: '800',
-    color: brandColors.foreground,
+    color: c.foreground,
     letterSpacing: -1.1,
   },
   date: { fontSize: 14, color: 'rgba(245,241,234,0.72)', marginTop: 14 },
   card: {
-    backgroundColor: brandColors.panel,
+    backgroundColor: c.panel,
     borderRadius: 24,
     borderWidth: 1,
-    borderColor: brandColors.line,
+    borderColor: c.line,
     padding: 18,
     marginBottom: 16,
     ...brandShadow,
   },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
-  cardTitle: { fontSize: 16, fontWeight: '700', color: brandColors.foregroundSoft },
-  cardValue: { fontSize: 14, fontWeight: '600', color: brandColors.textMuted },
-  cardCopy: { marginTop: 8, fontSize: 14, lineHeight: 20, color: brandColors.textMuted },
-  connectedName: { marginTop: 6, fontSize: 24, fontWeight: '800', color: brandColors.foreground },
+  cardTitle: { fontSize: 16, fontWeight: '700', color: c.foregroundSoft },
+  cardValue: { fontSize: 14, fontWeight: '600', color: c.textMuted },
+  cardCopy: { marginTop: 8, fontSize: 14, lineHeight: 20, color: c.textMuted },
+  connectedName: { marginTop: 6, fontSize: 24, fontWeight: '800', color: c.foreground },
   inlineLink: { marginTop: 14, flexDirection: 'row', alignItems: 'center', gap: 6 },
-  inlineLinkText: { fontSize: 14, fontWeight: '700', color: brandColors.brand500 },
-  progressBg: { height: 8, backgroundColor: brandColors.panelMuted, borderRadius: 4, overflow: 'hidden' },
+  inlineLinkText: { fontSize: 14, fontWeight: '700', color: c.brand500 },
+  progressBg: { height: 8, backgroundColor: c.panelMuted, borderRadius: 4, overflow: 'hidden' },
   progressFill: { height: '100%', borderRadius: 4 },
   macroRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 12 },
   macroPill: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   macroDot: { width: 8, height: 8, borderRadius: 4 },
-  macroLabel: { fontSize: 12, color: brandColors.textMuted },
-  macroValue: { fontSize: 12, fontWeight: '600', color: brandColors.foregroundSoft },
+  macroLabel: { fontSize: 12, color: c.textMuted },
+  macroValue: { fontSize: 12, fontWeight: '600', color: c.foregroundSoft },
   waterButtons: { flexDirection: 'row', gap: 8, marginTop: 12 },
   waterBtn: {
     flex: 1,
-    backgroundColor: brandColors.panelMuted,
+    backgroundColor: c.panelMuted,
     borderRadius: 14,
     paddingVertical: 12,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: brandColors.accentLine,
+    borderColor: c.accentLine,
   },
-  waterBtnText: { fontSize: 13, fontWeight: '700', color: brandColors.brand500 },
-  sectionTitle: { fontSize: 18, fontWeight: '700', color: brandColors.foreground, marginBottom: 12, marginTop: 8 },
+  waterBtnText: { fontSize: 13, fontWeight: '700', color: c.brand500 },
+  sectionTitle: { fontSize: 18, fontWeight: '700', color: c.foreground, marginBottom: 12, marginTop: 8 },
   actionsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   actionCard: {
     width: '47%',
-    backgroundColor: brandColors.panelMuted,
+    backgroundColor: c.panelMuted,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: brandColors.line,
+    borderColor: c.line,
     padding: 18,
     alignItems: 'center',
     gap: 8,
   },
-  actionLabel: { fontSize: 13, fontWeight: '700', color: brandColors.foregroundSoft },
+  actionLabel: { fontSize: 13, fontWeight: '700', color: c.foregroundSoft },
   planStatusRow: { flexDirection: 'row', gap: 12, marginBottom: 16 },
   planStatusCard: {
     flex: 1,
-    backgroundColor: brandColors.panel,
+    backgroundColor: c.panel,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: brandColors.line,
+    borderColor: c.line,
     padding: 16,
     ...brandShadow,
   },
-  planStatusLabel: { fontSize: 13, fontWeight: '700', color: brandColors.foregroundSoft },
+  planStatusLabel: { fontSize: 13, fontWeight: '700', color: c.foregroundSoft },
   planStatusValue: { marginTop: 8, fontSize: 13, lineHeight: 18 },
-  planStatusReady: { color: brandColors.success },
-  planStatusWaiting: { color: brandColors.textMuted },
+  planStatusReady: { color: c.success },
+  planStatusWaiting: { color: c.textMuted },
   trainerStatsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 16 },
   trainerStatCard: {
     width: '47%',
-    backgroundColor: brandColors.panel,
+    backgroundColor: c.panel,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: brandColors.line,
+    borderColor: c.line,
     padding: 16,
     ...brandShadow,
   },
-  trainerStatValue: { fontSize: 28, fontWeight: '800', color: brandColors.foreground },
-  trainerStatLabel: { marginTop: 6, fontSize: 13, color: brandColors.textMuted },
+  trainerStatValue: { fontSize: 28, fontWeight: '800', color: c.foreground },
+  trainerStatLabel: { marginTop: 6, fontSize: 13, color: c.textMuted },
   taskLine: {
     marginTop: 10,
     flexDirection: 'row',
@@ -537,19 +554,20 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: brandColors.line,
-    backgroundColor: brandColors.panelMuted,
+    borderColor: c.line,
+    backgroundColor: c.panelMuted,
     paddingHorizontal: 14,
     paddingVertical: 12,
   },
-  taskLabel: { flex: 1, fontSize: 14, color: brandColors.textMuted, paddingRight: 12 },
+  taskLabel: { flex: 1, fontSize: 14, color: c.textMuted, paddingRight: 12 },
   taskBadge: {
     minWidth: 30,
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 5,
-    backgroundColor: brandColors.brand100,
+    backgroundColor: c.brand100,
     alignItems: 'center',
   },
-  taskBadgeText: { fontSize: 12, fontWeight: '700', color: brandColors.brand400 },
+  taskBadgeText: { fontSize: 12, fontWeight: '700', color: c.brand400 },
 })
+

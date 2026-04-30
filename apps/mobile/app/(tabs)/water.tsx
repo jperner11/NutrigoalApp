@@ -5,9 +5,29 @@ import { Ionicons } from '@expo/vector-icons'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
 import { WATER_QUICK_ADD } from '@nutrigoal/shared'
-import { brandColors, brandShadow } from '../../src/theme/brand'
+import { useBrandColors, useThemedStyles, brandShadow } from '../../src/theme/brand'
 
 export default function WaterScreen() {
+  const colors = useBrandColors()
+  const styles = useThemedStyles((c) => ({
+  container: { flex: 1, backgroundColor: c.background },
+  header: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 },
+  title: { fontSize: 24, fontWeight: '800', color: c.foreground, letterSpacing: -0.6 },
+  content: { padding: 20, paddingTop: 0 },
+  card: { backgroundColor: c.panel, borderRadius: 24, borderWidth: 1, borderColor: c.line, padding: 24, alignItems: 'center', marginBottom: 16, ...brandShadow },
+  bigNum: { fontSize: 48, fontWeight: '800', color: c.brand500, marginTop: 8 },
+  target: { fontSize: 14, color: c.textMuted, marginBottom: 16 },
+  progressBg: { width: '100%', height: 10, backgroundColor: c.brand200, borderRadius: 5, overflow: 'hidden' },
+  progressFill: { height: '100%', backgroundColor: c.brand500, borderRadius: 5 },
+  quickRow: { flexDirection: 'row', gap: 10, marginBottom: 20 },
+  quickBtn: { flex: 1, backgroundColor: c.brand100, borderRadius: 16, borderWidth: 1, borderColor: c.accentLine, paddingVertical: 14, alignItems: 'center' },
+  quickBtnText: { fontSize: 15, fontWeight: '700', color: c.brand500 },
+  sectionTitle: { fontSize: 16, fontWeight: '700', color: c.foregroundSoft, marginBottom: 8 },
+  logRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: c.line },
+  logAmount: { fontSize: 15, fontWeight: '600', color: c.foregroundSoft },
+  logTime: { fontSize: 14, color: c.textSubtle },
+}))
+
   const { user, profile } = useAuth()
   const [logs, setLogs] = useState<{ id: string; amount_ml: number; logged_at: string }[]>([])
   const [refreshing, setRefreshing] = useState(false)
@@ -44,10 +64,10 @@ export default function WaterScreen() {
       </View>
       <ScrollView
         contentContainerStyle={styles.content}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={brandColors.brand500} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.brand500} />}
       >
         <View style={styles.card}>
-          <Ionicons name="water" size={40} color={brandColors.brand500} />
+          <Ionicons name="water" size={40} color={colors.brand500} />
           <Text style={styles.bigNum}>{(total / 1000).toFixed(1)}L</Text>
           <Text style={styles.target}>of {(target / 1000).toFixed(1)}L target</Text>
           <View style={styles.progressBg}>
@@ -75,21 +95,3 @@ export default function WaterScreen() {
   )
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: brandColors.background },
-  header: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 },
-  title: { fontSize: 24, fontWeight: '800', color: brandColors.foreground, letterSpacing: -0.6 },
-  content: { padding: 20, paddingTop: 0 },
-  card: { backgroundColor: brandColors.panel, borderRadius: 24, borderWidth: 1, borderColor: brandColors.line, padding: 24, alignItems: 'center', marginBottom: 16, ...brandShadow },
-  bigNum: { fontSize: 48, fontWeight: '800', color: brandColors.brand500, marginTop: 8 },
-  target: { fontSize: 14, color: brandColors.textMuted, marginBottom: 16 },
-  progressBg: { width: '100%', height: 10, backgroundColor: brandColors.brand200, borderRadius: 5, overflow: 'hidden' },
-  progressFill: { height: '100%', backgroundColor: brandColors.brand500, borderRadius: 5 },
-  quickRow: { flexDirection: 'row', gap: 10, marginBottom: 20 },
-  quickBtn: { flex: 1, backgroundColor: brandColors.brand100, borderRadius: 16, borderWidth: 1, borderColor: brandColors.accentLine, paddingVertical: 14, alignItems: 'center' },
-  quickBtnText: { fontSize: 15, fontWeight: '700', color: brandColors.brand500 },
-  sectionTitle: { fontSize: 16, fontWeight: '700', color: brandColors.foregroundSoft, marginBottom: 8 },
-  logRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: brandColors.line },
-  logAmount: { fontSize: 15, fontWeight: '600', color: brandColors.foregroundSoft },
-  logTime: { fontSize: 14, color: brandColors.textSubtle },
-})

@@ -18,7 +18,7 @@ import type {
   Conversation, Message, FeedbackRequest, FeedbackQuestion,
   Exercise, FoodItem, MealType,
 } from '@nutrigoal/shared'
-import { brandColors, brandShadow } from '../../src/theme/brand'
+import { useBrandColors, useThemedStyles, brandShadow, type BrandColors } from '../../src/theme/brand'
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || ''
 
@@ -55,6 +55,9 @@ interface ExerciseEntry {
 
 // ─── Main Screen ────────────────────────────────────────
 export default function ClientsScreen() {
+  const colors = useBrandColors()
+  const st = useThemedStyles(makeStyles)
+
   const { user, profile } = useAuth()
   const router = useRouter()
   const [screen, setScreen] = useState<Screen>('list')
@@ -153,7 +156,7 @@ export default function ClientsScreen() {
     return (
       <SafeAreaView style={st.container}>
         <View style={st.empty}>
-          <Ionicons name="lock-closed-outline" size={48} color={brandColors.textSubtle} />
+          <Ionicons name="lock-closed-outline" size={48} color={colors.textSubtle} />
           <Text style={st.emptyText}>Trainer access only</Text>
           <Text style={st.clientMeta}>This area is only available for personal trainer accounts.</Text>
         </View>
@@ -170,10 +173,10 @@ export default function ClientsScreen() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView contentContainerStyle={st.content} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={brandColors.brand500} />}>
+      <ScrollView contentContainerStyle={st.content} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.brand500} />}>
         {clients.length === 0 ? (
           <View style={st.empty}>
-            <Ionicons name="people-outline" size={48} color={brandColors.textSubtle} />
+            <Ionicons name="people-outline" size={48} color={colors.textSubtle} />
             <Text style={st.emptyText}>No clients yet</Text>
             <TouchableOpacity onPress={() => setShowInvite(true)}>
               <Text style={st.emptyLink}>Invite your first client</Text>
@@ -195,7 +198,7 @@ export default function ClientsScreen() {
                         {c.profile?.goal ? `${c.profile.goal} · ` : ''}{c.profile?.daily_calories ? `${c.profile.daily_calories} kcal` : 'No targets set'}
                       </Text>
                     </View>
-                    <Ionicons name="chevron-forward" size={20} color={brandColors.textSubtle} />
+                    <Ionicons name="chevron-forward" size={20} color={colors.textSubtle} />
                   </TouchableOpacity>
                 ))}
               </>
@@ -205,8 +208,8 @@ export default function ClientsScreen() {
                 <Text style={st.sectionTitle}>Pending ({pendingClients.length})</Text>
                 {pendingClients.map(c => (
                   <View key={c.id} style={[st.clientCard, { opacity: 0.7 }]}>
-                    <View style={[st.avatar, { backgroundColor: brandColors.panelMuted }]}>
-                      <Ionicons name="hourglass-outline" size={18} color={brandColors.textSubtle} />
+                    <View style={[st.avatar, { backgroundColor: colors.panelMuted }]}>
+                      <Ionicons name="hourglass-outline" size={18} color={colors.textSubtle} />
                     </View>
                     <View style={{ flex: 1 }}>
                       <Text style={st.clientName}>{c.invited_email}</Text>
@@ -232,7 +235,7 @@ export default function ClientsScreen() {
           </View>
           <View style={{ padding: 20 }}>
             <Text style={st.label}>Client's email address</Text>
-            <TextInput style={st.input} value={inviteEmail} onChangeText={setInviteEmail} placeholder="client@email.com" placeholderTextColor={brandColors.textSubtle}
+            <TextInput style={st.input} value={inviteEmail} onChangeText={setInviteEmail} placeholder="client@email.com" placeholderTextColor={colors.textSubtle}
               keyboardType="email-address" autoCapitalize="none" autoCorrect={false} />
             <Text style={st.hint}>We&apos;ll send a secure invite email. They only appear as active after they accept.</Text>
             <TouchableOpacity style={[st.primaryBtn, inviting && { opacity: 0.6 }]} onPress={handleInvite} disabled={inviting || !inviteEmail.trim()}>
@@ -251,6 +254,9 @@ function ClientDetail({ client, user, onBack, onMessages, onFeedback, onCreateDi
   onMessages: () => void; onFeedback: () => void
   onCreateDiet: () => void; onCreateTraining: () => void
 }) {
+  const colors = useBrandColors()
+  const st = useThemedStyles(makeStyles)
+
   const p = client.profile
   const [dietPlans, setDietPlans] = useState<DietPlan[]>([])
   const [trainingPlans, setTrainingPlans] = useState<TrainingPlan[]>([])
@@ -271,7 +277,7 @@ function ClientDetail({ client, user, onBack, onMessages, onFeedback, onCreateDi
   return (
     <SafeAreaView style={st.container}>
       <View style={st.detailHeader}>
-        <TouchableOpacity onPress={onBack}><Ionicons name="arrow-back" size={24} color={brandColors.foreground} /></TouchableOpacity>
+        <TouchableOpacity onPress={onBack}><Ionicons name="arrow-back" size={24} color={colors.foreground} /></TouchableOpacity>
         <Text style={st.detailTitle}>{p?.full_name || client.invited_email || 'Client'}</Text>
         <View style={{ width: 24 }} />
       </View>
@@ -292,10 +298,10 @@ function ClientDetail({ client, user, onBack, onMessages, onFeedback, onCreateDi
 
             {/* Targets */}
             <View style={st.targetsRow}>
-              <TargetPill label="Cal" value={p.daily_calories} color={brandColors.brand500} />
-              <TargetPill label="P" value={p.daily_protein} color={brandColors.brand400} />
-              <TargetPill label="C" value={p.daily_carbs} color={brandColors.warning} />
-              <TargetPill label="F" value={p.daily_fat} color={brandColors.danger} />
+              <TargetPill label="Cal" value={p.daily_calories} color={colors.brand500} />
+              <TargetPill label="P" value={p.daily_protein} color={colors.brand400} />
+              <TargetPill label="C" value={p.daily_carbs} color={colors.warning} />
+              <TargetPill label="F" value={p.daily_fat} color={colors.accent} />
             </View>
 
             {/* Anamnesis summary */}
@@ -315,11 +321,11 @@ function ClientDetail({ client, user, onBack, onMessages, onFeedback, onCreateDi
         {/* Action Buttons */}
         <View style={st.actionsGrid}>
           <TouchableOpacity style={st.actionCard} onPress={onMessages}>
-            <Ionicons name="chatbubbles" size={24} color={brandColors.brand400} />
+            <Ionicons name="chatbubbles" size={24} color={colors.brand400} />
             <Text style={st.actionLabel}>Messages</Text>
           </TouchableOpacity>
           <TouchableOpacity style={st.actionCard} onPress={onFeedback}>
-            <Ionicons name="clipboard" size={24} color={brandColors.brand500} />
+            <Ionicons name="clipboard" size={24} color={colors.brand500} />
             <Text style={st.actionLabel}>Feedback</Text>
           </TouchableOpacity>
         </View>
@@ -329,7 +335,7 @@ function ClientDetail({ client, user, onBack, onMessages, onFeedback, onCreateDi
           <View style={st.planSectionHeader}>
             <Text style={st.planSectionTitle}>Diet Plans</Text>
             <TouchableOpacity onPress={onCreateDiet}>
-              <Ionicons name="add-circle" size={28} color={brandColors.brand500} />
+              <Ionicons name="add-circle" size={28} color={colors.brand500} />
             </TouchableOpacity>
           </View>
           {loading ? <ActivityIndicator /> : dietPlans.length === 0 ? (
@@ -350,7 +356,7 @@ function ClientDetail({ client, user, onBack, onMessages, onFeedback, onCreateDi
           <View style={st.planSectionHeader}>
             <Text style={st.planSectionTitle}>Training Plans</Text>
             <TouchableOpacity onPress={onCreateTraining}>
-              <Ionicons name="add-circle" size={28} color={brandColors.brand500} />
+              <Ionicons name="add-circle" size={28} color={colors.brand500} />
             </TouchableOpacity>
           </View>
           {loading ? <ActivityIndicator /> : trainingPlans.length === 0 ? (
@@ -371,6 +377,8 @@ function ClientDetail({ client, user, onBack, onMessages, onFeedback, onCreateDi
 }
 
 function TargetPill({ label, value, color }: { label: string; value: number | null; color: string }) {
+  const st = useThemedStyles(makeStyles)
+
   return (
     <View style={st.targetPill}>
       <Text style={[st.targetValue, { color }]}>{value ?? '—'}</Text>
@@ -380,9 +388,12 @@ function TargetPill({ label, value, color }: { label: string; value: number | nu
 }
 
 function AnamnesisRow({ icon, label, value }: { icon: string; label: string; value: string }) {
+  const colors = useBrandColors()
+  const st = useThemedStyles(makeStyles)
+
   return (
     <View style={st.anamnesisRow}>
-      <Ionicons name={icon as any} size={16} color={brandColors.textMuted} />
+      <Ionicons name={icon as any} size={16} color={colors.textMuted} />
       <Text style={st.anamnesisLabel}>{label}:</Text>
       <Text style={st.anamnesisValue}>{value}</Text>
     </View>
@@ -391,6 +402,9 @@ function AnamnesisRow({ icon, label, value }: { icon: string; label: string; val
 
 // ─── Messages Screen ────────────────────────────────────
 function MessagesScreen({ client, user, onBack }: { client: ClientWithProfile; user: any; onBack: () => void }) {
+  const colors = useBrandColors()
+  const st = useThemedStyles(makeStyles)
+
   const [messages, setMessages] = useState<Message[]>([])
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
@@ -472,7 +486,7 @@ function MessagesScreen({ client, user, onBack }: { client: ClientWithProfile; u
   return (
     <SafeAreaView style={st.container}>
       <View style={st.detailHeader}>
-        <TouchableOpacity onPress={onBack}><Ionicons name="arrow-back" size={24} color={brandColors.foreground} /></TouchableOpacity>
+        <TouchableOpacity onPress={onBack}><Ionicons name="arrow-back" size={24} color={colors.foreground} /></TouchableOpacity>
         <Text style={st.detailTitle}>{client.profile?.full_name || client.invited_email || 'Messages'}</Text>
         <View style={{ width: 24 }} />
       </View>
@@ -500,7 +514,7 @@ function MessagesScreen({ client, user, onBack }: { client: ClientWithProfile; u
           value={text}
           onChangeText={setText}
           placeholder="Type a message..."
-          placeholderTextColor={brandColors.textSubtle}
+          placeholderTextColor={colors.textSubtle}
           multiline
         />
         <TouchableOpacity style={st.sendBtn} onPress={handleSend} disabled={sending || !text.trim()}>
@@ -513,6 +527,9 @@ function MessagesScreen({ client, user, onBack }: { client: ClientWithProfile; u
 
 // ─── Feedback Screen ────────────────────────────────────
 function FeedbackScreen({ client, user, onBack }: { client: ClientWithProfile; user: any; onBack: () => void }) {
+  const colors = useBrandColors()
+  const st = useThemedStyles(makeStyles)
+
   const [requests, setRequests] = useState<FeedbackRequest[]>([])
   const [showCreate, setShowCreate] = useState(false)
   const [fbTitle, setFbTitle] = useState('')
@@ -577,15 +594,15 @@ function FeedbackScreen({ client, user, onBack }: { client: ClientWithProfile; u
   return (
     <SafeAreaView style={st.container}>
       <View style={st.detailHeader}>
-        <TouchableOpacity onPress={onBack}><Ionicons name="arrow-back" size={24} color={brandColors.foreground} /></TouchableOpacity>
+        <TouchableOpacity onPress={onBack}><Ionicons name="arrow-back" size={24} color={colors.foreground} /></TouchableOpacity>
         <Text style={st.detailTitle}>Feedback</Text>
-        <TouchableOpacity onPress={() => setShowCreate(true)}><Ionicons name="add-circle" size={28} color={brandColors.brand500} /></TouchableOpacity>
+        <TouchableOpacity onPress={() => setShowCreate(true)}><Ionicons name="add-circle" size={28} color={colors.brand500} /></TouchableOpacity>
       </View>
 
       <ScrollView contentContainerStyle={st.content}>
         {requests.length === 0 && !showCreate ? (
           <View style={st.empty}>
-            <Ionicons name="clipboard-outline" size={48} color={brandColors.textSubtle} />
+            <Ionicons name="clipboard-outline" size={48} color={colors.textSubtle} />
             <Text style={st.emptyText}>No feedback requests</Text>
             <TouchableOpacity onPress={() => setShowCreate(true)}>
               <Text style={st.emptyLink}>Request feedback</Text>
@@ -624,7 +641,7 @@ function FeedbackScreen({ client, user, onBack }: { client: ClientWithProfile; u
             <Text style={st.fbCreateTitle}>New Feedback Request</Text>
 
             <Text style={st.label}>Title</Text>
-            <TextInput style={st.input} value={fbTitle} onChangeText={setFbTitle} placeholder="e.g. Weekly Check-in" placeholderTextColor={brandColors.textSubtle} />
+            <TextInput style={st.input} value={fbTitle} onChangeText={setFbTitle} placeholder="e.g. Weekly Check-in" placeholderTextColor={colors.textSubtle} />
 
             <Text style={[st.label, { marginTop: 16 }]}>Questions</Text>
             {fbQuestions.map((q, i) => (
@@ -634,11 +651,11 @@ function FeedbackScreen({ client, user, onBack }: { client: ClientWithProfile; u
                     <Text style={st.fbQType}>{q.type === 'text' ? '📝 Text' : q.type === 'rating' ? '⭐ Rating (1-5)' : '✅ Yes/No'}</Text>
                     {fbQuestions.length > 1 && (
                       <TouchableOpacity onPress={() => removeQuestion(q.id)}>
-                        <Ionicons name="close-circle" size={20} color={brandColors.textSubtle} />
+                        <Ionicons name="close-circle" size={20} color={colors.textSubtle} />
                       </TouchableOpacity>
                     )}
                   </View>
-                  <TextInput style={st.input} value={q.question} onChangeText={(t) => updateQuestion(q.id, t)} placeholder="Type your question..." placeholderTextColor={brandColors.textSubtle} />
+                  <TextInput style={st.input} value={q.question} onChangeText={(t) => updateQuestion(q.id, t)} placeholder="Type your question..." placeholderTextColor={colors.textSubtle} />
                 </View>
               </View>
             ))}
@@ -668,6 +685,9 @@ function FeedbackScreen({ client, user, onBack }: { client: ClientWithProfile; u
 function CreateClientDietPlan({ client, user, onDone, onCancel }: {
   client: ClientWithProfile; user: any; onDone: () => void; onCancel: () => void
 }) {
+  const colors = useBrandColors()
+  const st = useThemedStyles(makeStyles)
+
   const clientName = client.profile?.full_name || client.invited_email || 'Client'
   const [planName, setPlanName] = useState('')
   const [meals, setMeals] = useState<MealEntry[]>([
@@ -757,7 +777,7 @@ function CreateClientDietPlan({ client, user, onDone, onCancel }: {
   return (
     <SafeAreaView style={st.container}>
       <View style={st.detailHeader}>
-        <TouchableOpacity onPress={onCancel}><Ionicons name="arrow-back" size={24} color={brandColors.foreground} /></TouchableOpacity>
+        <TouchableOpacity onPress={onCancel}><Ionicons name="arrow-back" size={24} color={colors.foreground} /></TouchableOpacity>
         <Text style={st.detailTitle}>Diet Plan for {clientName}</Text>
         <View style={{ width: 24 }} />
       </View>
@@ -775,14 +795,14 @@ function CreateClientDietPlan({ client, user, onDone, onCancel }: {
 
       <ScrollView contentContainerStyle={st.content}>
         <Text style={st.label}>Plan Name</Text>
-        <TextInput style={st.input} value={planName} onChangeText={setPlanName} placeholder="e.g. Cutting Plan" placeholderTextColor={brandColors.textSubtle} />
+        <TextInput style={st.input} value={planName} onChangeText={setPlanName} placeholder="e.g. Cutting Plan" placeholderTextColor={colors.textSubtle} />
 
         {/* Current totals */}
         <View style={st.macroSummary}>
-          <View style={st.macroBox}><Text style={[st.macroValue, { color: brandColors.brand500 }]}>{totalCals}</Text><Text style={st.macroLabel}>Cals</Text></View>
-          <View style={st.macroBox}><Text style={[st.macroValue, { color: brandColors.brand400 }]}>{totalProtein}g</Text><Text style={st.macroLabel}>Protein</Text></View>
-          <View style={st.macroBox}><Text style={[st.macroValue, { color: brandColors.warning }]}>{totalCarbs}g</Text><Text style={st.macroLabel}>Carbs</Text></View>
-          <View style={st.macroBox}><Text style={[st.macroValue, { color: brandColors.danger }]}>{totalFat}g</Text><Text style={st.macroLabel}>Fat</Text></View>
+          <View style={st.macroBox}><Text style={[st.macroValue, { color: colors.brand500 }]}>{totalCals}</Text><Text style={st.macroLabel}>Cals</Text></View>
+          <View style={st.macroBox}><Text style={[st.macroValue, { color: colors.brand400 }]}>{totalProtein}g</Text><Text style={st.macroLabel}>Protein</Text></View>
+          <View style={st.macroBox}><Text style={[st.macroValue, { color: colors.warning }]}>{totalCarbs}g</Text><Text style={st.macroLabel}>Carbs</Text></View>
+          <View style={st.macroBox}><Text style={[st.macroValue, { color: colors.accent }]}>{totalFat}g</Text><Text style={st.macroLabel}>Fat</Text></View>
         </View>
 
         {meals.map((meal, mi) => (
@@ -797,18 +817,18 @@ function CreateClientDietPlan({ client, user, onDone, onCancel }: {
                   <Text style={st.foodName}>{food.name}</Text>
                   <Text style={st.foodMacros}>{food.amount}{food.unit} · {food.calories}kcal · P{food.protein} C{food.carbs} F{food.fat}</Text>
                 </View>
-                <TouchableOpacity onPress={() => removeFood(mi, fi)}><Ionicons name="close-circle" size={20} color={brandColors.textSubtle} /></TouchableOpacity>
+                <TouchableOpacity onPress={() => removeFood(mi, fi)}><Ionicons name="close-circle" size={20} color={colors.textSubtle} /></TouchableOpacity>
               </View>
             ))}
             <TouchableOpacity style={st.addItemBtn} onPress={() => { setSearchMealIdx(mi); setShowFoodSearch(true); setSearchQuery(''); setSearchResults([]) }}>
-              <Ionicons name="search" size={18} color={brandColors.brand500} />
+              <Ionicons name="search" size={18} color={colors.brand500} />
               <Text style={st.addItemText}>Search & Add Food</Text>
             </TouchableOpacity>
           </View>
         ))}
 
         <TouchableOpacity style={st.addRowBtn} onPress={addMeal}>
-          <Ionicons name="add" size={18} color={brandColors.brand500} />
+          <Ionicons name="add" size={18} color={colors.brand500} />
           <Text style={st.addRowText}>Add Snack</Text>
         </TouchableOpacity>
 
@@ -828,7 +848,7 @@ function CreateClientDietPlan({ client, user, onDone, onCancel }: {
           <View style={{ padding: 16 }}>
             <View style={st.searchRow}>
               <TextInput style={[st.input, { flex: 1 }]} value={searchQuery} onChangeText={setSearchQuery}
-                placeholder="e.g. chicken breast, rice..." placeholderTextColor={brandColors.textSubtle} returnKeyType="search" onSubmitEditing={searchFood} />
+                placeholder="e.g. chicken breast, rice..." placeholderTextColor={colors.textSubtle} returnKeyType="search" onSubmitEditing={searchFood} />
               <TouchableOpacity style={st.searchBtn} onPress={searchFood}>
                 {searching ? <ActivityIndicator color="#fff" size="small" /> : <Ionicons name="search" size={20} color="#fff" />}
               </TouchableOpacity>
@@ -841,7 +861,7 @@ function CreateClientDietPlan({ client, user, onDone, onCancel }: {
             renderItem={({ item }) => (
               <TouchableOpacity style={st.foodSearchItem} onPress={() => addFood(item)} disabled={loadingNutrition === item.id}>
                 <Text style={st.foodSearchName}>{item.name}</Text>
-                {loadingNutrition === item.id ? <ActivityIndicator size="small" color={brandColors.brand500} /> : <Ionicons name="add-circle" size={24} color={brandColors.brand500} />}
+                {loadingNutrition === item.id ? <ActivityIndicator size="small" color={colors.brand500} /> : <Ionicons name="add-circle" size={24} color={colors.brand500} />}
               </TouchableOpacity>
             )}
             ListEmptyComponent={!searching ? <Text style={st.emptySearch}>Search for ingredients to add</Text> : null}
@@ -856,6 +876,9 @@ function CreateClientDietPlan({ client, user, onDone, onCancel }: {
 function CreateClientTrainingPlan({ client, user, onDone, onCancel }: {
   client: ClientWithProfile; user: any; onDone: () => void; onCancel: () => void
 }) {
+  const colors = useBrandColors()
+  const st = useThemedStyles(makeStyles)
+
   const clientName = client.profile?.full_name || client.invited_email || 'Client'
   const [planName, setPlanName] = useState('')
   const [description, setDescription] = useState('')
@@ -937,7 +960,7 @@ function CreateClientTrainingPlan({ client, user, onDone, onCancel }: {
   return (
     <SafeAreaView style={st.container}>
       <View style={st.detailHeader}>
-        <TouchableOpacity onPress={onCancel}><Ionicons name="arrow-back" size={24} color={brandColors.foreground} /></TouchableOpacity>
+        <TouchableOpacity onPress={onCancel}><Ionicons name="arrow-back" size={24} color={colors.foreground} /></TouchableOpacity>
         <Text style={st.detailTitle}>Training for {clientName}</Text>
         <View style={{ width: 24 }} />
       </View>
@@ -947,22 +970,22 @@ function CreateClientTrainingPlan({ client, user, onDone, onCancel }: {
         <View style={st.clientTargetBar}>
           {client.profile.training_experience && <Text style={st.clientTargetValue}>Exp: {client.profile.training_experience}</Text>}
           {client.profile.equipment_access && <Text style={st.clientTargetValue}>Equip: {client.profile.equipment_access.replace(/_/g, ' ')}</Text>}
-          {client.profile.injuries?.length > 0 && <Text style={[st.clientTargetValue, { color: brandColors.danger }]}>Injuries: {client.profile.injuries.join(', ')}</Text>}
+          {client.profile.injuries?.length > 0 && <Text style={[st.clientTargetValue, { color: colors.error }]}>Injuries: {client.profile.injuries.join(', ')}</Text>}
         </View>
       )}
 
       <ScrollView contentContainerStyle={st.content}>
         <Text style={st.label}>Plan Name</Text>
-        <TextInput style={st.input} value={planName} onChangeText={setPlanName} placeholder="e.g. Push Pull Legs" placeholderTextColor={brandColors.textSubtle} />
+        <TextInput style={st.input} value={planName} onChangeText={setPlanName} placeholder="e.g. Push Pull Legs" placeholderTextColor={colors.textSubtle} />
 
         <Text style={[st.label, { marginTop: 14 }]}>Description (optional)</Text>
-        <TextInput style={st.input} value={description} onChangeText={setDescription} placeholder="e.g. 4-week hypertrophy focus" placeholderTextColor={brandColors.textSubtle} />
+        <TextInput style={st.input} value={description} onChangeText={setDescription} placeholder="e.g. 4-week hypertrophy focus" placeholderTextColor={colors.textSubtle} />
 
         {days.map((day, di) => (
           <View key={di} style={st.dayCard}>
             <View style={st.dayHeader}>
               <TextInput style={st.dayNameInput} value={day.name} onChangeText={(t) => { const u = [...days]; u[di].name = t; setDays(u) }} />
-              {days.length > 1 && <TouchableOpacity onPress={() => removeDay(di)}><Ionicons name="trash-outline" size={20} color={brandColors.danger} /></TouchableOpacity>}
+              {days.length > 1 && <TouchableOpacity onPress={() => removeDay(di)}><Ionicons name="trash-outline" size={20} color={colors.error} /></TouchableOpacity>}
             </View>
             {day.exercises.map((ex, ei) => (
               <View key={ei} style={st.exerciseRow}>
@@ -984,19 +1007,19 @@ function CreateClientTrainingPlan({ client, user, onDone, onCancel }: {
                   </View>
                 </View>
                 <TouchableOpacity onPress={() => removeExercise(di, ei)} style={{ marginLeft: 8 }}>
-                  <Ionicons name="close-circle" size={22} color={brandColors.textSubtle} />
+                  <Ionicons name="close-circle" size={22} color={colors.textSubtle} />
                 </TouchableOpacity>
               </View>
             ))}
             <TouchableOpacity style={st.addItemBtn} onPress={() => { setPickerDayIdx(di); setShowPicker(true); setSearch(''); setFilterBody('') }}>
-              <Ionicons name="add-circle-outline" size={20} color={brandColors.brand500} />
+              <Ionicons name="add-circle-outline" size={20} color={colors.brand500} />
               <Text style={st.addItemText}>Add Exercise</Text>
             </TouchableOpacity>
           </View>
         ))}
 
         <TouchableOpacity style={st.addRowBtn} onPress={addDay}>
-          <Ionicons name="add" size={18} color={brandColors.brand500} />
+          <Ionicons name="add" size={18} color={colors.brand500} />
           <Text style={st.addRowText}>Add Day</Text>
         </TouchableOpacity>
 
@@ -1014,7 +1037,7 @@ function CreateClientTrainingPlan({ client, user, onDone, onCancel }: {
             <View style={{ width: 60 }} />
           </View>
           <View style={{ padding: 16, gap: 8 }}>
-            <TextInput style={st.input} placeholder="Search exercises..." placeholderTextColor={brandColors.textSubtle} value={search} onChangeText={setSearch} />
+            <TextInput style={st.input} placeholder="Search exercises..." placeholderTextColor={colors.textSubtle} value={search} onChangeText={setSearch} />
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6 }}>
               <TouchableOpacity style={[st.filterChip, !filterBody && st.filterChipActive]} onPress={() => setFilterBody('')}>
                 <Text style={[st.filterChipText, !filterBody && st.filterChipTextActive]}>All</Text>
@@ -1037,7 +1060,7 @@ function CreateClientTrainingPlan({ client, user, onDone, onCancel }: {
                   <Text style={st.pickName}>{item.name}</Text>
                   <Text style={st.pickMeta}>{item.body_part} · {item.equipment}{item.is_compound ? ' · compound' : ''}</Text>
                 </View>
-                <Ionicons name="add-circle" size={24} color={brandColors.brand500} />
+                <Ionicons name="add-circle" size={24} color={colors.brand500} />
               </TouchableOpacity>
             )}
           />
@@ -1048,138 +1071,139 @@ function CreateClientTrainingPlan({ client, user, onDone, onCancel }: {
 }
 
 // ─── Styles ─────────────────────────────────────────────
-const st = StyleSheet.create({
-  container: { flex: 1, backgroundColor: brandColors.background },
+const makeStyles = (c: BrandColors) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: c.background },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 },
-  title: { fontSize: 24, fontWeight: '800', color: brandColors.foreground, letterSpacing: -0.6 },
-  addBtn: { backgroundColor: brandColors.brand500, borderRadius: 20, width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
+  title: { fontSize: 24, fontWeight: '800', color: c.foreground, letterSpacing: -0.6 },
+  addBtn: { backgroundColor: c.brand500, borderRadius: 20, width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
   content: { padding: 20, paddingTop: 0, paddingBottom: 40 },
   empty: { alignItems: 'center', paddingTop: 80, gap: 8 },
-  emptyText: { fontSize: 18, fontWeight: '600', color: brandColors.textMuted },
-  emptyLink: { fontSize: 15, fontWeight: '600', color: brandColors.brand500, marginTop: 4 },
-  sectionTitle: { fontSize: 14, fontWeight: '700', color: brandColors.textMuted, textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 16, marginBottom: 8 },
+  emptyText: { fontSize: 18, fontWeight: '600', color: c.textMuted },
+  emptyLink: { fontSize: 15, fontWeight: '600', color: c.brand500, marginTop: 4 },
+  sectionTitle: { fontSize: 14, fontWeight: '700', color: c.textMuted, textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 16, marginBottom: 8 },
   // Client card
-  clientCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: brandColors.panel, borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 8, ...brandShadow },
-  avatar: { width: 44, height: 44, borderRadius: 22, backgroundColor: brandColors.brand100, alignItems: 'center', justifyContent: 'center' },
-  avatarText: { fontSize: 18, fontWeight: '700', color: brandColors.brand500 },
-  clientName: { fontSize: 16, fontWeight: '600', color: brandColors.foregroundSoft },
-  clientMeta: { fontSize: 13, color: brandColors.textSubtle, marginTop: 2 },
+  clientCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: c.panel, borderRadius: 18, borderWidth: 1, borderColor: c.line, padding: 16, marginBottom: 8, ...brandShadow },
+  avatar: { width: 44, height: 44, borderRadius: 22, backgroundColor: c.brand100, alignItems: 'center', justifyContent: 'center' },
+  avatarText: { fontSize: 18, fontWeight: '700', color: c.brand500 },
+  clientName: { fontSize: 16, fontWeight: '600', color: c.foregroundSoft },
+  clientMeta: { fontSize: 13, color: c.textSubtle, marginTop: 2 },
   // Modal
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: brandColors.line },
-  cancelText: { fontSize: 16, color: brandColors.textMuted },
-  modalTitle: { fontSize: 18, fontWeight: '700', color: brandColors.foreground },
-  label: { fontSize: 14, fontWeight: '600', color: brandColors.foregroundSoft, marginBottom: 6 },
-  hint: { fontSize: 12, color: brandColors.textSubtle, marginTop: 8 },
-  input: { backgroundColor: brandColors.panel, borderWidth: 1, borderColor: brandColors.lineStrong, borderRadius: 16, paddingHorizontal: 16, paddingVertical: 14, fontSize: 16, color: brandColors.foreground },
-  primaryBtn: { flex: 2, backgroundColor: brandColors.brand500, borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginTop: 20 },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: c.line },
+  cancelText: { fontSize: 16, color: c.textMuted },
+  modalTitle: { fontSize: 18, fontWeight: '700', color: c.foreground },
+  label: { fontSize: 14, fontWeight: '600', color: c.foregroundSoft, marginBottom: 6 },
+  hint: { fontSize: 12, color: c.textSubtle, marginTop: 8 },
+  input: { backgroundColor: c.panel, borderWidth: 1, borderColor: c.lineStrong, borderRadius: 16, paddingHorizontal: 16, paddingVertical: 14, fontSize: 16, color: c.foreground },
+  primaryBtn: { flex: 2, backgroundColor: c.brand500, borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginTop: 20 },
   primaryBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
-  cancelBtn: { flex: 1, borderWidth: 1, borderColor: brandColors.lineStrong, borderRadius: 16, paddingVertical: 14, alignItems: 'center', backgroundColor: brandColors.panelMuted },
-  cancelBtnText: { fontSize: 15, fontWeight: '600', color: brandColors.textMuted },
+  cancelBtn: { flex: 1, borderWidth: 1, borderColor: c.lineStrong, borderRadius: 16, paddingVertical: 14, alignItems: 'center', backgroundColor: c.panelMuted },
+  cancelBtnText: { fontSize: 15, fontWeight: '600', color: c.textMuted },
   // Detail screen
   detailHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 },
-  detailTitle: { fontSize: 18, fontWeight: '700', color: brandColors.foreground },
-  profileCard: { backgroundColor: brandColors.panel, borderRadius: 20, borderWidth: 1, borderColor: brandColors.line, padding: 18, marginBottom: 16, ...brandShadow },
+  detailTitle: { fontSize: 18, fontWeight: '700', color: c.foreground },
+  profileCard: { backgroundColor: c.panel, borderRadius: 20, borderWidth: 1, borderColor: c.line, padding: 18, marginBottom: 16, ...brandShadow },
   profileRow: { flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 14 },
-  avatarLg: { width: 56, height: 56, borderRadius: 28, backgroundColor: brandColors.brand100, alignItems: 'center', justifyContent: 'center' },
-  avatarLgText: { fontSize: 24, fontWeight: '700', color: brandColors.brand500 },
-  profileName: { fontSize: 20, fontWeight: '800', color: brandColors.foreground },
-  profileMeta: { fontSize: 14, color: brandColors.textMuted, marginTop: 2 },
+  avatarLg: { width: 56, height: 56, borderRadius: 28, backgroundColor: c.brand100, alignItems: 'center', justifyContent: 'center' },
+  avatarLgText: { fontSize: 24, fontWeight: '700', color: c.brand500 },
+  profileName: { fontSize: 20, fontWeight: '800', color: c.foreground },
+  profileMeta: { fontSize: 14, color: c.textMuted, marginTop: 2 },
   targetsRow: { flexDirection: 'row', justifyContent: 'space-around', marginBottom: 12 },
   targetPill: { alignItems: 'center' },
   targetValue: { fontSize: 18, fontWeight: '800' },
-  targetLabel: { fontSize: 11, color: brandColors.textMuted, marginTop: 2 },
-  anamnesisBox: { borderTopWidth: 1, borderTopColor: brandColors.line, paddingTop: 12, gap: 6 },
+  targetLabel: { fontSize: 11, color: c.textMuted, marginTop: 2 },
+  anamnesisBox: { borderTopWidth: 1, borderTopColor: c.line, paddingTop: 12, gap: 6 },
   anamnesisRow: { flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' },
-  anamnesisLabel: { fontSize: 12, fontWeight: '600', color: brandColors.textMuted },
-  anamnesisValue: { fontSize: 12, color: brandColors.foregroundSoft, flex: 1 },
+  anamnesisLabel: { fontSize: 12, fontWeight: '600', color: c.textMuted },
+  anamnesisValue: { fontSize: 12, color: c.foregroundSoft, flex: 1 },
   // Actions
   actionsGrid: { flexDirection: 'row', gap: 12, marginBottom: 20 },
-  actionCard: { flex: 1, backgroundColor: brandColors.panel, borderRadius: 16, borderWidth: 1, borderColor: brandColors.line, padding: 16, alignItems: 'center', gap: 6, ...brandShadow },
-  actionLabel: { fontSize: 13, fontWeight: '600', color: brandColors.foregroundSoft },
+  actionCard: { flex: 1, backgroundColor: c.panel, borderRadius: 16, borderWidth: 1, borderColor: c.line, padding: 16, alignItems: 'center', gap: 6, ...brandShadow },
+  actionLabel: { fontSize: 13, fontWeight: '600', color: c.foregroundSoft },
   // Plans
   planSection: { marginBottom: 20 },
   planSectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
-  planSectionTitle: { fontSize: 16, fontWeight: '700', color: brandColors.foreground },
-  noPlanText: { fontSize: 14, color: brandColors.textSubtle, fontStyle: 'italic' },
-  planCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: brandColors.panel, borderRadius: 16, borderWidth: 1, borderColor: brandColors.line, padding: 14, marginBottom: 8, ...brandShadow },
-  planName: { fontSize: 15, fontWeight: '600', color: brandColors.foregroundSoft },
-  planMeta: { fontSize: 12, color: brandColors.textSubtle, marginTop: 2 },
-  activeBadge: { backgroundColor: brandColors.brand100, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 },
-  badgeText: { fontSize: 11, fontWeight: '600', color: brandColors.brand500 },
+  planSectionTitle: { fontSize: 16, fontWeight: '700', color: c.foreground },
+  noPlanText: { fontSize: 14, color: c.textSubtle, fontStyle: 'italic' },
+  planCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: c.panel, borderRadius: 16, borderWidth: 1, borderColor: c.line, padding: 14, marginBottom: 8, ...brandShadow },
+  planName: { fontSize: 15, fontWeight: '600', color: c.foregroundSoft },
+  planMeta: { fontSize: 12, color: c.textSubtle, marginTop: 2 },
+  activeBadge: { backgroundColor: c.brand100, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 },
+  badgeText: { fontSize: 11, fontWeight: '600', color: c.brand500 },
   // Messages
   msgBubble: { maxWidth: '80%', borderRadius: 16, padding: 12, marginBottom: 8 },
-  msgMe: { backgroundColor: brandColors.brand500, alignSelf: 'flex-end', borderBottomRightRadius: 4 },
-  msgThem: { backgroundColor: brandColors.panel, alignSelf: 'flex-start', borderBottomLeftRadius: 4, borderWidth: 1, borderColor: brandColors.line },
-  msgText: { fontSize: 15, color: brandColors.foregroundSoft, lineHeight: 20 },
-  msgTime: { fontSize: 10, color: brandColors.textSubtle, marginTop: 4, alignSelf: 'flex-end' },
-  inputBar: { flexDirection: 'row', padding: 12, gap: 8, borderTopWidth: 1, borderTopColor: brandColors.line, backgroundColor: brandColors.panel },
-  msgInput: { flex: 1, backgroundColor: brandColors.panelMuted, borderRadius: 20, paddingHorizontal: 16, paddingVertical: 10, fontSize: 15, color: brandColors.foreground, maxHeight: 100 },
-  sendBtn: { backgroundColor: brandColors.brand500, width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  msgMe: { backgroundColor: c.brand500, alignSelf: 'flex-end', borderBottomRightRadius: 4 },
+  msgThem: { backgroundColor: c.panel, alignSelf: 'flex-start', borderBottomLeftRadius: 4, borderWidth: 1, borderColor: c.line },
+  msgText: { fontSize: 15, color: c.foregroundSoft, lineHeight: 20 },
+  msgTime: { fontSize: 10, color: c.textSubtle, marginTop: 4, alignSelf: 'flex-end' },
+  inputBar: { flexDirection: 'row', padding: 12, gap: 8, borderTopWidth: 1, borderTopColor: c.line, backgroundColor: c.panel },
+  msgInput: { flex: 1, backgroundColor: c.panelMuted, borderRadius: 20, paddingHorizontal: 16, paddingVertical: 10, fontSize: 15, color: c.foreground, maxHeight: 100 },
+  sendBtn: { backgroundColor: c.brand500, width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   // Feedback
-  fbCard: { backgroundColor: brandColors.panel, borderRadius: 16, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 10, ...brandShadow },
+  fbCard: { backgroundColor: c.panel, borderRadius: 16, borderWidth: 1, borderColor: c.line, padding: 16, marginBottom: 10, ...brandShadow },
   fbHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  fbTitle: { fontSize: 16, fontWeight: '700', color: brandColors.foregroundSoft },
-  fbBadge: { backgroundColor: brandColors.warningBg, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3 },
-  fbBadgeDone: { backgroundColor: brandColors.brand100 },
-  fbBadgeText: { fontSize: 11, fontWeight: '600', color: brandColors.warning },
-  fbBadgeTextDone: { color: brandColors.brand500 },
-  fbDate: { fontSize: 12, color: brandColors.textSubtle, marginTop: 4 },
-  fbResponses: { borderTopWidth: 1, borderTopColor: brandColors.line, marginTop: 12, paddingTop: 10, gap: 8 },
+  fbTitle: { fontSize: 16, fontWeight: '700', color: c.foregroundSoft },
+  fbBadge: { backgroundColor: c.warningBg, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3 },
+  fbBadgeDone: { backgroundColor: c.brand100 },
+  fbBadgeText: { fontSize: 11, fontWeight: '600', color: c.warning },
+  fbBadgeTextDone: { color: c.brand500 },
+  fbDate: { fontSize: 12, color: c.textSubtle, marginTop: 4 },
+  fbResponses: { borderTopWidth: 1, borderTopColor: c.line, marginTop: 12, paddingTop: 10, gap: 8 },
   fbResponseRow: { gap: 2 },
-  fbQuestion: { fontSize: 13, fontWeight: '600', color: brandColors.textMuted },
-  fbAnswer: { fontSize: 14, color: brandColors.foregroundSoft },
-  fbCreateCard: { backgroundColor: brandColors.panel, borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 18, ...brandShadow },
-  fbCreateTitle: { fontSize: 17, fontWeight: '700', color: brandColors.foreground, marginBottom: 12 },
+  fbQuestion: { fontSize: 13, fontWeight: '600', color: c.textMuted },
+  fbAnswer: { fontSize: 14, color: c.foregroundSoft },
+  fbCreateCard: { backgroundColor: c.panel, borderRadius: 18, borderWidth: 1, borderColor: c.line, padding: 18, ...brandShadow },
+  fbCreateTitle: { fontSize: 17, fontWeight: '700', color: c.foreground, marginBottom: 12 },
   fbQRow: { marginBottom: 12 },
   fbQTypeRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
-  fbQType: { fontSize: 12, fontWeight: '600', color: brandColors.textMuted },
+  fbQType: { fontSize: 12, fontWeight: '600', color: c.textMuted },
   addQRow: { flexDirection: 'row', gap: 8, marginTop: 8 },
-  addQBtn: { borderWidth: 1, borderColor: brandColors.line, borderRadius: 14, backgroundColor: brandColors.panelMuted, paddingVertical: 8, paddingHorizontal: 14 },
-  addQText: { fontSize: 13, fontWeight: '600', color: brandColors.brand500 },
+  addQBtn: { borderWidth: 1, borderColor: c.line, borderRadius: 14, backgroundColor: c.panelMuted, paddingVertical: 8, paddingHorizontal: 14 },
+  addQText: { fontSize: 13, fontWeight: '600', color: c.brand500 },
   // Plan creation - client target bar
-  clientTargetBar: { flexDirection: 'row', flexWrap: 'wrap', backgroundColor: brandColors.panel, paddingHorizontal: 20, paddingVertical: 10, gap: 8, borderBottomWidth: 1, borderBottomColor: brandColors.line },
-  clientTargetLabel: { fontSize: 13, fontWeight: '700', color: brandColors.foregroundSoft },
-  clientTargetValue: { fontSize: 13, color: brandColors.textMuted },
+  clientTargetBar: { flexDirection: 'row', flexWrap: 'wrap', backgroundColor: c.panel, paddingHorizontal: 20, paddingVertical: 10, gap: 8, borderBottomWidth: 1, borderBottomColor: c.line },
+  clientTargetLabel: { fontSize: 13, fontWeight: '700', color: c.foregroundSoft },
+  clientTargetValue: { fontSize: 13, color: c.textMuted },
   // Macro summary
-  macroSummary: { flexDirection: 'row', justifyContent: 'space-around', backgroundColor: brandColors.panel, borderRadius: 16, borderWidth: 1, borderColor: brandColors.line, padding: 14, marginVertical: 14, ...brandShadow },
+  macroSummary: { flexDirection: 'row', justifyContent: 'space-around', backgroundColor: c.panel, borderRadius: 16, borderWidth: 1, borderColor: c.line, padding: 14, marginVertical: 14, ...brandShadow },
   macroBox: { alignItems: 'center' },
   macroValue: { fontSize: 18, fontWeight: '800' },
-  macroLabel: { fontSize: 11, color: brandColors.textMuted, marginTop: 2 },
+  macroLabel: { fontSize: 11, color: c.textMuted, marginTop: 2 },
   // Meal card (diet plan creation)
-  mealCard: { backgroundColor: brandColors.panel, borderRadius: 16, borderWidth: 1, borderColor: brandColors.line, padding: 14, marginBottom: 10, ...brandShadow },
+  mealCard: { backgroundColor: c.panel, borderRadius: 16, borderWidth: 1, borderColor: c.line, padding: 14, marginBottom: 10, ...brandShadow },
   mealHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
-  mealName: { fontSize: 15, fontWeight: '700', color: brandColors.foregroundSoft },
-  mealCals: { fontSize: 13, fontWeight: '600', color: brandColors.brand500 },
-  foodRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 6, borderTopWidth: 1, borderTopColor: brandColors.line },
-  foodName: { fontSize: 14, fontWeight: '500', color: brandColors.foregroundSoft },
-  foodMacros: { fontSize: 11, color: brandColors.textSubtle, marginTop: 1 },
+  mealName: { fontSize: 15, fontWeight: '700', color: c.foregroundSoft },
+  mealCals: { fontSize: 13, fontWeight: '600', color: c.brand500 },
+  foodRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 6, borderTopWidth: 1, borderTopColor: c.line },
+  foodName: { fontSize: 14, fontWeight: '500', color: c.foregroundSoft },
+  foodMacros: { fontSize: 11, color: c.textSubtle, marginTop: 1 },
   // Day card (training plan creation)
-  dayCard: { backgroundColor: brandColors.panel, borderRadius: 16, borderWidth: 1, borderColor: brandColors.line, padding: 14, marginTop: 14, ...brandShadow },
+  dayCard: { backgroundColor: c.panel, borderRadius: 16, borderWidth: 1, borderColor: c.line, padding: 14, marginTop: 14, ...brandShadow },
   dayHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
-  dayNameInput: { fontSize: 16, fontWeight: '700', color: brandColors.foregroundSoft, flex: 1 },
-  exerciseRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8, borderTopWidth: 1, borderTopColor: brandColors.line },
-  exerciseName: { fontSize: 14, fontWeight: '600', color: brandColors.foregroundSoft },
+  dayNameInput: { fontSize: 16, fontWeight: '700', color: c.foregroundSoft, flex: 1 },
+  exerciseRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8, borderTopWidth: 1, borderTopColor: c.line },
+  exerciseName: { fontSize: 14, fontWeight: '600', color: c.foregroundSoft },
   exerciseInputRow: { flexDirection: 'row', gap: 10, marginTop: 6 },
   exerciseInputGroup: { alignItems: 'center' },
-  exerciseInputLabel: { fontSize: 10, color: brandColors.textSubtle, marginBottom: 2 },
-  exerciseInputField: { backgroundColor: brandColors.panelMuted, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 6, fontSize: 14, color: brandColors.foreground, width: 60, textAlign: 'center' },
+  exerciseInputLabel: { fontSize: 10, color: c.textSubtle, marginBottom: 2 },
+  exerciseInputField: { backgroundColor: c.panelMuted, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 6, fontSize: 14, color: c.foreground, width: 60, textAlign: 'center' },
   // Shared add buttons
   addItemBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 10 },
-  addItemText: { fontSize: 14, fontWeight: '600', color: brandColors.brand500 },
-  addRowBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 14, borderWidth: 1, borderColor: brandColors.line, borderRadius: 16, borderStyle: 'dashed', marginTop: 10, backgroundColor: brandColors.panelMuted },
-  addRowText: { fontSize: 14, fontWeight: '600', color: brandColors.brand500 },
+  addItemText: { fontSize: 14, fontWeight: '600', color: c.brand500 },
+  addRowBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 14, borderWidth: 1, borderColor: c.line, borderRadius: 16, borderStyle: 'dashed', marginTop: 10, backgroundColor: c.panelMuted },
+  addRowText: { fontSize: 14, fontWeight: '600', color: c.brand500 },
   // Search modal
   searchRow: { flexDirection: 'row', gap: 8 },
-  searchBtn: { backgroundColor: brandColors.brand500, width: 48, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
-  foodSearchItem: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: brandColors.line },
-  foodSearchName: { fontSize: 15, fontWeight: '500', color: brandColors.foregroundSoft },
-  emptySearch: { textAlign: 'center', color: brandColors.textSubtle, fontSize: 14, paddingTop: 24 },
+  searchBtn: { backgroundColor: c.brand500, width: 48, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
+  foodSearchItem: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: c.line },
+  foodSearchName: { fontSize: 15, fontWeight: '500', color: c.foregroundSoft },
+  emptySearch: { textAlign: 'center', color: c.textSubtle, fontSize: 14, paddingTop: 24 },
   // Exercise picker
-  filterChip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, backgroundColor: brandColors.panelMuted },
-  filterChipActive: { backgroundColor: brandColors.brand500 },
-  filterChipText: { fontSize: 13, fontWeight: '500', color: brandColors.textMuted },
+  filterChip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, backgroundColor: c.panelMuted },
+  filterChipActive: { backgroundColor: c.brand500 },
+  filterChipText: { fontSize: 13, fontWeight: '500', color: c.textMuted },
   filterChipTextActive: { color: '#fff' },
-  pickItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: brandColors.line },
-  pickName: { fontSize: 15, fontWeight: '600', color: brandColors.foregroundSoft },
-  pickMeta: { fontSize: 12, color: brandColors.textSubtle, marginTop: 2 },
+  pickItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: c.line },
+  pickName: { fontSize: 15, fontWeight: '600', color: c.foregroundSoft },
+  pickMeta: { fontSize: 12, color: c.textSubtle, marginTop: 2 },
 })
+

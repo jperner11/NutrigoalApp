@@ -5,12 +5,16 @@ import { Ionicons } from '@expo/vector-icons'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { PRICING } from '@nutrigoal/shared'
 import { BrandLogo } from '../../src/components/BrandLogo'
-import { brandColors, brandShadow } from '../../src/theme/brand'
+import { useBrandColors, useThemedStyles, brandShadow, type BrandColors } from '../../src/theme/brand'
 import { supabase } from '../../src/lib/supabase'
 
 const SUPPORT_EMAIL = 'support@treno.app'
 
 export default function SettingsScreen() {
+  const colors = useBrandColors()
+  const styles = useThemedStyles(makeStyles)
+  const supportStatusStyles = useThemedStyles(makeSupportStatusStyles)
+
   const { profile, signOut } = useAuth()
   const tier = profile?.role ?? 'free'
   const tierInfo = PRICING[tier as keyof typeof PRICING]
@@ -98,7 +102,7 @@ export default function SettingsScreen() {
         {/* Profile Card */}
         <View style={styles.profileCard}>
           <View style={styles.avatar}>
-            <Ionicons name="person" size={32} color={brandColors.brand500} />
+            <Ionicons name="person" size={32} color={colors.brand500} />
           </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.name}>{profile?.full_name || 'User'}</Text>
@@ -147,14 +151,14 @@ export default function SettingsScreen() {
             value={supportSubject}
             onChangeText={setSupportSubject}
             placeholder="Short summary"
-            placeholderTextColor={brandColors.textSubtle}
+            placeholderTextColor={colors.textSubtle}
           />
           <TextInput
             style={[styles.supportInput, styles.supportTextarea]}
             value={supportMessage}
             onChangeText={setSupportMessage}
             placeholder="What happened, what you expected, and how we can reproduce it"
-            placeholderTextColor={brandColors.textSubtle}
+            placeholderTextColor={colors.textSubtle}
             multiline
             textAlignVertical="top"
           />
@@ -202,7 +206,7 @@ export default function SettingsScreen() {
         </View>
 
         <TouchableOpacity style={styles.signOutBtn} onPress={signOut}>
-          <Ionicons name="log-out-outline" size={20} color={brandColors.danger} />
+          <Ionicons name="log-out-outline" size={20} color={colors.error} />
           <Text style={styles.signOutText}>Sign Out</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -211,6 +215,8 @@ export default function SettingsScreen() {
 }
 
 function StatItem({ label, value }: { label: string; value: string }) {
+  const styles = useThemedStyles(makeStyles)
+
   return (
     <View style={styles.statItem}>
       <Text style={styles.statValue}>{value}</Text>
@@ -219,46 +225,46 @@ function StatItem({ label, value }: { label: string; value: string }) {
   )
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: brandColors.background },
+const makeStyles = (c: BrandColors) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: c.background },
   header: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12, gap: 8 },
-  title: { fontSize: 24, fontWeight: '800', color: brandColors.foreground, letterSpacing: -0.6 },
+  title: { fontSize: 24, fontWeight: '800', color: c.foreground, letterSpacing: -0.6 },
   content: { padding: 20, paddingTop: 0 },
-  profileCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: brandColors.panel, borderRadius: 20, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 16, ...brandShadow },
-  avatar: { width: 56, height: 56, borderRadius: 28, backgroundColor: brandColors.brand100, alignItems: 'center', justifyContent: 'center' },
-  name: { fontSize: 18, fontWeight: '700', color: brandColors.foreground },
-  email: { fontSize: 13, color: brandColors.textMuted, marginTop: 2 },
-  tierBadge: { backgroundColor: brandColors.brand100, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 },
-  tierText: { fontSize: 12, fontWeight: '700', color: brandColors.brand500 },
-  card: { backgroundColor: brandColors.panel, borderRadius: 20, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 16, ...brandShadow },
-  cardTitle: { fontSize: 16, fontWeight: '700', color: brandColors.foregroundSoft, marginBottom: 12 },
-  cardBody: { fontSize: 14, lineHeight: 22, color: brandColors.textMuted },
+  profileCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: c.panel, borderRadius: 20, borderWidth: 1, borderColor: c.line, padding: 16, marginBottom: 16, ...brandShadow },
+  avatar: { width: 56, height: 56, borderRadius: 28, backgroundColor: c.brand100, alignItems: 'center', justifyContent: 'center' },
+  name: { fontSize: 18, fontWeight: '700', color: c.foreground },
+  email: { fontSize: 13, color: c.textMuted, marginTop: 2 },
+  tierBadge: { backgroundColor: c.brand100, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 },
+  tierText: { fontSize: 12, fontWeight: '700', color: c.brand500 },
+  card: { backgroundColor: c.panel, borderRadius: 20, borderWidth: 1, borderColor: c.line, padding: 16, marginBottom: 16, ...brandShadow },
+  cardTitle: { fontSize: 16, fontWeight: '700', color: c.foregroundSoft, marginBottom: 12 },
+  cardBody: { fontSize: 14, lineHeight: 22, color: c.textMuted },
   supportCategoryRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 14 },
-  categoryChip: { borderWidth: 1, borderColor: brandColors.lineStrong, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: brandColors.panelMuted },
-  categoryChipActive: { backgroundColor: brandColors.brand100, borderColor: brandColors.brand500 },
-  categoryChipText: { fontSize: 13, fontWeight: '600', color: brandColors.textMuted },
-  categoryChipTextActive: { color: brandColors.brand500 },
-  supportInput: { marginTop: 12, borderWidth: 1, borderColor: brandColors.lineStrong, borderRadius: 14, backgroundColor: brandColors.panel, paddingHorizontal: 14, paddingVertical: 12, fontSize: 14, color: brandColors.foregroundSoft },
+  categoryChip: { borderWidth: 1, borderColor: c.lineStrong, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: c.panelMuted },
+  categoryChipActive: { backgroundColor: c.brand100, borderColor: c.brand500 },
+  categoryChipText: { fontSize: 13, fontWeight: '600', color: c.textMuted },
+  categoryChipTextActive: { color: c.brand500 },
+  supportInput: { marginTop: 12, borderWidth: 1, borderColor: c.lineStrong, borderRadius: 14, backgroundColor: c.panel, paddingHorizontal: 14, paddingVertical: 12, fontSize: 14, color: c.foregroundSoft },
   supportTextarea: { minHeight: 110, paddingTop: 12 },
   statRow: { flexDirection: 'row', justifyContent: 'space-around' },
   statItem: { alignItems: 'center' },
-  statValue: { fontSize: 20, fontWeight: '800', color: brandColors.brand500 },
-  statLabel: { fontSize: 12, color: brandColors.textMuted, marginTop: 2 },
-  supportBtn: { marginTop: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: brandColors.brand500, borderRadius: 14, paddingVertical: 14 },
+  statValue: { fontSize: 20, fontWeight: '800', color: c.brand500 },
+  statLabel: { fontSize: 12, color: c.textMuted, marginTop: 2 },
+  supportBtn: { marginTop: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: c.brand500, borderRadius: 14, paddingVertical: 14 },
   supportBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
-  supportEmail: { marginTop: 10, fontSize: 12, color: brandColors.textSubtle, textAlign: 'center' },
+  supportEmail: { marginTop: 10, fontSize: 12, color: c.textSubtle, textAlign: 'center' },
   supportHistoryList: { marginTop: 14, gap: 10 },
-  supportHistoryItem: { flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1, borderColor: brandColors.line, borderRadius: 14, backgroundColor: brandColors.panelMuted, padding: 12 },
-  supportHistorySubject: { fontSize: 14, fontWeight: '700', color: brandColors.foregroundSoft },
-  supportHistoryMeta: { marginTop: 4, fontSize: 12, color: brandColors.textMuted, textTransform: 'capitalize' },
-  supportHistoryEmpty: { marginTop: 14, fontSize: 13, color: brandColors.textMuted },
+  supportHistoryItem: { flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1, borderColor: c.line, borderRadius: 14, backgroundColor: c.panelMuted, padding: 12 },
+  supportHistorySubject: { fontSize: 14, fontWeight: '700', color: c.foregroundSoft },
+  supportHistoryMeta: { marginTop: 4, fontSize: 12, color: c.textMuted, textTransform: 'capitalize' },
+  supportHistoryEmpty: { marginTop: 14, fontSize: 13, color: c.textMuted },
   supportStatusBadge: { borderRadius: 999, paddingHorizontal: 10, paddingVertical: 6, borderWidth: 1 },
   supportStatusText: { fontSize: 11, fontWeight: '700', textTransform: 'capitalize' },
   signOutBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 24, paddingVertical: 16 },
-  signOutText: { fontSize: 16, fontWeight: '600', color: brandColors.danger },
+  signOutText: { fontSize: 16, fontWeight: '600', color: c.error },
 })
 
-const supportStatusStyles = StyleSheet.create({
+const makeSupportStatusStyles = (c: BrandColors) => StyleSheet.create({
   open: {
     backgroundColor: '#FEF3C7',
     borderColor: '#FCD34D',
@@ -272,3 +278,4 @@ const supportStatusStyles = StyleSheet.create({
     borderColor: '#86EFAC',
   },
 })
+

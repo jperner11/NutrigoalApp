@@ -1,11 +1,12 @@
 import { useEffect } from 'react'
+import { useColorScheme } from 'react-native'
 import { Stack, useRouter, useSegments } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
 import * as Sentry from '@sentry/react-native'
 import Constants from 'expo-constants'
 import { AuthProvider, useAuth } from '../src/contexts/AuthContext'
-import { brandColors } from '../src/theme/brand'
+import { useBrandColors } from '../src/theme/brand'
 import { requiresOnboardingQuestionnaire } from '@nutrigoal/shared'
 
 export { ErrorBoundary } from 'expo-router'
@@ -54,14 +55,16 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 }
 
 function RootLayout() {
+  const colors = useBrandColors()
+  const scheme = useColorScheme()
   return (
     <AuthProvider>
       <AuthGuard>
-        <StatusBar style="light" backgroundColor={brandColors.background} />
+        <StatusBar style={scheme === 'light' ? 'dark' : 'light'} backgroundColor={colors.background} />
         <Stack
           screenOptions={{
             headerShown: false,
-            contentStyle: { backgroundColor: brandColors.background },
+            contentStyle: { backgroundColor: colors.background },
             animation: 'fade',
           }}
         >

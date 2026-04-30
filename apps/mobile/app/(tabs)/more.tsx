@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { BrandLogo } from '../../src/components/BrandLogo'
-import { brandColors, brandShadow } from '../../src/theme/brand'
+import { useBrandColors, useThemedStyles, brandShadow } from '../../src/theme/brand'
 import { isManagedClientRole, isTrainerRole } from '@nutrigoal/shared'
 
 interface MenuItem {
@@ -15,22 +15,45 @@ interface MenuItem {
   roles?: string[]
 }
 
-const CLIENT_MENU_ITEMS: MenuItem[] = [
-  { icon: 'water', label: 'Water Tracking', route: '/(tabs)/water', color: brandColors.brand500 },
-  { icon: 'sparkles', label: 'AI Generate Plans', route: '/(tabs)/ai-generate', color: brandColors.brand500 },
-  { icon: 'sparkles', label: 'AI Suggestions', route: '/(tabs)/ai', color: brandColors.brand400 },
-  { icon: 'chatbubbles', label: 'My Trainer / Messages', route: '/(tabs)/my-pt', color: brandColors.brand400, roles: ['free', 'pro', 'personal_trainer_client', 'nutritionist_client'] },
-  { icon: 'people', label: 'Clients', route: '/(tabs)/clients', color: '#df9a2b', roles: ['personal_trainer', 'nutritionist'] },
-  { icon: 'settings-sharp', label: 'Settings', route: '/(tabs)/settings', color: brandColors.textMuted },
-]
-
-const TRAINER_MENU_ITEMS: MenuItem[] = [
-  { icon: 'people', label: 'Client Roster', route: '/(tabs)/clients', color: '#df9a2b' },
-  { icon: 'sparkles', label: 'AI Suggestions', route: '/(tabs)/ai', color: brandColors.brand400 },
-  { icon: 'settings-sharp', label: 'Settings', route: '/(tabs)/settings', color: brandColors.textMuted },
-]
-
 export default function MoreScreen() {
+  const colors = useBrandColors()
+  const CLIENT_MENU_ITEMS: MenuItem[] = [
+    { icon: 'water', label: 'Water Tracking', route: '/(tabs)/water', color: colors.brand500 },
+    { icon: 'sparkles', label: 'AI Generate Plans', route: '/(tabs)/ai-generate', color: colors.brand500 },
+    { icon: 'sparkles', label: 'AI Suggestions', route: '/(tabs)/ai', color: colors.brand400 },
+    { icon: 'chatbubbles', label: 'My Trainer / Messages', route: '/(tabs)/my-pt', color: colors.brand400, roles: ['free', 'pro', 'personal_trainer_client', 'nutritionist_client'] },
+    { icon: 'people', label: 'Clients', route: '/(tabs)/clients', color: '#df9a2b', roles: ['personal_trainer', 'nutritionist'] },
+    { icon: 'settings-sharp', label: 'Settings', route: '/(tabs)/settings', color: colors.textMuted },
+  ]
+
+  const TRAINER_MENU_ITEMS: MenuItem[] = [
+    { icon: 'people', label: 'Client Roster', route: '/(tabs)/clients', color: '#df9a2b' },
+    { icon: 'sparkles', label: 'AI Suggestions', route: '/(tabs)/ai', color: colors.brand400 },
+    { icon: 'settings-sharp', label: 'Settings', route: '/(tabs)/settings', color: colors.textMuted },
+  ]
+  const styles = useThemedStyles((c) => ({
+  container: { flex: 1, backgroundColor: c.background },
+  header: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12, gap: 8 },
+  title: { fontSize: 24, fontWeight: '800', color: c.foreground, letterSpacing: -0.6 },
+  subtitle: { fontSize: 14, color: c.textMuted },
+  content: { padding: 20, paddingTop: 0, gap: 8 },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: c.panel,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: c.line,
+    padding: 16,
+    gap: 12,
+    ...brandShadow,
+  },
+  iconBox: { width: 40, height: 40, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
+  menuLabel: { flex: 1, fontSize: 16, fontWeight: '600', color: c.foregroundSoft },
+  signOutBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 32, paddingVertical: 16 },
+  signOutText: { fontSize: 16, fontWeight: '600', color: c.error },
+}))
+
   const router = useRouter()
   const { profile, signOut } = useAuth()
   const userRole = profile?.role ?? 'free'
@@ -67,12 +90,12 @@ export default function MoreScreen() {
               <Ionicons name={item.icon as any} size={22} color={item.color} />
             </View>
             <Text style={styles.menuLabel}>{item.label}</Text>
-            <Ionicons name="chevron-forward" size={20} color={brandColors.textSubtle} />
+            <Ionicons name="chevron-forward" size={20} color={colors.textSubtle} />
           </TouchableOpacity>
         ))}
 
         <TouchableOpacity style={styles.signOutBtn} onPress={signOut}>
-          <Ionicons name="log-out-outline" size={20} color={brandColors.danger} />
+          <Ionicons name="log-out-outline" size={20} color={colors.error} />
           <Text style={styles.signOutText}>Sign Out</Text>
         </TouchableOpacity>
       </View>
@@ -80,25 +103,3 @@ export default function MoreScreen() {
   )
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: brandColors.background },
-  header: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12, gap: 8 },
-  title: { fontSize: 24, fontWeight: '800', color: brandColors.foreground, letterSpacing: -0.6 },
-  subtitle: { fontSize: 14, color: brandColors.textMuted },
-  content: { padding: 20, paddingTop: 0, gap: 8 },
-  menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: brandColors.panel,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: brandColors.line,
-    padding: 16,
-    gap: 12,
-    ...brandShadow,
-  },
-  iconBox: { width: 40, height: 40, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
-  menuLabel: { flex: 1, fontSize: 16, fontWeight: '600', color: brandColors.foregroundSoft },
-  signOutBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 32, paddingVertical: 16 },
-  signOutText: { fontSize: 16, fontWeight: '600', color: brandColors.danger },
-})

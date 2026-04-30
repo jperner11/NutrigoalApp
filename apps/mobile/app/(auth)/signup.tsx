@@ -15,9 +15,156 @@ import { Link } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
 import { supabase } from '../../src/lib/supabase'
 import { BrandLogo } from '../../src/components/BrandLogo'
-import { brandColors, brandShadow } from '../../src/theme/brand'
+import { useBrandColors, useThemedStyles, brandShadow } from '../../src/theme/brand'
 
 export default function SignupScreen() {
+  const colors = useBrandColors()
+  const styles = useThemedStyles((c) => ({
+  container: {
+    flex: 1,
+    backgroundColor: c.background,
+  },
+  topGlow: {
+    position: 'absolute',
+    top: -120,
+    left: -40,
+    width: 280,
+    height: 280,
+    borderRadius: 140,
+    backgroundColor: c.brand100,
+  },
+  sideGlow: {
+    position: 'absolute',
+    top: 180,
+    right: -80,
+    width: 210,
+    height: 210,
+    borderRadius: 105,
+    backgroundColor: 'rgba(245, 241, 234, 0.04)',
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
+  inner: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 36,
+  },
+  header: {
+    marginBottom: 28,
+    gap: 14,
+  },
+  eyebrow: {
+    alignSelf: 'flex-start',
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: c.accentLine,
+    backgroundColor: c.brand100,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+  },
+  eyebrowText: {
+    color: c.foregroundSoft,
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  title: {
+    fontSize: 30,
+    lineHeight: 34,
+    fontWeight: '800',
+    color: c.foreground,
+    letterSpacing: -1.1,
+  },
+  subtitle: {
+    fontSize: 15,
+    lineHeight: 22,
+    color: c.textMuted,
+  },
+  formCard: {
+    borderRadius: 28,
+    backgroundColor: c.panel,
+    borderWidth: 1,
+    borderColor: c.line,
+    padding: 20,
+    ...brandShadow,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: c.foregroundSoft,
+    marginBottom: 4,
+    marginTop: 12,
+  },
+  roleRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 4,
+  },
+  roleCard: {
+    flex: 1,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: c.line,
+    backgroundColor: c.panel,
+    padding: 14,
+    gap: 6,
+  },
+  roleCardActive: {
+    borderColor: c.accentLine,
+    backgroundColor: c.brand100,
+  },
+  roleTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: c.foreground,
+  },
+  roleBody: {
+    fontSize: 12,
+    lineHeight: 17,
+    color: c.textMuted,
+  },
+  input: {
+    backgroundColor: c.backgroundElevated,
+    borderWidth: 1,
+    borderColor: c.lineStrong,
+    borderRadius: 18,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 16,
+    color: c.foreground,
+  },
+  button: {
+    backgroundColor: c.brand500,
+    borderRadius: 18,
+    paddingVertical: 16,
+    alignItems: 'center',
+    marginTop: 24,
+  },
+  buttonDisabled: {
+    opacity: 0.6,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 24,
+  },
+  footerText: {
+    color: c.textMuted,
+    fontSize: 14,
+  },
+  link: {
+    color: c.brand500,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+}))
+
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -129,7 +276,7 @@ export default function SignupScreen() {
                 style={[styles.roleCard, role === 'free' && styles.roleCardActive]}
                 onPress={() => setRole('free')}
               >
-                <Ionicons name="person-outline" size={22} color={role === 'free' ? brandColors.brand500 : brandColors.textMuted} />
+                <Ionicons name="person-outline" size={22} color={role === 'free' ? colors.brand500 : colors.textMuted} />
                 <Text style={styles.roleTitle}>Individual</Text>
                 <Text style={styles.roleBody}>Self-serve progress with Discover Coaches included.</Text>
               </TouchableOpacity>
@@ -137,7 +284,7 @@ export default function SignupScreen() {
                 style={[styles.roleCard, role === 'personal_trainer' && styles.roleCardActive]}
                 onPress={() => setRole('personal_trainer')}
               >
-                <Ionicons name="people-outline" size={22} color={role === 'personal_trainer' ? brandColors.brand500 : brandColors.textMuted} />
+                <Ionicons name="people-outline" size={22} color={role === 'personal_trainer' ? colors.brand500 : colors.textMuted} />
                 <Text style={styles.roleTitle}>Coach / PT</Text>
                 <Text style={styles.roleBody}>Client management, coaching, and marketplace visibility.</Text>
               </TouchableOpacity>
@@ -147,7 +294,7 @@ export default function SignupScreen() {
             <TextInput
               style={styles.input}
               placeholder="Your full name"
-              placeholderTextColor={brandColors.textSubtle}
+              placeholderTextColor={colors.textSubtle}
               value={fullName}
               onChangeText={setFullName}
             />
@@ -156,7 +303,7 @@ export default function SignupScreen() {
             <TextInput
               style={styles.input}
               placeholder="your@email.com"
-              placeholderTextColor={brandColors.textSubtle}
+              placeholderTextColor={colors.textSubtle}
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
@@ -167,7 +314,7 @@ export default function SignupScreen() {
             <TextInput
               style={styles.input}
               placeholder="At least 6 characters"
-              placeholderTextColor={brandColors.textSubtle}
+              placeholderTextColor={colors.textSubtle}
               value={password}
               onChangeText={setPassword}
               secureTextEntry
@@ -177,7 +324,7 @@ export default function SignupScreen() {
             <TextInput
               style={styles.input}
               placeholder="Repeat your password"
-              placeholderTextColor={brandColors.textSubtle}
+              placeholderTextColor={colors.textSubtle}
               value={confirmPassword}
               onChangeText={setConfirmPassword}
               secureTextEntry
@@ -210,148 +357,3 @@ export default function SignupScreen() {
   )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: brandColors.background,
-  },
-  topGlow: {
-    position: 'absolute',
-    top: -120,
-    left: -40,
-    width: 280,
-    height: 280,
-    borderRadius: 140,
-    backgroundColor: brandColors.brand100,
-  },
-  sideGlow: {
-    position: 'absolute',
-    top: 180,
-    right: -80,
-    width: 210,
-    height: 210,
-    borderRadius: 105,
-    backgroundColor: 'rgba(245, 241, 234, 0.04)',
-  },
-  scrollContent: {
-    flexGrow: 1,
-  },
-  inner: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 36,
-  },
-  header: {
-    marginBottom: 28,
-    gap: 14,
-  },
-  eyebrow: {
-    alignSelf: 'flex-start',
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: brandColors.accentLine,
-    backgroundColor: brandColors.brand100,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-  },
-  eyebrowText: {
-    color: brandColors.foregroundSoft,
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  title: {
-    fontSize: 30,
-    lineHeight: 34,
-    fontWeight: '800',
-    color: brandColors.foreground,
-    letterSpacing: -1.1,
-  },
-  subtitle: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: brandColors.textMuted,
-  },
-  formCard: {
-    borderRadius: 28,
-    backgroundColor: brandColors.panel,
-    borderWidth: 1,
-    borderColor: brandColors.line,
-    padding: 20,
-    ...brandShadow,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: brandColors.foregroundSoft,
-    marginBottom: 4,
-    marginTop: 12,
-  },
-  roleRow: {
-    flexDirection: 'row',
-    gap: 10,
-    marginBottom: 4,
-  },
-  roleCard: {
-    flex: 1,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: brandColors.line,
-    backgroundColor: brandColors.panel,
-    padding: 14,
-    gap: 6,
-  },
-  roleCardActive: {
-    borderColor: brandColors.accentLine,
-    backgroundColor: brandColors.brand100,
-  },
-  roleTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: brandColors.foreground,
-  },
-  roleBody: {
-    fontSize: 12,
-    lineHeight: 17,
-    color: brandColors.textMuted,
-  },
-  input: {
-    backgroundColor: brandColors.backgroundElevated,
-    borderWidth: 1,
-    borderColor: brandColors.lineStrong,
-    borderRadius: 18,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 16,
-    color: brandColors.foreground,
-  },
-  button: {
-    backgroundColor: brandColors.brand500,
-    borderRadius: 18,
-    paddingVertical: 16,
-    alignItems: 'center',
-    marginTop: 24,
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 24,
-  },
-  footerText: {
-    color: brandColors.textMuted,
-    fontSize: 14,
-  },
-  link: {
-    color: brandColors.brand500,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-})

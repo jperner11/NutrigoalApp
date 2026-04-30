@@ -1,7 +1,7 @@
 import { Tabs } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
 import { useAuth } from '../../src/contexts/AuthContext'
-import { brandColors } from '../../src/theme/brand'
+import { useBrandColors } from '../../src/theme/brand'
 import { isTrainerRole, isManagedClientRole } from '@nutrigoal/shared'
 
 type TabIconName = React.ComponentProps<typeof Ionicons>['name']
@@ -48,6 +48,7 @@ const ALL_SCREENS = [
 
 export default function TabLayout() {
   const { profile } = useAuth()
+  const colors = useBrandColors()
   const userRole = profile?.role ?? 'free'
   const isTrainer = isTrainerRole(userRole) && !isManagedClientRole(userRole)
   const tabs = isTrainer ? TRAINER_TABS : CLIENT_TABS
@@ -56,11 +57,11 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: brandColors.brand500,
-        tabBarInactiveTintColor: brandColors.textSubtle,
+        tabBarActiveTintColor: colors.brand500,
+        tabBarInactiveTintColor: colors.textSubtle,
         tabBarStyle: {
-          backgroundColor: brandColors.panel,
-          borderTopColor: brandColors.line,
+          backgroundColor: colors.panel,
+          borderTopColor: colors.line,
           paddingBottom: 8,
           paddingTop: 8,
           height: 92,
@@ -71,7 +72,7 @@ export default function TabLayout() {
           letterSpacing: 0.2,
         },
         sceneStyle: {
-          backgroundColor: brandColors.background,
+          backgroundColor: colors.background,
         },
       }}
     >

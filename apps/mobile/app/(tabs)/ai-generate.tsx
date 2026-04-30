@@ -8,7 +8,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
-import { brandColors, brandShadow } from '../../src/theme/brand'
+import { useBrandColors, useThemedStyles, brandShadow, type BrandColors } from '../../src/theme/brand'
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || ''
 
@@ -30,6 +30,9 @@ interface AIDay { day_number: number; name: string; exercises: AIExercise[] }
 interface AITrainingPlan { name: string; description: string; days: AIDay[] }
 
 export default function AIGenerateScreen() {
+  const colors = useBrandColors()
+  const st = useThemedStyles(makeStyles)
+
   const { user, profile } = useAuth()
   const router = useRouter()
   const [tab, setTab] = useState<Tab>('meal')
@@ -245,7 +248,7 @@ export default function AIGenerateScreen() {
     <SafeAreaView style={st.container}>
       <View style={st.header}>
         <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color={brandColors.foregroundSoft} />
+          <Ionicons name="arrow-back" size={24} color={colors.foregroundSoft} />
         </TouchableOpacity>
         <Text style={st.title}>AI Generate</Text>
         <View style={{ width: 24 }} />
@@ -254,11 +257,11 @@ export default function AIGenerateScreen() {
       {/* Tab Switcher */}
       <View style={st.tabRow}>
         <TouchableOpacity style={[st.tab, tab === 'meal' && st.tabActive]} onPress={() => setTab('meal')}>
-          <Ionicons name="restaurant" size={18} color={tab === 'meal' ? brandColors.brand500 : brandColors.textSubtle} />
+          <Ionicons name="restaurant" size={18} color={tab === 'meal' ? colors.brand500 : colors.textSubtle} />
           <Text style={[st.tabText, tab === 'meal' && st.tabTextActive]}>Meal Plan</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[st.tab, tab === 'training' && st.tabActive]} onPress={() => setTab('training')}>
-          <Ionicons name="barbell" size={18} color={tab === 'training' ? brandColors.brand500 : brandColors.textSubtle} />
+          <Ionicons name="barbell" size={18} color={tab === 'training' ? colors.brand500 : colors.textSubtle} />
           <Text style={[st.tabText, tab === 'training' && st.tabTextActive]}>Training Plan</Text>
         </TouchableOpacity>
       </View>
@@ -268,7 +271,7 @@ export default function AIGenerateScreen() {
           <>
             {/* Info card */}
             <View style={st.infoCard}>
-              <Ionicons name="sparkles" size={20} color={brandColors.brand500} />
+              <Ionicons name="sparkles" size={20} color={colors.brand500} />
               <View style={{ flex: 1 }}>
                 <Text style={st.infoTitle}>Smart Meal Planning</Text>
                 <Text style={st.infoDesc}>
@@ -287,7 +290,7 @@ export default function AIGenerateScreen() {
 
             {loading && (
               <View style={st.loadingBox}>
-                <ActivityIndicator size="large" color={brandColors.brand500} />
+                <ActivityIndicator size="large" color={colors.brand500} />
                 <Text style={st.loadingText}>Creating your personalized meal plan...</Text>
               </View>
             )}
@@ -298,7 +301,7 @@ export default function AIGenerateScreen() {
                   <View key={i} style={st.mealCard}>
                     <View style={st.mealHeader}>
                       <View style={st.mealTimeBox}>
-                        <Ionicons name="time-outline" size={14} color={brandColors.brand500} />
+                        <Ionicons name="time-outline" size={14} color={colors.brand500} />
                         <Text style={st.mealTime}>{formatTime12(meal.time)}</Text>
                       </View>
                       <Text style={st.mealType}>{meal.meal_type}</Text>
@@ -335,7 +338,7 @@ export default function AIGenerateScreen() {
 
                 <View style={st.actionRow}>
                   <TouchableOpacity style={st.regenBtn} onPress={generateMealPlan}>
-                    <Ionicons name="refresh" size={18} color={brandColors.brand500} />
+                    <Ionicons name="refresh" size={18} color={colors.brand500} />
                     <Text style={st.regenText}>Regenerate</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={[st.saveBtn, saving && { opacity: 0.6 }]} onPress={saveMealPlan} disabled={saving}>
@@ -355,7 +358,7 @@ export default function AIGenerateScreen() {
         {tab === 'training' && (
           <>
             <View style={st.infoCard}>
-              <Ionicons name="sparkles" size={20} color={brandColors.brand500} />
+              <Ionicons name="sparkles" size={20} color={colors.brand500} />
               <View style={{ flex: 1 }}>
                 <Text style={st.infoTitle}>AI Training Program</Text>
                 <Text style={st.infoDesc}>
@@ -373,7 +376,7 @@ export default function AIGenerateScreen() {
 
             {loading && (
               <View style={st.loadingBox}>
-                <ActivityIndicator size="large" color={brandColors.brand500} />
+                <ActivityIndicator size="large" color={colors.brand500} />
                 <Text style={st.loadingText}>Designing your training program...</Text>
               </View>
             )}
@@ -406,7 +409,7 @@ export default function AIGenerateScreen() {
 
                 <View style={st.actionRow}>
                   <TouchableOpacity style={st.regenBtn} onPress={generateTrainingPlan}>
-                    <Ionicons name="refresh" size={18} color={brandColors.brand500} />
+                    <Ionicons name="refresh" size={18} color={colors.brand500} />
                     <Text style={st.regenText}>Regenerate</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={[st.saveBtn, saving && { opacity: 0.6 }]} onPress={saveTrainingPlan} disabled={saving}>
@@ -428,6 +431,8 @@ export default function AIGenerateScreen() {
 }
 
 function TotalItem({ label, value, target, unit }: { label: string; value: number; target?: number | null; unit: string }) {
+  const st = useThemedStyles(makeStyles)
+
   return (
     <View style={st.totalItem}>
       <Text style={st.totalLabel}>{label}</Text>
@@ -437,58 +442,59 @@ function TotalItem({ label, value, target, unit }: { label: string; value: numbe
   )
 }
 
-const st = StyleSheet.create({
-  container: { flex: 1, backgroundColor: brandColors.background },
+const makeStyles = (c: BrandColors) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: c.background },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 },
-  title: { fontSize: 20, fontWeight: '800', color: brandColors.foreground },
-  tabRow: { flexDirection: 'row', marginHorizontal: 20, backgroundColor: brandColors.panel, borderWidth: 1, borderColor: brandColors.line, borderRadius: 18, padding: 4, marginBottom: 8 },
+  title: { fontSize: 20, fontWeight: '800', color: c.foreground },
+  tabRow: { flexDirection: 'row', marginHorizontal: 20, backgroundColor: c.panel, borderWidth: 1, borderColor: c.line, borderRadius: 18, padding: 4, marginBottom: 8 },
   tab: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 10, borderRadius: 10 },
-  tabActive: { backgroundColor: brandColors.brand100 },
-  tabText: { fontSize: 14, fontWeight: '600', color: brandColors.textSubtle },
-  tabTextActive: { color: brandColors.brand500 },
+  tabActive: { backgroundColor: c.brand100 },
+  tabText: { fontSize: 14, fontWeight: '600', color: c.textSubtle },
+  tabTextActive: { color: c.brand500 },
   content: { padding: 20, paddingTop: 8, paddingBottom: 40 },
-  infoCard: { flexDirection: 'row', backgroundColor: brandColors.brand100, borderRadius: 18, borderWidth: 1, borderColor: brandColors.accentLine, padding: 16, gap: 12, marginBottom: 16, alignItems: 'flex-start' },
-  infoTitle: { fontSize: 15, fontWeight: '700', color: brandColors.foregroundSoft },
-  infoDesc: { fontSize: 13, color: brandColors.foregroundSoft, marginTop: 2, lineHeight: 18 },
-  generateBtn: { flexDirection: 'row', backgroundColor: brandColors.brand500, borderRadius: 18, paddingVertical: 16, alignItems: 'center', justifyContent: 'center', gap: 8 },
+  infoCard: { flexDirection: 'row', backgroundColor: c.brand100, borderRadius: 18, borderWidth: 1, borderColor: c.accentLine, padding: 16, gap: 12, marginBottom: 16, alignItems: 'flex-start' },
+  infoTitle: { fontSize: 15, fontWeight: '700', color: c.foregroundSoft },
+  infoDesc: { fontSize: 13, color: c.foregroundSoft, marginTop: 2, lineHeight: 18 },
+  generateBtn: { flexDirection: 'row', backgroundColor: c.brand500, borderRadius: 18, paddingVertical: 16, alignItems: 'center', justifyContent: 'center', gap: 8 },
   generateBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
   loadingBox: { alignItems: 'center', paddingVertical: 40, gap: 16 },
-  loadingText: { fontSize: 15, color: brandColors.textMuted, fontWeight: '500' },
+  loadingText: { fontSize: 15, color: c.textMuted, fontWeight: '500' },
   // Meal plan styles
-  mealCard: { backgroundColor: brandColors.panel, borderRadius: 20, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 12, ...brandShadow },
+  mealCard: { backgroundColor: c.panel, borderRadius: 20, borderWidth: 1, borderColor: c.line, padding: 16, marginBottom: 12, ...brandShadow },
   mealHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
   mealTimeBox: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  mealTime: { fontSize: 13, fontWeight: '600', color: brandColors.brand500 },
-  mealType: { fontSize: 12, fontWeight: '600', color: brandColors.textMuted, textTransform: 'uppercase', letterSpacing: 0.5 },
-  mealTitle: { fontSize: 17, fontWeight: '700', color: brandColors.foreground, marginBottom: 4 },
-  timingNote: { fontSize: 12, color: brandColors.brand500, fontStyle: 'italic', marginBottom: 8 },
+  mealTime: { fontSize: 13, fontWeight: '600', color: c.brand500 },
+  mealType: { fontSize: 12, fontWeight: '600', color: c.textMuted, textTransform: 'uppercase', letterSpacing: 0.5 },
+  mealTitle: { fontSize: 17, fontWeight: '700', color: c.foreground, marginBottom: 4 },
+  timingNote: { fontSize: 12, color: c.brand500, fontStyle: 'italic', marginBottom: 8 },
   macroRow: { flexDirection: 'row', gap: 6, marginBottom: 10 },
-  macroPill: { fontSize: 11, fontWeight: '600', color: brandColors.foregroundSoft, backgroundColor: brandColors.panelMuted, borderRadius: 10, paddingHorizontal: 8, paddingVertical: 3 },
-  ingRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 6, borderBottomWidth: 1, borderBottomColor: brandColors.line },
-  ingName: { fontSize: 14, color: brandColors.foregroundSoft },
-  ingAmount: { fontSize: 14, color: brandColors.textMuted },
-  totalsCard: { backgroundColor: brandColors.brand100, borderRadius: 18, borderWidth: 1, borderColor: brandColors.accentLine, padding: 16, marginBottom: 12 },
-  totalsTitle: { fontSize: 15, fontWeight: '700', color: brandColors.foregroundSoft, marginBottom: 8 },
+  macroPill: { fontSize: 11, fontWeight: '600', color: c.foregroundSoft, backgroundColor: c.panelMuted, borderRadius: 10, paddingHorizontal: 8, paddingVertical: 3 },
+  ingRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 6, borderBottomWidth: 1, borderBottomColor: c.line },
+  ingName: { fontSize: 14, color: c.foregroundSoft },
+  ingAmount: { fontSize: 14, color: c.textMuted },
+  totalsCard: { backgroundColor: c.brand100, borderRadius: 18, borderWidth: 1, borderColor: c.accentLine, padding: 16, marginBottom: 12 },
+  totalsTitle: { fontSize: 15, fontWeight: '700', color: c.foregroundSoft, marginBottom: 8 },
   totalsRow: { flexDirection: 'row', justifyContent: 'space-between' },
   totalItem: { alignItems: 'center' },
-  totalLabel: { fontSize: 11, color: brandColors.foregroundSoft },
-  totalValue: { fontSize: 16, fontWeight: '800', color: brandColors.foregroundSoft, marginTop: 2 },
-  totalTarget: { fontSize: 10, color: brandColors.brand500, marginTop: 1 },
+  totalLabel: { fontSize: 11, color: c.foregroundSoft },
+  totalValue: { fontSize: 16, fontWeight: '800', color: c.foregroundSoft, marginTop: 2 },
+  totalTarget: { fontSize: 10, color: c.brand500, marginTop: 1 },
   actionRow: { flexDirection: 'row', gap: 12, marginTop: 8 },
-  regenBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, borderWidth: 1, borderColor: brandColors.accentLine, borderRadius: 16, backgroundColor: brandColors.panelMuted, paddingVertical: 14 },
-  regenText: { fontSize: 15, fontWeight: '600', color: brandColors.brand500 },
-  saveBtn: { flex: 2, flexDirection: 'row', backgroundColor: brandColors.brand500, borderRadius: 16, paddingVertical: 14, alignItems: 'center', justifyContent: 'center', gap: 6 },
+  regenBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, borderWidth: 1, borderColor: c.accentLine, borderRadius: 16, backgroundColor: c.panelMuted, paddingVertical: 14 },
+  regenText: { fontSize: 15, fontWeight: '600', color: c.brand500 },
+  saveBtn: { flex: 2, flexDirection: 'row', backgroundColor: c.brand500, borderRadius: 16, paddingVertical: 14, alignItems: 'center', justifyContent: 'center', gap: 6 },
   saveBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
   // Training plan styles
   planHeader: { marginBottom: 16 },
-  planName: { fontSize: 20, fontWeight: '800', color: brandColors.foreground },
-  planDesc: { fontSize: 14, color: brandColors.textMuted, marginTop: 4 },
-  dayCard: { backgroundColor: brandColors.panel, borderRadius: 20, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 12, ...brandShadow },
-  dayTitle: { fontSize: 16, fontWeight: '700', color: brandColors.brand500, marginBottom: 10 },
-  exRow: { flexDirection: 'row', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: brandColors.line },
-  exName: { fontSize: 14, fontWeight: '600', color: brandColors.foregroundSoft },
-  exMeta: { fontSize: 12, color: brandColors.textSubtle, marginTop: 2 },
-  exNotes: { fontSize: 12, color: brandColors.textMuted, fontStyle: 'italic', marginTop: 2 },
-  exSets: { fontSize: 14, fontWeight: '700', color: brandColors.foreground },
-  exRest: { fontSize: 11, color: brandColors.textSubtle, marginTop: 2 },
+  planName: { fontSize: 20, fontWeight: '800', color: c.foreground },
+  planDesc: { fontSize: 14, color: c.textMuted, marginTop: 4 },
+  dayCard: { backgroundColor: c.panel, borderRadius: 20, borderWidth: 1, borderColor: c.line, padding: 16, marginBottom: 12, ...brandShadow },
+  dayTitle: { fontSize: 16, fontWeight: '700', color: c.brand500, marginBottom: 10 },
+  exRow: { flexDirection: 'row', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: c.line },
+  exName: { fontSize: 14, fontWeight: '600', color: c.foregroundSoft },
+  exMeta: { fontSize: 12, color: c.textSubtle, marginTop: 2 },
+  exNotes: { fontSize: 12, color: c.textMuted, fontStyle: 'italic', marginTop: 2 },
+  exSets: { fontSize: 14, fontWeight: '700', color: c.foreground },
+  exRest: { fontSize: 11, color: c.textSubtle, marginTop: 2 },
 })
+

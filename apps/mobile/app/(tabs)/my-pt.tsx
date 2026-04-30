@@ -8,11 +8,14 @@ import { Ionicons } from '@expo/vector-icons'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
 import type { Message, FeedbackRequest, FeedbackQuestion } from '@nutrigoal/shared'
-import { brandColors, brandShadow } from '../../src/theme/brand'
+import { useBrandColors, useThemedStyles, brandShadow, type BrandColors } from '../../src/theme/brand'
 
 type Screen = 'home' | 'messages' | 'feedback-list' | 'feedback-respond'
 
 export default function MyPTScreen() {
+  const colors = useBrandColors()
+  const s = useThemedStyles(makeStyles)
+
   const { user } = useAuth()
   const [screen, setScreen] = useState<Screen>('home')
   const [ptName, setPtName] = useState<string | null>(null)
@@ -109,7 +112,7 @@ export default function MyPTScreen() {
     <SafeAreaView style={s.container}>
       <View style={s.header}><Text style={s.title}>My PT</Text></View>
       <View style={s.empty}>
-        <Ionicons name="person-outline" size={48} color={brandColors.textSubtle} />
+        <Ionicons name="person-outline" size={48} color={colors.textSubtle} />
         <Text style={s.emptyText}>No PT assigned</Text>
         <Text style={s.emptyHint}>Ask your personal trainer to invite you.</Text>
       </View>
@@ -145,7 +148,7 @@ export default function MyPTScreen() {
         {/* Action Cards */}
         <TouchableOpacity style={s.actionCard} onPress={() => setScreen('messages')}>
           <View style={[s.actionIcon, { backgroundColor: '#eff6ff' }]}>
-            <Ionicons name="chatbubbles" size={24} color={brandColors.brand500} />
+            <Ionicons name="chatbubbles" size={24} color={colors.brand500} />
           </View>
           <View style={{ flex: 1 }}>
             <Text style={s.actionTitle}>Messages</Text>
@@ -154,21 +157,21 @@ export default function MyPTScreen() {
           {unreadCount > 0 && (
             <View style={s.badge}><Text style={s.badgeText}>{unreadCount}</Text></View>
           )}
-          <Ionicons name="chevron-forward" size={20} color={brandColors.textSubtle} />
+          <Ionicons name="chevron-forward" size={20} color={colors.textSubtle} />
         </TouchableOpacity>
 
         <TouchableOpacity style={s.actionCard} onPress={() => setScreen('feedback-list')}>
           <View style={[s.actionIcon, { backgroundColor: '#f5f3ff' }]}>
-            <Ionicons name="clipboard" size={24} color={brandColors.brand500} />
+            <Ionicons name="clipboard" size={24} color={colors.brand500} />
           </View>
           <View style={{ flex: 1 }}>
             <Text style={s.actionTitle}>Feedback Requests</Text>
             <Text style={s.actionSub}>{pendingFeedbackCount > 0 ? `${pendingFeedbackCount} pending` : 'All caught up'}</Text>
           </View>
           {pendingFeedbackCount > 0 && (
-            <View style={[s.badge, { backgroundColor: brandColors.brand500 }]}><Text style={s.badgeText}>{pendingFeedbackCount}</Text></View>
+            <View style={[s.badge, { backgroundColor: colors.brand500 }]}><Text style={s.badgeText}>{pendingFeedbackCount}</Text></View>
           )}
-          <Ionicons name="chevron-forward" size={20} color={brandColors.textSubtle} />
+          <Ionicons name="chevron-forward" size={20} color={colors.textSubtle} />
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
@@ -179,6 +182,9 @@ export default function MyPTScreen() {
 function ChatScreen({ conversationId, user, ptName, onBack }: {
   conversationId: string; user: any; ptName: string; onBack: () => void
 }) {
+  const colors = useBrandColors()
+  const s = useThemedStyles(makeStyles)
+
   const [messages, setMessages] = useState<Message[]>([])
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
@@ -221,7 +227,7 @@ function ChatScreen({ conversationId, user, ptName, onBack }: {
   return (
     <SafeAreaView style={s.container}>
       <View style={s.chatHeader}>
-        <TouchableOpacity onPress={onBack}><Ionicons name="arrow-back" size={24} color={brandColors.foregroundSoft} /></TouchableOpacity>
+        <TouchableOpacity onPress={onBack}><Ionicons name="arrow-back" size={24} color={colors.foregroundSoft} /></TouchableOpacity>
         <Text style={s.chatTitle}>{ptName}</Text>
         <View style={{ width: 24 }} />
       </View>
@@ -245,7 +251,7 @@ function ChatScreen({ conversationId, user, ptName, onBack }: {
 
       <View style={s.inputBar}>
         <TextInput style={s.msgInput} value={text} onChangeText={setText}
-          placeholder="Type a message..." placeholderTextColor={brandColors.textSubtle} multiline />
+          placeholder="Type a message..." placeholderTextColor={colors.textSubtle} multiline />
         <TouchableOpacity style={s.sendBtn} onPress={handleSend} disabled={sending || !text.trim()}>
           <Ionicons name="send" size={20} color="#fff" />
         </TouchableOpacity>
@@ -258,10 +264,13 @@ function ChatScreen({ conversationId, user, ptName, onBack }: {
 function FeedbackListScreen({ requests, onBack, onSelect }: {
   requests: FeedbackRequest[]; onBack: () => void; onSelect: (fb: FeedbackRequest) => void
 }) {
+  const colors = useBrandColors()
+  const s = useThemedStyles(makeStyles)
+
   return (
     <SafeAreaView style={s.container}>
       <View style={s.chatHeader}>
-        <TouchableOpacity onPress={onBack}><Ionicons name="arrow-back" size={24} color={brandColors.foregroundSoft} /></TouchableOpacity>
+        <TouchableOpacity onPress={onBack}><Ionicons name="arrow-back" size={24} color={colors.foregroundSoft} /></TouchableOpacity>
         <Text style={s.chatTitle}>Feedback Requests</Text>
         <View style={{ width: 24 }} />
       </View>
@@ -269,7 +278,7 @@ function FeedbackListScreen({ requests, onBack, onSelect }: {
       <ScrollView contentContainerStyle={s.content}>
         {requests.length === 0 ? (
           <View style={s.empty}>
-            <Ionicons name="clipboard-outline" size={48} color={brandColors.textSubtle} />
+            <Ionicons name="clipboard-outline" size={48} color={colors.textSubtle} />
             <Text style={s.emptyText}>No feedback requests</Text>
           </View>
         ) : requests.map(fb => (
@@ -294,6 +303,9 @@ function FeedbackListScreen({ requests, onBack, onSelect }: {
 function FeedbackRespondScreen({ feedback, user, onBack }: {
   feedback: FeedbackRequest; user: any; onBack: () => void
 }) {
+  const colors = useBrandColors()
+  const s = useThemedStyles(makeStyles)
+
   const [answers, setAnswers] = useState<Record<string, string | number | boolean>>({})
   const [saving, setSaving] = useState(false)
   const isCompleted = feedback.status === 'completed'
@@ -322,7 +334,7 @@ function FeedbackRespondScreen({ feedback, user, onBack }: {
   return (
     <SafeAreaView style={s.container}>
       <View style={s.chatHeader}>
-        <TouchableOpacity onPress={onBack}><Ionicons name="arrow-back" size={24} color={brandColors.foregroundSoft} /></TouchableOpacity>
+        <TouchableOpacity onPress={onBack}><Ionicons name="arrow-back" size={24} color={colors.foregroundSoft} /></TouchableOpacity>
         <Text style={s.chatTitle}>{feedback.title}</Text>
         <View style={{ width: 24 }} />
       </View>
@@ -346,7 +358,7 @@ function FeedbackRespondScreen({ feedback, user, onBack }: {
                 </View>
               ) : q.type === 'text' ? (
                 <TextInput style={s.answerInput} multiline
-                  placeholder="Type your answer..." placeholderTextColor={brandColors.textSubtle}
+                  placeholder="Type your answer..." placeholderTextColor={colors.textSubtle}
                   value={String(answers[q.id] ?? '')}
                   onChangeText={(t) => updateAnswer(q.id, t)} />
               ) : q.type === 'rating' ? (
@@ -385,67 +397,68 @@ function FeedbackRespondScreen({ feedback, user, onBack }: {
 }
 
 // ─── Styles ──────────────────────────────────────────────
-const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: brandColors.background },
+const makeStyles = (c: BrandColors) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: c.background },
   header: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 },
-  title: { fontSize: 24, fontWeight: '800', color: brandColors.foreground, letterSpacing: -0.6 },
+  title: { fontSize: 24, fontWeight: '800', color: c.foreground, letterSpacing: -0.6 },
   content: { padding: 20, paddingTop: 0, paddingBottom: 40 },
   empty: { alignItems: 'center', paddingTop: 80, gap: 8 },
-  emptyText: { fontSize: 18, fontWeight: '600', color: brandColors.textMuted },
-  emptyHint: { fontSize: 14, color: brandColors.textSubtle, textAlign: 'center' },
+  emptyText: { fontSize: 18, fontWeight: '600', color: c.textMuted },
+  emptyHint: { fontSize: 14, color: c.textSubtle, textAlign: 'center' },
   // PT card
-  ptCard: { backgroundColor: brandColors.panel, borderRadius: 24, borderWidth: 1, borderColor: brandColors.line, padding: 24, alignItems: 'center', marginBottom: 20, ...brandShadow },
-  ptAvatar: { width: 64, height: 64, borderRadius: 32, backgroundColor: brandColors.brand100, alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
-  ptAvatarText: { fontSize: 28, fontWeight: '700', color: brandColors.brand500 },
-  ptName: { fontSize: 22, fontWeight: '800', color: brandColors.foreground },
-  ptLabel: { fontSize: 13, color: brandColors.textSubtle, marginTop: 4 },
+  ptCard: { backgroundColor: c.panel, borderRadius: 24, borderWidth: 1, borderColor: c.line, padding: 24, alignItems: 'center', marginBottom: 20, ...brandShadow },
+  ptAvatar: { width: 64, height: 64, borderRadius: 32, backgroundColor: c.brand100, alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
+  ptAvatarText: { fontSize: 28, fontWeight: '700', color: c.brand500 },
+  ptName: { fontSize: 22, fontWeight: '800', color: c.foreground },
+  ptLabel: { fontSize: 13, color: c.textSubtle, marginTop: 4 },
   planStatusRow: { flexDirection: 'row', gap: 12, marginBottom: 20 },
-  planStatusCard: { flex: 1, backgroundColor: brandColors.panel, borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, ...brandShadow },
-  planStatusLabel: { fontSize: 12, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, color: brandColors.textSubtle },
-  planStatusValue: { fontSize: 14, fontWeight: '600', color: brandColors.foregroundSoft, marginTop: 8, lineHeight: 20 },
+  planStatusCard: { flex: 1, backgroundColor: c.panel, borderRadius: 18, borderWidth: 1, borderColor: c.line, padding: 16, ...brandShadow },
+  planStatusLabel: { fontSize: 12, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, color: c.textSubtle },
+  planStatusValue: { fontSize: 14, fontWeight: '600', color: c.foregroundSoft, marginTop: 8, lineHeight: 20 },
   // Action cards
-  actionCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: brandColors.panel, borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 10, ...brandShadow },
+  actionCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: c.panel, borderRadius: 18, borderWidth: 1, borderColor: c.line, padding: 16, marginBottom: 10, ...brandShadow },
   actionIcon: { width: 48, height: 48, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-  actionTitle: { fontSize: 16, fontWeight: '700', color: brandColors.foregroundSoft },
-  actionSub: { fontSize: 13, color: brandColors.textSubtle, marginTop: 2 },
-  badge: { backgroundColor: brandColors.brand500, borderRadius: 12, minWidth: 24, height: 24, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
+  actionTitle: { fontSize: 16, fontWeight: '700', color: c.foregroundSoft },
+  actionSub: { fontSize: 13, color: c.textSubtle, marginTop: 2 },
+  badge: { backgroundColor: c.brand500, borderRadius: 12, minWidth: 24, height: 24, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
   badgeText: { color: '#fff', fontSize: 12, fontWeight: '700' },
   // Chat
   chatHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 },
-  chatTitle: { fontSize: 18, fontWeight: '700', color: brandColors.foreground },
+  chatTitle: { fontSize: 18, fontWeight: '700', color: c.foreground },
   msgBubble: { maxWidth: '80%', borderRadius: 16, padding: 12, marginBottom: 8 },
-  msgMe: { backgroundColor: brandColors.brand500, alignSelf: 'flex-end', borderBottomRightRadius: 4 },
-  msgThem: { backgroundColor: brandColors.panel, alignSelf: 'flex-start', borderBottomLeftRadius: 4, borderWidth: 1, borderColor: brandColors.line },
-  msgText: { fontSize: 15, color: brandColors.foregroundSoft, lineHeight: 20 },
-  msgTime: { fontSize: 10, color: brandColors.textSubtle, marginTop: 4, alignSelf: 'flex-end' },
-  inputBar: { flexDirection: 'row', padding: 12, gap: 8, borderTopWidth: 1, borderTopColor: brandColors.line, backgroundColor: brandColors.panel },
-  msgInput: { flex: 1, backgroundColor: brandColors.panelMuted, borderRadius: 20, paddingHorizontal: 16, paddingVertical: 10, fontSize: 15, color: brandColors.foreground, maxHeight: 100 },
-  sendBtn: { backgroundColor: brandColors.brand500, width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  msgMe: { backgroundColor: c.brand500, alignSelf: 'flex-end', borderBottomRightRadius: 4 },
+  msgThem: { backgroundColor: c.panel, alignSelf: 'flex-start', borderBottomLeftRadius: 4, borderWidth: 1, borderColor: c.line },
+  msgText: { fontSize: 15, color: c.foregroundSoft, lineHeight: 20 },
+  msgTime: { fontSize: 10, color: c.textSubtle, marginTop: 4, alignSelf: 'flex-end' },
+  inputBar: { flexDirection: 'row', padding: 12, gap: 8, borderTopWidth: 1, borderTopColor: c.line, backgroundColor: c.panel },
+  msgInput: { flex: 1, backgroundColor: c.panelMuted, borderRadius: 20, paddingHorizontal: 16, paddingVertical: 10, fontSize: 15, color: c.foreground, maxHeight: 100 },
+  sendBtn: { backgroundColor: c.brand500, width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   // Feedback list
-  fbCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: brandColors.panel, borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 8, ...brandShadow },
-  fbTitle: { fontSize: 16, fontWeight: '600', color: brandColors.foregroundSoft },
-  fbDate: { fontSize: 12, color: brandColors.textSubtle, marginTop: 2 },
-  fbBadge: { backgroundColor: brandColors.warningBg, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 },
-  fbBadgeDone: { backgroundColor: brandColors.brand100 },
-  fbBadgeText: { fontSize: 11, fontWeight: '600', color: brandColors.warning },
-  fbBadgeTextDone: { color: brandColors.brand500 },
+  fbCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: c.panel, borderRadius: 18, borderWidth: 1, borderColor: c.line, padding: 16, marginBottom: 8, ...brandShadow },
+  fbTitle: { fontSize: 16, fontWeight: '600', color: c.foregroundSoft },
+  fbDate: { fontSize: 12, color: c.textSubtle, marginTop: 2 },
+  fbBadge: { backgroundColor: c.warningBg, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 },
+  fbBadgeDone: { backgroundColor: c.brand100 },
+  fbBadgeText: { fontSize: 11, fontWeight: '600', color: c.warning },
+  fbBadgeTextDone: { color: c.brand500 },
   // Feedback respond
-  questionCard: { backgroundColor: brandColors.panel, borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 12, ...brandShadow },
-  questionText: { fontSize: 16, fontWeight: '600', color: brandColors.foregroundSoft, marginBottom: 4 },
-  questionType: { fontSize: 12, color: brandColors.textSubtle, marginBottom: 12 },
-  answerInput: { backgroundColor: brandColors.panelMuted, borderWidth: 1, borderColor: brandColors.lineStrong, borderRadius: 12, padding: 12, fontSize: 15, color: brandColors.foreground, minHeight: 60, textAlignVertical: 'top' },
-  answerBox: { backgroundColor: brandColors.panelMuted, borderRadius: 12, padding: 12 },
-  answerText: { fontSize: 15, color: brandColors.foregroundSoft },
+  questionCard: { backgroundColor: c.panel, borderRadius: 18, borderWidth: 1, borderColor: c.line, padding: 16, marginBottom: 12, ...brandShadow },
+  questionText: { fontSize: 16, fontWeight: '600', color: c.foregroundSoft, marginBottom: 4 },
+  questionType: { fontSize: 12, color: c.textSubtle, marginBottom: 12 },
+  answerInput: { backgroundColor: c.panelMuted, borderWidth: 1, borderColor: c.lineStrong, borderRadius: 12, padding: 12, fontSize: 15, color: c.foreground, minHeight: 60, textAlignVertical: 'top' },
+  answerBox: { backgroundColor: c.panelMuted, borderRadius: 12, padding: 12 },
+  answerText: { fontSize: 15, color: c.foregroundSoft },
   ratingRow: { flexDirection: 'row', gap: 10 },
-  ratingBtn: { width: 44, height: 44, borderRadius: 22, borderWidth: 1, borderColor: brandColors.lineStrong, alignItems: 'center', justifyContent: 'center', backgroundColor: brandColors.panelMuted },
-  ratingBtnActive: { backgroundColor: brandColors.brand500, borderColor: brandColors.brand500 },
-  ratingText: { fontSize: 18, fontWeight: '700', color: brandColors.textSubtle },
+  ratingBtn: { width: 44, height: 44, borderRadius: 22, borderWidth: 1, borderColor: c.lineStrong, alignItems: 'center', justifyContent: 'center', backgroundColor: c.panelMuted },
+  ratingBtnActive: { backgroundColor: c.brand500, borderColor: c.brand500 },
+  ratingText: { fontSize: 18, fontWeight: '700', color: c.textSubtle },
   ratingTextActive: { color: '#fff' },
   yesNoRow: { flexDirection: 'row', gap: 12 },
-  yesNoBtn: { flex: 1, paddingVertical: 14, borderRadius: 14, borderWidth: 1, borderColor: brandColors.lineStrong, alignItems: 'center', backgroundColor: brandColors.panelMuted },
-  yesNoBtnActive: { backgroundColor: brandColors.brand500, borderColor: brandColors.brand500 },
-  yesNoText: { fontSize: 16, fontWeight: '600', color: brandColors.textSubtle },
+  yesNoBtn: { flex: 1, paddingVertical: 14, borderRadius: 14, borderWidth: 1, borderColor: c.lineStrong, alignItems: 'center', backgroundColor: c.panelMuted },
+  yesNoBtnActive: { backgroundColor: c.brand500, borderColor: c.brand500 },
+  yesNoText: { fontSize: 16, fontWeight: '600', color: c.textSubtle },
   yesNoTextActive: { color: '#fff' },
-  submitBtn: { backgroundColor: brandColors.brand500, borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginTop: 8 },
+  submitBtn: { backgroundColor: c.brand500, borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginTop: 8 },
   submitBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
 })
+

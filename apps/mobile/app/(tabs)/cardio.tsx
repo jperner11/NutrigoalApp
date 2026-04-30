@@ -9,9 +9,47 @@ import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
 import { calculateCardioCalories } from '@nutrigoal/shared'
 import type { CardioSession, CardioType } from '@nutrigoal/shared'
-import { brandColors, brandShadow } from '../../src/theme/brand'
+import { useBrandColors, useThemedStyles, brandShadow } from '../../src/theme/brand'
 
 export default function CardioScreen() {
+  const colors = useBrandColors()
+  const styles = useThemedStyles((c) => ({
+  container: { flex: 1, backgroundColor: c.background },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 },
+  title: { fontSize: 24, fontWeight: '800', color: c.foreground, letterSpacing: -0.6 },
+  addBtn: { backgroundColor: c.accent, borderRadius: 20, width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
+  content: { padding: 20, paddingTop: 0 },
+  empty: { alignItems: 'center', paddingTop: 80, gap: 8 },
+  emptyText: { fontSize: 18, fontWeight: '600', color: c.textMuted },
+  emptyLink: { fontSize: 15, fontWeight: '600', color: c.accent, marginTop: 4 },
+  card: { backgroundColor: c.panel, borderRadius: 18, borderWidth: 1, borderColor: c.line, padding: 16, marginBottom: 10, ...brandShadow },
+  cardRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  cardIconBox: { width: 40, height: 40, borderRadius: 20, backgroundColor: c.accentBg, alignItems: 'center', justifyContent: 'center' },
+  cardTitle: { fontSize: 16, fontWeight: '700', color: c.foregroundSoft },
+  cardDate: { fontSize: 12, color: c.textSubtle, marginTop: 2 },
+  cardCalories: { fontSize: 15, fontWeight: '700', color: c.accent },
+  cardDuration: { fontSize: 12, color: c.textMuted, marginTop: 2 },
+  // Modal
+  modalContainer: { flex: 1, backgroundColor: c.background },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: c.line },
+  cancelText: { fontSize: 16, color: c.textMuted },
+  modalTitle: { fontSize: 18, fontWeight: '700', color: c.foreground },
+  modalContent: { padding: 20, gap: 4 },
+  label: { fontSize: 14, fontWeight: '600', color: c.foregroundSoft, marginTop: 12, marginBottom: 6 },
+  input: { backgroundColor: c.panel, borderWidth: 1, borderColor: c.lineStrong, borderRadius: 16, paddingHorizontal: 16, paddingVertical: 14, fontSize: 16, color: c.foreground },
+  typeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  typeBtn: { backgroundColor: c.panel, borderWidth: 1, borderColor: c.line, borderRadius: 14, paddingVertical: 10, paddingHorizontal: 14 },
+  typeBtnActive: { borderColor: c.accentLine, backgroundColor: c.accentBg },
+  typeBtnText: { fontSize: 14, fontWeight: '600', color: c.textMuted },
+  typeBtnTextActive: { color: c.accent },
+  previewCard: { backgroundColor: c.accentBg, borderRadius: 18, padding: 16, alignItems: 'center', marginTop: 16, borderWidth: 1, borderColor: c.accentLine },
+  previewLabel: { fontSize: 13, color: c.textMuted },
+  previewValue: { fontSize: 28, fontWeight: '800', color: c.accent, marginTop: 4 },
+  saveBtn: { backgroundColor: c.accent, borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginTop: 24 },
+  saveBtnDisabled: { opacity: 0.6 },
+  saveBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+}))
+
   const { user, profile } = useAuth()
   const [sessions, setSessions] = useState<(CardioSession & { cardio_types?: CardioType })[]>([])
   const [cardioTypes, setCardioTypes] = useState<CardioType[]>([])
@@ -91,11 +129,11 @@ export default function CardioScreen() {
 
       <ScrollView
         contentContainerStyle={styles.content}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={brandColors.danger} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.accent} />}
       >
         {sessions.length === 0 ? (
           <View style={styles.empty}>
-            <Ionicons name="heart-outline" size={48} color={brandColors.textSubtle} />
+            <Ionicons name="heart-outline" size={48} color={colors.textSubtle} />
             <Text style={styles.emptyText}>No cardio sessions yet</Text>
             <TouchableOpacity onPress={() => setShowForm(true)}>
               <Text style={styles.emptyLink}>Log your first session</Text>
@@ -106,7 +144,7 @@ export default function CardioScreen() {
             <View key={s.id} style={styles.card}>
               <View style={styles.cardRow}>
                 <View style={styles.cardIconBox}>
-                  <Ionicons name="heart" size={20} color={brandColors.danger} />
+                  <Ionicons name="heart" size={20} color={colors.accent} />
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.cardTitle}>{(s as any).cardio_types?.name || 'Cardio'}</Text>
@@ -148,10 +186,10 @@ export default function CardioScreen() {
             </View>
 
             <Text style={styles.label}>Duration (minutes)</Text>
-            <TextInput style={styles.input} value={duration} onChangeText={setDuration} keyboardType="numeric" placeholder="30" placeholderTextColor={brandColors.textSubtle} />
+            <TextInput style={styles.input} value={duration} onChangeText={setDuration} keyboardType="numeric" placeholder="30" placeholderTextColor={colors.textSubtle} />
 
             <Text style={styles.label}>Average Heart Rate (optional)</Text>
-            <TextInput style={styles.input} value={bpm} onChangeText={setBpm} keyboardType="numeric" placeholder="e.g. 145" placeholderTextColor={brandColors.textSubtle} />
+            <TextInput style={styles.input} value={bpm} onChangeText={setBpm} keyboardType="numeric" placeholder="e.g. 145" placeholderTextColor={colors.textSubtle} />
 
             {duration && parseInt(duration) > 0 && selectedTypeId && profile && (
               <View style={styles.previewCard}>
@@ -183,39 +221,3 @@ export default function CardioScreen() {
   )
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: brandColors.background },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 },
-  title: { fontSize: 24, fontWeight: '800', color: brandColors.foreground, letterSpacing: -0.6 },
-  addBtn: { backgroundColor: brandColors.danger, borderRadius: 20, width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
-  content: { padding: 20, paddingTop: 0 },
-  empty: { alignItems: 'center', paddingTop: 80, gap: 8 },
-  emptyText: { fontSize: 18, fontWeight: '600', color: brandColors.textMuted },
-  emptyLink: { fontSize: 15, fontWeight: '600', color: brandColors.danger, marginTop: 4 },
-  card: { backgroundColor: brandColors.panel, borderRadius: 18, borderWidth: 1, borderColor: brandColors.line, padding: 16, marginBottom: 10, ...brandShadow },
-  cardRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  cardIconBox: { width: 40, height: 40, borderRadius: 20, backgroundColor: brandColors.dangerBg, alignItems: 'center', justifyContent: 'center' },
-  cardTitle: { fontSize: 16, fontWeight: '700', color: brandColors.foregroundSoft },
-  cardDate: { fontSize: 12, color: brandColors.textSubtle, marginTop: 2 },
-  cardCalories: { fontSize: 15, fontWeight: '700', color: brandColors.danger },
-  cardDuration: { fontSize: 12, color: brandColors.textMuted, marginTop: 2 },
-  // Modal
-  modalContainer: { flex: 1, backgroundColor: brandColors.background },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: brandColors.line },
-  cancelText: { fontSize: 16, color: brandColors.textMuted },
-  modalTitle: { fontSize: 18, fontWeight: '700', color: brandColors.foreground },
-  modalContent: { padding: 20, gap: 4 },
-  label: { fontSize: 14, fontWeight: '600', color: brandColors.foregroundSoft, marginTop: 12, marginBottom: 6 },
-  input: { backgroundColor: brandColors.panel, borderWidth: 1, borderColor: brandColors.lineStrong, borderRadius: 16, paddingHorizontal: 16, paddingVertical: 14, fontSize: 16, color: brandColors.foreground },
-  typeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  typeBtn: { backgroundColor: brandColors.panel, borderWidth: 1, borderColor: brandColors.line, borderRadius: 14, paddingVertical: 10, paddingHorizontal: 14 },
-  typeBtnActive: { borderColor: brandColors.accentLine, backgroundColor: brandColors.dangerBg },
-  typeBtnText: { fontSize: 14, fontWeight: '600', color: brandColors.textMuted },
-  typeBtnTextActive: { color: brandColors.danger },
-  previewCard: { backgroundColor: brandColors.dangerBg, borderRadius: 18, padding: 16, alignItems: 'center', marginTop: 16, borderWidth: 1, borderColor: brandColors.accentLine },
-  previewLabel: { fontSize: 13, color: brandColors.textMuted },
-  previewValue: { fontSize: 28, fontWeight: '800', color: brandColors.danger, marginTop: 4 },
-  saveBtn: { backgroundColor: brandColors.danger, borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginTop: 24 },
-  saveBtnDisabled: { opacity: 0.6 },
-  saveBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
-})
