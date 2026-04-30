@@ -1,29 +1,56 @@
 @import "tailwindcss";
 
 :root {
-  /* Ember palette — charcoal + bone + bold red */
-  --background: #131012;
-  --background-elevated: #1a1719;
-  --panel: rgba(34, 29, 31, 0.82);
-  --panel-strong: rgba(34, 29, 31, 0.96);
-  --foreground: #f5f1ea;
-  --muted: #c9c3bb;
-  --muted-soft: #8a847d;
-  --line: rgba(245, 241, 234, 0.10);
-  --line-strong: rgba(245, 241, 234, 0.20);
+  /* Treno light palette — white + black + acid lime */
+  --background: #ffffff;
+  --background-elevated: #f7f8f7;
+  --panel: rgba(247, 248, 247, 0.92);
+  --panel-strong: #ffffff;
+  --foreground: #0a0a0a;
+  --muted: #3a3a3a;
+  --muted-soft: #6b6b6b;
+  --line: rgba(10, 10, 10, 0.10);
+  --line-strong: rgba(10, 10, 10, 0.18);
 
-  /* Brand scale — red instead of blue */
-  --brand-900: #5a0f15;
-  --brand-800: #7c1a22;
-  --brand-700: #a32530;
-  --brand-500: #e63946;
-  --brand-400: #f05661;
-  --brand-200: rgba(230, 57, 70, 0.22);
-  --brand-100: rgba(230, 57, 70, 0.10);
+  /* Brand scale — acid lime accent */
+  --brand-900: #4d6800;
+  --brand-800: #6b8c0a;
+  --brand-700: #8fb31a;
+  --brand-500: #cdf24e;
+  --brand-400: #d6ff4e;
+  --brand-200: rgba(205, 242, 78, 0.32);
+  --brand-100: rgba(205, 242, 78, 0.16);
 
-  --focus: rgba(230, 57, 70, 0.28);
+  --focus: rgba(205, 242, 78, 0.45);
   --success-bg: rgba(26, 163, 122, 0.12);
-  --danger-bg: rgba(230, 57, 70, 0.14);
+  --danger-bg: rgba(220, 38, 38, 0.14);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Treno dark palette — graphite + bone + acid lime */
+    --background: #0e1116;
+    --background-elevated: #171b22;
+    --panel: rgba(23, 27, 34, 0.82);
+    --panel-strong: rgba(23, 27, 34, 0.96);
+    --foreground: #f5f7fa;
+    --muted: #c9cdd3;
+    --muted-soft: #8a8f97;
+    --line: rgba(245, 247, 250, 0.10);
+    --line-strong: rgba(245, 247, 250, 0.20);
+
+    --brand-900: #4d6800;
+    --brand-800: #6b8c0a;
+    --brand-700: #8fb31a;
+    --brand-500: #cdf24e;
+    --brand-400: #d6ff4e;
+    --brand-200: rgba(205, 242, 78, 0.28);
+    --brand-100: rgba(205, 242, 78, 0.12);
+
+    --focus: rgba(205, 242, 78, 0.32);
+    --success-bg: rgba(26, 163, 122, 0.12);
+    --danger-bg: rgba(220, 38, 38, 0.14);
+  }
 }
 
 @theme inline {
@@ -131,7 +158,7 @@ input, textarea, select {
 }
 
 .animate-shimmer {
-  background: linear-gradient(90deg, transparent 25%, rgba(245, 241, 234, 0.24) 50%, transparent 75%);
+  background: linear-gradient(90deg, transparent 25%, var(--line-strong) 50%, transparent 75%);
   background-size: 200% 100%;
   animation: shimmer 2s infinite;
 }
@@ -154,7 +181,7 @@ input, textarea, select {
 /* ─── Card system ─── */
 .card,
 .surface-card {
-  background: rgba(34, 29, 31, 0.74);
+  background: var(--panel);
   backdrop-filter: blur(18px);
   border: 1px solid var(--line);
   border-radius: 24px;
@@ -173,20 +200,20 @@ input, textarea, select {
 }
 
 .card-flat {
-  background: rgba(34, 29, 31, 0.6);
+  background: var(--background-elevated);
   backdrop-filter: blur(12px);
   border: 1px solid var(--line);
   border-radius: 20px;
 }
 
 .glass-card {
-  background: linear-gradient(180deg, rgba(34, 29, 31, 0.86), rgba(26, 23, 25, 0.72));
+  background: linear-gradient(180deg, var(--panel-strong), var(--panel));
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--line);
   box-shadow:
     0 16px 38px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(245, 241, 234, 0.04);
+    inset 0 1px 0 var(--line);
 }
 
 .panel-strong {
@@ -195,13 +222,13 @@ input, textarea, select {
   border-radius: 28px;
   box-shadow:
     0 22px 54px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(245, 241, 234, 0.04);
+    inset 0 1px 0 var(--line);
 }
 
 .btn-primary {
   background: linear-gradient(135deg, var(--foreground), var(--muted));
   color: var(--background);
-  border: 1px solid rgba(245, 241, 234, 0.18);
+  border: 1px solid var(--line-strong);
   box-shadow: 0 14px 35px rgba(0, 0, 0, 0.35);
   transition: all 0.25s ease;
 }
@@ -213,39 +240,39 @@ input, textarea, select {
 
 .btn-accent {
   background: linear-gradient(135deg, var(--brand-500), var(--brand-400));
-  color: #fff;
-  border: 1px solid rgba(230, 57, 70, 0.42);
-  box-shadow: 0 8px 18px rgba(230, 57, 70, 0.10);
+  color: #0a0a0a;
+  border: 1px solid var(--brand-200);
+  box-shadow: 0 8px 18px var(--brand-100);
   transition: all 0.25s ease;
 }
 
 .btn-accent:hover {
   transform: translateY(-1px);
-  box-shadow: 0 12px 24px rgba(230, 57, 70, 0.14);
+  box-shadow: 0 12px 24px var(--brand-100);
 }
 
 .btn-secondary {
-  background: rgba(34, 29, 31, 0.7);
+  background: var(--panel);
   color: var(--foreground);
   border: 1px solid var(--line-strong);
   transition: all 0.25s ease;
 }
 
 .btn-secondary:hover {
-  background: rgba(34, 29, 31, 0.92);
-  border-color: rgba(230, 57, 70, 0.4);
+  background: var(--panel-strong);
+  border-color: rgba(205, 242, 78, 0.5);
 }
 
 .input-field {
   width: 100%;
   border-radius: 18px;
   border: 1px solid var(--line-strong);
-  background: rgba(34, 29, 31, 0.62);
+  background: var(--background-elevated);
   padding: 0.95rem 1rem;
   line-height: 1.5;
   font-size: 1rem;
   color: var(--foreground);
-  box-shadow: inset 0 1px 0 rgba(245, 241, 234, 0.04);
+  box-shadow: inset 0 1px 0 var(--line);
   transition: all 0.2s ease;
 }
 
@@ -259,7 +286,7 @@ input, textarea, select {
 }
 
 .input-field:focus {
-  border-color: rgba(230, 57, 70, 0.6);
+  border-color: rgba(205, 242, 78, 0.65);
   box-shadow: 0 0 0 4px var(--focus);
 }
 
@@ -268,8 +295,8 @@ input, textarea, select {
   align-items: center;
   gap: 0.5rem;
   border-radius: 999px;
-  border: 1px solid rgba(230, 57, 70, 0.28);
-  background: rgba(230, 57, 70, 0.10);
+  border: 1px solid rgba(205, 242, 78, 0.38);
+  background: rgba(205, 242, 78, 0.14);
   color: var(--brand-400);
   padding: 0.5rem 0.9rem;
   font-size: 0.78rem;
@@ -285,17 +312,17 @@ input, textarea, select {
   align-items: center;
   justify-content: center;
   border-radius: 1rem;
-  background: linear-gradient(135deg, rgba(230, 57, 70, 0.14), rgba(230, 57, 70, 0.04));
+  background: linear-gradient(135deg, rgba(205, 242, 78, 0.20), rgba(205, 242, 78, 0.06));
   color: var(--foreground);
-  box-shadow: inset 0 1px 0 rgba(245, 241, 234, 0.06), 0 10px 24px rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(230, 57, 70, 0.22);
+  box-shadow: inset 0 1px 0 var(--line), 0 10px 24px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(205, 242, 78, 0.32);
 }
 
 .brand-mark-light {
-  background: rgba(245, 241, 234, 0.12);
+  background: var(--line-strong);
   color: #fff;
-  border-color: rgba(245, 241, 234, 0.16);
-  box-shadow: inset 0 1px 0 rgba(245, 241, 234, 0.18);
+  border-color: var(--line-strong);
+  box-shadow: inset 0 1px 0 var(--line-strong);
 }
 
 .brand-mark-core {
@@ -332,19 +359,19 @@ input, textarea, select {
 }
 
 .app-bg {
-  background-color: #131012;
+  background-color: var(--background);
   background-image:
-    radial-gradient(ellipse at 18% 0%, rgba(230, 57, 70, 0.06) 0%, transparent 55%),
-    radial-gradient(ellipse at 84% 100%, rgba(245, 241, 234, 0.04) 0%, transparent 52%),
-    linear-gradient(180deg, #1a1719 0%, #131012 45%, #0e0c0d 100%);
+    radial-gradient(ellipse at 18% 0%, rgba(205, 242, 78, 0.10) 0%, transparent 55%),
+    radial-gradient(ellipse at 84% 100%, var(--line) 0%, transparent 52%),
+    linear-gradient(180deg, var(--background-elevated) 0%, var(--background) 45%, var(--background) 100%);
 }
 
 .auth-bg {
-  background-color: #131012;
+  background-color: var(--background);
   background-image:
-    radial-gradient(ellipse at 15% 20%, rgba(230, 57, 70, 0.07) 0%, transparent 46%),
-    radial-gradient(ellipse at 85% 82%, rgba(245, 241, 234, 0.05) 0%, transparent 52%),
-    linear-gradient(180deg, rgba(34, 29, 31, 0.7), rgba(19, 16, 18, 0.94));
+    radial-gradient(ellipse at 15% 20%, rgba(205, 242, 78, 0.10) 0%, transparent 46%),
+    radial-gradient(ellipse at 85% 82%, var(--line) 0%, transparent 52%),
+    linear-gradient(180deg, var(--panel), var(--panel-strong));
 }
 
 ::-webkit-scrollbar {
@@ -375,7 +402,7 @@ main {
 }
 
 /* ───────────────────────────────────────────────────────────
-   Meal & Motion prototype port
+   Treno prototype port
    Tokens, utilities, and keyframes from the prototype design,
    mapped onto the app theme + Bricolage Grotesque / Mulish.
    ─────────────────────────────────────────────────────────── */
@@ -385,25 +412,25 @@ main {
   --fg: var(--foreground);
   --fg-2: var(--muted);
   --fg-3: var(--muted-soft);
-  --fg-4: rgba(245, 241, 234, 0.40);
+  --fg-4: var(--muted-soft);
 
   /* Accent (Ember red) */
   --acc: var(--brand-500);
-  --acc-soft: rgba(230, 57, 70, 0.10);
+  --acc-soft: rgba(205, 242, 78, 0.14);
 
   /* Surfaces — dark stack */
   --ink-0: var(--background);
-  --ink-1: #1a1719;
-  --ink-2: rgba(245, 241, 234, 0.06);
-  --ink-3: rgba(230, 57, 70, 0.08);
+  --ink-1: var(--background-elevated);
+  --ink-2: var(--line);
+  --ink-3: rgba(205, 242, 78, 0.12);
 
   /* Lines */
   --line-2: var(--line-strong);
-  --line-3: rgba(245, 241, 234, 0.32);
+  --line-3: var(--line-strong);
 
   /* Paper-ink reverse (light-on-dark "paper" sections) */
-  --paper: #f5f1ea;
-  --paper-ink: #131012;
+  --paper: var(--foreground);
+  --paper-ink: var(--background);
   --paper-line: rgba(19, 16, 18, 0.14);
 
   /* Status */
@@ -411,7 +438,7 @@ main {
   --warn: #c4791c;
 
   /* Surface-strong — always-dark cards (greeting hero, PR card, footer, ForCoaches section) */
-  --surface-strong: #221d1f;
+  --surface-strong: var(--background-elevated);
   --on-strong: var(--foreground);
 
   --font-mono-stack: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
@@ -555,19 +582,19 @@ main {
 .btn.btn-primary {
   background: linear-gradient(135deg, var(--foreground), var(--muted));
   color: var(--background);
-  border: 1px solid rgba(245, 241, 234, 0.18);
+  border: 1px solid var(--line-strong);
   box-shadow: 0 14px 35px rgba(0, 0, 0, 0.35);
 }
 
 .btn.btn-accent {
   background: linear-gradient(135deg, var(--brand-500), var(--brand-400));
-  color: #fff;
-  border: 1px solid rgba(230, 57, 70, 0.42);
-  box-shadow: 0 8px 18px rgba(230, 57, 70, 0.10);
+  color: #0a0a0a;
+  border: 1px solid var(--brand-200);
+  box-shadow: 0 8px 18px var(--brand-100);
 }
 
 .btn.btn-secondary {
-  background: rgba(34, 29, 31, 0.7);
+  background: var(--panel);
   color: var(--foreground);
   border: 1px solid var(--line-strong);
 }
@@ -737,9 +764,9 @@ input[type="range"] {
   border: 1px solid var(--line);
   border-radius: 30px;
   background:
-    radial-gradient(ellipse at 18% 18%, rgba(230, 57, 70, 0.08), transparent 48%),
-    linear-gradient(180deg, rgba(34, 29, 31, 0.94), rgba(26, 23, 25, 0.82));
-  box-shadow: inset 0 1px 0 rgba(245, 241, 234, 0.04);
+    radial-gradient(ellipse at 18% 18%, rgba(205, 242, 78, 0.12), transparent 48%),
+    linear-gradient(180deg, var(--panel-strong), var(--panel));
+  box-shadow: inset 0 1px 0 var(--line);
 }
 
 .app-hero-content,
@@ -796,7 +823,7 @@ input[type="range"] {
 
 .app-heartline {
   width: min(420px, 100%);
-  color: rgba(245, 241, 234, 0.08);
+  color: var(--line);
 }
 
 .app-section-header {
@@ -843,8 +870,8 @@ input[type="range"] {
 .app-empty-card {
   border: 1px solid var(--line);
   border-radius: 24px;
-  background: rgba(26, 23, 25, 0.72);
-  box-shadow: inset 0 1px 0 rgba(245, 241, 234, 0.03);
+  background: var(--panel);
+  box-shadow: inset 0 1px 0 var(--line);
 }
 
 .app-metric-card {
@@ -854,8 +881,8 @@ input[type="range"] {
 
 .app-metric-card.is-accent,
 .app-list-card.is-accent {
-  border-color: rgba(230, 57, 70, 0.42);
-  background: linear-gradient(180deg, rgba(48, 22, 25, 0.72), rgba(26, 23, 25, 0.74));
+  border-color: rgba(205, 242, 78, 0.5);
+  background: linear-gradient(180deg, rgba(48, 22, 25, 0.72), var(--panel));
 }
 
 .app-card-topline,
@@ -906,7 +933,7 @@ input[type="range"] {
   height: 4px;
   margin-top: 20px;
   border-radius: 999px;
-  background: rgba(245, 241, 234, 0.08);
+  background: var(--line);
 }
 
 .app-progress-track > div {
@@ -950,7 +977,7 @@ input[type="range"] {
   width: 58px;
   height: 58px;
   margin-bottom: 18px;
-  border: 1px solid rgba(230, 57, 70, 0.24);
+  border: 1px solid rgba(205, 242, 78, 0.34);
   border-radius: 20px;
   background: var(--ink-3);
   color: var(--acc);
@@ -971,7 +998,7 @@ input[type="range"] {
   padding: 5px 12px;
   border: 1px solid var(--line-2);
   border-radius: 999px;
-  background: rgba(245, 241, 234, 0.045);
+  background: var(--line);
   font-family: var(--font-mono-stack);
   font-size: 11px;
   letter-spacing: 0.08em;
@@ -998,7 +1025,7 @@ input[type="range"] {
 .bg-gray-100,
 .bg-slate-50,
 .bg-slate-100 {
-  background-color: rgba(26, 23, 25, 0.78) !important;
+  background-color: var(--panel) !important;
 }
 
 .hover\:bg-white:hover,
@@ -1009,7 +1036,7 @@ input[type="range"] {
 .hover\:bg-green-50:hover,
 .hover\:bg-amber-50:hover,
 .hover\:bg-yellow-50:hover {
-  background-color: rgba(245, 241, 234, 0.06) !important;
+  background-color: var(--line) !important;
 }
 
 .text-gray-900,
@@ -1053,7 +1080,7 @@ input[type="range"] {
 .bg-sky-100,
 .bg-red-50,
 .bg-red-100 {
-  background-color: rgba(230, 57, 70, 0.10) !important;
+  background-color: rgba(205, 242, 78, 0.14) !important;
 }
 
 .bg-green-50,
@@ -1106,7 +1133,7 @@ input[type="range"] {
 .hover\:bg-blue-100:hover,
 .hover\:bg-sky-50:hover,
 .hover\:bg-red-100:hover {
-  background-color: rgba(230, 57, 70, 0.14) !important;
+  background-color: rgba(205, 242, 78, 0.20) !important;
 }
 
 .text-purple-300,
@@ -1174,7 +1201,7 @@ input[type="range"] {
 .border-amber-200,
 .border-yellow-100,
 .border-yellow-200 {
-  border-color: rgba(230, 57, 70, 0.28) !important;
+  border-color: rgba(205, 242, 78, 0.38) !important;
 }
 
 .focus\:ring-purple-200:focus,
@@ -1191,7 +1218,7 @@ input[type="range"] {
 .focus\:border-blue-500:focus,
 .focus\:border-sky-500:focus,
 .focus\:border-red-500:focus {
-  border-color: rgba(230, 57, 70, 0.6) !important;
+  border-color: rgba(205, 242, 78, 0.65) !important;
 }
 
 .from-purple-50,
@@ -1207,7 +1234,7 @@ input[type="range"] {
 .from-red-500,
 .from-red-600 {
   --tw-gradient-from: var(--brand-500) var(--tw-gradient-from-position) !important;
-  --tw-gradient-to: rgba(230, 57, 70, 0) var(--tw-gradient-to-position) !important;
+  --tw-gradient-to: rgba(205, 242, 78, 0) var(--tw-gradient-to-position) !important;
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
 }
 
@@ -1230,7 +1257,7 @@ input[type="range"] {
 
 .shadow-purple-500\/25,
 .hover\:shadow-purple-500\/25:hover {
-  --tw-shadow-color: rgba(230, 57, 70, 0.14) !important;
+  --tw-shadow-color: rgba(205, 242, 78, 0.20) !important;
   --tw-shadow: var(--tw-shadow-colored) !important;
 }
 
