@@ -1,6 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <path d="M136 348V216C136 175.131 169.131 142 210 142C250.869 142 284 175.131 284 216V348" fill="none" stroke="#111111" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M284 348V228C284 180.608 322.608 142 370 142C417.392 142 456 180.608 456 228V348" fill="none" stroke="#111111" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M160 386C198 418 314 418 352 386" fill="none" stroke="#111111" stroke-width="36" stroke-linecap="round"/>
-  <circle cx="372" cy="126" r="30" fill="#111111"/>
+  <text
+    x="50%"
+    y="50%"
+    text-anchor="middle"
+    dominant-baseline="central"
+    font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+    font-weight="700"
+    font-size="160"
+    letter-spacing="-8"
+    fill="#111111"
+  >treno</text>
 </svg>
