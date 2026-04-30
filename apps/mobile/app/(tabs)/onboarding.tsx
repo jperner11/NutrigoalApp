@@ -237,7 +237,7 @@ export default function OnboardingScreen() {
     } else {
       await refreshProfile()
       Alert.alert(
-        'Welcome to Meal & Motion',
+        'Welcome to Treno',
         'Would you like AI to generate a personalized meal plan and training program based on your profile?',
         [
           { text: 'Later', style: 'cancel', onPress: () => router.replace('/(tabs)') },

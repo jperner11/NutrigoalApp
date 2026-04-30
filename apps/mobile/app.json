@@ -1,29 +1,29 @@
 {
   "expo": {
-    "name": "Meal & Motion",
+    "name": "Treno",
     "slug": "nutrigoal",
     "version": "1.0.0",
     "entryPoint": "./index.js",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "nutrigoal",
-    "userInterfaceStyle": "light",
+    "scheme": "treno",
+    "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#131012"
+      "backgroundColor": "#0e1116"
     },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.nutrigoal.app",
       "infoPlist": {
-        "NSHealthShareUsageDescription": "Meal & Motion reads your health data to sync workouts, steps, weight, and water intake.",
-        "NSHealthUpdateUsageDescription": "Meal & Motion writes workout and water data to keep your Health app up to date."
+        "NSHealthShareUsageDescription": "Treno reads your health data to sync workouts, steps, weight, and water intake.",
+        "NSHealthUpdateUsageDescription": "Treno writes workout and water data to keep your Health app up to date."
       }
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#131012",
+        "backgroundColor": "#0e1116",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"

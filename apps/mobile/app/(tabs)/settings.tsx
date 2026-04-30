@@ -8,7 +8,7 @@ import { BrandLogo } from '../../src/components/BrandLogo'
 import { brandColors, brandShadow } from '../../src/theme/brand'
 import { supabase } from '../../src/lib/supabase'
 
-const SUPPORT_EMAIL = 'support@mealandmotion.app'
+const SUPPORT_EMAIL = 'support@treno.app'
 
 export default function SettingsScreen() {
   const { profile, signOut } = useAuth()
@@ -46,7 +46,7 @@ export default function SettingsScreen() {
   }, [profile])
 
   const openSupportEmail = () => {
-    Linking.openURL(`mailto:${SUPPORT_EMAIL}?subject=mealandmotion%20beta%20support`)
+    Linking.openURL(`mailto:${SUPPORT_EMAIL}?subject=treno%20beta%20support`)
   }
 
   const submitSupportRequest = async () => {
