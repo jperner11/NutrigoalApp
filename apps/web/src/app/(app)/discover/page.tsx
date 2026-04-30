@@ -195,7 +195,7 @@ export default function DiscoverPage() {
         eyebrow="Discover coaches"
         title="Find a coach who"
         accent="matches your goal."
-        subtitle="Browse public coach profiles by specialty, format, and price range, then send a structured coaching request inside Meal & Motion."
+        subtitle="Browse public coach profiles by specialty, format, and price range, then send a structured coaching request inside Treno."
         chip={
           <span className="chip">
             {filteredCoaches.length} COACH{filteredCoaches.length !== 1 ? 'ES' : ''} SHOWN
@@ -310,7 +310,7 @@ export default function DiscoverPage() {
                         className="mt-1"
                         style={{ fontSize: 13, color: 'var(--fg-2)', lineHeight: 1.45 }}
                       >
-                        {coach.headline || 'Personal coaching inside Meal & Motion'}
+                        {coach.headline || 'Personal coaching inside Treno'}
                       </div>
                     </div>
                   </div>

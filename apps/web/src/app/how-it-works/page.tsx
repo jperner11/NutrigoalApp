@@ -3,9 +3,9 @@ import MarketingHowItWorks from '@/components/marketing/MarketingHowItWorks'
 import PublicFooter from '@/components/marketing/PublicFooter'
 
 export const metadata = {
-  title: 'How it works · Meal & Motion',
+  title: 'How it works · Treno',
   description:
-    'Four steps, honest ones. How Meal & Motion works for clients and for coaches.',
+    'Four steps, honest ones. How Treno works for clients and for coaches.',
 }
 
 export default function HowItWorksPage() {

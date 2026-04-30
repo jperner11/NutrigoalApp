@@ -5,7 +5,7 @@ import PublicFooter from '@/components/marketing/PublicFooter'
 import { faqCopy } from '@/lib/copy/faq'
 
 export const metadata = {
-  title: 'FAQ · Meal & Motion',
+  title: 'FAQ · Treno',
   description: faqCopy.shell.intro,
 }
 

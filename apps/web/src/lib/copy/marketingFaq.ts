@@ -4,7 +4,7 @@ export const marketingFaqCopy = {
   questions: [
     {
       q: 'Is this for me if I already have a personal trainer?',
-      a: 'Yes — ask them to invite you. If they are on Meal & Motion their plans land in your app, you log, they watch. No friction.',
+      a: 'Yes — ask them to invite you. If they are on Treno their plans land in your app, you log, they watch. No friction.',
     },
     {
       q: 'What makes the marketplace different from Instagram DMs?',

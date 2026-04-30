@@ -1635,7 +1635,7 @@ export default function SettingsPage() {
               </div>
               <div className="mt-4 flex flex-wrap gap-3">
                 <a
-                  href={`mailto:${SUPPORT_EMAIL}?subject=mealandmotion%20beta%20support`}
+                  href={`mailto:${SUPPORT_EMAIL}?subject=treno%20beta%20support`}
                   className="btn btn-accent"
                 >
                   Email support

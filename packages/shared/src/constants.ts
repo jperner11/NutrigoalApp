@@ -1,4 +1,4 @@
-// mealandmotion - App Constants
+// treno - App Constants
 
 // ─── Pricing Tiers ──────────────────────────────────────
 

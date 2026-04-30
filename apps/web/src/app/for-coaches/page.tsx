@@ -3,7 +3,7 @@ import MarketingForCoaches from '@/components/marketing/MarketingForCoaches'
 import PublicFooter from '@/components/marketing/PublicFooter'
 
 export const metadata = {
-  title: 'For coaches · Meal & Motion',
+  title: 'For coaches · Treno',
   description:
     'Run your coaching business — intake, plans, check-ins, payments — from one room. Marketplace is opt-in.',
 }

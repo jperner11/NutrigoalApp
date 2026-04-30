@@ -1,5 +1,5 @@
-export const COMPANY_NAME = 'Meal & Motion'
-export const BRAND_NAME = 'Meal & Motion'
-export const SUPPORT_EMAIL = 'support@mealandmotion.app'
+export const COMPANY_NAME = 'Treno'
+export const BRAND_NAME = 'Treno'
+export const SUPPORT_EMAIL = 'support@treno.app'
 export const LEGAL_JURISDICTION = 'England and Wales'
 export const LAST_POLICY_UPDATE = '4 April 2026'
