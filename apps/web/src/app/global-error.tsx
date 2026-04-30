@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import Link from 'next/link'
 import * as Sentry from '@sentry/nextjs'
 
 export default function GlobalError({ error }: { error: Error & { digest?: string } }) {
@@ -18,9 +19,9 @@ export default function GlobalError({ error }: { error: Error & { digest?: strin
         <p style={{ color: '#666', marginBottom: '1.5rem' }}>
           The error has been logged. Please refresh and try again.
         </p>
-        <a href="/" style={{ color: '#0a0a0a', textDecoration: 'underline' }}>
+        <Link href="/" style={{ color: '#0a0a0a', textDecoration: 'underline' }}>
           Go home
-        </a>
+        </Link>
       </body>
     </html>
   )
