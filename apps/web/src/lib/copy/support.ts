@@ -28,7 +28,7 @@ export const supportCopy = {
     bodyBefore: 'Send bug reports, account issues, trainer-client linking problems, and general feedback to ',
     bodyAfter: '.',
     email: SUPPORT_EMAIL,
-    mailtoSubject: 'Meal & Motion support',
+    mailtoSubject: 'Treno support',
     primaryCta: 'Email support',
     secondaryCta: 'Read the FAQ',
   },

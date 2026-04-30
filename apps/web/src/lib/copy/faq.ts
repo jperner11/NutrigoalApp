@@ -5,7 +5,7 @@ export const faqCopy = {
     eyebrow: 'FAQ',
     title: 'Answers before you sign up',
     intro:
-      'Who Meal & Motion is for, how individuals and coaches use it, how the marketplace works, and where to get help.',
+      'Who Treno is for, how individuals and coaches use it, how the marketplace works, and where to get help.',
   },
 
   quickCards: [
@@ -28,7 +28,7 @@ export const faqCopy = {
       title: 'About',
       items: [
         {
-          q: 'Who is Meal & Motion for?',
+          q: 'Who is Treno for?',
           a: 'Three audiences: individuals who want an AI-built meal and training plan, Personal Trainers who want one app to run their clients, and anyone looking for a coach to work with.',
         },
         {
@@ -109,7 +109,7 @@ export const faqCopy = {
         },
         {
           q: 'Is this medical advice?',
-          a: 'No. Meal & Motion supports training, nutrition, and coaching. It is not a medical device and does not provide diagnosis or treatment. For injuries, medical conditions, eating disorders, pregnancy, or anything needing clinical supervision, speak to a qualified medical professional.',
+          a: 'No. Treno supports training, nutrition, and coaching. It is not a medical device and does not provide diagnosis or treatment. For injuries, medical conditions, eating disorders, pregnancy, or anything needing clinical supervision, speak to a qualified medical professional.',
         },
         {
           q: 'How is my data handled?',
@@ -131,7 +131,7 @@ export const faqCopy = {
   stillUnsure: {
     title: 'Still unsure?',
     body:
-      'The fastest way to know if Meal & Motion fits is to create an account and try the side of the app that matches you — individual, coach, or client looking for a coach.',
+      'The fastest way to know if Treno fits is to create an account and try the side of the app that matches you — individual, coach, or client looking for a coach.',
     primaryCta: 'Visit support',
     secondaryCta: 'Create account',
   },

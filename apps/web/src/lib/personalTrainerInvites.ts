@@ -88,9 +88,9 @@ export async function sendInviteEmail(
       Authorization: `Bearer ${resendKey}`,
     },
     body: JSON.stringify({
-      from: process.env.RESEND_FROM_EMAIL || 'Meal & Motion <noreply@mealandmotion.com>',
+      from: process.env.RESEND_FROM_EMAIL || 'Treno <noreply@treno.com>',
       to: [email.trim().toLowerCase()],
-      subject: `${coachLabel} invited you to Meal & Motion`,
+      subject: `${coachLabel} invited you to Treno`,
       html: `
         <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px 0">
           <h2 style="margin:0 0 16px">You've been invited!</h2>

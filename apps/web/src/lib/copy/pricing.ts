@@ -53,7 +53,7 @@ export const pricingCopy = {
     ctaLabel: 'Start Coach Pro',
     ctaLoading: 'Redirecting…',
     moreComing:
-      'More coming based on coach feedback — tell us what you need most at support@mealandmotion.app.',
+      'More coming based on coach feedback — tell us what you need most at support@treno.app.',
   },
 
   faq: {
@@ -72,7 +72,7 @@ export const pricingCopy = {
       },
       {
         q: 'Does Coach Pro set the price I charge my clients?',
-        a: 'No. Coach Pro is what you pay to use Meal & Motion. You decide what to charge your own clients, and you can list those prices on your public profile.',
+        a: 'No. Coach Pro is what you pay to use Treno. You decide what to charge your own clients, and you can list those prices on your public profile.',
       },
     ],
   },

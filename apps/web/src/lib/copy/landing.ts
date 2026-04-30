@@ -10,17 +10,17 @@ export const landingCopy = {
   },
 
   hero: {
-    eyebrow: 'Spring release 01 — open beta',
-    region: 'EST. 2024 · LONDON / LISBOA',
-    titleLines: ['Eat better.', 'Train smarter.'],
-    titleAccent: 'Feel yourself moving.',
+    eyebrow: 'Open beta — spring 2026',
+    region: 'EST. 2024 · BR / UK',
+    titleLines: ['One fitness app.'],
+    titleAccent: "That's it.",
     subtitle:
-      "One calm app for the plan you follow alone — or the coach you work with when you're ready for more. No feed. No noise. Just your momentum.",
+      'Train, eat, track, and message your coach in one place. Or find one in the marketplace. No feed, no streaks, no noise — just the work.',
     ctas: {
-      forSelf: "I'm here for myself",
-      forCoach: "I'm a personal trainer",
-      buildPlan: 'Build my first plan',
-      browseCoaches: 'Browse coaches first',
+      forSelf: 'Start training',
+      forCoach: "I'm a coach",
+      buildPlan: 'Start training',
+      browseCoaches: 'Find a coach',
       trialNote: '7-day free trial · no card',
     },
     stats: [
@@ -85,7 +85,7 @@ export const landingCopy = {
         title: 'Work with a coach.',
         sub: 'The private side of the app, for you and your PT.',
         body:
-          'If your trainer is on Meal & Motion, their plans land here. You log. They watch. The feedback loop is the product.',
+          'If your trainer is on Treno, their plans land here. You log. They watch. The feedback loop is the product.',
         bullets: [
           'Assigned plans from your coach',
           'Weekly check-ins & feedback loop',

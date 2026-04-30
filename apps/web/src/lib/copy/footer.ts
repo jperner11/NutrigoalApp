@@ -1,6 +1,6 @@
 export const footerCopy = {
   tagline:
-    'Eat better. Train smarter. Feel yourself moving — alone or with a coach who actually replies.',
+    'One fitness app for athletes and the coaches who train them.',
   columns: [
     {
       heading: 'App',
@@ -27,6 +27,6 @@ export const footerCopy = {
       ],
     },
   ],
-  legal: '© 2026 MEAL & MOTION · LONDON / LISBOA',
+  legal: '© 2026 TRENO · BR / UK',
   version: 'v0.9 · OPEN BETA',
 } as const

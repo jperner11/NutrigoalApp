@@ -15,10 +15,21 @@ const body = Mulish({
 })
 
 export const metadata: Metadata = {
-  title: `${BRAND_NAME} - Feel Your Momentum`,
-  description: "Meal planning, training structure, coaching intelligence, and Personal Trainer workflows in one calm, momentum-driven platform.",
-  keywords: "nutrition, diet, meal planning, workout, training, cardio, hydration, personal trainer, fitness coaching",
-  authors: [{ name: `${BRAND_NAME} Team` }],
+  title: `${BRAND_NAME} — One fitness app.`,
+  description: "Treno is one fitness app for athletes and the coaches who train them. Plan, train, eat, and check in — without the noise.",
+  keywords: "nutrition, diet, meal planning, workout, training, cardio, hydration, personal trainer, fitness coaching, coach marketplace",
+  authors: [{ name: `${BRAND_NAME}` }],
+  openGraph: {
+    title: `${BRAND_NAME} — One fitness app.`,
+    description: "One app for athletes and the coaches who train them.",
+    siteName: BRAND_NAME,
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `${BRAND_NAME} — One fitness app.`,
+    description: "One app for athletes and the coaches who train them.",
+  },
 }
 
 export default function RootLayout({
@@ -44,30 +55,30 @@ export default function RootLayout({
               fontWeight: '600',
               maxWidth: '420px',
               boxShadow: '0 18px 45px rgba(0, 0, 0, 0.45)',
-              border: '1px solid rgba(245, 241, 234, 0.16)',
-              background: '#1a1719',
-              color: '#f5f1ea',
+              border: '1px solid var(--line-strong)',
+              background: 'var(--background-elevated)',
+              color: 'var(--foreground)',
             },
             success: {
               style: {
                 background: 'rgba(26, 163, 122, 0.18)',
-                color: '#f5f1ea',
+                color: 'var(--foreground)',
                 border: '1px solid rgba(26, 163, 122, 0.4)',
               },
               iconTheme: {
                 primary: '#1aa37a',
-                secondary: '#1a1719',
+                secondary: 'var(--background-elevated)',
               },
             },
             error: {
               style: {
-                background: 'rgba(230, 57, 70, 0.18)',
-                color: '#f5f1ea',
-                border: '1px solid rgba(230, 57, 70, 0.42)',
+                background: 'rgba(220, 38, 38, 0.18)',
+                color: 'var(--foreground)',
+                border: '1px solid rgba(220, 38, 38, 0.42)',
               },
               iconTheme: {
-                primary: '#e63946',
-                secondary: '#1a1719',
+                primary: '#dc2626',
+                secondary: 'var(--background-elevated)',
               },
             },
           }}

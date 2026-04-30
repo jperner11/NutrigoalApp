@@ -215,7 +215,7 @@ export default function AcceptInvitePage() {
           </h1>
           <p className="mt-4 text-base leading-7 text-[var(--muted)]">
             Accepting connects your account to this trainer so they can deliver plans, monitor progress,
-            message you, and review your check-ins in mealandmotion.
+            message you, and review your check-ins in treno.
           </p>
 
           {loading ? (

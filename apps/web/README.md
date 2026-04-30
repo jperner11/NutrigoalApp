@@ -1,4 +1,4 @@
-# mealandmotion - Personalized Nutrition & Fitness Tracker
+# Treno — One fitness app
 
 A modern web application for tracking nutrition, hydration, workouts, and cardio — with support for nutritionist-managed client plans.
 

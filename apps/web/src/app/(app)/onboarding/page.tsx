@@ -647,7 +647,7 @@ export default function OnboardingPage() {
             <StepHeader
               icon={<User className="h-12 w-12 text-purple-600" />}
               title="Set up your coaching profile"
-              subtitle="This tells Nutrigoal who you coach, how you work, and how to frame client intake around your process."
+              subtitle="This tells Treno who you coach, how you work, and how to frame client intake around your process."
             />
             <div className="flex items-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 -mt-2">
               <span className="text-sm font-medium text-indigo-600">Clients will see this reflected in their coach-led intake and dashboard journey.</span>
@@ -831,9 +831,9 @@ export default function OnboardingPage() {
               <Label>Main reason you&apos;re using the app</Label>
               <div className="space-y-2">
                 {[
-                  ['client_management', 'Client management', 'Use Nutrigoal mainly to onboard, review, and coach existing clients.'],
-                  ['prospecting', 'Prospecting', 'Use Nutrigoal mainly to capture and qualify new leads.'],
-                  ['both', 'Both', 'Use Nutrigoal for both delivery and growth.'],
+                  ['client_management', 'Client management', 'Use Treno mainly to onboard, review, and coach existing clients.'],
+                  ['prospecting', 'Prospecting', 'Use Treno mainly to capture and qualify new leads.'],
+                  ['both', 'Both', 'Use Treno for both delivery and growth.'],
                 ].map(([value, title, description]) => (
                   <OptionCard
                     key={value}

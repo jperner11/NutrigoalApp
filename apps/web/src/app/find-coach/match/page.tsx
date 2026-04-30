@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import CoachWizard from '@/components/find-coach/CoachWizard'
 
 export const metadata: Metadata = {
-  title: 'Match with a coach · Meal & Motion',
+  title: 'Match with a coach · Treno',
   description:
     'Answer a few questions and get matched with coaches who fit your goals, preferences, and budget.',
 }

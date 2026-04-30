@@ -23,7 +23,7 @@ export default function MatchedCoachCard({ match }: { match: MatchedCoachResult 
           </div>
           <div>
             <h2 className="text-xl font-semibold text-[var(--foreground)]">{coachName}</h2>
-            <p className="mt-1 text-sm text-[var(--muted)]">{match.headline || 'Personal coaching inside Meal & Motion'}</p>
+            <p className="mt-1 text-sm text-[var(--muted)]">{match.headline || 'Personal coaching inside Treno'}</p>
           </div>
         </div>
         <div className={`rounded-full border px-3 py-1 text-sm font-semibold ${getBadgeClasses(match.score)}`}>

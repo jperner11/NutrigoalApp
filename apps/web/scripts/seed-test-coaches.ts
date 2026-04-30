@@ -79,7 +79,7 @@ interface SeedCoach {
 
 const COACHES: SeedCoach[] = [
   {
-    email: 'coach.marcus@mealandmotion.test',
+    email: 'coach.marcus@treno.test',
     password: 'TestCoach!2026',
     full_name: 'Marcus Liao',
     headline: 'Powerlifting & hybrid coaching',
@@ -98,7 +98,7 @@ Twelve years coaching, eight as a competitive powerlifter. I take intermediates 
     coach_ideal_client: 'Intermediate lifters with 2+ years of training, ready to compete',
   },
   {
-    email: 'coach.camila@mealandmotion.test',
+    email: 'coach.camila@treno.test',
     password: 'TestCoach!2026',
     full_name: 'Camila Ferreira',
     headline: 'Strength & postpartum coaching',
