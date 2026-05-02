@@ -67,7 +67,11 @@ export async function updateSession(request: NextRequest) {
     isInvitePublicApi
 
   // If not authenticated and trying to access protected route, redirect to login
+  // For API routes, return 401 JSON instead of redirecting — clients handle this
   if (!user && !isPublicRoute) {
+    if (pathname.startsWith('/api/')) {
+      return NextResponse.json({ message: 'Not authenticated' }, { status: 401 })
+    }
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)
