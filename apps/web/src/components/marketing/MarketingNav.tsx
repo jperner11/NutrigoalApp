@@ -21,7 +21,7 @@ export default function MarketingNav() {
       <div className="mx-auto flex max-w-[1320px] items-center justify-between px-8 py-5">
         <BrandLogo href="/" />
 
-        <div className="hidden items-center gap-6 text-sm md:flex">
+        <div className="hidden items-center gap-1 text-sm md:flex">
           {links.map((l) => {
             const active = pathname === l.href
             return (
@@ -29,20 +29,14 @@ export default function MarketingNav() {
                 key={l.href}
                 href={l.href}
                 aria-current={active ? 'page' : undefined}
-                className="relative py-1 transition hover:text-[var(--fg)]"
+                className="rounded-full px-3 py-1.5 transition hover:text-[var(--fg)]"
                 style={{
-                  color: active ? 'var(--fg)' : 'var(--fg-3)',
+                  color: active ? 'var(--acc)' : 'var(--fg-3)',
+                  background: active ? 'var(--acc-soft)' : 'transparent',
                   fontWeight: active ? 600 : 400,
                 }}
               >
                 {l.label}
-                {active && (
-                  <span
-                    aria-hidden
-                    className="absolute -bottom-[1rem] left-0 right-0 h-[2px] rounded-full"
-                    style={{ background: 'var(--accent)' }}
-                  />
-                )}
               </Link>
             )
           })}
