@@ -7,7 +7,18 @@ Sentry.init({
   replaysSessionSampleRate: 0,
   replaysOnErrorSampleRate: 1.0,
   enabled: process.env.NODE_ENV === 'production',
-  integrations: [Sentry.replayIntegration({ maskAllText: false, blockAllMedia: true })],
+  integrations: [
+    Sentry.replayIntegration({ maskAllText: false, blockAllMedia: true }),
+    Sentry.feedbackIntegration({
+      colorScheme: 'dark',
+      buttonLabel: 'Report a bug',
+      submitButtonLabel: 'Send',
+      formTitle: 'Report a bug',
+      messagePlaceholder: 'What happened? What were you trying to do?',
+      showBranding: false,
+      autoInject: true,
+    }),
+  ],
 })
 
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart
