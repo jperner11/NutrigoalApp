@@ -8,6 +8,12 @@ import MarketingNav from '@/components/marketing/MarketingNav'
 import PublicFooter from '@/components/marketing/PublicFooter'
 import { PRICING } from '@/lib/constants'
 import { apiFetch, ApiError } from '@/lib/apiClient'
+import {
+  CHECKOUT_INTENT_STORAGE_KEY,
+  type CheckoutIntentPlan,
+  getCheckoutSignupHref,
+  parseCheckoutIntent,
+} from '@/lib/checkoutIntent'
 
 const formatPrice = (price: number) =>
   price === 0 ? '$0' : `$${price.toFixed(price % 1 === 0 ? 0 : 2)}`
@@ -42,9 +48,7 @@ const tiers = [
 const coachPlan = PRICING.nutritionist
 
 function getSignupHref(plan: string) {
-  return plan === 'personal_trainer'
-    ? '/signup?role=personal_trainer'
-    : '/signup?role=free'
+  return getCheckoutSignupHref(plan)
 }
 
 export default function PricingPage() {
@@ -74,6 +78,10 @@ export default function PricingPage() {
       }
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
+        const intent = parseCheckoutIntent(plan)
+        if (intent) {
+          window.localStorage.setItem(CHECKOUT_INTENT_STORAGE_KEY, intent)
+        }
         window.location.href = getSignupHref(plan)
         return
       }
@@ -98,7 +106,9 @@ export default function PricingPage() {
       return
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
-        window.location.href = getSignupHref('free')
+        const intent: CheckoutIntentPlan = 'pro'
+        window.localStorage.setItem(CHECKOUT_INTENT_STORAGE_KEY, intent)
+        window.location.href = getSignupHref('pro')
         return
       }
       if (err instanceof ApiError && err.status === 400) {

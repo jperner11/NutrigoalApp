@@ -8,6 +8,13 @@ import { createClient } from '@/lib/supabase/client'
 import { sanitizeNextPath } from '@/lib/authRedirect'
 import BrandLogo from '@/components/brand/BrandLogo'
 import { signupCopy } from '@/lib/copy/signup'
+import {
+  CHECKOUT_INTENT_QUERY_PARAM,
+  CHECKOUT_INTENT_STORAGE_KEY,
+  type CheckoutIntentPlan,
+  getCheckoutIntentRole,
+  parseCheckoutIntent,
+} from '@/lib/checkoutIntent'
 
 type Role = 'free' | 'personal_trainer'
 
@@ -15,6 +22,7 @@ export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [nextPath, setNextPath] = useState('/onboarding')
+  const [checkoutIntent, setCheckoutIntent] = useState<CheckoutIntentPlan | null>(null)
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -25,22 +33,38 @@ export default function SignupPage() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
-    const next = sanitizeNextPath(params.get('next'), '/onboarding')
+    const intent = parseCheckoutIntent(params.get('intent'))
+    const next = sanitizeNextPath(params.get('next'), intent ? '/dashboard' : '/onboarding')
     const email = params.get('email') || ''
     const role = params.get('role')
+    const intentRole = intent ? getCheckoutIntentRole(intent) : null
+
+    if (intent) {
+      window.localStorage.setItem(CHECKOUT_INTENT_STORAGE_KEY, intent)
+    }
+
+    setCheckoutIntent(intent)
     setNextPath(next)
     setFormData((prev) => ({
       ...prev,
       email,
-      ...(role === 'free' || role === 'personal_trainer' ? { role: role as Role } : {}),
+      ...(intentRole
+        ? { role: intentRole }
+        : role === 'free' || role === 'personal_trainer'
+          ? { role: role as Role }
+          : {}),
     }))
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const signupRole = formData.role
+    const signupRole = checkoutIntent ? getCheckoutIntentRole(checkoutIntent) : formData.role
     const postSignupNextPath = sanitizeNextPath(nextPath, '/onboarding')
     const isInviteSignup = postSignupNextPath.startsWith('/invite/accept')
+
+    if (checkoutIntent) {
+      window.localStorage.setItem(CHECKOUT_INTENT_STORAGE_KEY, checkoutIntent)
+    }
 
     if (!formData.fullName.trim() || !formData.email || !formData.password) {
       toast.error('Please fill in all fields')
@@ -58,6 +82,12 @@ export default function SignupPage() {
     setIsLoading(true)
     const supabase = createClient()
     const redirectBase = typeof window !== 'undefined' ? window.location.origin : ''
+    const callbackParams = new URLSearchParams({
+      next: postSignupNextPath,
+    })
+    if (checkoutIntent) {
+      callbackParams.set(CHECKOUT_INTENT_QUERY_PARAM, checkoutIntent)
+    }
 
     const { error } = await supabase.auth.signUp({
       email: formData.email,
@@ -67,7 +97,7 @@ export default function SignupPage() {
           role: signupRole,
           full_name: formData.fullName.trim(),
         },
-        emailRedirectTo: `${redirectBase}/auth/callback?next=${encodeURIComponent(postSignupNextPath)}`,
+        emailRedirectTo: `${redirectBase}/auth/callback?${callbackParams.toString()}`,
       },
     })
 

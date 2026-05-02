@@ -6,6 +6,11 @@ import { PRICING } from '@/lib/constants'
 import { toast } from 'react-hot-toast'
 import { useUser } from '@/hooks/useUser'
 import { apiFetch, ApiError } from '@/lib/apiClient'
+import {
+  CHECKOUT_INTENT_STORAGE_KEY,
+  getCheckoutSignupHref,
+  parseCheckoutIntent,
+} from '@/lib/checkoutIntent'
 
 interface UpgradeModalProps {
   isOpen: boolean
@@ -42,7 +47,11 @@ export default function UpgradeModal({ isOpen, onClose, feature }: UpgradeModalP
       }
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
-        window.location.href = plan === 'personal_trainer' ? '/signup?role=personal_trainer' : '/signup?role=free'
+        const intent = parseCheckoutIntent(plan)
+        if (intent) {
+          window.localStorage.setItem(CHECKOUT_INTENT_STORAGE_KEY, intent)
+        }
+        window.location.href = getCheckoutSignupHref(plan)
         return
       }
       if (err instanceof ApiError && err.status === 503) {
@@ -70,6 +79,11 @@ export default function UpgradeModal({ isOpen, onClose, feature }: UpgradeModalP
       window.location.href = '/dashboard'
       return
     } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
+        window.localStorage.setItem(CHECKOUT_INTENT_STORAGE_KEY, 'pro')
+        window.location.href = getCheckoutSignupHref('pro')
+        return
+      }
       if (err instanceof ApiError && err.status === 400) {
         const payload = err.payload as { message?: string } | null
         if (payload?.message === 'Trial not applicable') {

@@ -6,6 +6,7 @@ import { useState } from 'react'
 import Sidebar from '@/components/ui/Sidebar'
 import { useUser } from '@/hooks/useUser'
 import BrandLogo from '@/components/brand/BrandLogo'
+import PendingCheckoutIntent from '@/components/billing/PendingCheckoutIntent'
 
 function TrialBanner({ trialEndsAt }: { trialEndsAt: string }) {
   const [dismissed, setDismissed] = useState(false)
@@ -57,6 +58,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen app-bg">
+      <PendingCheckoutIntent enabled={Boolean(profile)} />
       <Sidebar
         userRole={profile?.role ?? 'free'}
         userName={profile?.full_name ?? profile?.email ?? 'User'}
