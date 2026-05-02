@@ -32,7 +32,6 @@ There are likely more. Until the migration table reflects reality, you cannot sa
 
 ## 2. Remaining env vars
 
-- **`CRON_SECRET`** — required by `apps/web/src/app/api/cron/check-ins/route.ts:6`. Without it, scheduled check-ins return 401. Generate any random string, set in Vercel production env, and use it as the `Authorization: Bearer <secret>` header in your Vercel cron config (`vercel.json` or dashboard).
 - **Preview-env Stripe vars** — production Stripe vars are set, but preview deploys still don't have them. The CLI flow with `--yes --git-branch` was rejected by a Claude plugin wrapper. Add via the Vercel dashboard: project → Settings → Environment Variables → tick "Preview" for each of `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_PRO`, `STRIPE_PRICE_UNLIMITED`, `STRIPE_PRICE_NUTRITIONIST`. Use the same sandbox values as production for now.
 
 ---
@@ -80,3 +79,4 @@ From the earlier full audit. None of these are critical for closed beta but shou
 - ✅ Sentry wired up; the `trial_ends_at` and `/pricing` 500 issues should be resolved (verify in dashboard)
 - ✅ Unauthed paid-plan clicks on `/pricing` now preserve checkout intent through signup/auth and resume Stripe checkout on first authenticated app load. Commit: `24d44d7`.
 - ✅ Branded app 404 added at `apps/web/src/app/not-found.tsx`. Commit: `24d44d7`.
+- ✅ `CRON_SECRET` added to Vercel Production and production redeployed. Public unauthenticated calls to `/api/cron/check-ins` return 401 as expected. Deployment: `nutrigoal-dyu7rs3oi-jurgen-perners-projects.vercel.app`.
