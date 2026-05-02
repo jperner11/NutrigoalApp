@@ -72,7 +72,7 @@ export default function MarketingPricing() {
                 ? '1px solid var(--acc)'
                 : '1px solid var(--line-2)',
               background: t.featured
-                ? 'linear-gradient(180deg, rgba(230,57,70,0.12), transparent)'
+                ? 'linear-gradient(180deg, var(--acc-soft), transparent)'
                 : 'var(--ink-2)',
             }}
           >
@@ -122,7 +122,7 @@ export default function MarketingPricing() {
               className="btn mt-6 w-full justify-center"
               style={{
                 background: t.featured ? 'var(--acc)' : 'transparent',
-                color: t.featured ? '#fff' : 'var(--fg)',
+                color: t.featured ? '#0a0a0a' : 'var(--fg)',
                 border: t.featured ? 'none' : '1px solid var(--line-2)',
                 fontWeight: t.featured ? 600 : 500,
               }}
