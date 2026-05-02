@@ -28,10 +28,21 @@ export default function MarketingNav() {
               <Link
                 key={l.href}
                 href={l.href}
-                className="transition"
-                style={{ color: active ? 'var(--fg)' : 'var(--fg-3)' }}
+                aria-current={active ? 'page' : undefined}
+                className="relative py-1 transition hover:text-[var(--fg)]"
+                style={{
+                  color: active ? 'var(--fg)' : 'var(--fg-3)',
+                  fontWeight: active ? 600 : 400,
+                }}
               >
                 {l.label}
+                {active && (
+                  <span
+                    aria-hidden
+                    className="absolute -bottom-[1rem] left-0 right-0 h-[2px] rounded-full"
+                    style={{ background: 'var(--accent)' }}
+                  />
+                )}
               </Link>
             )
           })}
