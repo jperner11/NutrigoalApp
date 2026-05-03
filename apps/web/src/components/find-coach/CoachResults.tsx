@@ -43,7 +43,7 @@ export default function CoachResults({ answers, matches }: CoachResultsProps) {
 
   return (
     <div className="space-y-8">
-      <div className="rounded-[28px] border border-[rgba(230,57,70,0.22)] bg-[linear-gradient(135deg,rgba(34,29,31,0.96),rgba(26,23,25,0.98))] p-6 sm:p-8">
+      <div className="rounded-[28px] border border-[rgba(205, 242, 78,0.22)] bg-[linear-gradient(135deg,rgba(34,29,31,0.96),rgba(26,23,25,0.98))] p-6 sm:p-8">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full bg-[var(--brand-100)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--brand-400)]">

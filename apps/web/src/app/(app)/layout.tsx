@@ -16,7 +16,7 @@ function TrialBanner({ trialEndsAt }: { trialEndsAt: string }) {
   if (daysLeft === 0) return null
 
   return (
-    <div className="border-b border-[rgba(230,57,70,0.24)] bg-[linear-gradient(90deg,#221d1f,#5a0f15)] px-4 py-3 text-sm text-white">
+    <div className="border-b border-[rgba(205, 242, 78,0.24)] bg-[linear-gradient(90deg,#1a1719,#2a3410)] px-4 py-3 text-sm text-white">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
         <div className="hidden lg:block">
           <BrandLogo href="/dashboard" compact light className="pointer-events-none" />

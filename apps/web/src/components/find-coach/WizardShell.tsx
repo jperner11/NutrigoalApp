@@ -22,8 +22,8 @@ export default function WizardShell({
   return (
     <div className="overflow-hidden rounded-[36px] border border-[var(--line)] bg-[var(--panel-strong)] shadow-[0_30px_80px_rgba(0,0,0,0.32)]">
       <div className="grid min-h-[760px] lg:grid-cols-[0.9fr_1.1fr]">
-        <aside className="relative overflow-hidden bg-[linear-gradient(160deg,#221d1f_0%,#5a0f15_58%,#e63946_140%)] p-8 text-white sm:p-10 lg:p-12">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(245,241,234,0.12),transparent_34%),radial-gradient(circle_at_88%_18%,rgba(230,57,70,0.24),transparent_22%)]" />
+        <aside className="relative overflow-hidden bg-[linear-gradient(160deg,#1a1719_0%,#2a3410_58%,#cdf24e_140%)] p-8 text-white sm:p-10 lg:p-12">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(245,241,234,0.12),transparent_34%),radial-gradient(circle_at_88%_18%,rgba(205, 242, 78,0.24),transparent_22%)]" />
           <div className="relative flex h-full flex-col justify-between gap-10">
             <div>
               <div className="inline-flex rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-sky-100/90">

@@ -118,7 +118,7 @@ export default function Sidebar({ userRole, userName, onSignOut }: SidebarProps)
               href={item.href}
               className={`flex items-center space-x-3 px-3 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 group ${
                 isActive
-                  ? 'bg-[linear-gradient(135deg,rgba(230,57,70,0.22),rgba(245,241,234,0.06))] text-white shadow-[0_14px_28px_rgba(0,0,0,0.22)] ring-1 ring-[rgba(230,57,70,0.28)]'
+                  ? 'bg-[linear-gradient(135deg,rgba(205, 242, 78,0.22),rgba(245,241,234,0.06))] text-white shadow-[0_14px_28px_rgba(0,0,0,0.22)] ring-1 ring-[rgba(205, 242, 78,0.28)]'
                   : 'text-[var(--muted)] hover:bg-[rgba(245,241,234,0.06)] hover:text-white'
               }`}
               title={collapsed && !mobileOpen ? item.label : undefined}

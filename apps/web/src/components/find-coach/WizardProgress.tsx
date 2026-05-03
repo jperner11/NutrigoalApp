@@ -23,7 +23,7 @@ export default function WizardProgress({ currentStep, totalSteps }: WizardProgre
       </div>
       <div className="mt-4 h-2.5 rounded-full bg-[var(--brand-100)]">
         <div
-          className="h-2.5 rounded-full bg-[linear-gradient(90deg,#e63946,#f05661)] transition-all duration-300 ease-out"
+          className="h-2.5 rounded-full bg-[linear-gradient(90deg,#cdf24e,#dbf676)] transition-all duration-300 ease-out"
           style={{ width: `${percentage}%` }}
         />
       </div>

@@ -37,8 +37,8 @@ export function ChoiceCard({
       onClick={onClick}
       className={`rounded-[24px] border p-5 text-left transition ${
         selected
-          ? 'border-[rgba(230,57,70,0.34)] bg-[var(--brand-100)] shadow-[0_14px_32px_rgba(230,57,70,0.16)]'
-          : 'border-[var(--line)] bg-[var(--surface-strong)] hover:border-[rgba(230,57,70,0.28)] hover:bg-[rgba(230,57,70,0.08)]'
+          ? 'border-[rgba(205, 242, 78,0.34)] bg-[var(--brand-100)] shadow-[0_14px_32px_rgba(205, 242, 78,0.16)]'
+          : 'border-[var(--line)] bg-[var(--surface-strong)] hover:border-[rgba(205, 242, 78,0.28)] hover:bg-[rgba(205, 242, 78,0.08)]'
       }`}
     >
       {icon ? <div className={`mb-4 inline-flex rounded-2xl p-3 ${selected ? 'bg-[var(--brand-500)] text-white' : 'bg-[var(--brand-100)] text-[var(--brand-400)]'}`}>{icon}</div> : null}
@@ -65,8 +65,8 @@ export function ChoiceListItem({
       onClick={onClick}
       className={`flex w-full items-start justify-between gap-4 rounded-[22px] border px-5 py-4 text-left transition ${
         selected
-          ? 'border-[rgba(230,57,70,0.34)] bg-[var(--brand-100)]'
-          : 'border-[var(--line)] bg-[var(--surface-strong)] hover:border-[rgba(230,57,70,0.28)]'
+          ? 'border-[rgba(205, 242, 78,0.34)] bg-[var(--brand-100)]'
+          : 'border-[var(--line)] bg-[var(--surface-strong)] hover:border-[rgba(205, 242, 78,0.28)]'
       }`}
     >
       <div>
@@ -97,8 +97,8 @@ export function ChoiceChip({
       onClick={onClick}
       className={`rounded-full border px-4 py-2.5 text-sm font-semibold transition ${
         selected
-          ? 'border-[rgba(230,57,70,0.34)] bg-[var(--brand-100)] text-[var(--brand-400)]'
-          : 'border-[var(--line)] bg-[var(--surface-strong)] text-[var(--foreground)] hover:border-[rgba(230,57,70,0.28)]'
+          ? 'border-[rgba(205, 242, 78,0.34)] bg-[var(--brand-100)] text-[var(--brand-400)]'
+          : 'border-[var(--line)] bg-[var(--surface-strong)] text-[var(--foreground)] hover:border-[rgba(205, 242, 78,0.28)]'
       }`}
     >
       {label}

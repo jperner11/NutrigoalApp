@@ -92,7 +92,7 @@ export default function SummaryStep({
       </div>
 
       {statusMessage ? (
-        <div className="mt-5 rounded-[22px] border border-[rgba(230,57,70,0.24)] bg-[var(--brand-100)] px-5 py-4 text-sm leading-6 text-[var(--foreground)]">
+        <div className="mt-5 rounded-[22px] border border-[rgba(205, 242, 78,0.24)] bg-[var(--brand-100)] px-5 py-4 text-sm leading-6 text-[var(--foreground)]">
           {statusMessage}
         </div>
       ) : null}

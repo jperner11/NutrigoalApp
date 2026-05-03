@@ -45,8 +45,8 @@ export default function StatTile({
   // Hero treatment: subtle accent tint to lift one tile above the others
   const heroStyles: React.CSSProperties = hero
     ? {
-        background: 'rgba(230, 57, 70, 0.08)',
-        borderColor: 'rgba(230, 57, 70, 0.32)',
+        background: 'rgba(205, 242, 78, 0.08)',
+        borderColor: 'rgba(205, 242, 78, 0.32)',
       }
     : {}
 
