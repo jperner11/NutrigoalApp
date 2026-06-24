@@ -6,11 +6,26 @@ import { completeOnboarding } from '../lib/flows'
 // (paid surfaces show an upgrade prompt, NOT the feature) — the leak we most want
 // to catch — plus the discover marketplace renders for a prospective buyer.
 
-// fixme pending reliable wizard automation — see note in pt-onboarding.spec.ts.
-// The gating + discover tests below do NOT depend on onboarding and ARE green.
-test.fixme('free user completes onboarding and lands on the dashboard', async ({ clientPage }) => {
-  test.setTimeout(120_000) // 9 wizard steps; dev-mode cold compiles are slow
-  await completeOnboarding(clientPage) // asserts /dashboard internally
+// The anamnesis questionnaire renders for a brand-new free user: a fresh signup is
+// routed into the intake wizard, step 1 of 9 shows, and the first question is on
+// screen. This reliably catches a broken/blank/erroring questionnaire — the most
+// common regression — without depending on driving all 9 steps.
+test('the onboarding questionnaire loads for a new client', async ({ clientPage }) => {
+  await clientPage.goto('/onboarding', { waitUntil: 'networkidle' })
+  await expect(clientPage).toHaveURL(/\/onboarding/)
+  await expect(clientPage.getByText(/01\s*\/\s*09/)).toBeVisible()
+  await expect(clientPage.getByText(/get to know you/i)).toBeVisible()
+  await expect(clientPage.getByRole('button', { name: /continue|next/i }).first()).toBeVisible()
+})
+
+// Full 9-step completion. Marked fixme: the generic auto-fill is brittle (some steps
+// enable Continue but don't advance on click). True end-to-end completion is better
+// validated by the agentic mission, which adapts to each step. Helper kept for reuse.
+test.fixme('free user completes the full questionnaire and reaches the dashboard', async ({
+  clientPage,
+}) => {
+  test.setTimeout(120_000)
+  await completeOnboarding(clientPage)
   await expect(clientPage).toHaveURL(/\/dashboard/)
 })
 
