@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "e2e:seed": "tsx e2e/seed-cli.ts",
+    "e2e:install": "playwright install chromium",
+    "e2e:test": "playwright test",
+    "e2e:test:ui": "playwright test --ui",
+    "e2e:report": "playwright show-report"
   },
   "dependencies": {
     "@nutrigoal/shared": "*",
@@ -34,7 +39,8 @@
     "eslint": "^9",
     "eslint-config-next": "15.3.4",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "@playwright/test": "^1.49.0"
   },
   "optionalDependencies": {
     "@tailwindcss/oxide-linux-x64-gnu": "^4"
