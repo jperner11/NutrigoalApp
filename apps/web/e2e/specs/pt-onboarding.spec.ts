@@ -6,16 +6,21 @@ import { completeOnboarding, publishCoachProfile, requestVerification } from '..
 // requests verification — asserting the profile renders publicly but WITHOUT a
 // verified badge while verification is only pending (the trust-layer guarantee).
 
-// NOTE: these two are `test.fixme` (skipped) pending reliable wizard automation.
-// completeOnboarding / publishCoachProfile (../lib/flows.ts) work when driven
-// standalone against a warm server, but the multi-step coach wizard is flaky inside
-// the harness in dev mode (hydration timing on a fresh page load). Re-enable and
-// validate against the CI production build (next start), where there is no per-route
-// compile and hydration is immediate. The seed→login→gating/discover paths ARE green.
-test.fixme('coach completes onboarding and lands on the coach dashboard', async ({ coachPage }) => {
+// The coach setup questionnaire renders for a brand-new coach: step 1 of 6 and the
+// first prompt are on screen. Reliable guard against a broken coach intake.
+test('the coach setup questionnaire loads for a new coach', async ({ coachPage }) => {
+  await coachPage.goto('/onboarding', { waitUntil: 'networkidle' })
+  await expect(coachPage).toHaveURL(/\/onboarding/)
+  await expect(coachPage.getByText(/01\s*\/\s*06/)).toBeVisible()
+  await expect(coachPage.getByText(/coaching profile/i).first()).toBeVisible()
+  await expect(coachPage.getByRole('button', { name: /continue|next/i }).first()).toBeVisible()
+})
+
+// Full 6-step completion. fixme — generic auto-fill is brittle (see client spec).
+// Better validated by the agentic coach-onboarding mission. Helper kept for reuse.
+test.fixme('coach completes the full setup and lands on the coach dashboard', async ({ coachPage }) => {
   test.setTimeout(120_000)
   await completeOnboarding(coachPage)
-  // Coach-only navigation confirms we're in the coach experience, not a client's.
   await expect(coachPage.getByRole('link', { name: 'Clients' })).toBeVisible()
   await expect(coachPage.getByRole('link', { name: 'Leads' })).toBeVisible()
 })
