@@ -14,7 +14,7 @@ import type {
   FeedbackRequest, FeedbackQuestion, FeedbackResponse, FeedbackTemplate,
   FeedbackSchedule, FeedbackQuestionType, UserProfile, CheckInRecurrence,
 } from '@/lib/supabase/types'
-import { isTrainerRole } from '@nutrigoal/shared'
+import { isTrainerRole } from '@treno/shared'
 
 const QUESTION_TYPES: { value: FeedbackQuestionType; label: string }[] = [
   { value: 'text', label: 'Text' },

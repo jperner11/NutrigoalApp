@@ -32,6 +32,7 @@ export type {
   CoachStyle,
   CoachPostIntakeAction,
   CoachAppFocus,
+  CoachVerificationStatus,
   CustomIntakeQuestionType,
   CoachLeadStatus,
   CoachLeadStage,
@@ -86,6 +87,13 @@ export type {
   TrainingCheckIn,
   InviteStatus,
 } from './types'
+
+// Coach-prescribed supplement plans
+export type {
+  SupplementPlan,
+  SupplementPlanItem,
+  SupplementPlanWithItems,
+} from './types/supplementPlans'
 
 // Nutrition
 export type { UserMetrics, NutritionTargets } from './nutrition'
@@ -158,3 +166,19 @@ export {
   normalizeRole,
   getRolePlanLabel,
 } from './roles'
+
+// Anamnesis (custom intake) feature types
+export type {
+  CustomIntakeResponseValue,
+  CustomIntakeQuestionInput,
+  CustomIntakeResponseInput,
+} from './types/anamnesis'
+
+// Cardio plans (coach-prescribed weekly cardio programmes)
+export type {
+  CardioPlan,
+  CardioPlanSession,
+  CardioPlanInput,
+  CardioPlanSessionInput,
+  CardioPlanIntensity,
+} from './types/cardioPlans'

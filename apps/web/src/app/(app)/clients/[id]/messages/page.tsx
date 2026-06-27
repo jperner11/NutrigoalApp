@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
 import type { UserProfile } from '@/lib/supabase/types'
-import { isTrainerRole } from '@nutrigoal/shared'
+import { isTrainerRole } from '@treno/shared'
 import { ChatThread } from '@/components/messages/ChatThread'
 
 export default function ClientMessagesPage() {

@@ -18,8 +18,8 @@ import {
   PLAN_PREFERENCES, HARDER_DAYS_OPTIONS, EATING_OUT_FREQUENCIES,
   calculateNutritionTargets,
   requiresOnboardingQuestionnaire,
-} from '@nutrigoal/shared'
-import type { UserMetrics } from '@nutrigoal/shared'
+} from '@treno/shared'
+import type { UserMetrics } from '@treno/shared'
 import { BrandLogo } from '../../src/components/BrandLogo'
 import { useBrandColors, useThemedStyles, brandShadow, type BrandColors } from '../../src/theme/brand'
 

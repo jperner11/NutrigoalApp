@@ -3,7 +3,7 @@ import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Linking, TextInpu
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { useAuth } from '../../src/contexts/AuthContext'
-import { PRICING } from '@nutrigoal/shared'
+import { PRICING } from '@treno/shared'
 import { BrandLogo } from '../../src/components/BrandLogo'
 import { useBrandColors, useThemedStyles, brandShadow, type BrandColors } from '../../src/theme/brand'
 import { supabase } from '../../src/lib/supabase'

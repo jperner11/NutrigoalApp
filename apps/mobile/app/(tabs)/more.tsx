@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { BrandLogo } from '../../src/components/BrandLogo'
 import { useBrandColors, useThemedStyles, brandShadow } from '../../src/theme/brand'
-import { isManagedClientRole, isTrainerRole } from '@nutrigoal/shared'
+import { isManagedClientRole, isTrainerRole } from '@treno/shared'
 
 interface MenuItem {
   icon: string

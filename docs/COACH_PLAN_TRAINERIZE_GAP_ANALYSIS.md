@@ -34,7 +34,7 @@ Date: 2026-04-12
 
 - The platform subscription should sell the coach workspace, not the coach's service itself.
 - Coaches should set their own public package pricing through marketplace offers.
-- Meal & Motion monetizes software: onboarding, planning, delivery, messaging, progress, CRM, and visibility.
+- Treno monetizes software: onboarding, planning, delivery, messaging, progress, CRM, and visibility.
 - The coach monetizes coaching.
 
 ### What is already in the product

@@ -1,5 +1,5 @@
 {
-  "name": "@nutrigoal/web",
+  "name": "@treno/web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -14,11 +14,8 @@
     "e2e:report": "playwright show-report"
   },
   "dependencies": {
-    "@nutrigoal/shared": "*",
+    "@treno/shared": "*",
     "@sentry/nextjs": "^10.50.0",
-    "@supabase/auth-helpers-nextjs": "^0.10.0",
-    "@supabase/auth-ui-react": "^0.4.7",
-    "@supabase/auth-ui-shared": "^0.1.8",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.100.0",
     "lucide-react": "^0.518.0",
@@ -32,15 +29,17 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@playwright/test": "^1.49.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^16.4.5",
     "eslint": "^9",
     "eslint-config-next": "15.3.4",
     "tailwindcss": "^4",
-    "typescript": "^5",
-    "@playwright/test": "^1.49.0"
+    "tsx": "^4.19.2",
+    "typescript": "^5"
   },
   "optionalDependencies": {
     "@tailwindcss/oxide-linux-x64-gnu": "^4"

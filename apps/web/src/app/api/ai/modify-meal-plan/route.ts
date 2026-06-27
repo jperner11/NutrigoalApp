@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import * as Sentry from '@sentry/nextjs'
 import { rateLimit, getClientIp } from '@/lib/rateLimit'
+import { requireAiUser } from '@/lib/aiAuth'
 
 interface MealForContext {
   id: string
@@ -26,6 +27,9 @@ export async function POST(request: Request) {
   if (!apiKey) {
     return NextResponse.json({ message: 'AI service not configured' }, { status: 503 })
   }
+
+  const auth = await requireAiUser({ requireAiRole: true })
+  if (auth.response) return auth.response
 
   try {
     const { userMessage, currentMeals, targets, userProfile } = await request.json()

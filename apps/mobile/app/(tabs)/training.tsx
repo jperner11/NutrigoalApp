@@ -10,12 +10,12 @@ import { supabase } from '../../src/lib/supabase'
 import {
   BODY_PARTS, EQUIPMENT_TYPES, DEFAULT_REST_SECONDS, DEFAULT_SETS, DEFAULT_REPS,
   calculateSuggestion, parseRepRange,
-} from '@nutrigoal/shared'
+} from '@treno/shared'
 import type {
   TrainingPlan, Exercise, BodyPart, Equipment,
   TrainingPlanDay, TrainingPlanExercise, WorkoutSetLog, WorkoutExerciseLog,
-} from '@nutrigoal/shared'
-import { isManagedClientRole } from '@nutrigoal/shared'
+} from '@treno/shared'
+import { isManagedClientRole } from '@treno/shared'
 import { useBrandColors, useThemedStyles, brandShadow, type BrandColors } from '../../src/theme/brand'
 
 // ─── Types ──────────────────────────────────────────────

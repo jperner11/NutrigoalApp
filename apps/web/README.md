@@ -43,8 +43,8 @@ A modern web application for tracking nutrition, hydration, workouts, and cardio
 ### Setup
 
 ```bash
-git clone https://github.com/jperner11/NutrigoalApp.git
-cd NutrigoalApp
+git clone https://github.com/jperner11/TrenoApp.git
+cd TrenoApp
 npm install
 ```
 

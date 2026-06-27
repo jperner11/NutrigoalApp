@@ -201,7 +201,7 @@ const FAQ = () => {
   const [open, setOpen] = React.useState(0);
   const qs = [
     ['Is this for me if I already have a personal trainer?',
-     'Yes — ask them to invite you. If they are on Meal & Motion their plans land in your app, you log, they watch. No friction.'],
+     'Yes — ask them to invite you. If they are on Treno their plans land in your app, you log, they watch. No friction.'],
     ['What makes the marketplace different from Instagram DMs?',
      'Coaches have structured profiles you can actually compare. You send one structured request — goal, budget, format. Coaches accept, reply with one question, or decline. No ghosting, no pricing roulette.'],
     ['Can I just use the AI without a coach?',

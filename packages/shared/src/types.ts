@@ -1,4 +1,4 @@
-// Database types for NutriGoal v2
+// Database types for Treno v2
 
 export type UserRole =
   | 'free'
@@ -44,6 +44,7 @@ export type CoachCheckInFrequency = 'weekly' | 'biweekly' | 'monthly' | 'as_need
 export type CoachStyle = 'structured' | 'balanced' | 'flexible'
 export type CoachPostIntakeAction = 'review_and_plan' | 'message_first' | 'book_consult' | 'send_assessment'
 export type CoachAppFocus = 'client_management' | 'prospecting' | 'both'
+export type CoachVerificationStatus = 'unverified' | 'pending' | 'verified' | 'rejected'
 export type CustomIntakeQuestionType = 'short_text' | 'long_text' | 'single_select' | 'multi_select' | 'yes_no'
 
 // ─── Core Tables ────────────────────────────────────────
@@ -142,6 +143,11 @@ export interface UserProfile {
   coach_intake_requirements: string[]
   coach_post_intake_action: CoachPostIntakeAction | null
   coach_app_focus: CoachAppFocus | null
+  // Marketplace verification
+  coach_verification_status: CoachVerificationStatus
+  coach_verified_at: string | null
+  coach_credential_url: string | null
+  coach_credential_note: string | null
   trial_ends_at: string | null
   created_at: string
   updated_at: string

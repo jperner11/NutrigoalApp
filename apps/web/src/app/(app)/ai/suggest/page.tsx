@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useUser } from '@/hooks/useUser'
 import { Sparkles, Send, Lock } from 'lucide-react'
 import { toast } from 'react-hot-toast'
-import { isManagedClientRole } from '@nutrigoal/shared'
+import { isManagedClientRole } from '@treno/shared'
 import { apiFetch, ApiError } from '@/lib/apiClient'
 
 export default function AISuggestPage() {

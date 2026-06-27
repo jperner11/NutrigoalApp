@@ -12,7 +12,7 @@ import {
 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import type { UserProfile, DietPlan, TrainingPlan } from '@/lib/supabase/types'
-import { isTrainerRole } from '@nutrigoal/shared'
+import { isTrainerRole } from '@treno/shared'
 import { AppHeroPanel, AppSectionHeader, EmptyStateCard, MetricCard } from '@/components/ui/AppDesign'
 
 interface ClientOverviewState {

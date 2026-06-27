@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { rateLimit, getClientIp } from '@/lib/rateLimit'
+import { requireAiUser } from '@/lib/aiAuth'
 
 export async function POST(request: Request) {
   const ip = getClientIp(request)
@@ -10,32 +11,17 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { prompt, userId, userProfile } = await request.json()
+    const auth = await requireAiUser({ requireAiRole: true })
+    if (auth.response) return auth.response
+    const userId = auth.userId
 
-    if (!prompt || !userId) {
+    const { prompt, userProfile } = await request.json()
+
+    if (!prompt) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 })
     }
 
     const supabase = await createClient()
-
-    // Get user profile to check role/limits
-    const { data: profile } = await supabase
-      .from('user_profiles')
-      .select('role')
-      .eq('id', userId)
-      .single()
-
-    if (!profile) {
-      return NextResponse.json({ message: 'User not found' }, { status: 404 })
-    }
-
-    // Free users cannot use AI suggestions
-    if (profile.role === 'free') {
-      return NextResponse.json(
-        { message: 'AI suggestions require a Pro plan or higher. Upgrade to unlock.' },
-        { status: 403 }
-      )
-    }
 
     // Call OpenAI
     const apiKey = process.env.OPENAI_API_KEY
@@ -87,10 +73,11 @@ GUIDELINES:
     const suggestion = aiData.choices?.[0]?.message?.content ?? 'No suggestion generated.'
     const tokensUsed = aiData.usage?.total_tokens ?? 0
 
-    // Log usage
+    // Log usage. Distinct type so suggestions don't count against the
+    // plan-regeneration cooldown (which tracks meal_suggestion/workout_suggestion).
     await supabase.from('ai_usage').insert({
       user_id: userId,
-      type: 'meal_suggestion',
+      type: 'ai_suggest',
       prompt,
       response: suggestion,
       tokens_used: tokensUsed,

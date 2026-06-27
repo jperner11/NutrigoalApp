@@ -32,7 +32,7 @@ import type { GatedFeature } from '@/lib/tierUtils'
 import { isFeatureLocked } from '@/lib/tierUtils'
 import ProBadge from './ProBadge'
 import BrandLogo from '@/components/brand/BrandLogo'
-import { getRolePlanLabel, isManagedClientRole, isTrainerRole } from '@nutrigoal/shared'
+import { getRolePlanLabel, isManagedClientRole, isTrainerRole } from '@treno/shared'
 
 interface SidebarProps {
   userRole: UserRole

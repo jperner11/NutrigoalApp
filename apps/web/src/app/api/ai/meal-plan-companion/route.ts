@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import * as Sentry from '@sentry/nextjs'
 import { rateLimit, getClientIp } from '@/lib/rateLimit'
-import { calculateBMR, calculateTDEE, adjustCaloriesForGoal } from '@nutrigoal/shared'
+import { requireAiUser } from '@/lib/aiAuth'
+import { calculateBMR, calculateTDEE, adjustCaloriesForGoal } from '@treno/shared'
 
 const ACTIVITY_MULTIPLIERS: Record<string, number> = {
   sedentary: 1.2,
@@ -33,6 +34,11 @@ export async function POST(request: Request) {
   if (!apiKey) {
     return NextResponse.json({ message: 'AI service not configured' }, { status: 503 })
   }
+
+  // Companion content is part of the plan-generation flow, which free users
+  // can run once — require a session but not a paid role.
+  const auth = await requireAiUser()
+  if (auth.response) return auth.response
 
   try {
     const body = await request.json()

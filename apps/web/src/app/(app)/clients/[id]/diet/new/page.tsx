@@ -8,7 +8,7 @@ import { ArrowLeft, Plus, Trash2, Search, Loader2, PlusCircle } from 'lucide-rea
 import { toast } from 'react-hot-toast'
 import Link from 'next/link'
 import type { FoodItem, MealType, UserProfile } from '@/lib/supabase/types'
-import { isTrainerRole } from '@nutrigoal/shared'
+import { isTrainerRole } from '@treno/shared'
 import { AppHeroPanel, ListCard, MetricCard } from '@/components/ui/AppDesign'
 import { apiFetch, ApiError } from '@/lib/apiClient'
 

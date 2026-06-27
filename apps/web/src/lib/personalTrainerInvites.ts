@@ -1,6 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import type { UserRole } from '@/lib/supabase/types'
-import { isTrainerRole } from '@nutrigoal/shared'
+import { BRAND_NAME } from '@/lib/site'
+import { isTrainerRole } from '@treno/shared'
 
 export interface InviteRecord {
   id: string
@@ -69,17 +70,26 @@ export async function resolveExistingUser(email: string) {
   return data
 }
 
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
 export async function sendInviteEmail(
   email: string,
   inviteUrl: string,
   trainerName: string,
   clientFirstName?: string | null,
 ) {
-  const resendKey = process.env.RESEND_API_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
+  const resendKey = process.env.RESEND_API_KEY
   if (!resendKey) throw new Error('Email sending is not configured.')
 
-  const greeting = clientFirstName || 'there'
-  const coachLabel = trainerName || 'A coach'
+  const greeting = escapeHtml(clientFirstName || 'there')
+  const coachLabel = escapeHtml(trainerName || 'A coach')
 
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -88,14 +98,14 @@ export async function sendInviteEmail(
       Authorization: `Bearer ${resendKey}`,
     },
     body: JSON.stringify({
-      from: process.env.RESEND_FROM_EMAIL || 'Treno <noreply@treno.com>',
+      from: process.env.RESEND_FROM_EMAIL || `${BRAND_NAME} <noreply@treno.app>`,
       to: [email.trim().toLowerCase()],
-      subject: `${coachLabel} invited you to Treno`,
+      subject: `${trainerName || 'A coach'} invited you to ${BRAND_NAME}`,
       html: `
         <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px 0">
           <h2 style="margin:0 0 16px">You've been invited!</h2>
           <p style="color:#444;line-height:1.6">
-            Hi ${greeting}, <strong>${coachLabel}</strong> has invited you to join their roster on Meal &amp; Motion.
+            Hi ${greeting}, <strong>${coachLabel}</strong> has invited you to join their roster on ${BRAND_NAME}.
           </p>
           <p style="color:#444;line-height:1.6">
             Click the button below to create your account and get started.
@@ -107,7 +117,7 @@ export async function sendInviteEmail(
           <p style="color:#999;font-size:13px;line-height:1.5">
             If you didn't expect this invitation, you can safely ignore this email.
           </p>
-          <p style="color:#999;font-size:13px">— The Meal &amp; Motion Team</p>
+          <p style="color:#999;font-size:13px">— The ${BRAND_NAME} Team</p>
         </div>
       `,
     }),

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
-import { Settings, User, Crown, Target, Calendar, HeartPulse, Dumbbell, Utensils, Activity, Lock, Trash2, AlertTriangle, Loader2, ExternalLink, Compass } from 'lucide-react'
+import { Settings, User, Crown, Target, Calendar, HeartPulse, Dumbbell, Utensils, Activity, Lock, Trash2, AlertTriangle, Loader2, ExternalLink, Compass, BadgeCheck } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import Link from 'next/link'
 import {
@@ -30,7 +30,7 @@ import type { ActivityLevel, FitnessGoal, Gender, PersonalTrainerCustomIntakeQue
 import { BaseClientIntakePreview } from '@/components/onboarding/BaseClientIntakePreview'
 import { SUPPORT_EMAIL } from '@/lib/site'
 import { COACH_MARKETPLACE_CURRENCIES, COACH_OFFER_BILLING_PERIODS, buildCoachProfileSlug, formatCoachPriceRange, formatOfferPrice } from '@/lib/coachMarketplace'
-import { isTrainerRole } from '@nutrigoal/shared'
+import { isTrainerRole } from '@treno/shared'
 import { AppHeroPanel } from '@/components/ui/AppDesign'
 import { apiFetch, ApiError } from '@/lib/apiClient'
 
@@ -164,6 +164,10 @@ export default function SettingsPage() {
   const [loadingCoachOffers, setLoadingCoachOffers] = useState(false)
   const [savingCoachOffers, setSavingCoachOffers] = useState(false)
   const [coachOffersInitialized, setCoachOffersInitialized] = useState(false)
+  const [credentialUrl, setCredentialUrl] = useState('')
+  const [credentialNote, setCredentialNote] = useState('')
+  const [savingVerification, setSavingVerification] = useState(false)
+  const [verificationStatus, setVerificationStatus] = useState<string>('unverified')
 
   // Form state
   const [form, setForm] = useState({
@@ -333,6 +337,9 @@ export default function SettingsPage() {
         created_at: row?.created_at ?? new Date().toISOString(),
         updated_at: row?.updated_at ?? new Date().toISOString(),
       })
+      setVerificationStatus(profile.coach_verification_status ?? 'unverified')
+      setCredentialUrl(profile.coach_credential_url ?? '')
+      setCredentialNote(profile.coach_credential_note ?? '')
       setMarketplaceInitialized(true)
       setLoadingMarketplaceProfile(false)
     }
@@ -587,6 +594,30 @@ export default function SettingsPage() {
 
   function setMarketplaceField<K extends keyof CoachPublicProfile>(key: K, value: CoachPublicProfile[K]) {
     setMarketplaceProfile((prev) => ({ ...prev, [key]: value }))
+  }
+
+  async function requestVerification() {
+    if (!credentialUrl.trim() && !credentialNote.trim()) {
+      toast.error('Add a link to your certification or a note for our team.')
+      return
+    }
+    setSavingVerification(true)
+    try {
+      const res = await fetch('/api/coach/verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential_url: credentialUrl, credential_note: credentialNote }),
+      })
+      const json = await res.json()
+      if (!res.ok) {
+        toast.error(json.error || 'Failed to submit verification request.')
+        return
+      }
+      setVerificationStatus('pending')
+      toast.success('Verification request submitted. We’ll review it shortly.')
+    } finally {
+      setSavingVerification(false)
+    }
   }
 
   async function saveMarketplaceProfile() {
@@ -1490,6 +1521,61 @@ export default function SettingsPage() {
                   >
                     {savingMarketplaceProfile ? 'Saving...' : 'Save marketplace profile'}
                   </button>
+                </div>
+
+                <div className="card-2 p-5">
+                  <div className="flex items-center gap-2">
+                    <BadgeCheck className="h-5 w-5" style={{ color: verificationStatus === 'verified' ? 'var(--acc)' : 'var(--fg-3)' }} />
+                    <div className="serif" style={{ fontSize: 18, color: 'var(--fg)' }}>Verification</div>
+                    {verificationStatus === 'verified' && (
+                      <span className="chip" style={{ color: 'var(--acc)' }}>Verified</span>
+                    )}
+                    {verificationStatus === 'pending' && (
+                      <span className="chip" style={{ color: 'var(--warn)' }}>Under review</span>
+                    )}
+                    {verificationStatus === 'rejected' && (
+                      <span className="chip" style={{ color: 'var(--danger, #e5484d)' }}>Not approved</span>
+                    )}
+                  </div>
+                  <p className="mt-1 text-sm leading-6" style={{ color: 'var(--fg-2)' }}>
+                    {verificationStatus === 'verified'
+                      ? 'Your account is verified. The verified badge appears on your marketplace profile and in search results.'
+                      : 'Get a verified badge on your marketplace profile. Share a link to your certification (or a note) and our team will review it.'}
+                  </p>
+
+                  {verificationStatus !== 'verified' && (
+                    <div className="mt-4 space-y-3">
+                      <div>
+                        <label className="app-mono-label mb-1 block">Certification link</label>
+                        <input
+                          type="url"
+                          value={credentialUrl}
+                          onChange={(e) => setCredentialUrl(e.target.value)}
+                          placeholder="https://… (REPS / PT diploma / federation profile)"
+                          className="input-field px-3 py-2 text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="app-mono-label mb-1 block">Note for our team (optional)</label>
+                        <textarea
+                          value={credentialNote}
+                          onChange={(e) => setCredentialNote(e.target.value)}
+                          rows={2}
+                          placeholder="Anything that helps us verify your credentials"
+                          className="input-field px-3 py-2 text-sm"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={requestVerification}
+                        disabled={savingVerification || verificationStatus === 'pending'}
+                        className="btn btn-secondary disabled:opacity-50"
+                      >
+                        {savingVerification ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+                        {verificationStatus === 'pending' ? 'Submitted — under review' : 'Request verification'}
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 <div className="card-2 p-5">

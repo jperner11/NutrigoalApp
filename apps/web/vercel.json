@@ -4,6 +4,10 @@
     {
       "path": "/api/cron/check-ins",
       "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/expire-trials",
+      "schedule": "30 6 * * *"
     }
   ]
 }

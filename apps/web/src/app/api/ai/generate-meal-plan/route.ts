@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import * as Sentry from '@sentry/nextjs'
 import { rateLimit, getClientIp } from '@/lib/rateLimit'
 import { createClient } from '@/lib/supabase/server'
+import { checkPlanGenerationAllowed, logPlanGeneration } from '@/lib/aiAuth'
 
 export async function POST(request: Request) {
   const ip = getClientIp(request)
@@ -22,16 +23,8 @@ export async function POST(request: Request) {
     .eq('id', user.id)
     .single()
 
-  if (profile?.role === 'free') {
-    const { count } = await supabase
-      .from('ai_usage')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-      .eq('type', 'meal_suggestion')
-    if ((count ?? 0) > 0) {
-      return NextResponse.json({ message: 'Upgrade to Pro to regenerate AI meal plans.' }, { status: 403 })
-    }
-  }
+  const gate = await checkPlanGenerationAllowed(supabase, user.id, profile?.role, 'meal_suggestion')
+  if (gate) return gate
 
   const apiKey = process.env.OPENAI_API_KEY
   if (!apiKey) {
@@ -330,6 +323,15 @@ Return JSON only.`
 
     const aiData = await openaiResponse.json()
     const content = aiData.choices?.[0]?.message?.content?.trim() ?? '{}'
+
+    await logPlanGeneration(
+      supabase,
+      user.id,
+      'meal_suggestion',
+      `plan-generation day ${dayIndex + 1}${dayName ? ` (${dayName})` : ''}`,
+      content,
+      aiData.usage?.total_tokens ?? 0,
+    )
 
     let parsed
     try {

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 180" role="img" aria-labelledby="title desc">
+  <title id="title">Treno inverse logo</title>
+  <desc id="desc">The Treno wordmark paired with an acid-lime T momentum mark for dark surfaces.</desc>
+  <rect x="24" y="42" width="96" height="96" rx="24" fill="#cdf24e"/>
+  <path d="M50 71H94" fill="none" stroke="#0a0a0a" stroke-width="10" stroke-linecap="round"/>
+  <path d="M72 72V110" fill="none" stroke="#0a0a0a" stroke-width="10" stroke-linecap="round"/>
+  <path d="M52 110C64 118 83 118 96 106" fill="none" stroke="#0a0a0a" stroke-width="8" stroke-linecap="round"/>
+  <text x="148" y="106" fill="#f5f7fa" font-family="Inter, Avenir Next, Segoe UI, sans-serif" font-size="68" font-weight="800" letter-spacing="0">treno</text>
+  <text x="152" y="136" fill="#8a8f97" font-family="Inter, Avenir Next, Segoe UI, sans-serif" font-size="15" font-weight="800" letter-spacing="4">ONE FITNESS APP</text>
+</svg>

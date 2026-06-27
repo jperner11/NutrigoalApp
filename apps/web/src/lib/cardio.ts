@@ -1,1 +1,1 @@
-export { calculateCardioCalories } from '@nutrigoal/shared'
+export { calculateCardioCalories } from '@treno/shared'

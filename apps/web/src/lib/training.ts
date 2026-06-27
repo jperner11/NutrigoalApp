@@ -1,1 +1,1 @@
-export { parseRepRange, calculateSuggestion } from '@nutrigoal/shared'
+export { parseRepRange, calculateSuggestion } from '@treno/shared'

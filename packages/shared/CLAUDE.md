@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Package Overview
 
-`@nutrigoal/shared` is the shared library for the Meal & Motion monorepo. It provides TypeScript types, constants, and pure calculation functions consumed by both `apps/web/` (Next.js) and `apps/mobile/` (Expo).
+`@treno/shared` is the shared library for the Treno monorepo. It provides TypeScript types, constants, and pure calculation functions consumed by both `apps/web/` (Next.js) and `apps/mobile/` (Expo).
 
 ## Commands
 
@@ -13,7 +13,7 @@ npm run build    # tsc — compiles src/ to dist/
 npm run dev      # tsc --watch
 ```
 
-After editing any file in `src/`, rebuild before the consuming apps will pick up changes. The web app has `transpilePackages: ['@nutrigoal/shared']` but still resolves from the compiled output.
+After editing any file in `src/`, rebuild before the consuming apps will pick up changes. The web app has `transpilePackages: ['@treno/shared']` but still resolves from the compiled output.
 
 No test framework is configured.
 

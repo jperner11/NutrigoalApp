@@ -44,7 +44,7 @@ There are likely more. Until the migration table reflects reality, you cannot sa
 1. Complete Stripe KYC: dashboard → "Verify your business" banner → submit business details, bank info, identity. Takes a few days for review.
 2. Once activated, recreate the 3 products in **live** mode (sandbox products do not migrate). Same names: Pro $4.99, Unlimited $9.99, Coach Pro $24.99 — monthly recurring, USD.
 3. Get **live keys** (Developers → API keys, no sandbox toggle): `pk_live_*` and `sk_live_*`.
-4. Create a **live webhook** at `https://www.mealandmotion.com/api/webhooks/stripe`, subscribe to `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`. Get the `whsec_*` for live.
+4. Create a **live webhook** at `https://www.treno.com/api/webhooks/stripe`, subscribe to `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`. Get the `whsec_*` for live.
 5. Update Vercel production env vars:
    - `STRIPE_SECRET_KEY` → live
    - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` → live
@@ -54,7 +54,7 @@ There are likely more. Until the migration table reflects reality, you cannot sa
 7. Smoke-test with a **real card** (don't refund yourself; Stripe takes processing fees on test live charges). Verify role flip and webhook delivery.
 8. Keep sandbox keys somewhere accessible if you ever need to debug — they're in `.env.local` for local dev.
 
-**Don't forget.** Update `apps/web/src/lib/site.ts` if any links/copy reference test mode. Resolve the open `mealandmotion.sentry.io` issues.
+**Don't forget.** Update `apps/web/src/lib/site.ts` if any links/copy reference test mode. Resolve the open `treno.sentry.io` issues.
 
 ---
 
@@ -79,4 +79,4 @@ From the earlier full audit. None of these are critical for closed beta but shou
 - ✅ Sentry wired up; the `trial_ends_at` and `/pricing` 500 issues should be resolved (verify in dashboard)
 - ✅ Unauthed paid-plan clicks on `/pricing` now preserve checkout intent through signup/auth and resume Stripe checkout on first authenticated app load. Commit: `24d44d7`.
 - ✅ Branded app 404 added at `apps/web/src/app/not-found.tsx`. Commit: `24d44d7`.
-- ✅ `CRON_SECRET` added to Vercel Production and production redeployed. Public unauthenticated calls to `/api/cron/check-ins` return 401 as expected. Deployment: `nutrigoal-dyu7rs3oi-jurgen-perners-projects.vercel.app`.
+- ✅ `CRON_SECRET` added to Vercel Production and production redeployed. Public unauthenticated calls to `/api/cron/check-ins` return 401 as expected. Deployment: `treno-dyu7rs3oi-jurgen-perners-projects.vercel.app`.

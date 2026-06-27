@@ -8,3 +8,10 @@ dist
 .env
 .env.local
 .DS_Store
+
+# Local tooling / agent state — never commit
+.claude/
+**/.temp/
+tmp-*.mjs
+playwright-report/
+test-results/

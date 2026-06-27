@@ -15,8 +15,8 @@ import {
   ALCOHOL_FREQUENCIES, SNACK_MOTIVATIONS, SNACK_PREFERENCES,
   PLAN_PREFERENCES, HARDER_DAYS_OPTIONS, EATING_OUT_FREQUENCIES,
   calculateNutritionTargets,
-} from '@nutrigoal/shared'
-import type { UserMetrics, PersonalTrainerCustomIntakeQuestion } from '@nutrigoal/shared'
+} from '@treno/shared'
+import type { UserMetrics, PersonalTrainerCustomIntakeQuestion } from '@treno/shared'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
 import {
@@ -27,7 +27,7 @@ import {
 } from '@/lib/findCoach'
 import { buildCoachProfileSlug, COACH_MARKETPLACE_CURRENCIES } from '@/lib/coachMarketplace'
 import { toast } from 'react-hot-toast'
-import { isManagedClientRole, isTrainerRole } from '@nutrigoal/shared'
+import { isManagedClientRole, isTrainerRole } from '@treno/shared'
 import { BaseClientIntakePreview } from '@/components/onboarding/BaseClientIntakePreview'
 import {
   TrainerCustomQuestionsEditor,

@@ -1,5 +1,5 @@
 {
-  "name": "nutrigoal-monorepo",
+  "name": "treno-monorepo",
   "private": true,
   "packageManager": "npm@11.9.0",
   "workspaces": [

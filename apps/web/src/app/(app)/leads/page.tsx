@@ -7,7 +7,7 @@ import { Inbox, Loader2, Mail, UserCheck, XCircle } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { useUser } from '@/hooks/useUser'
 import { COACH_LEAD_STAGES, formatLeadStage } from '@/lib/coachMarketplace'
-import { isTrainerRole } from '@nutrigoal/shared'
+import { isTrainerRole } from '@treno/shared'
 import { apiFetch, ApiError } from '@/lib/apiClient'
 
 interface LeadRecord {

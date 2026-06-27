@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
-import type { Message, FeedbackRequest, FeedbackQuestion } from '@nutrigoal/shared'
+import type { Message, FeedbackRequest, FeedbackQuestion } from '@treno/shared'
 import { useBrandColors, useThemedStyles, brandShadow, type BrandColors } from '../../src/theme/brand'
 
 type Screen = 'home' | 'messages' | 'feedback-list' | 'feedback-respond'

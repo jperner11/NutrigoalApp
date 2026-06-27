@@ -7,6 +7,7 @@ import {
   type CoachWizardAnswers,
 } from '@/lib/findCoach'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { rateLimit, getClientIp } from '@/lib/rateLimit'
 
 export const runtime = 'nodejs'
 
@@ -30,6 +31,12 @@ type RawCoachProfile = Omit<CoachMatchProfile, 'coach' | 'offers'> & {
 }
 
 export async function GET(request: Request) {
+  const ip = getClientIp(request)
+  const { success } = rateLimit(`coach-match:${ip}`, { limit: 20, windowMs: 60_000 })
+  if (!success) {
+    return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 })
+  }
+
   const { searchParams } = new URL(request.url)
   const encoded = searchParams.get('q')
 
@@ -57,12 +64,14 @@ export async function GET(request: Request) {
       price_to,
       currency,
       accepting_new_clients,
+      rating_avg,
+      rating_count,
       coach:coach_id (
         id,
         full_name,
-        email,
         avatar_url,
         role,
+        coach_verification_status,
         coach_specialties,
         coach_formats,
         coach_services,

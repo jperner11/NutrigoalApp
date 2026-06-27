@@ -4,11 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository
 
-Turborepo monorepo for **Meal & Motion** (previously NutrigoalApp / Performance Clinic), using npm workspaces (`npm@11.9.0`).
+Turborepo monorepo for **Treno** (previously TrenoApp / Performance Clinic), using npm workspaces (`npm@11.9.0`).
 
-- `apps/web/` — Next.js 15 web app (primary). Also reachable via the `NutrigoalApp/` symlink at the repo root.
+- `apps/web/` — Next.js 15 web app (primary). Also reachable via the `TrenoApp/` symlink at the repo root.
 - `apps/mobile/` — Expo 55 + React Native app.
-- `packages/shared/` — `@nutrigoal/shared`: types, role helpers, nutrition/training/cardio calculations, constants. Consumed by both apps; web's `next.config` has `transpilePackages: ['@nutrigoal/shared']`.
+- `packages/shared/` — `@treno/shared`: types, role helpers, nutrition/training/cardio calculations, constants. Consumed by both apps; web's `next.config` has `transpilePackages: ['@treno/shared']`.
 
 **For detailed web-app architecture, routes, auth layers, roles/tiers, API endpoints, and lib modules, read `apps/web/CLAUDE.md`.** That file is the authoritative reference — do not duplicate its contents here.
 
@@ -36,4 +36,4 @@ The compiled output lives in `packages/shared/dist/` and is what the apps actual
 
 ## Legacy directory
 
-An older standalone copy of the app exists at `~/NutrigoalApp/` (outside this repo). **Do not use it** — always work inside `~/Desktop/Nutrigoal/`.
+An older standalone copy of the app exists at `~/TrenoApp/` (outside this repo). **Do not use it** — always work inside `~/Desktop/Treno/`.

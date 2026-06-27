@@ -7,7 +7,7 @@ import {
   ChevronDown, ChevronUp, RefreshCw, ArrowRight, BarChart3,
   Calendar, Dumbbell, Target,
 } from 'lucide-react'
-import type { ExerciseProgress } from '@nutrigoal/shared'
+import type { ExerciseProgress } from '@treno/shared'
 import { apiFetch } from '@/lib/apiClient'
 
 interface CheckInResult {

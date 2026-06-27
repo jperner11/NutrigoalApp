@@ -8,7 +8,7 @@ import {
   ChevronDown, ChevronRight, Pencil, Copy, ToggleLeft, ToggleRight,
 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
-import { isTrainerRole } from '@nutrigoal/shared'
+import { isTrainerRole } from '@treno/shared'
 import type {
   FeedbackRequest, FeedbackQuestion, FeedbackResponse,
   FeedbackTemplate, FeedbackQuestionType, UserProfile,
