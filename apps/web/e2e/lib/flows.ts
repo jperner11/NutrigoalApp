@@ -74,6 +74,15 @@ export async function completeOnboarding(page: Page): Promise<void> {
  * that, never "Generate AI Plans", which would spend AI credits).
  */
 export async function completeClientOnboarding(page: Page): Promise<void> {
+  // Capture any failed profile save (e.g. test-DB schema drift) so a failure is
+  // diagnosable instead of just "stuck on /onboarding".
+  const saveErrors: string[] = []
+  page.on('response', async (res) => {
+    if (res.url().includes('user_profiles') && !res.ok()) {
+      saveErrors.push(`${res.request().method()} ${res.status()}: ${(await res.text().catch(() => '')).slice(0, 240)}`)
+    }
+  })
+
   await page.goto('/onboarding', { waitUntil: 'networkidle' })
   const cont = page.getByRole('button', { name: /continue/i })
   await cont.waitFor({ state: 'visible' })
@@ -97,7 +106,14 @@ export async function completeClientOnboarding(page: Page): Promise<void> {
     await page.waitForTimeout(400)
   }
 
-  await expect(page).toHaveURL(/\/dashboard/, { timeout: 25_000 })
+  try {
+    await expect(page).toHaveURL(/\/dashboard/, { timeout: 25_000 })
+  } catch (e) {
+    if (saveErrors.length) {
+      throw new Error(`Client onboarding save failed (test-DB likely behind app schema): ${saveErrors.join(' || ')}`)
+    }
+    throw e
+  }
 }
 
 export interface PublishedCoach {
