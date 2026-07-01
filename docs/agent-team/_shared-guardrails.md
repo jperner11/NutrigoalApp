@@ -11,7 +11,10 @@ These are hard rules. If a rule conflicts with your charter, the rule wins.
 ## Git / merge safety
 - **NEVER** push to `main`. **NEVER** merge anything into `main`. Only YOU (a human)
   promote `staging` → `main`.
-- Branch off the latest `origin/main`. Open every PR with **base branch `staging`**.
+- **Start from `staging`, not `main`** — `staging` holds the team's merged work, so
+  branching off `main` re-does things already merged. First run:
+  `git fetch origin && git checkout staging && git pull`, then cut your working branch
+  from there. Open every PR with **base branch `staging`**.
 - Only the **PR-gatekeeper** merges PRs, and only into `staging`.
 - Branch name: `agent/<role>/<short-slug>`. PR title prefix: `[agent:<role>]`.
   Apply the label `agent:<role>` (create it if missing).
