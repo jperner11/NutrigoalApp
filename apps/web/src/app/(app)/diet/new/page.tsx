@@ -10,7 +10,7 @@ import Link from 'next/link'
 import { MEAL_TYPES } from '@/lib/constants'
 import type { FoodItem, MealType } from '@/lib/supabase/types'
 import { canAccess } from '@/lib/tierUtils'
-import { isManagedClientRole } from '@nutrigoal/shared'
+import { isManagedClientRole } from '@treno/shared'
 import { AppHeroPanel, ListCard, MetricCard } from '@/components/ui/AppDesign'
 import { apiFetch, ApiError } from '@/lib/apiClient'
 

@@ -2,7 +2,7 @@ import { Tabs } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { useBrandColors } from '../../src/theme/brand'
-import { isTrainerRole, isManagedClientRole } from '@nutrigoal/shared'
+import { isTrainerRole, isManagedClientRole } from '@treno/shared'
 
 type TabIconName = React.ComponentProps<typeof Ionicons>['name']
 

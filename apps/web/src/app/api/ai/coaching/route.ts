@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import * as Sentry from '@sentry/nextjs'
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from '@/lib/supabase/server'
 import { rateLimit, getClientIp } from '@/lib/rateLimit'
+import { requireAiUser } from '@/lib/aiAuth'
 import { buildCoachingPrompt, type CoachingTool } from '@/lib/coachingPrompts'
 
 const VALID_TOOLS: CoachingTool[] = ['recovery', 'injury-prevention', 'recomp']
@@ -19,9 +20,13 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { toolType, userId, additionalInputs = {} } = await request.json()
+    const auth = await requireAiUser()
+    if (auth.response) return auth.response
+    const userId = auth.userId
 
-    if (!toolType || !userId) {
+    const { toolType, additionalInputs = {} } = await request.json()
+
+    if (!toolType) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 })
     }
 
@@ -29,14 +34,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Invalid tool type' }, { status: 400 })
     }
 
-    // Fetch full profile server-side
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-    if (!supabaseUrl || !serviceRoleKey) {
-      return NextResponse.json({ message: 'Server configuration error' }, { status: 503 })
-    }
-
-    const supabase = createClient(supabaseUrl, serviceRoleKey)
+    // Session-scoped client: RLS limits reads/writes to the user's own rows
+    const supabase = await createClient()
 
     const { data: profile } = await supabase
       .from('user_profiles')
@@ -103,7 +102,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ response })
   } catch (err) {
     Sentry.captureException(err, { tags: { kind: 'api-route', route: 'ai/coaching' } })
-    const message = err instanceof Error ? err.message : 'Internal server error'
-    return NextResponse.json({ message }, { status: 500 })
+    return NextResponse.json({ message: 'Internal server error' }, { status: 500 })
   }
 }

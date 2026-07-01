@@ -1,4 +1,4 @@
--- NutriGoal v2 - Initial Database Schema
+-- Treno v2 - Initial Database Schema
 -- Run this in your Supabase SQL Editor
 
 -- Enable UUID extension

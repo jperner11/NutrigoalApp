@@ -10,7 +10,7 @@ import {
 import Link from 'next/link'
 import type { DietPlan, DietPlanMeal } from '@/lib/supabase/types'
 import { AppHeroPanel, AppSectionHeader, EmptyStateCard, ListCard } from '@/components/ui/AppDesign'
-import { isManagedClientRole } from '@nutrigoal/shared'
+import { isManagedClientRole } from '@treno/shared'
 
 const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const
 

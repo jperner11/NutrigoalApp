@@ -1,7 +1,7 @@
 'use client'
 
 import { Plus, Trash2 } from 'lucide-react'
-import type { CustomIntakeQuestionType } from '@nutrigoal/shared'
+import type { CustomIntakeQuestionType } from '@treno/shared'
 
 export interface DraftCustomQuestion {
   // Stable local id — either the real DB id (for existing rows) or a temp

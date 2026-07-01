@@ -8,7 +8,7 @@ import Link from 'next/link'
 import { Sparkles, Dumbbell, Utensils, CheckCircle2, AlertCircle, Loader2, Pill, ArrowRight } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { checkRegenEligibility, getRegenCooldownDays } from '@/lib/tierUtils'
-import { isManagedClientRole } from '@nutrigoal/shared'
+import { isManagedClientRole } from '@treno/shared'
 import { apiFetch } from '@/lib/apiClient'
 
 type StepStatus = 'pending' | 'loading' | 'done' | 'error'
@@ -175,25 +175,8 @@ export default function GeneratePlansPage() {
         setSavedSupplements(true)
       }
 
-      // Log AI usage for cooldown tracking
-      if (trainingPlan) {
-        await supabase.from('ai_usage').insert({
-          user_id: profile!.id,
-          type: 'workout_suggestion',
-          prompt: 'generate-training-plan',
-          response: 'success',
-          tokens_used: 0,
-        })
-      }
-      if (weekMealPlan) {
-        await supabase.from('ai_usage').insert({
-          user_id: profile!.id,
-          type: 'meal_suggestion',
-          prompt: 'generate-meal-plan-7day',
-          response: 'success',
-          tokens_used: 0,
-        })
-      }
+      // AI usage for cooldown tracking is logged server-side by the
+      // generate-meal-plan / generate-training-plan routes.
 
       // Save companion content to the diet plan's notes field
       if (companionContent) {

@@ -1,4 +1,4 @@
-# Mealandmotion Beta Readiness
+# Treno Beta Readiness
 
 ## Beta scope
 - Personal Trainers are the primary customer during beta.
@@ -23,7 +23,7 @@
 - Fresh-account QA pass completed
 
 ## Beta support process
-- Support email: support@mealandmotion.app
+- Support email: support@treno.app
 - Urgent issues: login, invite acceptance, missing plans, trainer/client linkage
 - All tester bugs should include role, platform, expected result, actual result, and screenshot if possible
 

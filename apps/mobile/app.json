@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Treno",
-    "slug": "nutrigoal",
+    "slug": "treno",
     "version": "1.0.0",
     "entryPoint": "./index.js",
     "orientation": "portrait",
@@ -15,7 +15,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.nutrigoal.app",
+      "bundleIdentifier": "com.treno.app",
       "infoPlist": {
         "NSHealthShareUsageDescription": "Treno reads your health data to sync workouts, steps, weight, and water intake.",
         "NSHealthUpdateUsageDescription": "Treno writes workout and water data to keep your Health app up to date."
@@ -28,7 +28,7 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "package": "com.nutrigoal.app"
+      "package": "com.treno.app"
     },
     "web": {
       "bundler": "metro",

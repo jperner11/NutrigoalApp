@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document is **upstream** of the existing beta/test docs. It exists to force decisions *before* we hand Meal & Motion to real Personal Trainers at a local gym — so that `PT_TESTER_GUIDE.md`, `QA_CHECKLIST.md`, and the pricing/onboarding copy are all shaped by the same answers.
+This document is **upstream** of the existing beta/test docs. It exists to force decisions *before* we hand Treno to real Personal Trainers at a local gym — so that `PT_TESTER_GUIDE.md`, `QA_CHECKLIST.md`, and the pricing/onboarding copy are all shaped by the same answers.
 
 It is organised around **Simple, Lovable, Complete**:
 
@@ -28,7 +28,7 @@ Related docs (do not duplicate — these are downstream of this one):
 
 Before anything else: finish this sentence in one line. If you can't, the test isn't defined.
 
-> **"By the end of the gym test, I will know whether Meal & Motion is good enough that \_\_\_\_ will \_\_\_\_."**
+> **"By the end of the gym test, I will know whether Treno is good enough that \_\_\_\_ will \_\_\_\_."**
 
 Example shapes (pick or write your own):
 - "...a working PT will keep using it after the free period without me nagging them."
@@ -69,7 +69,7 @@ Your answer: I don't know - I will take my own exmaple with my coach using a dif
 
 > 
 
-**Why it matters:** Meal & Motion replaces *part* of an existing loop, not all of it. The parts it doesn't replace are the parts where the PT will keep using their current tool — and every tool-switch in a week is a moment where the PT decides whether to bother opening your app at all. Fewer switches = more usage.
+**Why it matters:** Treno replaces *part* of an existing loop, not all of it. The parts it doesn't replace are the parts where the PT will keep using their current tool — and every tool-switch in a week is a moment where the PT decides whether to bother opening your app at all. Fewer switches = more usage.
 
 ### 2.3 What would make them *stop* using it after week one?
 
@@ -87,7 +87,7 @@ Your answer: I think it they cannot do at least what they can in Trainerise (fin
 
 ### 3.1 The one flow
 
-Complete this: **"A PT using Meal & Motion for the first time must be able to \_\_\_\_ within 15 minutes of signing up, without asking me for help."**
+Complete this: **"A PT using Treno for the first time must be able to \_\_\_\_ within 15 minutes of signing up, without asking me for help."**
 
 Your answer: create account and don't feel lost - find whatever they need, like creating custom questions, setting up their workspace/dashboard, prices, profile that show on marketplace, etc. profile picture
 
@@ -137,7 +137,7 @@ A lovable product has 2–4 moments the user talks about. Not a list of features
 
 ### 4.1 Candidate moments
 
-Here are the moments Meal & Motion could realistically deliver today. Rank them 1 (most lovable) to N (least), and cross out any that aren't actually delivered yet:
+Here are the moments Treno could realistically deliver today. Rank them 1 (most lovable) to N (least), and cross out any that aren't actually delivered yet:
 
 - Typing "200g chicken breast, 100g rice, 1 tbsp olive oil" and seeing macros appear instantly.
 - Sending a client an invite by email and watching them show up as "active" 30 seconds later.

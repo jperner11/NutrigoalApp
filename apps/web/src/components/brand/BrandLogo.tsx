@@ -14,37 +14,74 @@ interface BrandLogoProps {
 
 export default function BrandLogo({
   href,
+  compact = false,
   tagline = false,
   light = false,
   size = 28,
   className = '',
 }: BrandLogoProps) {
+  const markSize = Math.max(30, Math.round(size * 1.18))
+  const wordColor = light ? '#ffffff' : 'var(--foreground)'
+
   const content = (
     <div
-      className={`inline-flex items-center ${className}`.trim()}
-      style={{ color: light ? '#fff' : 'var(--foreground)' }}
+      className={`inline-flex items-center gap-2.5 ${className}`.trim()}
+      style={{ color: wordColor }}
     >
-      <div className="min-w-0">
-        <div
-          className="font-display"
-          style={{
-            fontSize: Math.round(size * 0.95),
-            letterSpacing: '-0.05em',
-            lineHeight: 1,
-            fontWeight: 700,
-          }}
-        >
-          treno
-        </div>
-        {tagline && (
+      <svg
+        width={markSize}
+        height={markSize}
+        viewBox="0 0 48 48"
+        aria-hidden="true"
+        className="shrink-0"
+      >
+        <rect width="48" height="48" rx="12" fill="var(--brand-500)" />
+        <path
+          d="M13 14.5H35"
+          fill="none"
+          stroke="#0a0a0a"
+          strokeLinecap="round"
+          strokeWidth="5"
+        />
+        <path
+          d="M24 15V34"
+          fill="none"
+          stroke="#0a0a0a"
+          strokeLinecap="round"
+          strokeWidth="5"
+        />
+        <path
+          d="M14 34C20 38 29.5 38 36 32"
+          fill="none"
+          stroke="#0a0a0a"
+          strokeLinecap="round"
+          strokeWidth="4"
+        />
+      </svg>
+
+      {!compact && (
+        <div className="min-w-0">
           <div
-            className={`brand-tagline ${light ? 'brand-tagline-light' : ''}`}
-            style={{ marginTop: 4 }}
+            className="font-display"
+            style={{
+              fontSize: Math.round(size * 0.95),
+              letterSpacing: 0,
+              lineHeight: 1,
+              fontWeight: 800,
+            }}
           >
-            one fitness app
+            treno
           </div>
-        )}
-      </div>
+          {tagline && (
+            <div
+              className={`brand-tagline ${light ? 'brand-tagline-light' : ''}`}
+              style={{ marginTop: 4 }}
+            >
+              one fitness app
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Compass, ExternalLink, Loader2, MapPin, MessageSquare, Search, SlidersHorizontal, UserCheck } from 'lucide-react'
+import { BadgeCheck, Compass, ExternalLink, Loader2, MapPin, MessageSquare, Search, SlidersHorizontal, Star, UserCheck } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { useUser } from '@/hooks/useUser'
 import { formatCoachPriceRange, formatOfferPrice } from '@/lib/coachMarketplace'
@@ -13,9 +13,9 @@ import {
   clearLeadWizardPreferences,
   loadLeadWizardPreferences,
 } from '@/lib/findCoach'
-import { isManagedClientRole, isTrainerRole } from '@nutrigoal/shared'
+import { isManagedClientRole, isTrainerRole } from '@treno/shared'
 import AppPageHeader from '@/components/ui/AppPageHeader'
-import Portrait from '@/components/ui/Portrait'
+import CoachAvatar from '@/components/coach/CoachAvatar'
 import { apiFetch, ApiError } from '@/lib/apiClient'
 
 interface DiscoverCoach {
@@ -29,6 +29,8 @@ interface DiscoverCoach {
   price_to: number | null
   currency: string
   accepting_new_clients: boolean
+  rating_avg: number | null
+  rating_count: number
   offers: Array<{
     id: string
     title: string
@@ -42,6 +44,7 @@ interface DiscoverCoach {
     full_name: string | null
     email: string
     avatar_url: string | null
+    coach_verification_status: string | null
     coach_specialties: string[]
     coach_formats: string[]
     coach_services: string[]
@@ -60,16 +63,6 @@ const inputStyle: React.CSSProperties = {
   fontSize: 14,
   color: 'var(--fg)',
   outline: 'none',
-}
-
-function getInitials(name: string | null) {
-  return (name || 'C')
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((p) => p[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase()
 }
 
 export default function DiscoverPage() {
@@ -291,7 +284,6 @@ export default function DiscoverPage() {
         <div className="grid gap-5 xl:grid-cols-2">
           {filteredCoaches.map((coach, i) => {
             const coachName = coach.coach?.full_name || 'Coach'
-            const initials = getInitials(coachName)
             const accepting = coach.accepting_new_clients
 
             return (
@@ -300,11 +292,16 @@ export default function DiscoverPage() {
                 <div className="row items-start justify-between gap-4">
                   <div className="row items-start gap-4">
                     <div style={{ width: 64, height: 64, flexShrink: 0 }}>
-                      <Portrait seed={i} label={initials} height={64} />
+                      <CoachAvatar avatarUrl={coach.coach?.avatar_url} name={coachName} height={64} seed={i} />
                     </div>
                     <div className="min-w-0">
-                      <div className="serif" style={{ fontSize: 22, lineHeight: 1.15 }}>
-                        {coachName}
+                      <div className="row items-center gap-1.5">
+                        <div className="serif" style={{ fontSize: 22, lineHeight: 1.15 }}>
+                          {coachName}
+                        </div>
+                        {coach.coach?.coach_verification_status === 'verified' && (
+                          <BadgeCheck width={16} height={16} style={{ color: 'var(--acc)' }} />
+                        )}
                       </div>
                       <div
                         className="mt-1"
@@ -312,6 +309,17 @@ export default function DiscoverPage() {
                       >
                         {coach.headline || 'Personal coaching inside Treno'}
                       </div>
+                      {coach.rating_count > 0 && coach.rating_avg != null && (
+                        <div className="row mt-1.5 items-center" style={{ gap: 5 }}>
+                          <Star width={13} height={13} style={{ color: 'var(--acc)', fill: 'var(--acc)' }} />
+                          <span style={{ fontSize: 13, fontWeight: 600 }}>
+                            {coach.rating_avg.toFixed(1)}
+                          </span>
+                          <span style={{ fontSize: 12, color: 'var(--fg-3)' }}>
+                            ({coach.rating_count})
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
                   <span

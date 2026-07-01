@@ -6,7 +6,7 @@ import { Mail, ArrowLeft } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { isTrainerRole } from '@nutrigoal/shared'
+import { isTrainerRole } from '@treno/shared'
 import { apiFetch, ApiError } from '@/lib/apiClient'
 
 type InviteResponse = {

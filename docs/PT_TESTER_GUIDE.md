@@ -25,5 +25,5 @@
 - Messaging or feedback inconsistencies
 
 ## Beta support
-- Email: support@mealandmotion.app
+- Email: support@treno.app
 

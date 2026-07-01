@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server'
 import * as Sentry from '@sentry/nextjs'
-import { calculateSuggestion } from '@nutrigoal/shared'
-import type { WorkoutSetLog } from '@nutrigoal/shared'
+import { calculateSuggestion } from '@treno/shared'
+import type { WorkoutSetLog } from '@treno/shared'
+import { rateLimit, getClientIp } from '@/lib/rateLimit'
+import { requireAiUser } from '@/lib/aiAuth'
 
 interface TrainingOverloadExerciseInput {
   exercise_id: string
@@ -12,6 +14,15 @@ interface TrainingOverloadExerciseInput {
 }
 
 export async function POST(request: Request) {
+  const ip = getClientIp(request)
+  const { success } = rateLimit(`ai-overload:${ip}`, { limit: 10, windowMs: 60_000 })
+  if (!success) {
+    return NextResponse.json({ message: 'Too many requests.' }, { status: 429 })
+  }
+
+  const auth = await requireAiUser({ requireAiRole: true })
+  if (auth.response) return auth.response
+
   const apiKey = process.env.OPENAI_API_KEY
 
   try {

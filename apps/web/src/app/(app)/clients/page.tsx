@@ -7,7 +7,7 @@ import { Users, Plus, Mail, UserCheck, Clock3, Copy, Send, Ban, AlertCircle } fr
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { toast } from 'react-hot-toast'
-import { isTrainerRole } from '@nutrigoal/shared'
+import { isTrainerRole } from '@treno/shared'
 import { AppHeroPanel, AppSectionHeader, EmptyStateCard, MetricCard } from '@/components/ui/AppDesign'
 import { apiFetch, ApiError } from '@/lib/apiClient'
 

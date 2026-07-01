@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { Session, User } from '@supabase/supabase-js'
 import * as Sentry from '@sentry/react-native'
-import type { UserProfile } from '@nutrigoal/shared'
+import type { UserProfile } from '@treno/shared'
 import { supabase } from '../lib/supabase'
 
 interface AuthContextType {

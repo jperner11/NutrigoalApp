@@ -20,7 +20,7 @@ import {
   SUPPLEMENT_FREQUENCIES,
   SUPPLEMENT_TIMES,
   COMMON_SUPPLEMENTS,
-} from '@nutrigoal/shared'
+} from '@treno/shared'
 import type { UserSupplement, SupplementLog } from '@/lib/supabase/types'
 import { AppHeroPanel, EmptyStateCard, ListCard } from '@/components/ui/AppDesign'
 

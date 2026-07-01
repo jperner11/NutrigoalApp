@@ -12,7 +12,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
-import { WATER_QUICK_ADD, isManagedClientRole, isTrainerRole } from '@nutrigoal/shared'
+import { WATER_QUICK_ADD, isManagedClientRole, isTrainerRole } from '@treno/shared'
 import { BrandLogo } from '../../src/components/BrandLogo'
 import { useBrandColors, useThemedStyles, brandShadow, type BrandColors } from '../../src/theme/brand'
 

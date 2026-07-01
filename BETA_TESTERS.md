@@ -1,6 +1,6 @@
-# Meal & Motion — Beta Tester Guide
+# Treno — Beta Tester Guide
 
-Welcome — and thank you for spending real time on this. You're one of four people testing Meal & Motion before it opens up. Your honest reactions are the entire point.
+Welcome — and thank you for spending real time on this. You're one of four people testing Treno before it opens up. Your honest reactions are the entire point.
 
 This isn't a polished launch — expect rough edges. **Tell us about them.** That's the job.
 
@@ -8,7 +8,7 @@ This isn't a polished launch — expect rough edges. **Tell us about them.** Tha
 
 ## What we're testing
 
-There are two ways to use Meal & Motion. You'll have access to one of them depending on who invited you:
+There are two ways to use Treno. You'll have access to one of them depending on who invited you:
 
 - **As an individual** — you're using it to plan your own meals and training, with optional coach support
 - **As a coach** — you're using it to run your clients (delivery, messaging, check-ins, marketplace profile)

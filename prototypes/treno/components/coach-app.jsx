@@ -11,7 +11,7 @@ const CoachShell = ({ tab, setTab, children }) => {
         <span style={{ width: 10, height: 10, borderRadius: 999, background: '#2a3a52' }}/>
         <span style={{ width: 10, height: 10, borderRadius: 999, background: '#2a3a52' }}/>
         <div className="mono" style={{ fontSize: 10, color: 'var(--fg-4)', marginLeft: 16, letterSpacing: '0.08em' }}>
-          mealandmotion.app/coach/{tab}
+          treno.app/coach/{tab}
         </div>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr' }}>

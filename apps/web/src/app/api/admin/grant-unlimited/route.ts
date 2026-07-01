@@ -23,25 +23,29 @@ export async function POST(request: Request) {
 
   const supabase = createAdminClient()
 
-  // Look up user by email in auth.users via admin API
-  const { data: { users }, error: listError } = await supabase.auth.admin.listUsers()
-  if (listError) {
-    return NextResponse.json({ error: 'Failed to look up users' }, { status: 500 })
-  }
+  // Look up by profile email — auth.admin.listUsers() is paginated and
+  // misses users beyond the first page.
+  const { data: profile, error: lookupError } = await supabase
+    .from('user_profiles')
+    .select('id, email')
+    .ilike('email', email.trim().toLowerCase())
+    .maybeSingle()
 
-  const authUser = users.find(u => u.email?.toLowerCase() === email.toLowerCase())
-  if (!authUser) {
+  if (lookupError) {
+    return NextResponse.json({ error: 'Failed to look up user' }, { status: 500 })
+  }
+  if (!profile) {
     return NextResponse.json({ error: `No user found with email: ${email}` }, { status: 404 })
   }
 
   const { error: updateError } = await supabase
     .from('user_profiles')
     .update({ role: 'unlimited' })
-    .eq('id', authUser.id)
+    .eq('id', profile.id)
 
   if (updateError) {
     return NextResponse.json({ error: 'Failed to update user role' }, { status: 500 })
   }
 
-  return NextResponse.json({ success: true, userId: authUser.id, email: authUser.email })
+  return NextResponse.json({ success: true, userId: profile.id, email: profile.email })
 }

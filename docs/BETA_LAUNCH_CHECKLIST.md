@@ -1,4 +1,4 @@
-# Mealandmotion Beta Launch Checklist
+# Treno Beta Launch Checklist
 
 ## Before inviting testers
 - Apply the latest Supabase migrations, including:
@@ -7,7 +7,7 @@
   - `023_support_requests.sql`
 - Confirm web and mobile env vars are set correctly.
 - Verify invite links open the correct deployed web domain.
-- Confirm `support@mealandmotion.app` is monitored.
+- Confirm `support@treno.app` is monitored.
 - Run the fresh-account QA flow from `docs/QA_CHECKLIST.md`.
 
 ## PT launch checks

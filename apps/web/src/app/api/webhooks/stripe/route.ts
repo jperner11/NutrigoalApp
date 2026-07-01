@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { getStripe } from '@/lib/stripe'
 import { createAdminClient } from '@/lib/supabase/admin'
 import type Stripe from 'stripe'
-import type { UserRole } from '@nutrigoal/shared'
+import type { UserRole } from '@treno/shared'
 
 export async function POST(request: Request) {
   const body = await request.text()
@@ -25,13 +25,15 @@ export async function POST(request: Request) {
 
   const supabase = createAdminClient()
 
+  const PAID_PLANS = new Set<string>(['pro', 'unlimited', 'nutritionist', 'personal_trainer'])
+
   switch (event.type) {
     case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session
       const userId = session.metadata?.userId
       const plan = session.metadata?.plan as UserRole | undefined
 
-      if (!userId || !plan) break
+      if (!userId || !plan || !PAID_PLANS.has(plan)) break
 
       // Retrieve full subscription for period dates
       const subscription = await getStripe().subscriptions.retrieve(
@@ -85,6 +87,15 @@ export async function POST(request: Request) {
           current_period_end: new Date(subscription.items.data[0].current_period_end * 1000).toISOString(),
         })
         .eq('user_id', userId)
+
+      // past_due keeps access (grace period); a fully canceled subscription
+      // revokes it even if no subscription.deleted event arrives.
+      if (mappedStatus === 'canceled') {
+        await supabase
+          .from('user_profiles')
+          .update({ role: 'free' as UserRole })
+          .eq('id', userId)
+      }
 
       break
     }

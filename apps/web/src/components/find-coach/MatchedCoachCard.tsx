@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ExternalLink, MapPin, MessageSquare, UserCheck } from 'lucide-react'
+import { BadgeCheck, ExternalLink, MapPin, MessageSquare, Star, UserCheck } from 'lucide-react'
 import { formatCoachPriceRange } from '@/lib/coachMarketplace'
 import { type MatchedCoachResult } from '@/lib/findCoach'
 
@@ -18,12 +18,33 @@ export default function MatchedCoachCard({ match }: { match: MatchedCoachResult 
     <article className="rounded-[30px] border border-[var(--line)] bg-[var(--surface-strong)] p-6 shadow-[0_18px_40px_rgba(0,0,0,0.28)]">
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[var(--brand-500)] to-[var(--brand-800)] text-lg font-bold text-white">
-            {initial}
-          </div>
+          {match.coach.avatar_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={match.coach.avatar_url}
+              alt={coachName}
+              className="h-14 w-14 rounded-full object-cover"
+            />
+          ) : (
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[var(--brand-500)] to-[var(--brand-800)] text-lg font-bold text-white">
+              {initial}
+            </div>
+          )}
           <div>
-            <h2 className="text-xl font-semibold text-[var(--foreground)]">{coachName}</h2>
+            <div className="flex items-center gap-1.5">
+              <h2 className="text-xl font-semibold text-[var(--foreground)]">{coachName}</h2>
+              {match.coach.coach_verification_status === 'verified' && (
+                <BadgeCheck className="h-4 w-4" style={{ color: 'var(--acc)' }} />
+              )}
+            </div>
             <p className="mt-1 text-sm text-[var(--muted)]">{match.headline || 'Personal coaching inside Treno'}</p>
+            {match.rating_count != null && match.rating_count > 0 && match.rating_avg != null && (
+              <div className="mt-1.5 flex items-center gap-1.5">
+                <Star className="h-3.5 w-3.5" style={{ color: 'var(--acc)', fill: 'var(--acc)' }} />
+                <span className="text-sm font-semibold text-[var(--foreground)]">{match.rating_avg.toFixed(1)}</span>
+                <span className="text-xs text-[var(--muted)]">({match.rating_count})</span>
+              </div>
+            )}
           </div>
         </div>
         <div className={`rounded-full border px-3 py-1 text-sm font-semibold ${getBadgeClasses(match.score)}`}>

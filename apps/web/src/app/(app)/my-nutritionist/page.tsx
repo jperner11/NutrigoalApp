@@ -7,7 +7,7 @@ import { UserCheck, MessageSquare, FileText, Utensils, Dumbbell } from 'lucide-r
 import Link from 'next/link'
 import AppPageHeader from '@/components/ui/AppPageHeader'
 import Portrait from '@/components/ui/Portrait'
-import { isManagedClientRole } from '@nutrigoal/shared'
+import { isManagedClientRole } from '@treno/shared'
 
 interface TrainerInfo {
   id: string

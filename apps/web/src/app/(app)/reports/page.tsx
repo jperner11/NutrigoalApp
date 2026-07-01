@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { BarChart3, Utensils, Dumbbell, Droplets, TrendingUp, TrendingDown, Minus, ChevronLeft, ChevronRight } from 'lucide-react'
 import { generateWeeklyReport } from '@/lib/reports'
 import type { WeeklyReport } from '@/lib/reports'
-import { isTrainerRole } from '@nutrigoal/shared'
+import { isTrainerRole } from '@treno/shared'
 
 function getWeekRange(offset: number): { start: string; end: string; label: string } {
   const now = new Date()

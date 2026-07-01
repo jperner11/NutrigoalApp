@@ -9,11 +9,11 @@ import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
 import {
   MEAL_TYPES, COMMON_SUPPLEMENTS, SUPPLEMENT_FREQUENCIES, SUPPLEMENT_TIMES,
-} from '@nutrigoal/shared'
+} from '@treno/shared'
 import type {
   DietPlan, DietPlanMeal, FoodItem, MealType, UserSupplement, SupplementFrequency, SupplementTime,
-} from '@nutrigoal/shared'
-import { isManagedClientRole } from '@nutrigoal/shared'
+} from '@treno/shared'
+import { isManagedClientRole } from '@treno/shared'
 import { useBrandColors, useThemedStyles, brandShadow, type BrandColors } from '../../src/theme/brand'
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || ''

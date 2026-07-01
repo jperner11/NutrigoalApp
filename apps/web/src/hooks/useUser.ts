@@ -6,6 +6,10 @@ import type { UserProfile } from '@/lib/supabase/types'
 import type { User } from '@supabase/supabase-js'
 import { toast } from 'react-hot-toast'
 
+// Distinguishes a deliberate sign-out from an expired session so the
+// auth-change listener doesn't show a misleading "session expired" toast.
+let intentionalSignOut = false
+
 export function useUser() {
   const [user, setUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<UserProfile | null>(null)
@@ -46,7 +50,7 @@ export function useUser() {
       if (event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED' && !session) {
         setUser(null)
         setProfile(null)
-        if (window.location.pathname !== '/login' && window.location.pathname !== '/signup') {
+        if (!intentionalSignOut && window.location.pathname !== '/login' && window.location.pathname !== '/signup') {
           toast.error('Your session has expired. Please sign in again.')
           window.location.href = '/login'
         }
@@ -63,6 +67,7 @@ export function useUser() {
   }, [])
 
   const signOut = async () => {
+    intentionalSignOut = true
     const supabase = createClient()
     await supabase.auth.signOut()
     window.location.href = '/login'

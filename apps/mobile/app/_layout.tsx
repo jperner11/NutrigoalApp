@@ -7,7 +7,7 @@ import * as Sentry from '@sentry/react-native'
 import Constants from 'expo-constants'
 import { AuthProvider, useAuth } from '../src/contexts/AuthContext'
 import { useBrandColors } from '../src/theme/brand'
-import { requiresOnboardingQuestionnaire } from '@nutrigoal/shared'
+import { requiresOnboardingQuestionnaire } from '@treno/shared'
 
 export { ErrorBoundary } from 'expo-router'
 

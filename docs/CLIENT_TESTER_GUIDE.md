@@ -24,5 +24,5 @@
 - Confusing screens or wording
 
 ## Beta support
-- Email: support@mealandmotion.app
+- Email: support@treno.app
 

@@ -32,7 +32,7 @@ import TrainerDashboard from '@/components/dashboard/TrainerDashboard'
 import StatTile from '@/components/ui/StatTile'
 import AINudgeCard from '@/components/ui/AINudgeCard'
 import { AppHeroPanel, AppSectionHeader, HeartbeatLine } from '@/components/ui/AppDesign'
-import { isManagedClientRole, isTrainerRole } from '@nutrigoal/shared'
+import { isManagedClientRole, isTrainerRole } from '@treno/shared'
 
 function getGreeting(): string {
   const hour = new Date().getHours()

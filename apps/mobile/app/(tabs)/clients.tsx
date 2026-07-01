@@ -12,12 +12,12 @@ import {
   BODY_PARTS, EQUIPMENT_TYPES, MEAL_TYPES,
   DEFAULT_REST_SECONDS, DEFAULT_SETS, DEFAULT_REPS,
   isTrainerRole,
-} from '@nutrigoal/shared'
+} from '@treno/shared'
 import type {
   NutritionistClient, UserProfile, DietPlan, TrainingPlan,
   Conversation, Message, FeedbackRequest, FeedbackQuestion,
   Exercise, FoodItem, MealType,
-} from '@nutrigoal/shared'
+} from '@treno/shared'
 import { useBrandColors, useThemedStyles, brandShadow, type BrandColors } from '../../src/theme/brand'
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || ''

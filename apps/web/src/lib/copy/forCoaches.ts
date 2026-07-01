@@ -23,8 +23,8 @@ export const forCoachesCopy = {
     how: 'See how it works',
   },
   preview: {
-    kicker: 'MARKETPLACE PROFILE · LIVE PREVIEW',
-    liveChip: 'Live',
+    kicker: 'MARKETPLACE PROFILE · EXAMPLE',
+    liveChip: 'Sample',
     coachName: 'Marcus Liao',
     coachInitials: 'ML',
     coachLine: 'POWERLIFTING · HYBRID · LONDON',

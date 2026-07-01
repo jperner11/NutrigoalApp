@@ -1,11 +1,14 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { createAdminClient } from '@/lib/supabase/admin'
-import Portrait from '@/components/ui/Portrait'
+import CoachAvatar from '@/components/coach/CoachAvatar'
+import CoachReviews from '@/components/coach/CoachReviews'
+import { Star } from 'lucide-react'
 import {
   buildCoachProfileSlug,
   formatCoachPriceRange,
 } from '@/lib/coachMarketplace'
+import { formatRatingAverage } from '@/lib/coachReviews'
 
 interface CoachProfile {
   coach_id: string
@@ -18,10 +21,13 @@ interface CoachProfile {
   currency: string | null
   accepting_new_clients: boolean
   consultation_url: string | null
+  rating_avg: number | null
+  rating_count: number
   coach: {
     id: string
     full_name: string | null
     avatar_url: string | null
+    coach_verification_status: string | null
     coach_specialties: string[] | null
     coach_formats: string[] | null
     coach_check_in_frequency: string | null
@@ -30,15 +36,6 @@ interface CoachProfile {
   } | null
 }
 
-const initials = (name: string | null) =>
-  (name || '?')
-    .split(' ')
-    .filter(Boolean)
-    .map((s) => s[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase()
-
 async function getCoach(slug: string): Promise<CoachProfile | null> {
   const admin = createAdminClient()
   const { data, error } = await admin
@@ -46,8 +43,9 @@ async function getCoach(slug: string): Promise<CoachProfile | null> {
     .select(`
       coach_id, slug, headline, bio, location_label,
       price_from, price_to, currency, accepting_new_clients, consultation_url,
+      rating_avg, rating_count,
       coach:coach_id (
-        id, full_name, avatar_url,
+        id, full_name, avatar_url, coach_verification_status,
         coach_specialties, coach_formats,
         coach_check_in_frequency, coach_ideal_client, coach_style
       )
@@ -90,6 +88,8 @@ export default async function CoachProfilePage({
     profile.price_to,
     profile.currency,
   )
+  const ratingLabel = profile.rating_count > 0 ? formatRatingAverage(profile.rating_avg) : null
+  const isVerified = profile.coach?.coach_verification_status === 'verified'
 
   return (
     <section className="mx-auto max-w-[1320px] px-8 py-10">
@@ -104,7 +104,7 @@ export default async function CoachProfilePage({
       <div className="grid gap-14 lg:grid-cols-[1.3fr_1fr]">
         <div>
           <div className="grid gap-6" style={{ gridTemplateColumns: '180px 1fr' }}>
-            <Portrait seed={1} label={initials(name)} height={210} />
+            <CoachAvatar avatarUrl={profile.coach?.avatar_url} name={name} height={210} seed={1} />
             <div>
               <div
                 className="mono"
@@ -114,7 +114,7 @@ export default async function CoachProfilePage({
                   letterSpacing: '0.14em',
                 }}
               >
-                VERIFIED ·{' '}
+                {isVerified && 'VERIFIED · '}
                 {profile.accepting_new_clients
                   ? 'ACCEPTING NEW CLIENTS'
                   : 'WAITLIST OPEN'}
@@ -132,6 +132,19 @@ export default async function CoachProfilePage({
                 {tag}
                 {loc && ` · ${loc}`}
               </div>
+              {ratingLabel && (
+                <div className="row mt-2.5" style={{ gap: 6, alignItems: 'center' }}>
+                  <Star
+                    width={16}
+                    height={16}
+                    style={{ color: 'var(--acc)', fill: 'var(--acc)' }}
+                  />
+                  <span style={{ fontSize: 15, fontWeight: 600 }}>{ratingLabel}</span>
+                  <span style={{ fontSize: 13, color: 'var(--fg-3)' }}>
+                    · {profile.rating_count} review{profile.rating_count === 1 ? '' : 's'}
+                  </span>
+                </div>
+              )}
               {profile.coach?.coach_specialties &&
                 profile.coach.coach_specialties.length > 0 && (
                   <div className="row mt-4 flex-wrap gap-1.5">
@@ -238,6 +251,8 @@ export default async function CoachProfilePage({
               </div>
             )}
           </div>
+
+          <CoachReviews coachId={profile.coach_id} coachName={name} />
         </div>
 
         <div>

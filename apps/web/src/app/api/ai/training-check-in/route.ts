@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import * as Sentry from '@sentry/nextjs'
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from '@/lib/supabase/server'
 import { rateLimit, getClientIp } from '@/lib/rateLimit'
+import { requireAiUser } from '@/lib/aiAuth'
 
 export async function POST(request: Request) {
   const ip = getClientIp(request)
@@ -11,19 +12,17 @@ export async function POST(request: Request) {
   }
 
   const apiKey = process.env.OPENAI_API_KEY
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!apiKey || !supabaseUrl || !serviceRoleKey) {
+  if (!apiKey) {
     return NextResponse.json({ message: 'Service not configured' }, { status: 503 })
   }
 
   try {
-    const { userId } = await request.json()
-    if (!userId) {
-      return NextResponse.json({ message: 'Missing userId' }, { status: 400 })
-    }
+    const auth = await requireAiUser()
+    if (auth.response) return auth.response
+    const userId = auth.userId
 
-    const supabase = createClient(supabaseUrl, serviceRoleKey)
+    // Session-scoped client: RLS limits reads/writes to the user's own rows
+    const supabase = await createClient()
 
     const { data: profile } = await supabase
       .from('user_profiles')
@@ -228,7 +227,6 @@ Return ONLY valid JSON:
     })
   } catch (err) {
     Sentry.captureException(err, { tags: { kind: 'api-route', route: 'ai/training-check-in' } })
-    const message = err instanceof Error ? err.message : 'Internal server error'
-    return NextResponse.json({ message }, { status: 500 })
+    return NextResponse.json({ message: 'Internal server error' }, { status: 500 })
   }
 }

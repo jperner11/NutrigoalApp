@@ -24,7 +24,7 @@ import {
   MetricCard,
   StatusPill,
 } from '@/components/ui/AppDesign'
-import { isManagedClientRole } from '@nutrigoal/shared'
+import { isManagedClientRole } from '@treno/shared'
 
 type ExercisePreview = TrainingPlanExercise & { exercises: Exercise | null }
 

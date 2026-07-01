@@ -1,4 +1,4 @@
-// Nutrition calculation utilities for NutriGoal
+// Nutrition calculation utilities for Treno
 
 export interface UserMetrics {
   age: number
@@ -84,7 +84,8 @@ export function calculateMacros(calories: number, goal: UserMetrics['goal'], wei
   const protein = Math.round(weight * proteinPerKg)
   const fat = Math.round((calories * fatPercent) / 9) // 9 calories per gram of fat
   const remainingCalories = calories - (protein * 4) - (fat * 9)
-  const carbs = Math.round(remainingCalories / 4) // 4 calories per gram of carbs
+  // Clamp: very low calorie targets with high bodyweight can push this negative
+  const carbs = Math.max(0, Math.round(remainingCalories / 4)) // 4 calories per gram of carbs
 
   return { protein, carbs, fat }
 }

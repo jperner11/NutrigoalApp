@@ -1,4 +1,4 @@
-export type { UserMetrics, NutritionTargets } from '@nutrigoal/shared'
+export type { UserMetrics, NutritionTargets } from '@treno/shared'
 export {
   calculateBMR,
   calculateTDEE,
@@ -8,4 +8,4 @@ export {
   calculateNutritionTargets,
   getActivityLevelName,
   getGoalName,
-} from '@nutrigoal/shared'
+} from '@treno/shared'

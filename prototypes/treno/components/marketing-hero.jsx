@@ -134,7 +134,7 @@ const ThreeLanes = ({ setView }) => {
      bullets: ['Meal generator with allergens & budget', 'Hybrid strength + cardio splits', 'Grocery list, auto-consolidated'],
      cta: 'Start solo →', go: 'signup'},
     {tag: '02 · COACHED', t: 'Work with a coach.', s: 'The private side of the app, for you and your PT.',
-     b: 'If your trainer is on Meal & Motion, their plans land here. You log. They watch. The feedback loop is the product.',
+     b: 'If your trainer is on Treno, their plans land here. You log. They watch. The feedback loop is the product.',
      bullets: ['Assigned plans from your coach', 'Weekly check-ins & feedback loop', 'Messaging without algorithms'],
      cta: 'Have an invite? Open it →', go: 'signup'},
     {tag: '03 · DISCOVER', t: 'Find a new coach.', s: 'A marketplace with quality, not vibes.',
@@ -210,7 +210,7 @@ const Footer = ({ setView }) => (
     <div className="row" style={{ maxWidth: 1320, margin: '40px auto 0', paddingTop: 24,
       borderTop: '1px solid var(--line)', justifyContent: 'space-between' }}>
       <span className="mono" style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.12em' }}>
-        © 2026 MEAL & MOTION · LONDON / LISBOA
+        © 2026 TRENO · LONDON / LISBOA
       </span>
       <span className="mono" style={{ fontSize: 11, color: 'var(--fg-4)', letterSpacing: '0.12em' }}>
         v0.9 · OPEN BETA

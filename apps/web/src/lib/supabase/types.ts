@@ -57,6 +57,7 @@ export type {
   CoachStyle,
   CoachPostIntakeAction,
   CoachAppFocus,
+  CoachVerificationStatus,
   CustomIntakeQuestionType,
   PersonalTrainerCustomIntakeQuestion,
   PersonalTrainerCustomIntakeResponse,
@@ -84,4 +85,4 @@ export type {
   EatingOutFrequency,
   ExerciseProgress,
   TrainingCheckIn,
-} from '@nutrigoal/shared'
+} from '@treno/shared'

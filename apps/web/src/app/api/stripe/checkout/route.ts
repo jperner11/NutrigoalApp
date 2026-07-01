@@ -14,7 +14,7 @@ export async function POST(request: Request) {
 
   const { plan } = await request.json()
 
-  if (!plan) {
+  if (typeof plan !== 'string' || !Object.prototype.hasOwnProperty.call(PRICE_IDS, plan)) {
     return NextResponse.json({ message: 'Invalid plan' }, { status: 400 })
   }
 

@@ -7,8 +7,8 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
-import { calculateCardioCalories } from '@nutrigoal/shared'
-import type { CardioSession, CardioType } from '@nutrigoal/shared'
+import { calculateCardioCalories } from '@treno/shared'
+import type { CardioSession, CardioType } from '@treno/shared'
 import { useBrandColors, useThemedStyles, brandShadow } from '../../src/theme/brand'
 
 export default function CardioScreen() {

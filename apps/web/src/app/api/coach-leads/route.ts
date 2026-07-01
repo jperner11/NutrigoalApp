@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { normalizeCoachWizardAnswers } from '@/lib/findCoach'
-import { isTrainerRole } from '@nutrigoal/shared'
+import { isTrainerRole } from '@treno/shared'
 
 export async function GET() {
   const supabase = await createClient()

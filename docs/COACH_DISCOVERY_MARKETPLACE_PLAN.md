@@ -1,13 +1,13 @@
-# Meal & Motion Coach Discovery Marketplace Plan
+# Treno Coach Discovery Marketplace Plan
 
 ## Product Thesis
 
-Meal & Motion should expand as a coach discovery marketplace layered on top of the existing product, not as a social network.
+Treno should expand as a coach discovery marketplace layered on top of the existing product, not as a social network.
 
 The product promise becomes:
 
 - Use AI to generate your own nutrition and training structure.
-- Work with a Personal Trainer who already coaches you privately inside Meal & Motion.
+- Work with a Personal Trainer who already coaches you privately inside Treno.
 - Discover a coach who matches your goal and convert into a managed coaching relationship.
 
 This creates three clear product lanes:
@@ -33,13 +33,13 @@ This creates three clear product lanes:
 
 ### Coach
 
-- Already manages private clients in Meal & Motion.
+- Already manages private clients in Treno.
 - Can optionally opt into public discovery.
 
 ### Managed client
 
 - Has an accepted coach relationship.
-- Uses Meal & Motion for assigned plans, messaging, feedback, and progress.
+- Uses Treno for assigned plans, messaging, feedback, and progress.
 
 ## Product Structure
 
@@ -61,7 +61,7 @@ Role of each area:
 
 ## Pricing Strategy For V1
 
-Meal & Motion should price this as two connected tracks:
+Treno should price this as two connected tracks:
 
 - Individuals: Free, Pro, and Unlimited.
 - Coaches: one paid coach workspace in v1.
@@ -76,7 +76,7 @@ Key pricing rules:
 
 ## MVP Goal
 
-Help a user find a relevant coach and allow that coach to convert them into a managed client inside the existing Meal & Motion workflow.
+Help a user find a relevant coach and allow that coach to convert them into a managed client inside the existing Treno workflow.
 
 ## MVP Scope
 
@@ -282,7 +282,7 @@ Not every coach should be public by default.
 
 ## Website Positioning
 
-Public messaging should describe Meal & Motion as:
+Public messaging should describe Treno as:
 
 "A nutrition and training platform where users can either follow AI-powered plans on their own or find a coach who matches their goal."
 

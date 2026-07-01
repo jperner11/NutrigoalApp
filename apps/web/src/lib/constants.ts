@@ -1,4 +1,4 @@
-export type { PlanType } from '@nutrigoal/shared'
+export type { PlanType } from '@treno/shared'
 export {
   PRICING,
   BODY_PARTS,
@@ -27,4 +27,4 @@ export {
   STRESS_LEVELS,
   GOAL_TIMELINES,
   MOTIVATIONS,
-} from '@nutrigoal/shared'
+} from '@treno/shared'

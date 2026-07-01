@@ -9,7 +9,7 @@ import { toast } from 'react-hot-toast'
 import Link from 'next/link'
 import type { Exercise, UserProfile } from '@/lib/supabase/types'
 import { BODY_PARTS, DEFAULT_REST_SECONDS, DEFAULT_SETS, DEFAULT_REPS } from '@/lib/constants'
-import { isTrainerRole } from '@nutrigoal/shared'
+import { isTrainerRole } from '@treno/shared'
 import { AppHeroPanel, ListCard } from '@/components/ui/AppDesign'
 
 interface DayExercise {

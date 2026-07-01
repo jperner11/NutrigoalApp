@@ -39,12 +39,14 @@ export interface CoachMatchProfile {
   price_to: number | null
   currency: string
   accepting_new_clients: boolean
+  rating_avg?: number | null
+  rating_count?: number
   coach: {
     id: string
     full_name: string | null
-    email: string
     avatar_url: string | null
     role?: string
+    coach_verification_status?: string | null
     coach_specialties: string[]
     coach_formats: string[]
     coach_services: string[]
@@ -171,8 +173,8 @@ export const DEFAULT_COACH_WIZARD_ANSWERS: CoachWizardAnswers = {
   additional_notes: '',
 }
 
-const COACH_WIZARD_STORAGE_KEY = 'nutrigoal.find-coach.answers'
-const COACH_WIZARD_LEAD_STORAGE_KEY = 'nutrigoal.find-coach.lead-preferences'
+const COACH_WIZARD_STORAGE_KEY = 'treno.find-coach.answers'
+const COACH_WIZARD_LEAD_STORAGE_KEY = 'treno.find-coach.lead-preferences'
 
 export function normalizeCoachWizardAnswers(
   answers?: Partial<CoachWizardAnswers> | null
