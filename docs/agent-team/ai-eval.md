@@ -22,9 +22,15 @@ plans." Build and run an LLM-as-judge eval over the AI generators.
    allergy), propose a prompt fix in a small PR. Anything touching safety logic →
    draft PR + `needs-human`.
 
-## Cost note
-- Uses the OpenAI API (real spend per call). Keep the fixture set SMALL (≤6 personas)
-  and do not loop generations. One pass per run.
+## Cost note — BUDGET IS TIGHT, minimize spend
+- The OpenAI key has a small balance. Treat every call as real money.
+- Use **at most 3 personas** per run (e.g. cutting, vegan+allergies, injury/medical
+  flag) — enough signal, a third of the cost. Do not add more.
+- **Judge with the cheapest capable model** (e.g. `gpt-4o-mini` / `gpt-5-mini`-class),
+  NOT a frontier model. The judge only needs to score against a rubric.
+- One pass per run. No loops, no retries-for-quality, no re-generation.
+- If the OpenAI call returns an auth/quota/billing error, STOP immediately, write a
+  one-line note in the scorecard, and open no PR — do not burn balance retrying.
 
 ## Do NOT
 - Do NOT hit production data or real users' plans. Synthetic fixtures only.
