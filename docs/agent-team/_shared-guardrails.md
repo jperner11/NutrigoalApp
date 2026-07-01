@@ -22,6 +22,7 @@ These are hard rules. If a rule conflicts with your charter, the rule wins.
 ## Never commit
 - `.claude/`, `.env*`, any secret / API key / service-role key
 - `node_modules/`, `.next/`, `test-results/`, `playwright-report/`, `**/.temp/`
+- screenshots / image artifacts (e.g. `/tmp/design-shots/`, `*.png` captures)
 - the stale `TrenoApp/` duplicate directory
 Scan your staged diff for secrets before committing.
 
