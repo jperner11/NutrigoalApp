@@ -64,6 +64,42 @@ export async function completeOnboarding(page: Page): Promise<void> {
   await expect(page).toHaveURL(/\/dashboard/, { timeout: 25_000 })
 }
 
+/**
+ * Complete the 9-step CLIENT onboarding reliably and land on /dashboard.
+ *
+ * Why this is deterministic (verified against onboarding/page.tsx): the client wizard's
+ * `canContinue()` only gates STEP 0 (fullName + age + height + weight). Every later step
+ * returns `true`, so "Continue →" is always enabled — we just fill step 0 and click
+ * through. The review step (last) hides the nav and shows "Go to Dashboard" (we take
+ * that, never "Generate AI Plans", which would spend AI credits).
+ */
+export async function completeClientOnboarding(page: Page): Promise<void> {
+  await page.goto('/onboarding', { waitUntil: 'networkidle' })
+  const cont = page.getByRole('button', { name: /continue/i })
+  await cont.waitFor({ state: 'visible' })
+  await page.waitForTimeout(1500) // let React hydrate (pre-hydration clicks no-op)
+
+  // Step 0 gate — the only step that blocks Continue.
+  await page.getByPlaceholder('Your name', { exact: true }).fill('E2E Test Client')
+  await page.getByPlaceholder('Years', { exact: true }).fill('30')
+  await page.getByPlaceholder('175', { exact: true }).fill('178')
+  await page.getByPlaceholder('70', { exact: true }).fill('75')
+
+  // Steps 1–8 never gate Continue; click through until the review step's dashboard button.
+  for (let i = 0; i < 12; i++) {
+    const toDashboard = page.getByRole('button', { name: /go to dashboard/i })
+    if ((await toDashboard.count()) && (await toDashboard.first().isVisible().catch(() => false))) {
+      await toDashboard.first().click()
+      break
+    }
+    await expect(cont).toBeEnabled({ timeout: 10_000 })
+    await cont.click()
+    await page.waitForTimeout(400)
+  }
+
+  await expect(page).toHaveURL(/\/dashboard/, { timeout: 25_000 })
+}
+
 export interface PublishedCoach {
   slug: string
 }
