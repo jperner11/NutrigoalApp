@@ -64,6 +64,57 @@ export async function completeOnboarding(page: Page): Promise<void> {
   await expect(page).toHaveURL(/\/dashboard/, { timeout: 25_000 })
 }
 
+/**
+ * Complete the 9-step CLIENT onboarding reliably and land on /dashboard.
+ *
+ * Deterministic because the client wizard's canContinue() only gates STEP 0
+ * (fullName + age + height + weight); every later step returns true, so "Continue →"
+ * is always enabled — fill step 0, then click through. The review step hides the nav
+ * and shows "Go to Dashboard" (we take that, never "Generate AI Plans", which spends
+ * AI credits). Requires the user_profiles onboarding columns (migration 060).
+ */
+export async function completeClientOnboarding(page: Page): Promise<void> {
+  // Surface a failed profile save (e.g. schema drift) instead of a silent "stuck".
+  const saveErrors: string[] = []
+  page.on('response', async (res) => {
+    if (res.url().includes('user_profiles') && !res.ok()) {
+      saveErrors.push(`${res.request().method()} ${res.status()}: ${(await res.text().catch(() => '')).slice(0, 240)}`)
+    }
+  })
+
+  await page.goto('/onboarding', { waitUntil: 'networkidle' })
+  const cont = page.getByRole('button', { name: /continue/i })
+  await cont.waitFor({ state: 'visible' })
+  await page.waitForTimeout(1500) // let React hydrate (pre-hydration clicks no-op)
+
+  // Step 0 gate — the only step that blocks Continue.
+  await page.getByPlaceholder('Your name', { exact: true }).fill('E2E Test Client')
+  await page.getByPlaceholder('Years', { exact: true }).fill('30')
+  await page.getByPlaceholder('175', { exact: true }).fill('178')
+  await page.getByPlaceholder('70', { exact: true }).fill('75')
+
+  // Steps 1–8 never gate Continue; click through until the review step's dashboard button.
+  for (let i = 0; i < 12; i++) {
+    const toDashboard = page.getByRole('button', { name: /go to dashboard/i })
+    if ((await toDashboard.count()) && (await toDashboard.first().isVisible().catch(() => false))) {
+      await toDashboard.first().click()
+      break
+    }
+    await expect(cont).toBeEnabled({ timeout: 10_000 })
+    await cont.click()
+    await page.waitForTimeout(400)
+  }
+
+  try {
+    await expect(page).toHaveURL(/\/dashboard/, { timeout: 25_000 })
+  } catch (e) {
+    if (saveErrors.length) {
+      throw new Error(`Client onboarding save failed (test-DB likely behind app schema): ${saveErrors.join(' || ')}`)
+    }
+    throw e
+  }
+}
+
 export interface PublishedCoach {
   slug: string
 }
