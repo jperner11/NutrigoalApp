@@ -249,12 +249,14 @@ export default function SignupPage() {
         <form onSubmit={handleSubmit} className="col mt-8 gap-4">
           <div>
             <label
+              htmlFor="signup-full-name"
               className="mono mb-2 block"
               style={{ fontSize: 11, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
             >
               {signupCopy.form.fullNameLabel.toUpperCase()}
             </label>
             <input
+              id="signup-full-name"
               type="text"
               value={formData.fullName}
               onChange={(e) =>
@@ -268,12 +270,14 @@ export default function SignupPage() {
 
           <div>
             <label
+              htmlFor="signup-email"
               className="mono mb-2 block"
               style={{ fontSize: 11, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
             >
               {signupCopy.form.emailLabel.toUpperCase()}
             </label>
             <input
+              id="signup-email"
               type="email"
               value={formData.email}
               onChange={(e) =>
@@ -287,6 +291,7 @@ export default function SignupPage() {
 
           <div>
             <label
+              htmlFor="signup-password"
               className="mono mb-2 block"
               style={{ fontSize: 11, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
             >
@@ -294,6 +299,7 @@ export default function SignupPage() {
             </label>
             <div className="relative">
               <input
+                id="signup-password"
                 type={showPassword ? 'text' : 'password'}
                 value={formData.password}
                 onChange={(e) =>
@@ -306,13 +312,14 @@ export default function SignupPage() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
                 className="absolute inset-y-0 right-0 flex items-center pr-4"
                 style={{ color: 'var(--fg-3)' }}
               >
                 {showPassword ? (
-                  <EyeOff className="h-5 w-5" />
+                  <EyeOff className="h-5 w-5" aria-hidden="true" />
                 ) : (
-                  <Eye className="h-5 w-5" />
+                  <Eye className="h-5 w-5" aria-hidden="true" />
                 )}
               </button>
             </div>
@@ -320,12 +327,14 @@ export default function SignupPage() {
 
           <div>
             <label
+              htmlFor="signup-confirm-password"
               className="mono mb-2 block"
               style={{ fontSize: 11, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
             >
               {signupCopy.form.confirmPasswordLabel.toUpperCase()}
             </label>
             <input
+              id="signup-confirm-password"
               type="password"
               value={formData.confirmPassword}
               onChange={(e) =>
