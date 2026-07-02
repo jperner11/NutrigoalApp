@@ -44,3 +44,6 @@ next-env.d.ts
 /test-results/
 /playwright-report/
 /playwright/.cache/
+
+# workspace lock file — monorepo uses root package-lock.json only
+/package-lock.json

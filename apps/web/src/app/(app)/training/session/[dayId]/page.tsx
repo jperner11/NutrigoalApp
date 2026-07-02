@@ -17,7 +17,7 @@ import {
   Dumbbell,
   Trophy,
 } from 'lucide-react'
-import type { WorkoutSetLog, WorkoutExerciseLog } from '@/lib/supabase/types'
+import type { WorkoutSetLog, WorkoutExerciseLog, TrainingPlanExercise, Exercise } from '@/lib/supabase/types'
 
 // ─── Types ──────────────────────────────────────────────
 
@@ -41,6 +41,8 @@ interface SessionExercise {
   isCompound: boolean
   sets: SessionSet[]
 }
+
+type PlanExerciseRow = TrainingPlanExercise & { exercises: Exercise | null }
 
 // ─── Helpers ────────────────────────────────────────────
 
@@ -144,8 +146,7 @@ export default function WorkoutSessionPage() {
 
       let hasOverloadSuggestion = false
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const sessionExercises: SessionExercise[] = planExercises.map((pe: any) => {
+      const sessionExercises: SessionExercise[] = planExercises.map((pe: PlanExerciseRow) => {
         const exercise = pe.exercises
         const targetReps = pe.reps || '8-12'
         const restSeconds = pe.rest_seconds ?? 90
