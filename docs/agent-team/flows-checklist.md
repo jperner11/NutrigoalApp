@@ -79,4 +79,7 @@ _Append one row per run. `last_checked` = most recent date a flow appears here._
 
 | flow_id | date | result | note |
 |---------|------|--------|------|
-| _(none yet — first QA run seeds this)_ | | | |
+| F01 | 2026-07-02 | BLOCKED | No deterministic spec for full signup flow; /signup page renders OK (200) |
+| F02 | 2026-07-02 | FAIL | Browser signInWithPassword() never resolves (isLoading stuck true); Node.js auth works fine — see #20 |
+| F05 | 2026-07-02 | PASS | /dashboard redirects unauthenticated visitor to /login |
+| F30 | 2026-07-02 | PASS | /find-coach page renders OK (200) |
