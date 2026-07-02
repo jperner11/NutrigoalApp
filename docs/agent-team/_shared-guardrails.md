@@ -36,5 +36,13 @@ Scan your staged diff for secrets before committing.
   is large/uncertain, open the PR as a **draft** and add the label `needs-human`
   instead of a normal PR. Do not let the gatekeeper auto-merge those.
 
+## Cloud run limits (avoid runaway usage)
+- **Never hand-start a long-running `next dev` server or drive a browser ad-hoc.** In the
+  cloud these crash/reconnect-loop and burn hours of subscription usage for no output.
+  If you need the app running (e2e/screenshots), use `npm run e2e:test` (Playwright's
+  config manages the server) or screenshot an already-deployed URL (staging/prod).
+- **Enforce a ~15-minute self budget.** If your task hasn't produced a result by then,
+  STOP, report what blocked you, and end — never loop/retry the same failing step.
+
 ## Reporting
 - End every run with a one-line summary: what you did + the PR URL (or "no action").
