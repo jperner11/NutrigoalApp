@@ -15,12 +15,24 @@ The full flow list + coverage log lives in
 2. Prefer single-user flows until they're consistently green; the multi-user flows
    (marked **Multi: yes** — PT↔client, feedback) need two seeded users acting in
    sequence, so only attempt those once the single-user flows are stable.
-3. Test that ONE flow end-to-end against the TEST env only (never prod), using
-   `apps/web/e2e/` seed + fixtures. Adapt like a human to the known automation-hostile
-   spots (number inputs commit on type+blur, options are clickable cards, use a precise
-   `/continue/i` selector).
+3. Verify that flow using the **deterministic e2e suite** — do NOT hand-start a dev
+   server or drive a browser yourself (that crashes/loops and burns hours in the cloud).
+   See "How to run tests" below.
 4. **Always** append a row to the Coverage log:
    `| <flow_id> | <YYYY-MM-DD> | PASS/FAIL/BLOCKED | <one-line note> |`
+
+## How to run tests (cloud-safe — READ THIS)
+- Run the existing deterministic suite: `npm run e2e:test -w apps/web` (or a single spec,
+  e.g. `... -- e2e/specs/client-onboarding.spec.ts`). Playwright's `webServer` config
+  builds/starts the app and waits for it — you do NOT manage the server.
+- **NEVER** run `next dev` yourself, and NEVER drive a browser via an MCP/ad-hoc script.
+  Those crash-loop in the cloud session and waste hours (this is a hard rule).
+- Map the spec results to flow IDs and write PASS/FAIL/BLOCKED to the coverage log.
+- **Time budget:** if the suite hasn't produced results within ~15 minutes, STOP, log the
+  target flow as BLOCKED with the reason, and end the run. Do not retry in a loop.
+- Coverage beyond the deterministic suite (flows without a spec yet): log them BLOCKED
+  ("no deterministic spec") and, if valuable, propose adding a spec in a small PR — but
+  still never hand-drive a browser.
 
 ## Output
 - **Log every run** (even a pass): commit the updated `flows-checklist.md` coverage log.
