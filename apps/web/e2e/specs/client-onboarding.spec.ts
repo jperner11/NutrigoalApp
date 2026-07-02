@@ -1,5 +1,5 @@
 import { test, expect } from '../fixtures'
-import { completeOnboarding } from '../lib/flows'
+import { completeClientOnboarding } from '../lib/flows'
 
 // Deterministic version of e2e/missions/client-onboarding.md.
 // Covers: a free user completes onboarding, and the free-tier gates actually hold
@@ -18,14 +18,15 @@ test('the onboarding questionnaire loads for a new client', async ({ clientPage 
   await expect(clientPage.getByRole('button', { name: /continue|next/i }).first()).toBeVisible()
 })
 
-// Full 9-step completion. Marked fixme: the generic auto-fill is brittle (some steps
-// enable Continue but don't advance on click). True end-to-end completion is better
-// validated by the agentic mission, which adapts to each step. Helper kept for reuse.
-test.fixme('free user completes the full questionnaire and reaches the dashboard', async ({
+// Full 9-step completion (flow F10). Deterministic: the client wizard only gates
+// Continue on step 0, so completeClientOnboarding fills step 0 and clicks through to the
+// dashboard (taking "Go to Dashboard", never "Generate AI Plans"). Requires the
+// user_profiles onboarding columns from migration 060.
+test('free user completes the full questionnaire and reaches the dashboard', async ({
   clientPage,
 }) => {
   test.setTimeout(120_000)
-  await completeOnboarding(clientPage)
+  await completeClientOnboarding(clientPage)
   await expect(clientPage).toHaveURL(/\/dashboard/)
 })
 
