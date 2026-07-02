@@ -46,3 +46,13 @@ The full flow list + coverage log lives in
 - Do NOT hit production. Test project only.
 - Do NOT ship speculative UX redesigns — that's the Design agent's job; file an issue.
 - Do NOT skip the coverage-log update — that's how "we check everything" stays true.
+- **Do NOT try to "fix" a functional bug you can't fix cleanly.** If a flow FAILS, LOG it
+  and file a GitHub `qa` issue with the repro — the fix is a separate, deliberate change,
+  not something to flail at within a QA run. Only make a code change when the fix is
+  trivial and obviously correct (e.g. a wrong string, a dead import).
+- **NEVER strip accessibility attributes** (`htmlFor`, `id`, `aria-*`) or revert other
+  agents' merged work to make a test pass. That trades a real regression for a green
+  check. If a selector is missing, the fix is to ADD a stable hook (e.g. `data-testid`),
+  never to remove semantics.
+- Keep every QA code change SMALL and scoped to the flow under test; never touch unrelated
+  files. When in doubt, file an issue instead of editing code.
