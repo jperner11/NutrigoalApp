@@ -25,6 +25,13 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
+    // Allow cloud envs (e.g. claude.ai remote sessions) to supply a pre-installed
+    // Chromium binary when the installed @playwright/test version doesn't match the
+    // bundled browser revision. Set PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH to the path
+    // of the binary; omit (or leave empty) to let Playwright use its managed copy.
+    ...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH
+      ? { launchOptions: { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH } }
+      : {}),
   },
 
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
