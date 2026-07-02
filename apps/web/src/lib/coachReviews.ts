@@ -14,7 +14,3 @@ export function formatRatingAverage(avg: number | null | undefined): string | nu
   return avg.toFixed(1)
 }
 
-export interface RatingSummary {
-  avg: number | null
-  count: number
-}
