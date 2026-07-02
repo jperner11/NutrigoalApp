@@ -31,6 +31,24 @@ function makeEmail(role: SeedRole): string {
   return `${TEST_PREFIX}+${tag}-${stamp}@${e2eEnv.emailDomain}`
 }
 
+/**
+ * Delete a test user by email. Used by the UI-signup spec, which creates the user
+ * through the app (so it never learns the id) but must clean up after itself.
+ */
+export async function deleteTestUserByEmail(email: string): Promise<void> {
+  const supabase = admin()
+  for (let page = 1; page <= 20; page++) {
+    const { data, error } = await supabase.auth.admin.listUsers({ page, perPage: 200 })
+    if (error || !data.users.length) return
+    const match = data.users.find((u) => u.email?.toLowerCase() === email.toLowerCase())
+    if (match) {
+      await supabase.auth.admin.deleteUser(match.id)
+      return
+    }
+    if (data.users.length < 200) return
+  }
+}
+
 export async function createTestUser(
   role: SeedRole,
   opts: { fullName?: string; password?: string } = {},
