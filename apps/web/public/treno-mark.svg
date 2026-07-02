@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title desc">
-  <title id="title">Treno mark</title>
-  <desc id="desc">A compact acid-lime T mark with a forward momentum rail.</desc>
-  <rect width="96" height="96" rx="24" fill="#cdf24e"/>
-  <path d="M26 29H70" fill="none" stroke="#0a0a0a" stroke-width="10" stroke-linecap="round"/>
-  <path d="M48 30V68" fill="none" stroke="#0a0a0a" stroke-width="10" stroke-linecap="round"/>
-  <path d="M28 68C40 76 59 76 72 64" fill="none" stroke="#0a0a0a" stroke-width="8" stroke-linecap="round"/>
-</svg>
