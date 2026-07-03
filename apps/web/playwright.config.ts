@@ -7,6 +7,12 @@ import { e2eEnv } from './e2e/lib/env'
 
 const isLocal = /localhost|127\.0\.0\.1/.test(e2eEnv.baseUrl)
 
+// Forward the HTTPS proxy to the browser so it can reach external services
+// (e.g. Supabase) in cloud/CI environments where outbound HTTPS is gated.
+const browserProxy = process.env.HTTPS_PROXY
+  ? { server: process.env.HTTPS_PROXY, bypass: 'localhost,127.0.0.1,::1' }
+  : undefined
+
 export default defineConfig({
   testDir: './e2e/specs',
   // Each spec seeds its own users, so files are independent and can run in parallel.
@@ -22,6 +28,11 @@ export default defineConfig({
 
   use: {
     baseURL: e2eEnv.baseUrl,
+    proxy: browserProxy,
+    // The cloud environment uses a MITM proxy for outbound HTTPS. Its CA is in the
+    // system store but headless Chromium doesn't always load it; ignoring HTTPS errors
+    // is appropriate here — this suite tests app behaviour, not TLS.
+    ignoreHTTPSErrors: !!process.env.HTTPS_PROXY,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',

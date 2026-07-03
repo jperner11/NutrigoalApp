@@ -8,6 +8,31 @@ import { createTestUser, deleteTestUser, type SeededUser, type SeedRole } from '
 // Each fixture tears its user down afterwards, so the test DB stays clean even
 // if you never run the `cleanup` CLI.
 
+// In cloud/CI environments where a MITM HTTPS proxy is active, Chromium gets
+// ERR_CONNECTION_RESET when trying to reach Supabase directly (TLS handshake
+// incompatibility with the proxy). Node.js reaches Supabase fine through the
+// same proxy. We detect this by the presence of HTTPS_PROXY and intercept all
+// supabase.co requests at the page level, forwarding them via Node.js fetch.
+async function routeSupabaseThroughNode(page: Page): Promise<void> {
+  if (!process.env.HTTPS_PROXY) return
+  await page.route('https://*.supabase.co/**', async (route) => {
+    const req = route.request()
+    const headers = { ...req.headers() }
+    delete headers['host'] // let fetch set the correct Host header
+    const resp = await fetch(req.url(), {
+      method: req.method(),
+      headers,
+      body: req.postDataBuffer() ?? undefined,
+    })
+    const body = Buffer.from(await resp.arrayBuffer())
+    const respHeaders: Record<string, string> = {}
+    resp.headers.forEach((v, k) => {
+      respHeaders[k] = v
+    })
+    await route.fulfill({ status: resp.status, headers: respHeaders, body })
+  })
+}
+
 /** Log a seeded user in via the real login form and wait until we leave /login. */
 export async function loginAs(page: Page, user: SeededUser): Promise<void> {
   // networkidle ensures the page's JS has loaded and React has hydrated. Before
@@ -56,6 +81,12 @@ function seededUserFixture(role: SeedRole) {
 }
 
 export const test = base.extend<SeededFixtures>({
+  // Override base page to add the Supabase proxy route when needed.
+  page: async ({ page }, use) => {
+    await routeSupabaseThroughNode(page)
+    await use(page)
+  },
+
   coach: seededUserFixture('personal_trainer'),
   client: seededUserFixture('free'),
 
