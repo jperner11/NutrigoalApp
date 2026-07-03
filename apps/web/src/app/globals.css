@@ -414,7 +414,7 @@ main {
   --fg-3: var(--muted-soft);
   --fg-4: var(--muted-soft);
 
-  /* Accent (Ember red) */
+  /* Accent (acid lime) */
   --acc: var(--brand-500);
   --acc-soft: rgba(205, 242, 78, 0.14);
 
