@@ -82,3 +82,4 @@ _Append one row per run. `last_checked` = most recent date a flow appears here._
 | F01 | 2026-07-03 | BLOCKED | No spec for signup flow; /signup page renders HTTP 200 (smoke only). |
 | F02 | 2026-07-03 | PASS | Seeded coach and client both log in via real form → dashboard/onboarding. |
 | F05 | 2026-07-03 | PASS | Logged-out user hitting /dashboard redirected to /login. |
+| F01 | 2026-07-03 | PASS | Re-run after infra fix: all 10 smoke tests green (10/10). /signup renders OK; full form-submission spec still missing. |
