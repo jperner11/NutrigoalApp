@@ -79,4 +79,6 @@ _Append one row per run. `last_checked` = most recent date a flow appears here._
 
 | flow_id | date | result | note |
 |---------|------|--------|------|
-| _(none yet — first QA run seeds this)_ | | | |
+| F01 | 2026-07-03 | BLOCKED | No spec for signup flow; /signup page renders HTTP 200 (smoke only). |
+| F02 | 2026-07-03 | PASS | Seeded coach and client both log in via real form → dashboard/onboarding. |
+| F05 | 2026-07-03 | PASS | Logged-out user hitting /dashboard redirected to /login. |
