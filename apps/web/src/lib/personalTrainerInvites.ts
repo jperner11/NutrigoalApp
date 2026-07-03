@@ -30,7 +30,7 @@ export function getAppOrigin(origin?: string | null) {
   return process.env.NEXT_PUBLIC_APP_URL || origin || 'http://localhost:3000'
 }
 
-export function getInviteNextPath(token: string) {
+function getInviteNextPath(token: string) {
   return `/invite/accept?token=${encodeURIComponent(token)}`
 }
 
