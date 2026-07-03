@@ -38,7 +38,17 @@ export default defineConfig({
     video: 'retain-on-failure',
   },
 
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [
+    {
+      name: 'chromium',
+      use: {
+        ...devices['Desktop Chrome'],
+        // Allow overriding the Chromium binary — needed when the pre-installed browser
+        // revision doesn't match the Playwright version (e.g. cloud agent environments).
+        ...(process.env.PLAYWRIGHT_EXEC_PATH ? { executablePath: process.env.PLAYWRIGHT_EXEC_PATH } : {}),
+      },
+    },
+  ],
 
   // When pointed at localhost, Playwright starts the app for us — crucially with the
   // TEST project's public credentials so the browser client never touches prod.
