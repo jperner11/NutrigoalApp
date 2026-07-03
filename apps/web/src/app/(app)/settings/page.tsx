@@ -1546,23 +1546,25 @@ export default function SettingsPage() {
                   {verificationStatus !== 'verified' && (
                     <div className="mt-4 space-y-3">
                       <div>
-                        <label className="app-mono-label mb-1 block">Certification link</label>
+                        <label htmlFor="verification-credential-url" className={labelClass} style={labelStyle}>Certification link</label>
                         <input
+                          id="verification-credential-url"
                           type="url"
                           value={credentialUrl}
                           onChange={(e) => setCredentialUrl(e.target.value)}
                           placeholder="https://… (REPS / PT diploma / federation profile)"
-                          className="input-field px-3 py-2 text-sm"
+                          className={inputClass}
                         />
                       </div>
                       <div>
-                        <label className="app-mono-label mb-1 block">Note for our team (optional)</label>
+                        <label htmlFor="verification-credential-note" className={labelClass} style={labelStyle}>Note for our team (optional)</label>
                         <textarea
+                          id="verification-credential-note"
                           value={credentialNote}
                           onChange={(e) => setCredentialNote(e.target.value)}
                           rows={2}
                           placeholder="Anything that helps us verify your credentials"
-                          className="input-field px-3 py-2 text-sm"
+                          className={inputClass}
                         />
                       </div>
                       <button
