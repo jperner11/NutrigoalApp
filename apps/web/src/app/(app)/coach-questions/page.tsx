@@ -160,18 +160,27 @@ export default function CoachQuestionsPage() {
     if (swapIdx < 0 || swapIdx >= sorted.length) return
     const a = sorted[idx]
     const b = sorted[swapIdx]
-    await Promise.all([
-      fetch(`/api/personal-trainer/custom-intake/questions/${a.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sort_order: b.sort_order }),
-      }),
-      fetch(`/api/personal-trainer/custom-intake/questions/${b.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sort_order: a.sort_order }),
-      }),
-    ])
+    try {
+      const [resA, resB] = await Promise.all([
+        fetch(`/api/personal-trainer/custom-intake/questions/${a.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sort_order: b.sort_order }),
+        }),
+        fetch(`/api/personal-trainer/custom-intake/questions/${b.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sort_order: a.sort_order }),
+        }),
+      ])
+      if (!resA.ok || !resB.ok) {
+        toast.error('Failed to reorder')
+        return
+      }
+    } catch {
+      toast.error('Failed to reorder')
+      return
+    }
     await fetchQuestions()
   }
 
