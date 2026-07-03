@@ -7,6 +7,7 @@ export default function MarketingTicker() {
     <div
       className="overflow-hidden border-y py-5"
       style={{ borderColor: 'var(--line)' }}
+      aria-hidden="true"
     >
       <div className="ticker-track flex gap-14 whitespace-nowrap">
         {items.map((text, i) => (
