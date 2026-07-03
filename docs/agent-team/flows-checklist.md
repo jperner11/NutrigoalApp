@@ -83,3 +83,4 @@ _Append one row per run. `last_checked` = most recent date a flow appears here._
 | F02 | 2026-07-03 | PASS | Seeded coach and client both log in via real form → dashboard/onboarding. |
 | F05 | 2026-07-03 | PASS | Logged-out user hitting /dashboard redirected to /login. |
 | F01 | 2026-07-03 | PASS | Re-run after infra fix: all 10 smoke tests green (10/10). /signup renders OK; full form-submission spec still missing. |
+| F03 | 2026-07-03 | BLOCKED | No deterministic spec existed; logout spec added to smoke.spec.ts in this PR — pending CI confirmation. |
