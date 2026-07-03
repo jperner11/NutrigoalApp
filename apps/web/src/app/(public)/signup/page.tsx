@@ -223,6 +223,7 @@ export default function SignupPage() {
                 key={role}
                 type="button"
                 onClick={() => setRole(role)}
+                aria-pressed={active}
                 className="text-left transition"
                 style={{
                   padding: 22,
