@@ -882,7 +882,7 @@ input[type="range"] {
 .app-metric-card.is-accent,
 .app-list-card.is-accent {
   border-color: rgba(205, 242, 78, 0.5);
-  background: linear-gradient(180deg, rgba(48, 22, 25, 0.72), var(--panel));
+  background: linear-gradient(180deg, var(--ink-3), var(--panel));
 }
 
 .app-card-topline,
