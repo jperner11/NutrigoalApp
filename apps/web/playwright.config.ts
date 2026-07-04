@@ -43,9 +43,12 @@ export default defineConfig({
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
-        // Allow overriding the Chromium binary — needed when the pre-installed browser
-        // revision doesn't match the Playwright version (e.g. cloud agent environments).
-        ...(process.env.PLAYWRIGHT_EXEC_PATH ? { executablePath: process.env.PLAYWRIGHT_EXEC_PATH } : {}),
+        // In cloud/CI environments where the pre-installed Chromium revision doesn't
+        // match the @playwright/test version, point at the system binary directly.
+        // Set PLAYWRIGHT_EXEC_PATH (e.g. /opt/pw-browsers/chromium) to activate.
+        ...(process.env.PLAYWRIGHT_EXEC_PATH
+          ? { launchOptions: { executablePath: process.env.PLAYWRIGHT_EXEC_PATH } }
+          : {}),
       },
     },
   ],
