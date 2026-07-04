@@ -79,4 +79,6 @@ _Append one row per run. `last_checked` = most recent date a flow appears here._
 
 | flow_id | date | result | note |
 |---------|------|--------|------|
-| _(none yet — first QA run seeds this)_ | | | |
+| F01 | 2026-07-04 | BLOCKED | Signup page renders OK (smoke). Full signup→onboarding flow has no deterministic spec yet. |
+| F02 | 2026-07-04 | BLOCKED | Chromium in cloud env gets net::ERR_CONNECTION_RESET on Supabase API calls; Node.js can reach Supabase fine. Filed GitHub issue #qa. |
+| F05 | 2026-07-04 | PASS | Logged-out users redirected /dashboard→/login (smoke spec). |

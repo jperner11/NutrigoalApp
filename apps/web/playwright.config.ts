@@ -27,7 +27,19 @@ export default defineConfig({
     video: 'retain-on-failure',
   },
 
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [
+    {
+      name: 'chromium',
+      use: {
+        ...devices['Desktop Chrome'],
+        // Use the pre-installed system Chromium in cloud/CI environments where the
+        // pinned Playwright revision may not be downloaded.
+        ...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH
+          ? { launchOptions: { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH } }
+          : {}),
+      },
+    },
+  ],
 
   // When pointed at localhost, Playwright starts the app for us — crucially with the
   // TEST project's public credentials so the browser client never touches prod.
