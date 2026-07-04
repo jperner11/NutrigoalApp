@@ -25,9 +25,39 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
+    // In cloud environments outbound HTTPS goes through a local TLS-intercepting proxy.
+    // Wire up the browser explicitly and accept its re-terminated certs so Supabase
+    // auth calls and other external HTTPS succeed.
+    ...(process.env.HTTPS_PROXY
+      ? {
+          proxy: { server: process.env.HTTPS_PROXY, bypass: process.env.NO_PROXY },
+          ignoreHTTPSErrors: true,
+          launchOptions: {
+            args: [
+              `--proxy-server=${process.env.HTTPS_PROXY}`,
+              `--proxy-bypass-list=${process.env.NO_PROXY ?? 'localhost,127.0.0.1'}`,
+              '--ignore-certificate-errors',
+              '--ignore-ssl-errors',
+            ],
+          },
+        }
+      : {}),
   },
 
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [
+    {
+      name: 'chromium',
+      use: {
+        ...devices['Desktop Chrome'],
+        // Cloud runners pre-install a specific Chromium revision under PLAYWRIGHT_BROWSERS_PATH;
+        // when the installed @playwright/test version expects a different revision, bypass the
+        // check by pointing directly at the pre-installed binary (per cloud-env README).
+        ...(process.env.PLAYWRIGHT_BROWSERS_PATH
+          ? { executablePath: `${process.env.PLAYWRIGHT_BROWSERS_PATH}/chromium` }
+          : {}),
+      },
+    },
+  ],
 
   // When pointed at localhost, Playwright starts the app for us — crucially with the
   // TEST project's public credentials so the browser client never touches prod.

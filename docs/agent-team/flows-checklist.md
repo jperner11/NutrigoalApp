@@ -79,4 +79,12 @@ _Append one row per run. `last_checked` = most recent date a flow appears here._
 
 | flow_id | date | result | note |
 |---------|------|--------|------|
-| _(none yet — first QA run seeds this)_ | | | |
+| F01 | 2026-07-04 | PASS | /signup page renders OK; seeded pre-confirmed users exercise auth path; email-confirm redirect not directly assertable |
+| F02 | 2026-07-04 | PASS | Seeded coach and seeded free client both log in via real /login form and land off /login |
+| F05 | 2026-07-04 | PASS | Unauthenticated request to /dashboard redirects to /login |
+| F10 | 2026-07-04 | PASS | New client onboarding questionnaire loads; free user completes full 9-step flow and reaches dashboard |
+| F14 | 2026-07-04 | PASS | Free user sees upgrade prompt on Pro-only surfaces (gating holds) |
+| F20 | 2026-07-04 | PASS | Coach setup questionnaire loads for new coach |
+| F30 | 2026-07-04 | PASS | Discover marketplace renders for unauthenticated prospective client |
+| F21 | 2026-07-04 | SKIP | pt-onboarding spec: "coach publishes marketplace profile" marked .skip — feature under development |
+| F40 | 2026-07-04 | SKIP | invite-to-review spec: "coach invites client → plan delivered → review shows on profile" marked .skip |

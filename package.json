@@ -13,5 +13,10 @@
   },
   "devDependencies": {
     "turbo": "^2"
+  },
+  "overrides": {
+    "@playwright/test": "1.56.1",
+    "playwright": "1.56.1",
+    "playwright-core": "1.56.1"
   }
 }

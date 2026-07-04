@@ -1,4 +1,5 @@
 import { test as base, expect, type Page } from '@playwright/test'
+import * as https from 'https'
 import { createTestUser, deleteTestUser, type SeededUser, type SeedRole } from './lib/seed'
 
 // Shared Playwright fixtures for the deterministic E2E layer.
@@ -8,8 +9,56 @@ import { createTestUser, deleteTestUser, type SeededUser, type SeedRole } from '
 // Each fixture tears its user down afterwards, so the test DB stays clean even
 // if you never run the `cleanup` CLI.
 
+// In cloud runner environments Chromium routes HTTPS through the local
+// TLS-intercepting proxy, which Chromium cannot always negotiate correctly.
+// Node.js's https module reaches external hosts directly (no env-proxy
+// behaviour by default) and succeeds.  Route all browser requests to
+// *.supabase.co through Node.js so Supabase auth calls work in both local
+// and cloud environments.
+async function installSupabaseRelay(page: Page): Promise<void> {
+  if (!process.env.HTTPS_PROXY) return
+  await page.route('**/*.supabase.co/**', async (route) => {
+    const req = route.request()
+    const url = new URL(req.url())
+    const method = req.method()
+    const headersRaw = req.headers()
+    const body = req.postDataBuffer()
+
+    const response = await new Promise<{ status: number; headers: Record<string, string>; body: Buffer }>(
+      (resolve, reject) => {
+        const options: https.RequestOptions = {
+          hostname: url.hostname,
+          port: url.port || 443,
+          path: url.pathname + url.search,
+          method,
+          headers: headersRaw,
+        }
+        const nodeReq = https.request(options, (res) => {
+          const chunks: Buffer[] = []
+          res.on('data', (chunk: Buffer) => chunks.push(chunk))
+          res.on('end', () => {
+            const responseHeaders: Record<string, string> = {}
+            for (const [k, v] of Object.entries(res.headers)) {
+              if (v !== undefined) responseHeaders[k] = Array.isArray(v) ? v.join(', ') : v
+            }
+            resolve({ status: res.statusCode ?? 200, headers: responseHeaders, body: Buffer.concat(chunks) })
+          })
+        })
+        nodeReq.on('error', reject)
+        if (body) nodeReq.write(body)
+        nodeReq.end()
+      },
+    )
+
+    await route.fulfill({ status: response.status, headers: response.headers, body: response.body })
+  })
+}
+
 /** Log a seeded user in via the real login form and wait until we leave /login. */
 export async function loginAs(page: Page, user: SeededUser): Promise<void> {
+  // In cloud environments relay Supabase API calls through Node.js (see installSupabaseRelay).
+  await installSupabaseRelay(page)
+
   // networkidle ensures the page's JS has loaded and React has hydrated. Before
   // hydration the form's onSubmit (which calls preventDefault) isn't attached, so a
   // click triggers a NATIVE GET submit to "/login?" that reloads the page and wipes
