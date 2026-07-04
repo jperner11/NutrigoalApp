@@ -10,6 +10,7 @@ import { toast } from 'react-hot-toast'
 import { isTrainerRole } from '@treno/shared'
 import { AppHeroPanel, AppSectionHeader, EmptyStateCard, MetricCard } from '@/components/ui/AppDesign'
 import { apiFetch, ApiError } from '@/lib/apiClient'
+import { getAppOrigin, getShareableInviteUrl } from '@/lib/personalTrainerInvites'
 
 interface ActiveClientRow {
   id: string
@@ -35,11 +36,6 @@ interface PendingInviteRow {
   last_sent_at: string
   created_at: string
   invite_token: string
-}
-
-function getAppOrigin() {
-  if (typeof window === 'undefined') return ''
-  return window.location.origin
 }
 
 export default function ClientsPage() {
@@ -154,7 +150,7 @@ export default function ClientsPage() {
   }
 
   async function copyInviteLink(token: string) {
-    const shareUrl = `${getAppOrigin()}/invite/accept?token=${encodeURIComponent(token)}`
+    const shareUrl = getShareableInviteUrl(getAppOrigin(), token)
     await navigator.clipboard.writeText(shareUrl)
     toast.success('Invite link copied.')
   }
