@@ -36,6 +36,7 @@ export default function ProgressCheckIn({ userId, onPlanRegenerate }: ProgressCh
   const [expanded, setExpanded] = useState(true)
   const [checking, setChecking] = useState(true)
   const [lastCheckInDate, setLastCheckInDate] = useState<string | null>(null)
+  const [checkInError, setCheckInError] = useState<string | null>(null)
 
   const checkEligibility = useCallback(async () => {
     const supabase = createClient()
@@ -74,6 +75,7 @@ export default function ProgressCheckIn({ userId, onPlanRegenerate }: ProgressCh
 
   async function runCheckIn() {
     setLoading(true)
+    setCheckInError(null)
     try {
       const data = await apiFetch<CheckInResult>('/api/ai/training-check-in', {
         method: 'POST',
@@ -82,8 +84,8 @@ export default function ProgressCheckIn({ userId, onPlanRegenerate }: ProgressCh
       })
       setResult(data)
       setEligible(false)
-    } catch (err) {
-      console.error('Check-in error:', err)
+    } catch {
+      setCheckInError('Check-in failed. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -105,7 +107,7 @@ export default function ProgressCheckIn({ userId, onPlanRegenerate }: ProgressCh
 
   if (eligible && !result && !loading) {
     return (
-      <div className="mb-6">
+      <div className="mb-6 space-y-2">
         <button
           onClick={runCheckIn}
           className="group flex w-full items-center gap-4 rounded-xl border-2 border-dashed border-[rgba(205, 242, 78,0.34)] bg-[var(--brand-100)] px-5 py-4 transition-all hover:border-[rgba(205, 242, 78,0.52)] hover:bg-[rgba(205, 242, 78,0.16)]"
@@ -123,6 +125,9 @@ export default function ProgressCheckIn({ userId, onPlanRegenerate }: ProgressCh
           </div>
           <ArrowRight className="h-4 w-4 text-[var(--brand-400)] transition-transform group-hover:translate-x-0.5" />
         </button>
+        {checkInError && (
+          <p className="px-1 text-xs text-[var(--danger)]">{checkInError}</p>
+        )}
       </div>
     )
   }
