@@ -18,7 +18,7 @@ interface WeekDayTabsProps {
 
 export default function WeekDayTabs({ selectedDay, onSelectDay, daySummaries }: WeekDayTabsProps) {
   return (
-    <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-6 overflow-x-auto">
+    <div className="flex gap-1 rounded-xl p-1 mb-6 overflow-x-auto" style={{ background: 'var(--line)' }}>
       {DAY_LABELS.map((label, i) => {
         const isActive = selectedDay === i
         const summary = daySummaries?.[i]
@@ -27,17 +27,21 @@ export default function WeekDayTabs({ selectedDay, onSelectDay, daySummaries }: 
           <button
             key={i}
             onClick={() => onSelectDay(i)}
-            className={`flex-1 min-w-[4rem] px-2 py-2.5 rounded-lg text-center transition-all ${
-              isActive
-                ? 'bg-white text-purple-700 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-            }`}
+            className="flex-1 min-w-[4rem] px-2 py-2.5 rounded-lg text-center transition-all"
+            style={{
+              background: isActive ? 'var(--background)' : 'transparent',
+              color: isActive ? 'var(--acc)' : 'var(--fg-2)',
+              boxShadow: isActive ? '0 1px 3px var(--line-strong)' : undefined,
+            }}
           >
-            <span className={`block text-sm font-semibold ${isActive ? 'text-purple-700' : ''}`}>
+            <span className="block text-sm font-semibold">
               {label}
             </span>
             {summary && summary.mealCount > 0 && (
-              <span className={`block text-[10px] mt-0.5 ${isActive ? 'text-purple-500' : 'text-gray-400'}`}>
+              <span
+                className="block text-[10px] mt-0.5"
+                style={{ color: isActive ? 'var(--acc)' : 'var(--fg-4)' }}
+              >
                 {Math.round(summary.calories)} cal
               </span>
             )}
