@@ -297,7 +297,7 @@ export default function MyNutritionistPage() {
           </Link>
 
           <Link
-            href="/my-nutritionist/feedback"
+            href="/check-ins"
             className="card-2 row gap-3 p-4 transition hover:border-[var(--acc)]"
           >
             <div
