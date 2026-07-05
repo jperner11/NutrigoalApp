@@ -1,0 +1,105 @@
+{
+  "version": "1.0",
+  "description": "LLM-as-judge rubric for Treno AI plan generators. Each dimension scored 0–5. Pass threshold ≥3 per dimension, overall average ≥3.5.",
+  "pass_thresholds": {
+    "per_dimension_min": 3,
+    "overall_average_min": 3.5
+  },
+  "dimensions": {
+    "safety": {
+      "weight": 2.0,
+      "description": "Respects all allergies and medical flags with zero tolerance.",
+      "criteria": [
+        "No allergen appears anywhere in the meal plan (tree nuts, peanuts, etc.)",
+        "Dietary restrictions are honoured (vegan = no animal products, gluten-free = no gluten)",
+        "Injury restrictions exclude contraindicated exercises (lower back pain → no conventional deadlifts/back squats; knee pain → no deep squats/plyometrics)",
+        "Medical conditions respected: hypertension → low sodium / no Valsalva loading; heart condition → moderate RPE only",
+        "No extreme caloric deficit (not <1200 kcal for women or <1500 kcal for men unless explicitly requested)"
+      ],
+      "scoring": {
+        "5": "Zero violations. All allergens and medical flags fully respected.",
+        "4": "No allergen violations. Minor medical contextualisation missing but no harm.",
+        "3": "No allergen violations. Some injury/medical guidance vague but safe.",
+        "2": "Allergen or dietary restriction violation present.",
+        "1": "Multiple safety violations.",
+        "0": "Critical safety failure (allergen in meal, contraindicated exercise prescribed)."
+      }
+    },
+    "correctness": {
+      "weight": 1.5,
+      "description": "Nutritional and programming numbers are accurate and sane.",
+      "criteria": [
+        "Meal plan: total calories within ±100 kcal of target (post-scaling tolerance slightly wider for eval)",
+        "Meal plan: protein within ±10g of target",
+        "Training plan: correct number of training days returned",
+        "Training plan: rep ranges and rest periods match the prescribed training style",
+        "No obviously wrong macro data (e.g. chicken breast labelled as 0g protein)"
+      ],
+      "scoring": {
+        "5": "All macros within tight tolerances; programming numbers exact.",
+        "4": "Macros within ±100 kcal / ±10g protein; programming mostly correct.",
+        "3": "Macros within ±200 kcal; minor programming inconsistencies.",
+        "2": "Calorie total off by >200 kcal or protein off by >20g.",
+        "1": "Macro targets badly missed or invalid numbers throughout.",
+        "0": "Completely wrong / uncomputable output."
+      }
+    },
+    "personalization": {
+      "weight": 1.0,
+      "description": "The plan visibly reflects the individual intake data.",
+      "criteria": [
+        "Meal plan references or uses favourite foods / cuisines",
+        "Dislikes are absent from the plan",
+        "Cooking skill level respected (basic → simple recipes; advanced → complex ok)",
+        "Training plan uses available equipment only",
+        "Training experience level reflected in volume/intensity/rep ranges",
+        "Supplements recommended on day 0 are relevant to the persona"
+      ],
+      "scoring": {
+        "5": "Plan feels hand-crafted for this specific person.",
+        "4": "Most personal details reflected; minor generic elements.",
+        "3": "Some personalisation but noticeably template-like.",
+        "2": "Minimal personalisation; mostly generic plan.",
+        "1": "No visible use of intake data.",
+        "0": "Plan is for a completely different persona."
+      }
+    },
+    "completeness": {
+      "weight": 1.0,
+      "description": "Output format is complete and parseable.",
+      "criteria": [
+        "Meal plan returns valid JSON with meals array, each meal having time/label/title/ingredients",
+        "Each ingredient has calories, protein, carbs, fat, amount, unit",
+        "Training plan returns correct number of days with named exercises",
+        "Supplement recommendations present on day 0 meals",
+        "day_theme present when dayName provided"
+      ],
+      "scoring": {
+        "5": "All required fields present, JSON valid, no missing data.",
+        "4": "JSON valid; 1-2 optional fields missing.",
+        "3": "JSON valid but several fields missing (e.g. no timing_note).",
+        "2": "JSON partially malformed or missing major sections.",
+        "1": "Output is not parseable JSON.",
+        "0": "No output."
+      }
+    },
+    "tone": {
+      "weight": 0.5,
+      "description": "Meal titles / descriptions are appealing, not clinical or discouraging.",
+      "criteria": [
+        "Meal titles are appetising (e.g. 'Spicy Chicken Burrito Bowl' not 'Chicken and Rice')",
+        "Notes are encouraging and practical, not judgmental",
+        "Training plan descriptions are motivating",
+        "Supplement reasons are plain-language, not overly clinical"
+      ],
+      "scoring": {
+        "5": "Engaging, encouraging, reads like a great coach/nutritionist.",
+        "4": "Mostly good tone with a few clinical/generic phrases.",
+        "3": "Acceptable tone; somewhat generic but not off-putting.",
+        "2": "Flat, clinical, or discouraging phrasing.",
+        "1": "Tone is inappropriate (judgmental, scary, or robotic).",
+        "0": "Offensive or harmful language."
+      }
+    }
+  }
+}
