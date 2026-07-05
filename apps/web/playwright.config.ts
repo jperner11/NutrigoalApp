@@ -25,9 +25,37 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
+    // Forward the system HTTPS proxy so Chromium can reach external hosts
+    // (e.g. Supabase auth) in cloud environments that route traffic via proxy.
+    ...(process.env.HTTPS_PROXY
+      ? {
+          proxy: {
+            server: process.env.HTTPS_PROXY,
+            bypass: 'localhost,127.0.0.1',
+          },
+        }
+      : {}),
   },
 
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [
+    {
+      name: 'chromium',
+      use: {
+        ...devices['Desktop Chrome'],
+        // Cloud env pre-installs chromium at a fixed path; the installed
+        // @playwright/test version may expect a newer build number so we
+        // set the executable path to the known-good binary.
+        launchOptions: process.env.PLAYWRIGHT_BROWSERS_PATH
+          ? {
+              executablePath: `${process.env.PLAYWRIGHT_BROWSERS_PATH}/chromium`,
+              args: process.env.HTTPS_PROXY
+                ? [`--proxy-server=${process.env.HTTPS_PROXY}`]
+                : [],
+            }
+          : {},
+      },
+    },
+  ],
 
   // When pointed at localhost, Playwright starts the app for us — crucially with the
   // TEST project's public credentials so the browser client never touches prod.

@@ -79,4 +79,7 @@ _Append one row per run. `last_checked` = most recent date a flow appears here._
 
 | flow_id | date | result | note |
 |---------|------|--------|------|
-| _(none yet — first QA run seeds this)_ | | | |
+| F01 | 2026-07-05 | BLOCKED | No deterministic sign-up spec; smoke suite covers adjacent auth flows only |
+| F02 | 2026-07-05 | FAIL | Seeded-user login fails in cloud: Chromium fetch → Supabase auth returns net::ERR_CONNECTION_RESET; proxy config added but issue persists (see gh issue #qa) |
+| F03 | 2026-07-05 | PASS | Smoke suite: public pages render, route protection redirects to /login |
+| F05 | 2026-07-05 | PASS | Smoke suite: unauthenticated /dashboard and /onboarding redirect to /login |
