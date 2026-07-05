@@ -89,3 +89,7 @@ _Append one row per run. `last_checked` = most recent date a flow appears here._
 | F02 | 2026-07-04 | PASS | smoke.spec.ts: login form fields, seeded coach + client sign-in (11/11 smoke green after launchOptions fix). |
 | F03 | 2026-07-04 | PASS | smoke.spec.ts: sign-out → /login, subsequent /dashboard still blocked (11/11 smoke green). |
 | F05 | 2026-07-04 | PASS | smoke.spec.ts: /dashboard → /login for unauthenticated user (confirmed again). |
+| F10 | 2026-07-05 | PASS | client-onboarding.spec.ts: questionnaire loads + full 9-step completion → /dashboard (4/4 green). |
+| F14 | 2026-07-05 | PASS | client-onboarding.spec.ts: free-tier gating — cardio + supplements show upgrade prompts. |
+| F30 | 2026-07-05 | PASS | client-onboarding.spec.ts: discover coaches renders for free client. |
+| F20 | 2026-07-05 | PASS | pt-onboarding.spec.ts: coach setup questionnaire loads (1/3 pass); 2 stubs still test.fixme (F20 full + F21 BLOCKED). |
