@@ -31,6 +31,7 @@ export function ChatThread({
   missingConversationMessage,
 }: ChatThreadProps) {
   const [messages, setMessages] = useState<Message[]>([])
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -49,9 +50,10 @@ export function ChatThread({
       .select('*')
       .eq('conversation_id', conversationId)
       .order('created_at', { ascending: true })
-      .then(({ data }) => {
-        if (cancelled || !data) return
-        setMessages(data as Message[])
+      .then(({ data, error }) => {
+        if (cancelled) return
+        if (error) { setLoadError('Failed to load messages. Please refresh.'); return }
+        setMessages((data ?? []) as Message[])
         setTimeout(scrollToBottom, 50)
       })
 
@@ -161,7 +163,14 @@ export function ChatThread({
               </p>
             </div>
           )}
-          {conversationId && messages.length === 0 && (
+          {loadError && (
+            <div className="card-2 mx-auto mt-8 max-w-[520px] p-6 text-center">
+              <p className="text-sm leading-6" style={{ color: 'var(--error, #c0392b)' }}>
+                {loadError}
+              </p>
+            </div>
+          )}
+          {conversationId && !loadError && messages.length === 0 && (
             <div className="card-2 mx-auto mt-8 max-w-[520px] p-6 text-center">
               <div className="serif" style={{ fontSize: 22, color: 'var(--fg)' }}>
                 No messages{' '}
