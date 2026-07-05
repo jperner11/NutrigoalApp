@@ -47,8 +47,29 @@ export default defineConfig({
         // match the @playwright/test version, point at the system binary directly.
         // Set PLAYWRIGHT_EXEC_PATH (e.g. /opt/pw-browsers/chromium) to activate.
         ...(process.env.PLAYWRIGHT_EXEC_PATH
-          ? { launchOptions: { executablePath: process.env.PLAYWRIGHT_EXEC_PATH } }
-          : {}),
+          ? {
+              launchOptions: {
+                executablePath: process.env.PLAYWRIGHT_EXEC_PATH,
+                // Belt-and-suspenders: also pass --proxy-server at the browser level
+                // so fetch() requests from page JS route through the proxy.
+                args: browserProxy
+                  ? [
+                      `--proxy-server=${browserProxy.server}`,
+                      `--proxy-bypass-list=${browserProxy.bypass}`,
+                    ]
+                  : [],
+              },
+            }
+          : browserProxy
+            ? {
+                launchOptions: {
+                  args: [
+                    `--proxy-server=${browserProxy.server}`,
+                    `--proxy-bypass-list=${browserProxy.bypass}`,
+                  ],
+                },
+              }
+            : {}),
       },
     },
   ],
