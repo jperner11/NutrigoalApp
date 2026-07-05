@@ -1261,6 +1261,27 @@ input[type="range"] {
   --tw-shadow: var(--tw-shadow-colored) !important;
 }
 
+/* ─── Reduced-motion safety ─────────────────────────────────
+   .fade-up and .animate-stagger > * set opacity:0 as their base
+   state and rely on the animation to restore visibility. When the
+   user requests reduced motion the animation may not run, leaving
+   content permanently invisible. Reset to visible + no-animation. */
+@media (prefers-reduced-motion: reduce) {
+  .fade-up {
+    opacity: 1;
+    animation: none;
+  }
+
+  .animate-stagger > * {
+    opacity: 1;
+    animation: none;
+  }
+
+  .ticker-track {
+    animation-play-state: paused;
+  }
+}
+
 @media (max-width: 900px) {
   .app-workspace {
     padding: 20px 16px 36px;
