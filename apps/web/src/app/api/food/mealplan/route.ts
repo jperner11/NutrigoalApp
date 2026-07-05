@@ -150,7 +150,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'AI service not configured' }, { status: 503 })
   }
 
-  const body = await request.json()
+  const body = await request.json().catch(() => null)
+  if (!body) return NextResponse.json({ message: 'Invalid request body' }, { status: 400 })
   const { mealType, targetCalories, targetProtein, targetCarbs, targetFat, ingredients } = body
 
   const openai = new OpenAI({ apiKey })
