@@ -100,6 +100,7 @@ export default function Sidebar({ userRole, userName, onSignOut }: SidebarProps)
         {/* Mobile close button */}
         <button
           onClick={() => setMobileOpen(false)}
+          aria-label="Close menu"
           className="ml-auto p-1.5 text-white/60 hover:text-white md:hidden"
         >
           <X className="h-5 w-5" />
