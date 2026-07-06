@@ -35,7 +35,7 @@ test.describe('F04 — Password reset request', () => {
   // arriving via an invite link can still request a password-reset email.
   // Currently, visiting /reset-password without a valid token hash shows an
   // "invalid link" banner instead of the request form.
-  // See: https://github.com/jperner11/NutrigoalApp/issues/<tbd>
+  // See: https://github.com/jperner11/NutrigoalApp/issues/62
   test.fixme(
     '/reset-password without a token shows an email-request form',
     async ({ page }) => {
