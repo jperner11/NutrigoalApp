@@ -214,7 +214,7 @@ Return ONLY valid JSON:
       workouts_planned: workoutsPlanned,
       exercise_progress: exerciseProgress,
       ai_summary: aiAnalysis?.overall_summary ?? null,
-      ai_recommendations: JSON.stringify(aiAnalysis) ?? null,
+      ai_recommendations: aiAnalysis != null ? JSON.stringify(aiAnalysis) : null,
     })
 
     return NextResponse.json({
