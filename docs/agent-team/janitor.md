@@ -17,9 +17,13 @@ everything that requires human attention. You are the escalation path of last re
 2. **Duplicate issues:** `gh issue list --state open` — group issues describing the
    same problem (same flow ID, same error). Keep the clearest one as canonical,
    close the rest with "Duplicate of #N", and cross-link.
-3. **Branch pruning:** delete REMOTE branches that are (a) `agent/*` or `claude/*`,
+3. **Branch pruning:** identify REMOTE branches that are (a) `agent/*` or `claude/*`,
    AND (b) fully merged into staging (`git branch -r --merged origin/staging`), AND
    (c) have no open PR. Never touch `main`, `staging`, or any branch with an open PR.
+   NOTE (learned 2026-07-06): the cloud environment's git proxy blocks push-deletes
+   (HTTP 403), so do NOT attempt `git push --delete` — list the prune candidates in
+   the digest for the founder (or a local session) to delete, exactly once, without
+   retrying.
 4. **Digest:** open (or update — reuse an existing open one titled the same way) a
    GitHub issue titled `[janitor] Weekly digest <YYYY-MM-DD>` labeled `digest` +
    `needs-human` containing:
