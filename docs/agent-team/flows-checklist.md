@@ -94,3 +94,4 @@ _Append one row per run. `last_checked` = most recent date a flow appears here._
 | F30 | 2026-07-05 | PASS | client-onboarding.spec.ts: discover coaches renders for free client. |
 | F20 | 2026-07-05 | PASS | pt-onboarding.spec.ts: coach setup questionnaire loads (1/3 pass); 2 stubs still test.fixme (F20 full + F21 BLOCKED). |
 | F11 | 2026-07-05 | BLOCKED | No prior spec; generate-plans.spec.ts added this run — AI routes mocked via page.route(); awaiting CI green to promote to PASS. |
+| F12 | 2026-07-06 | PASS | log-meal.spec.ts: /diet/new renders for free client (upgrade prompt shown), food search mocked, full add-meal → save → /diet flow (2/2 green). |
