@@ -11,7 +11,8 @@
     "e2e:install": "playwright install chromium",
     "e2e:test": "playwright test",
     "e2e:test:ui": "playwright test --ui",
-    "e2e:report": "playwright show-report"
+    "e2e:report": "playwright show-report",
+    "load:users": "tsx e2e/load/prepare-users.ts"
   },
   "dependencies": {
     "@treno/shared": "*",

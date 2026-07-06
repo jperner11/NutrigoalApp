@@ -47,3 +47,6 @@ next-env.d.ts
 
 # workspace lock file — monorepo uses root package-lock.json only
 /package-lock.json
+
+# k6 load-test user pool (contains test credentials)
+/e2e/load/.users.json

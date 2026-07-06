@@ -82,6 +82,62 @@ export async function deleteTestUser(userId: string): Promise<void> {
   }
 }
 
+/**
+ * Assign a seeded client to a seeded trainer — the state the invite-accept flow
+ * (F40) ends in. Lets multi-user specs and volume seeding skip the email invite.
+ */
+export async function linkClientToTrainer(clientId: string, trainerId: string): Promise<void> {
+  const supabase = admin()
+  const { error } = await supabase
+    .from('user_profiles')
+    .update({ personal_trainer_id: trainerId })
+    .eq('id', clientId)
+  if (error) throw new Error(`Failed to link client ${clientId} to trainer ${trainerId}: ${error.message}`)
+}
+
+/**
+ * Publish a marketplace profile for a seeded coach so they appear on /discover
+ * and /find-coach. Slug carries the e2e prefix so cleanup can match it (rows also
+ * cascade when the auth user is deleted).
+ */
+export async function publishCoachProfile(coachId: string, label: string): Promise<void> {
+  const supabase = admin()
+  const slug = `${TEST_PREFIX}-${label}-${coachId.slice(0, 8)}`
+  const { error } = await supabase.from('coach_public_profiles').upsert({
+    coach_id: coachId,
+    slug,
+    is_public: true,
+    headline: `E2E coach ${label}`,
+    bio: 'Synthetic coach profile seeded for testing. Not a real person.',
+    location_label: 'London, UK',
+    price_from: 40,
+    price_to: 80,
+    accepting_new_clients: true,
+  })
+  if (error) throw new Error(`Failed to publish coach profile for ${coachId}: ${error.message}`)
+}
+
+export interface SeededPair {
+  coach: SeededUser
+  clients: SeededUser[]
+}
+
+/**
+ * Mint one published coach plus `clientsPerCoach` clients already linked to them —
+ * realistic marketplace volume for load tests and the multi-user (F40+) specs.
+ */
+export async function createLinkedPair(clientsPerCoach = 1): Promise<SeededPair> {
+  const coach = await createTestUser('personal_trainer')
+  await publishCoachProfile(coach.id, 'pair')
+  const clients: SeededUser[] = []
+  for (let i = 0; i < clientsPerCoach; i++) {
+    const client = await createTestUser('free')
+    await linkClientToTrainer(client.id, coach.id)
+    clients.push(client)
+  }
+  return { coach, clients }
+}
+
 // Deletes every synthetic user this layer ever created (matched by the TEST_PREFIX
 // in their email). Safe to run before or after a test run to keep the test DB clean.
 export async function cleanupAllTestUsers(): Promise<number> {
