@@ -18,7 +18,14 @@ plans." Build and run an LLM-as-judge eval over the AI generators.
    (uses the intake), completeness, tone. Output scores + failing examples.
 3. **Report:** write results to `docs/ai-eval/` (a dated markdown scorecard). Open a
    PR to `staging` with the harness/scorecard.
-4. **Regressions → fixes:** if the judge finds a clear prompt bug (e.g. ignores an
+4. **Escalate suite FAILs (do not just write the scorecard):** if any persona fails
+   the rubric, file a GitHub issue titled
+   `[ai-eval] SAFETY: <persona> failed <date> eval`, with labels `safety` +
+   `needs-human` (create the labels if missing). Link the scorecard, name the failing
+   dimensions, and quote the worst output. First check for an existing OPEN `safety`
+   issue for the same persona/failure — update that one instead of duplicating. A
+   scorecard nobody reads is not a safety net; the issue is what reaches the founder.
+5. **Regressions → fixes:** if the judge finds a clear prompt bug (e.g. ignores an
    allergy), propose a prompt fix in a small PR. Anything touching safety logic →
    draft PR + `needs-human`.
 

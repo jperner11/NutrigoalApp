@@ -12,9 +12,15 @@ The full flow list + coverage log lives in
 [flows-checklist.md](flows-checklist.md). Each run:
 1. Read `flows-checklist.md`. In its **Coverage log**, pick the flow with the OLDEST
    `last_checked` (never-checked flows first). That is THIS run's target — exactly one.
-2. Prefer single-user flows until they're consistently green; the multi-user flows
-   (marked **Multi: yes** — PT↔client, feedback) need two seeded users acting in
-   sequence, so only attempt those once the single-user flows are stable.
+2. **Priority override (as of 2026-07-06):** single-user flows are largely green, and
+   the revenue-critical marketplace flows have zero coverage. Until each has a green
+   deterministic spec, work these BEFORE the plain round-robin:
+   1. **F40** — coach invites client / client accepts (use `e2e/seed-cli.ts` `pairs`
+      mode to mint a linked coach+client; two seeded users acting in sequence).
+   2. **F60** — Stripe test-mode tier upgrade (Stripe TEST cards only, never live).
+   Build one spec per run, keep it small. After F40 and F60 are green, resume the
+   oldest-`last_checked` round-robin, including the remaining multi-user flows
+   (F41–F43, F50–F51).
 3. Verify that flow using the **deterministic e2e suite** — do NOT hand-start a dev
    server or drive a browser yourself (that crashes/loops and burns hours in the cloud).
    See "How to run tests" below.
@@ -33,6 +39,12 @@ The full flow list + coverage log lives in
 - Coverage beyond the deterministic suite (flows without a spec yet): log them BLOCKED
   ("no deterministic spec") and, if valuable, propose adding a spec in a small PR — but
   still never hand-drive a browser.
+- **Cloud login constraint (canonical issue #57):** the cloud sandbox's MITM proxy
+  resets direct browser→Supabase auth calls (`net::ERR_CONNECTION_RESET`). This is an
+  environment limitation, NOT an app bug — never file a new issue for it. In cloud
+  runs, authenticate via the seed admin API + Playwright storage state (see
+  `e2e/fixtures.ts`) instead of driving the login form. The real form-login spec stays
+  covered in GitHub Actions CI, where it passes.
 
 ## Output
 - **Log every run** (even a pass): commit the updated `flows-checklist.md` coverage log.
