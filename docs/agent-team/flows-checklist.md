@@ -79,4 +79,6 @@ _Append one row per run. `last_checked` = most recent date a flow appears here._
 
 | flow_id | date | result | note |
 |---------|------|--------|------|
-| _(none yet — first QA run seeds this)_ | | | |
+| F01 | 2026-07-06 | BLOCKED | Sign-up page renders; post-auth redirect untestable — browser HTTPS to Supabase fails with net::ERR_CONNECTION_RESET through cloud MITM proxy (see GitHub issue #qa) |
+| F02 | 2026-07-06 | FAIL | Seeded coach & client login both fail: browser auth POST to Supabase returns net::ERR_CONNECTION_RESET; Node seeding works fine; issue filed |
+| F05 | 2026-07-06 | PASS | /dashboard redirects unauthenticated visitors to /login as expected |

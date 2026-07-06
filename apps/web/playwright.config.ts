@@ -25,6 +25,25 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
+    // Cloud-env overrides: pre-installed Chromium + outbound proxy.
+    // PLAYWRIGHT_BROWSERS_PATH → use the bundled Chromium (avoids re-downloading).
+    // HTTPS_PROXY → pass the proxy to the browser so external HTTPS (e.g. Supabase)
+    //   reaches the internet; bypass localhost so the local Next.js server is still
+    //   reachable directly.
+    launchOptions: {
+      ...(process.env.PLAYWRIGHT_BROWSERS_PATH
+        ? { executablePath: `${process.env.PLAYWRIGHT_BROWSERS_PATH}/chromium` }
+        : {}),
+      ...(process.env.HTTPS_PROXY
+        ? {
+            args: [
+              `--proxy-server=${process.env.HTTPS_PROXY}`,
+              '--proxy-bypass-list=localhost;127.0.0.1',
+              '--ignore-certificate-errors',
+            ],
+          }
+        : {}),
+    },
   },
 
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
