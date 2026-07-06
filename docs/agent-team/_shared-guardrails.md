@@ -36,6 +36,17 @@ Scan your staged diff for secrets before committing.
   is large/uncertain, open the PR as a **draft** and add the label `needs-human`
   instead of a normal PR. Do not let the gatekeeper auto-merge those.
 
+## No duplicates — search before you file
+- Before opening a PR or filing an issue, SEARCH what already exists:
+  `gh pr list --state open` and `gh issue list --state open --search "<keywords>"`.
+  If an open PR/issue already covers the same problem, comment there instead of
+  creating a new one.
+- If a PR from one of YOUR previous runs is now superseded (someone else's fix merged,
+  or you're opening a replacement), CLOSE the old one with a one-line comment saying
+  what superseded it.
+- Known environment constraints (e.g. cloud-proxy login resets — issue #57) get ONE
+  canonical issue. Never re-file them; comment on the canonical issue instead.
+
 ## Cloud run limits (avoid runaway usage)
 - **Never hand-start a long-running `next dev` server or drive a browser ad-hoc.** In the
   cloud these crash/reconnect-loop and burn hours of subscription usage for no output.

@@ -32,3 +32,10 @@ or leave feedback. **You merge ONLY into `staging`, NEVER into `main`.**
 
 ## Reporting
 - End with a digest: merged (list), left-open-with-feedback (list), needs-human (list).
+- Also surface what needs the FOUNDER's attention, explicitly, every run:
+  - open PRs that are drafts or labeled `needs-human`
+  - open issues labeled `safety` or `needs-human`
+  - how far staging is ahead of prod: `git rev-list --count origin/main..origin/staging`
+    (flag it when this exceeds ~15 commits or the range contains a DB migration)
+  You are the only agent whose summary the human reads regularly — if it isn't in your
+  digest, the human doesn't know about it.
