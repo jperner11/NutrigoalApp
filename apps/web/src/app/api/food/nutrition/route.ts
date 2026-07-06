@@ -166,17 +166,19 @@ function cacheFood(
     fat: Math.round((offNutriments?.fat_100g ?? 0) * 10) / 10,
   }
 
-  supabase
+  void supabase
     .from('foods')
-    .insert({
-      name,
-      source,
-      external_id: externalId,
-      calories_per_100g: macros.calories,
-      protein_per_100g: macros.protein,
-      carbs_per_100g: macros.carbs,
-      fat_per_100g: macros.fat,
-      is_verified: false,
-    })
-    .then(() => {})
+    .upsert(
+      {
+        name,
+        source,
+        external_id: externalId,
+        calories_per_100g: macros.calories,
+        protein_per_100g: macros.protein,
+        carbs_per_100g: macros.carbs,
+        fat_per_100g: macros.fat,
+        is_verified: false,
+      },
+      { onConflict: 'source,external_id', ignoreDuplicates: true },
+    )
 }
