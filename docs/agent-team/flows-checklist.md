@@ -79,4 +79,20 @@ _Append one row per run. `last_checked` = most recent date a flow appears here._
 
 | flow_id | date | result | note |
 |---------|------|--------|------|
-| _(none yet — first QA run seeds this)_ | | | |
+| F01 | 2026-07-03 | BLOCKED | No spec for signup flow; /signup page renders HTTP 200 (smoke only). |
+| F02 | 2026-07-03 | PASS | Seeded coach and client both log in via real form → dashboard/onboarding. |
+| F05 | 2026-07-03 | PASS | Logged-out user hitting /dashboard redirected to /login. |
+| F01 | 2026-07-03 | PASS | Re-run after infra fix: all 10 smoke tests green (10/10). /signup renders OK; full form-submission spec still missing. |
+| F03 | 2026-07-03 | BLOCKED | No deterministic spec existed; logout spec added to smoke.spec.ts in this PR — pending CI confirmation. |
+| F04 | 2026-07-04 | BLOCKED | No deterministic spec for password reset UX; /reset-password page renders 200 OK (smoke public-pages). |
+| F01 | 2026-07-04 | PASS | signup.spec.ts: form renders, password validation, full signup → /onboarding (all 3 tests green). |
+| F02 | 2026-07-04 | PASS | smoke.spec.ts: login form fields, seeded coach + client sign-in (11/11 smoke green after launchOptions fix). |
+| F03 | 2026-07-04 | PASS | smoke.spec.ts: sign-out → /login, subsequent /dashboard still blocked (11/11 smoke green). |
+| F05 | 2026-07-04 | PASS | smoke.spec.ts: /dashboard → /login for unauthenticated user (confirmed again). |
+| F10 | 2026-07-05 | PASS | client-onboarding.spec.ts: questionnaire loads + full 9-step completion → /dashboard (4/4 green). |
+| F14 | 2026-07-05 | PASS | client-onboarding.spec.ts: free-tier gating — cardio + supplements show upgrade prompts. |
+| F30 | 2026-07-05 | PASS | client-onboarding.spec.ts: discover coaches renders for free client. |
+| F20 | 2026-07-05 | PASS | pt-onboarding.spec.ts: coach setup questionnaire loads (1/3 pass); 2 stubs still test.fixme (F20 full + F21 BLOCKED). |
+| F11 | 2026-07-05 | BLOCKED | No prior spec; generate-plans.spec.ts added this run — AI routes mocked via page.route(); awaiting CI green to promote to PASS. |
+| F12 | 2026-07-06 | PASS | log-meal.spec.ts: /diet/new renders for free client (upgrade prompt shown), food search mocked, full add-meal → save → /diet flow (2/2 green). |
+| F04 | 2026-07-06 | FAIL | No password-reset request UI: /reset-password only serves post-invite "set password" flow; unauthenticated visitor without a token sees "invalid link" banner, not an email-request form. reset-password.spec.ts added with fixme for missing form. GitHub issue filed (label: qa). |

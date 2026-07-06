@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import * as Sentry from '@sentry/nextjs'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get('authorization')
@@ -8,13 +9,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!supabaseUrl || !serviceRoleKey) {
-    return NextResponse.json({ message: 'Not configured' }, { status: 503 })
-  }
-
-  const supabase = createClient(supabaseUrl, serviceRoleKey)
+  const supabase = createAdminClient()
   const now = new Date()
   const dayOfWeek = now.getUTCDay()
 
@@ -25,6 +20,7 @@ export async function GET(request: Request) {
     .eq('day_of_week', dayOfWeek)
 
   if (error || !schedules) {
+    Sentry.captureException(error ?? new Error('No schedules returned'), { tags: { kind: 'cron', route: 'check-ins' } })
     return NextResponse.json({ message: error?.message ?? 'Failed to load schedules' }, { status: 500 })
   }
 

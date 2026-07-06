@@ -414,7 +414,7 @@ main {
   --fg-3: var(--muted-soft);
   --fg-4: var(--muted-soft);
 
-  /* Accent (Ember red) */
+  /* Accent (acid lime) */
   --acc: var(--brand-500);
   --acc-soft: rgba(205, 242, 78, 0.14);
 
@@ -882,7 +882,7 @@ input[type="range"] {
 .app-metric-card.is-accent,
 .app-list-card.is-accent {
   border-color: rgba(205, 242, 78, 0.5);
-  background: linear-gradient(180deg, rgba(48, 22, 25, 0.72), var(--panel));
+  background: linear-gradient(180deg, var(--ink-3), var(--panel));
 }
 
 .app-card-topline,
@@ -1259,6 +1259,27 @@ input[type="range"] {
 .hover\:shadow-purple-500\/25:hover {
   --tw-shadow-color: rgba(205, 242, 78, 0.20) !important;
   --tw-shadow: var(--tw-shadow-colored) !important;
+}
+
+/* ─── Reduced-motion safety ─────────────────────────────────
+   .fade-up and .animate-stagger > * set opacity:0 as their base
+   state and rely on the animation to restore visibility. When the
+   user requests reduced motion the animation may not run, leaving
+   content permanently invisible. Reset to visible + no-animation. */
+@media (prefers-reduced-motion: reduce) {
+  .fade-up {
+    opacity: 1;
+    animation: none;
+  }
+
+  .animate-stagger > * {
+    opacity: 1;
+    animation: none;
+  }
+
+  .ticker-track {
+    animation-play-state: paused;
+  }
 }
 
 @media (max-width: 900px) {

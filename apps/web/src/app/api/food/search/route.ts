@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { rateLimit, getClientIp } from '@/lib/rateLimit'
 
 interface FoodResult {
@@ -69,11 +69,7 @@ export async function GET(request: Request) {
 }
 
 async function searchLocal(query: string, limit: number): Promise<FoodResult[]> {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!supabaseUrl || !serviceRoleKey) return []
-
-  const supabase = createClient(supabaseUrl, serviceRoleKey)
+  const supabase = createAdminClient()
 
   const { data, error } = await supabase
     .from('foods')

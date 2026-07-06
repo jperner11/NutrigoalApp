@@ -353,7 +353,7 @@ export default function NewTrainingPlanPage() {
         eyebrow="N° 03 · New program"
         title="Training,"
         accent="built."
-        subtitle="Design days, add exercises, and keep the working details dense without leaving the Ember workspace."
+        subtitle="Design days, add exercises, and keep the working details dense without leaving Treno."
       />
 
       {/* Plan Details */}

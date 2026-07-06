@@ -93,12 +93,14 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="col gap-4">
           <div>
             <label
+              htmlFor="login-email"
               className="mono mb-2 block"
               style={{ fontSize: 11, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
             >
               EMAIL
             </label>
             <input
+              id="login-email"
               type="email"
               value={formData.email}
               onChange={(e) =>
@@ -112,6 +114,7 @@ export default function LoginPage() {
 
           <div>
             <label
+              htmlFor="login-password"
               className="mono mb-2 block"
               style={{ fontSize: 11, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
             >
@@ -119,6 +122,7 @@ export default function LoginPage() {
             </label>
             <div className="relative">
               <input
+                id="login-password"
                 type={showPassword ? 'text' : 'password'}
                 value={formData.password}
                 onChange={(e) =>
@@ -131,13 +135,14 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
                 className="absolute inset-y-0 right-0 flex items-center pr-4"
                 style={{ color: 'var(--fg-3)' }}
               >
                 {showPassword ? (
-                  <EyeOff className="h-5 w-5" />
+                  <EyeOff className="h-5 w-5" aria-hidden="true" />
                 ) : (
-                  <Eye className="h-5 w-5" />
+                  <Eye className="h-5 w-5" aria-hidden="true" />
                 )}
               </button>
             </div>

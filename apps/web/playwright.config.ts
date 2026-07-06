@@ -7,6 +7,12 @@ import { e2eEnv } from './e2e/lib/env'
 
 const isLocal = /localhost|127\.0\.0\.1/.test(e2eEnv.baseUrl)
 
+// Forward the HTTPS proxy to the browser so it can reach external services
+// (e.g. Supabase) in cloud/CI environments where outbound HTTPS is gated.
+const browserProxy = process.env.HTTPS_PROXY
+  ? { server: process.env.HTTPS_PROXY, bypass: 'localhost,127.0.0.1,::1' }
+  : undefined
+
 export default defineConfig({
   testDir: './e2e/specs',
   // Each spec seeds its own users, so files are independent and can run in parallel.
@@ -22,12 +28,51 @@ export default defineConfig({
 
   use: {
     baseURL: e2eEnv.baseUrl,
+    proxy: browserProxy,
+    // The cloud environment uses a MITM proxy for outbound HTTPS. Its CA is in the
+    // system store but headless Chromium doesn't always load it; ignoring HTTPS errors
+    // is appropriate here — this suite tests app behaviour, not TLS.
+    ignoreHTTPSErrors: !!process.env.HTTPS_PROXY,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
   },
 
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [
+    {
+      name: 'chromium',
+      use: {
+        ...devices['Desktop Chrome'],
+        // In cloud/CI environments where the pre-installed Chromium revision doesn't
+        // match the @playwright/test version, point at the system binary directly.
+        // Set PLAYWRIGHT_EXEC_PATH (e.g. /opt/pw-browsers/chromium) to activate.
+        ...(process.env.PLAYWRIGHT_EXEC_PATH
+          ? {
+              launchOptions: {
+                executablePath: process.env.PLAYWRIGHT_EXEC_PATH,
+                // Belt-and-suspenders: also pass --proxy-server at the browser level
+                // so fetch() requests from page JS route through the proxy.
+                args: browserProxy
+                  ? [
+                      `--proxy-server=${browserProxy.server}`,
+                      `--proxy-bypass-list=${browserProxy.bypass}`,
+                    ]
+                  : [],
+              },
+            }
+          : browserProxy
+            ? {
+                launchOptions: {
+                  args: [
+                    `--proxy-server=${browserProxy.server}`,
+                    `--proxy-bypass-list=${browserProxy.bypass}`,
+                  ],
+                },
+              }
+            : {}),
+      },
+    },
+  ],
 
   // When pointed at localhost, Playwright starts the app for us — crucially with the
   // TEST project's public credentials so the browser client never touches prod.

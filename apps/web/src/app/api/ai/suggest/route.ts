@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { createClient } from '@/lib/supabase/server'
 import { rateLimit, getClientIp } from '@/lib/rateLimit'
 import { requireAiUser } from '@/lib/aiAuth'
@@ -84,7 +85,8 @@ GUIDELINES:
     })
 
     return NextResponse.json({ suggestion })
-  } catch {
+  } catch (err) {
+    Sentry.captureException(err, { tags: { kind: 'api-route', route: 'ai/suggest' } })
     return NextResponse.json({ message: 'Internal server error' }, { status: 500 })
   }
 }
