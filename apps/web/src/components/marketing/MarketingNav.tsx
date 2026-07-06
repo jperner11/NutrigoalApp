@@ -29,10 +29,10 @@ export default function MarketingNav() {
                 key={l.href}
                 href={l.href}
                 aria-current={active ? 'page' : undefined}
-                className="rounded-full px-3 py-1.5 transition hover:text-[var(--fg)]"
+                className="rounded-full px-3 py-1.5 transition hover:text-white"
                 style={{
-                  color: active ? 'var(--acc)' : 'var(--fg-3)',
-                  background: active ? 'var(--acc-soft)' : 'transparent',
+                  color: active ? 'var(--brand-400)' : 'rgba(255,255,255,0.52)',
+                  background: active ? 'rgba(205,242,78,0.14)' : 'transparent',
                   fontWeight: active ? 600 : 400,
                 }}
               >
@@ -43,7 +43,7 @@ export default function MarketingNav() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Link href="/login" className="btn btn-ghost">
+          <Link href="/login" className="btn btn-ghost" style={{ color: 'rgba(255,255,255,0.82)', borderColor: 'rgba(255,255,255,0.18)' }}>
             {landingCopy.nav.signIn}
           </Link>
           <Link href="/signup" className="btn btn-accent">
