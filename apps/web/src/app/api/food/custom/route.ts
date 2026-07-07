@@ -36,7 +36,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
   }
 
-  const body = await request.json()
+  const body = await request.json().catch(() => null)
+  if (!body) return NextResponse.json({ message: 'Invalid request body' }, { status: 400 })
   const { name, brand, calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g, default_amount, default_unit } = body
 
   if (!name || typeof name !== 'string' || name.trim().length < 2) {
@@ -75,7 +76,8 @@ export async function PUT(request: Request) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
   }
 
-  const body = await request.json()
+  const body = await request.json().catch(() => null)
+  if (!body) return NextResponse.json({ message: 'Invalid request body' }, { status: 400 })
   const { id, name, brand, calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g, default_amount, default_unit } = body
 
   if (!id) {
