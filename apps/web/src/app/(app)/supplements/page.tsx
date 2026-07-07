@@ -361,6 +361,8 @@ export default function SupplementsPage() {
                 <div className="flex items-center p-4">
                   <button
                     onClick={() => toggleLog(sup)}
+                    aria-label={isTaken ? `Mark ${sup.name} as not taken today` : `Mark ${sup.name} as taken today`}
+                    aria-pressed={isTaken}
                     className="mr-4 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 transition-colors"
                     style={{
                       borderColor: isTaken ? 'var(--ok)' : 'var(--line-2)',
@@ -368,7 +370,7 @@ export default function SupplementsPage() {
                       color: isTaken ? '#131012' : 'var(--fg-3)',
                     }}
                   >
-                    {isTaken && <Check className="h-4 w-4" />}
+                    {isTaken && <Check className="h-4 w-4" aria-hidden="true" />}
                   </button>
 
                   <div className="min-w-0 flex-1">
@@ -394,9 +396,10 @@ export default function SupplementsPage() {
 
                   <button
                     onClick={() => handleDelete(sup)}
+                    aria-label={`Remove ${sup.name}`}
                     className="btn btn-ghost ml-2 flex-shrink-0 p-2 text-[var(--fg-3)] hover:text-[var(--brand-400)]"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-4 w-4" aria-hidden="true" />
                   </button>
                 </div>
               </div>
