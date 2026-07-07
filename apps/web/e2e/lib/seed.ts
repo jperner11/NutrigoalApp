@@ -172,6 +172,59 @@ export async function createLinkedPair(clientsPerCoach = 1): Promise<SeededPair>
   return { coach, clients }
 }
 
+/**
+ * Seed a one-day training plan for a client with a single exercise (from the
+ * global `exercises` catalog seeded by migration 001, e.g. "Bench Press"), so
+ * a workout-logging spec (F13) can jump straight to /training/session/<dayId>
+ * without driving the "New Training Plan" builder UI. Cascades away when the
+ * client's auth user is deleted.
+ */
+export async function seedTrainingDay(
+  clientId: string,
+  exerciseName = 'Bench Press',
+): Promise<{ planDayId: string }> {
+  const supabase = admin()
+
+  const { data: exercise, error: exError } = await supabase
+    .from('exercises')
+    .select('id')
+    .eq('name', exerciseName)
+    .single()
+  if (exError || !exercise) {
+    throw new Error(`Failed to find seed exercise "${exerciseName}": ${exError?.message ?? 'not found'}`)
+  }
+
+  const { data: plan, error: planError } = await supabase
+    .from('training_plans')
+    .insert({ user_id: clientId, created_by: clientId, name: 'E2E Training Plan', days_per_week: 1, is_active: true })
+    .select()
+    .single()
+  if (planError || !plan) {
+    throw new Error(`Failed to seed training plan: ${planError?.message ?? 'unknown error'}`)
+  }
+
+  const { data: planDay, error: dayError } = await supabase
+    .from('training_plan_days')
+    .insert({ training_plan_id: plan.id, day_number: 1, name: 'Day 1' })
+    .select()
+    .single()
+  if (dayError || !planDay) {
+    throw new Error(`Failed to seed training plan day: ${dayError?.message ?? 'unknown error'}`)
+  }
+
+  const { error: peError } = await supabase.from('training_plan_exercises').insert({
+    plan_day_id: planDay.id,
+    exercise_id: exercise.id,
+    order_index: 0,
+    sets: 3,
+    reps: '8-12',
+    rest_seconds: 90,
+  })
+  if (peError) throw new Error(`Failed to seed training plan exercise: ${peError.message}`)
+
+  return { planDayId: planDay.id }
+}
+
 // Deletes every synthetic user this layer ever created (matched by the TEST_PREFIX
 // in their email). Safe to run before or after a test run to keep the test DB clean.
 export async function cleanupAllTestUsers(): Promise<number> {
