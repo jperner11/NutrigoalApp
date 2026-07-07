@@ -96,6 +96,40 @@ export async function linkClientToTrainer(clientId: string, trainerId: string): 
 }
 
 /**
+ * Insert a pending personal_trainer_invites row directly, bypassing the real
+ * POST /api/personal-trainer/invites route. That route hard-requires
+ * RESEND_API_KEY to send the invite email and fails closed when it's unset
+ * (as it is in this e2e/CI environment — see GitHub issue for details), so
+ * specs that need a real pending invite (F40) seed it here instead. Mirrors
+ * the columns the real route inserts (migration 021), minus the email side
+ * effect. Returns the invite_token so a test can drive /invite/accept for
+ * real, exactly as a client clicking the emailed link would.
+ */
+export async function seedPendingInvite(trainerId: string, invitedEmail: string): Promise<string> {
+  const supabase = admin()
+  const token = `${TEST_PREFIX}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`
+  const { error } = await supabase.from('personal_trainer_invites').insert({
+    personal_trainer_id: trainerId,
+    invited_email: invitedEmail.toLowerCase(),
+    invite_token: token,
+  })
+  if (error) throw new Error(`Failed to seed pending invite for ${invitedEmail}: ${error.message}`)
+  return token
+}
+
+/** Read back a user's linked-trainer state after an accept/decline flow. */
+export async function getTrainerLink(userId: string): Promise<{ role: string; personalTrainerId: string | null }> {
+  const supabase = admin()
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .select('role, personal_trainer_id')
+    .eq('id', userId)
+    .single()
+  if (error || !data) throw new Error(`Failed to read profile for ${userId}: ${error?.message ?? 'not found'}`)
+  return { role: data.role, personalTrainerId: data.personal_trainer_id }
+}
+
+/**
  * Publish a marketplace profile for a seeded coach so they appear on /discover
  * and /find-coach. Slug carries the e2e prefix so cleanup can match it (rows also
  * cascade when the auth user is deleted).

@@ -13,7 +13,7 @@ import { createTestUser, deleteTestUser, type SeededUser, type SeedRole } from '
 // incompatibility with the proxy). Node.js reaches Supabase fine through the
 // same proxy. We detect this by the presence of HTTPS_PROXY and intercept all
 // supabase.co requests at the page level, forwarding them via Node.js fetch.
-async function routeSupabaseThroughNode(page: Page): Promise<void> {
+export async function routeSupabaseThroughNode(page: Page): Promise<void> {
   if (!process.env.HTTPS_PROXY) return
   await page.route('https://*.supabase.co/**', async (route) => {
     const req = route.request()
