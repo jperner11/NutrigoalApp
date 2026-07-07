@@ -245,7 +245,7 @@ export default function TrainingPlanDetailPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--acc)]" />
       </div>
     )
   }
@@ -255,7 +255,7 @@ export default function TrainingPlanDetailPage() {
   return (
     <div className="min-h-screen">
       {/* Subtle background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-50/40 via-transparent to-indigo-50/30 pointer-events-none -z-10" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[var(--acc-soft)] via-transparent to-transparent pointer-events-none -z-10" />
 
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
@@ -313,11 +313,11 @@ export default function TrainingPlanDetailPage() {
 
       {/* Summary */}
       <div className="flex items-center gap-4 text-sm text-gray-600 mb-6">
-        <span className="flex items-center gap-1.5 bg-white/60 backdrop-blur-sm px-3 py-1.5 rounded-full border border-gray-200/60">
+        <span className="flex items-center gap-1.5 bg-white/60 backdrop-blur-sm px-3 py-1.5 rounded-full border border-[var(--line)]">
           <Calendar className="h-4 w-4 text-purple-500" />
           {plan.days_per_week} days/week
         </span>
-        <span className="flex items-center gap-1.5 bg-white/60 backdrop-blur-sm px-3 py-1.5 rounded-full border border-gray-200/60">
+        <span className="flex items-center gap-1.5 bg-white/60 backdrop-blur-sm px-3 py-1.5 rounded-full border border-[var(--line)]">
           <Dumbbell className="h-4 w-4 text-purple-500" />
           {days.length} training {days.length === 1 ? 'day' : 'days'}
         </span>
@@ -352,12 +352,12 @@ export default function TrainingPlanDetailPage() {
                 {/* Day Header */}
                 <button
                   onClick={() => isLocked ? setShowUpgradeModal(true) : toggleDay(day.id)}
-                  className="w-full flex items-center justify-between p-5 hover:bg-gray-50/50 transition-colors text-left"
+                  className="w-full flex items-center justify-between p-5 hover:bg-[var(--ink-2)] transition-colors text-left"
                 >
                   <div className="flex items-center space-x-4">
                     <div className="relative flex-shrink-0">
                       <div className={`w-12 h-12 rounded-full flex items-center justify-center shadow-sm ${
-                        isLocked ? 'bg-gray-300' : 'bg-gradient-to-br from-purple-500 to-indigo-600'
+                        isLocked ? 'bg-[var(--line-strong)]' : 'bg-gradient-to-br from-purple-500 to-indigo-600'
                       }`}>
                         {isLocked ? (
                           <Lock className="h-5 w-5 text-white" />
@@ -408,11 +408,11 @@ export default function TrainingPlanDetailPage() {
                         No exercises added to this day yet.
                       </div>
                     ) : (
-                      <div className="divide-y divide-gray-50">
+                      <div className="divide-y divide-[var(--line)]">
                         {day.exercises.map((exercise, idx) => (
                           <div
                             key={exercise.id}
-                            className="flex items-center justify-between px-5 py-3 hover:bg-gray-50/50 transition-colors"
+                            className="flex items-center justify-between px-5 py-3 hover:bg-[var(--ink-2)] transition-colors"
                           >
                             <div className="flex items-center space-x-3">
                               <span className="text-xs font-bold text-gray-400 bg-gray-100 w-6 h-6 rounded-full flex items-center justify-center">
@@ -449,7 +449,7 @@ export default function TrainingPlanDetailPage() {
                     )}
 
                     {/* Start Workout Button */}
-                    <div className="px-5 py-4 bg-gradient-to-r from-gray-50 to-gray-50/50 border-t border-gray-100">
+                    <div className="px-5 py-4 bg-[var(--ink-2)] border-t border-gray-100">
                       <Link
                         href={`/training/session/${day.id}`}
                         className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-200"
@@ -481,7 +481,7 @@ export default function TrainingPlanDetailPage() {
                 <button
                   key={day.id}
                   onClick={() => handleSelectFreeDay(day.id)}
-                  className="w-full flex items-center gap-3 p-3 rounded-xl border border-gray-200 hover:border-purple-300 hover:bg-purple-50/50 transition-all text-left"
+                  className="w-full flex items-center gap-3 p-3 rounded-xl border border-gray-200 hover:border-[var(--brand-400)] hover:bg-[var(--acc-soft)] transition-all text-left"
                 >
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
                     <span className="text-white font-bold">{day.day_number}</span>
