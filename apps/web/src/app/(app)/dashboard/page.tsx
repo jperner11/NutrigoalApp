@@ -414,7 +414,7 @@ export default function DashboardPage() {
         summary={`${Math.round(calorieProgress)}% of calorie target · ${weeklyStats.workoutsThisWeek} workouts this week`}
       />
 
-      {/* Today's KPIs \u2014 single editorial row */}
+      {/* Today's KPIs — single editorial row */}
       <div className="mb-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatTile
           variant="card"
@@ -634,7 +634,7 @@ export default function DashboardPage() {
               className="mono"
               style={{ fontSize: 10, color: 'var(--acc)', letterSpacing: '0.1em' }}
             >
-              VIEW ALL \u2192
+              VIEW ALL →
             </Link>
           </div>
           {clientCount === 0 && pendingInviteCount === 0 ? (
@@ -692,7 +692,7 @@ export default function DashboardPage() {
               className="mono"
               style={{ fontSize: 10, color: 'var(--acc)', letterSpacing: '0.1em' }}
             >
-              VIEW ALL \u2192
+              VIEW ALL →
             </Link>
           </div>
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
