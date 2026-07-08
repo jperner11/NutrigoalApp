@@ -38,6 +38,7 @@ function CoachCheckInsPage({ profile }: { profile: UserProfile }) {
 
   useEffect(() => {
     loadAll()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile.id])
 
   async function loadAll() {
@@ -452,6 +453,7 @@ function ClientCheckInsPage({ profile }: { profile: UserProfile }) {
 
   useEffect(() => {
     loadCheckIns()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile.id])
 
   async function loadCheckIns() {
