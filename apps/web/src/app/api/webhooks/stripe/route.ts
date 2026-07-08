@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { getStripe } from '@/lib/stripe'
 import { createAdminClient } from '@/lib/supabase/admin'
 import type Stripe from 'stripe'
@@ -27,97 +28,102 @@ export async function POST(request: Request) {
 
   const PAID_PLANS = new Set<string>(['pro', 'unlimited', 'nutritionist', 'personal_trainer'])
 
-  switch (event.type) {
-    case 'checkout.session.completed': {
-      const session = event.data.object as Stripe.Checkout.Session
-      const userId = session.metadata?.userId
-      const plan = session.metadata?.plan as UserRole | undefined
+  try {
+    switch (event.type) {
+      case 'checkout.session.completed': {
+        const session = event.data.object as Stripe.Checkout.Session
+        const userId = session.metadata?.userId
+        const plan = session.metadata?.plan as UserRole | undefined
 
-      if (!userId || !plan || !PAID_PLANS.has(plan)) break
+        if (!userId || !plan || !PAID_PLANS.has(plan)) break
 
-      // Retrieve full subscription for period dates
-      const subscription = await getStripe().subscriptions.retrieve(
-        session.subscription as string
-      )
+        // Retrieve full subscription for period dates
+        const subscription = await getStripe().subscriptions.retrieve(
+          session.subscription as string
+        )
 
-      await supabase.from('subscriptions').upsert(
-        {
-          user_id: userId,
-          stripe_customer_id: session.customer as string,
-          stripe_subscription_id: session.subscription as string,
-          plan_type: plan,
-          status: 'active',
-          current_period_start: new Date(subscription.items.data[0].current_period_start * 1000).toISOString(),
-          current_period_end: new Date(subscription.items.data[0].current_period_end * 1000).toISOString(),
-        },
-        { onConflict: 'user_id' }
-      )
+        await supabase.from('subscriptions').upsert(
+          {
+            user_id: userId,
+            stripe_customer_id: session.customer as string,
+            stripe_subscription_id: session.subscription as string,
+            plan_type: plan,
+            status: 'active',
+            current_period_start: new Date(subscription.items.data[0].current_period_start * 1000).toISOString(),
+            current_period_end: new Date(subscription.items.data[0].current_period_end * 1000).toISOString(),
+          },
+          { onConflict: 'user_id' }
+        )
 
-      await supabase
-        .from('user_profiles')
-        .update({ role: plan })
-        .eq('id', userId)
+        await supabase
+          .from('user_profiles')
+          .update({ role: plan })
+          .eq('id', userId)
 
-      break
-    }
-
-    case 'customer.subscription.updated': {
-      const subscription = event.data.object as Stripe.Subscription
-      const userId = subscription.metadata?.userId
-
-      if (!userId) break
-
-      const statusMap: Record<string, string> = {
-        active: 'active',
-        past_due: 'past_due',
-        canceled: 'canceled',
-        trialing: 'trialing',
-        unpaid: 'past_due',
-        incomplete: 'past_due',
-        incomplete_expired: 'canceled',
+        break
       }
 
-      const mappedStatus = statusMap[subscription.status] ?? 'canceled'
+      case 'customer.subscription.updated': {
+        const subscription = event.data.object as Stripe.Subscription
+        const userId = subscription.metadata?.userId
 
-      await supabase
-        .from('subscriptions')
-        .update({
-          status: mappedStatus,
-          current_period_start: new Date(subscription.items.data[0].current_period_start * 1000).toISOString(),
-          current_period_end: new Date(subscription.items.data[0].current_period_end * 1000).toISOString(),
-        })
-        .eq('user_id', userId)
+        if (!userId) break
 
-      // past_due keeps access (grace period); a fully canceled subscription
-      // revokes it even if no subscription.deleted event arrives.
-      if (mappedStatus === 'canceled') {
+        const statusMap: Record<string, string> = {
+          active: 'active',
+          past_due: 'past_due',
+          canceled: 'canceled',
+          trialing: 'trialing',
+          unpaid: 'past_due',
+          incomplete: 'past_due',
+          incomplete_expired: 'canceled',
+        }
+
+        const mappedStatus = statusMap[subscription.status] ?? 'canceled'
+
+        await supabase
+          .from('subscriptions')
+          .update({
+            status: mappedStatus,
+            current_period_start: new Date(subscription.items.data[0].current_period_start * 1000).toISOString(),
+            current_period_end: new Date(subscription.items.data[0].current_period_end * 1000).toISOString(),
+          })
+          .eq('user_id', userId)
+
+        // past_due keeps access (grace period); a fully canceled subscription
+        // revokes it even if no subscription.deleted event arrives.
+        if (mappedStatus === 'canceled') {
+          await supabase
+            .from('user_profiles')
+            .update({ role: 'free' as UserRole })
+            .eq('id', userId)
+        }
+
+        break
+      }
+
+      case 'customer.subscription.deleted': {
+        const subscription = event.data.object as Stripe.Subscription
+        const userId = subscription.metadata?.userId
+
+        if (!userId) break
+
+        await supabase
+          .from('subscriptions')
+          .update({ status: 'canceled' })
+          .eq('user_id', userId)
+
         await supabase
           .from('user_profiles')
           .update({ role: 'free' as UserRole })
           .eq('id', userId)
+
+        break
       }
-
-      break
     }
-
-    case 'customer.subscription.deleted': {
-      const subscription = event.data.object as Stripe.Subscription
-      const userId = subscription.metadata?.userId
-
-      if (!userId) break
-
-      await supabase
-        .from('subscriptions')
-        .update({ status: 'canceled' })
-        .eq('user_id', userId)
-
-      await supabase
-        .from('user_profiles')
-        .update({ role: 'free' as UserRole })
-        .eq('id', userId)
-
-      break
-    }
+  } catch (err) {
+    Sentry.captureException(err, { tags: { kind: 'webhook', route: 'stripe' } })
+    return NextResponse.json({ message: 'Webhook processing error' }, { status: 500 })
   }
 
   return NextResponse.json({ received: true })
