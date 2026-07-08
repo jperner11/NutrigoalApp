@@ -57,6 +57,7 @@ export default function ClientFeedbackPage() {
     if (!profile) return
     if (!isTrainerRole(profile.role)) { router.push('/dashboard'); return }
     loadAll()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile, id, router])
 
   async function loadAll() {
