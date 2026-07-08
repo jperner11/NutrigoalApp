@@ -25,7 +25,7 @@ test.fixme('coach completes the full setup and lands on the coach dashboard', as
   await expect(coachPage.getByRole('link', { name: 'Leads' })).toBeVisible()
 })
 
-test.fixme('coach publishes a marketplace profile that renders publicly with no verified badge', async ({
+test('coach publishes a marketplace profile that renders publicly with no verified badge', async ({
   coachPage,
   browser,
 }) => {
