@@ -117,6 +117,18 @@ export async function seedPendingInvite(trainerId: string, invitedEmail: string)
   return token
 }
 
+/**
+ * Force a seeded user's tier directly (bypassing billing/Stripe entirely). The
+ * signup trigger (migration 055) only ever bootstraps 'free' or 'personal_trainer'
+ * from metadata, so Pro/Unlimited-gated specs (F15, F16) need this to get a
+ * paid-tier client without touching real Stripe.
+ */
+export async function upgradeUserRole(userId: string, role: 'pro' | 'unlimited'): Promise<void> {
+  const supabase = admin()
+  const { error } = await supabase.from('user_profiles').update({ role }).eq('id', userId)
+  if (error) throw new Error(`Failed to upgrade user ${userId} to ${role}: ${error.message}`)
+}
+
 /** Read back a user's linked-trainer state after an accept/decline flow. */
 export async function getTrainerLink(userId: string): Promise<{ role: string; personalTrainerId: string | null }> {
   const supabase = admin()
