@@ -39,9 +39,12 @@ export default function MyNutritionistMessagesPage() {
       .select('id, full_name, email')
       .eq('id', trainerId)
       .single()
-      .then(({ data }) => {
-        if (!cancelled && data) setTrainer(data as TrainerInfo)
-      })
+      .then(
+        ({ data }) => {
+          if (!cancelled && data) setTrainer(data as TrainerInfo)
+        },
+        () => {}
+      )
 
     // Client cannot create a conversation (RLS: only coach can INSERT).
     // Just look for the existing one.
@@ -51,11 +54,16 @@ export default function MyNutritionistMessagesPage() {
       .eq('nutritionist_id', trainerId)
       .eq('client_id', profile.id)
       .maybeSingle()
-      .then(({ data }) => {
-        if (cancelled) return
-        setConversationId(data?.id ?? null)
-        setResolved(true)
-      })
+      .then(
+        ({ data }) => {
+          if (cancelled) return
+          setConversationId(data?.id ?? null)
+          setResolved(true)
+        },
+        () => {
+          if (!cancelled) setResolved(true)
+        }
+      )
 
     return () => {
       cancelled = true
