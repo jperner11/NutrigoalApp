@@ -39,7 +39,14 @@ export async function loginAs(page: Page, user: SeededUser): Promise<void> {
   // hydration the form's onSubmit (which calls preventDefault) isn't attached, so a
   // click triggers a NATIVE GET submit to "/login?" that reloads the page and wipes
   // the inputs — which is exactly the flake we hit in dev mode.
-  await page.goto('/login', { waitUntil: 'networkidle' })
+  // Retried once: WebKit aborts a goto that races an in-flight client-side
+  // redirect (e.g. arriving right after cookies were cleared on a protected page).
+  try {
+    await page.goto('/login', { waitUntil: 'networkidle' })
+  } catch (err) {
+    if (!/interrupted by another navigation/i.test(String(err))) throw err
+    await page.goto('/login', { waitUntil: 'networkidle' })
+  }
 
   // Retry the whole fill+submit: if a pre-hydration click ever does reload the page,
   // the next iteration re-fills the (now-empty) fields and tries again.
@@ -51,6 +58,10 @@ export async function loginAs(page: Page, user: SeededUser): Promise<void> {
     await page.getByRole('button', { name: /enter dashboard/i }).click()
     await expect(page).not.toHaveURL(/\/login/, { timeout: 5_000 })
   }).toPass({ timeout: 30_000 })
+
+  // Let the post-login navigation fully settle before handing control back —
+  // WebKit aborts a subsequent goto that races the still-in-flight redirect.
+  await page.waitForLoadState('networkidle')
 }
 
 interface SeededFixtures {

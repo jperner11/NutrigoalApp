@@ -53,13 +53,17 @@ jobs:
         if: steps.guard.outputs.run == 'true'
         run: npm run build -w packages/shared --if-present
 
-      - name: Install Playwright browser
+      - name: Install Playwright browsers
         if: steps.guard.outputs.run == 'true'
-        run: npx playwright install --with-deps chromium
+        # webkit powers the mobile-safari project (E2E_WEBKIT=1 below) — the
+        # engine iPhone testers actually use.
+        run: npx playwright install --with-deps chromium webkit
         working-directory: apps/web
 
       - name: Run E2E tests
         if: steps.guard.outputs.run == 'true'
+        env:
+          E2E_WEBKIT: '1'
         run: npx playwright test
         working-directory: apps/web
 

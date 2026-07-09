@@ -76,9 +76,11 @@ test('F12 (e2e): add a meal with a food item and save → /diet', async ({
   ).toBeVisible({ timeout: 10_000 })
   await clientPage.getByRole('button', { name: /chicken breast/i }).click()
 
-  // Food appears in ingredient list (150 g default_amount from mock)
+  // Food appears in ingredient list (150 g default_amount from mock). The
+  // responsive layout renders the list in both mobile and desktop containers,
+  // so assert on the first match rather than a unique one.
   await expect(
-    clientPage.getByText('150 g Chicken Breast (cooked)'),
+    clientPage.getByText('150 g Chicken Breast (cooked)').first(),
   ).toBeVisible({ timeout: 10_000 })
 
   // Save plan and assert redirect to /diet
