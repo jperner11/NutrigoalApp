@@ -226,19 +226,19 @@ export default function CoachQuestionsPage() {
                   )}
                 </div>
                 <div className="flex items-center gap-1">
-                  <button onClick={() => move(q, -1)} disabled={idx === 0} className="rounded-lg p-1.5 text-[var(--fg-4)] hover:bg-[var(--ink-3)] hover:text-[var(--fg-2)] disabled:opacity-30">
+                  <button onClick={() => move(q, -1)} disabled={idx === 0} aria-label="Move question up" className="rounded-lg p-1.5 text-[var(--fg-4)] hover:bg-[var(--ink-3)] hover:text-[var(--fg-2)] disabled:opacity-30">
                     <ArrowUp className="h-4 w-4" />
                   </button>
-                  <button onClick={() => move(q, 1)} disabled={idx === arr.length - 1} className="rounded-lg p-1.5 text-[var(--fg-4)] hover:bg-[var(--ink-3)] hover:text-[var(--fg-2)] disabled:opacity-30">
+                  <button onClick={() => move(q, 1)} disabled={idx === arr.length - 1} aria-label="Move question down" className="rounded-lg p-1.5 text-[var(--fg-4)] hover:bg-[var(--ink-3)] hover:text-[var(--fg-2)] disabled:opacity-30">
                     <ArrowDown className="h-4 w-4" />
                   </button>
                   <button onClick={() => toggleActive(q)} className="rounded-lg px-2 py-1 text-xs text-[var(--fg-3)] hover:bg-[var(--ink-3)] hover:text-[var(--fg-2)]">
                     {q.is_active ? 'Disable' : 'Enable'}
                   </button>
-                  <button onClick={() => startEdit(q)} className="rounded-lg p-1.5 text-[var(--fg-4)] hover:bg-[var(--ink-3)] hover:text-[var(--fg-2)]">
+                  <button onClick={() => startEdit(q)} aria-label="Edit question" className="rounded-lg p-1.5 text-[var(--fg-4)] hover:bg-[var(--ink-3)] hover:text-[var(--fg-2)]">
                     <Pencil className="h-4 w-4" />
                   </button>
-                  <button onClick={() => deleteQuestion(q.id)} className="rounded-lg p-1.5 text-red-400 hover:bg-[var(--ink-3)]">
+                  <button onClick={() => deleteQuestion(q.id)} aria-label="Delete question" className="rounded-lg p-1.5 text-red-400 hover:bg-[var(--ink-3)]">
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
@@ -251,7 +251,7 @@ export default function CoachQuestionsPage() {
         <div className="card mt-6 p-6 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="app-mono-label">{draft.id ? 'Edit question' : 'New question'}</h2>
-            <button onClick={() => setDraft(null)} className="rounded-lg p-1.5 text-[var(--fg-4)] hover:bg-[var(--ink-3)] hover:text-[var(--fg-2)]">
+            <button onClick={() => setDraft(null)} aria-label="Cancel" className="rounded-lg p-1.5 text-[var(--fg-4)] hover:bg-[var(--ink-3)] hover:text-[var(--fg-2)]">
               <X className="h-4 w-4" />
             </button>
           </div>

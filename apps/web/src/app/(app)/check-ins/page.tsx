@@ -247,6 +247,7 @@ function TemplateManager({ templates, trainerId, onRefresh }: {
                 </div>
                 <div className="flex items-center gap-2">
                   <button onClick={() => { setEditing(t); setCreating(false) }}
+                    aria-label={`Edit ${t.name}`}
                     className="p-2 text-gray-400 hover:text-purple-600 rounded-lg hover:bg-purple-50">
                     <Pencil className="h-4 w-4" />
                   </button>
@@ -261,6 +262,7 @@ function TemplateManager({ templates, trainerId, onRefresh }: {
                     toast.success('Template duplicated')
                     onRefresh()
                   }}
+                    aria-label={`Duplicate ${t.name}`}
                     className="p-2 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50">
                     <Copy className="h-4 w-4" />
                   </button>
@@ -381,9 +383,11 @@ function TemplateForm({ template, trainerId, onSaved, onCancel }: {
           <div key={q.id} className="flex items-start gap-2 bg-gray-50 rounded-xl p-3">
             <div className="flex flex-col gap-1 mt-1">
               <button onClick={() => moveQuestion(idx, -1)} disabled={idx === 0}
-                className="text-gray-300 hover:text-gray-600 disabled:opacity-30 text-xs">▲</button>
+                aria-label="Move question up"
+                className="text-gray-400 hover:text-gray-600 disabled:opacity-30 text-xs">▲</button>
               <button onClick={() => moveQuestion(idx, 1)} disabled={idx === questions.length - 1}
-                className="text-gray-300 hover:text-gray-600 disabled:opacity-30 text-xs">▼</button>
+                aria-label="Move question down"
+                className="text-gray-400 hover:text-gray-600 disabled:opacity-30 text-xs">▼</button>
             </div>
             <div className="flex-1">
               <select value={q.type} onChange={e => updateQuestion(q.id, 'type', e.target.value)}
@@ -397,7 +401,7 @@ function TemplateForm({ template, trainerId, onSaved, onCancel }: {
                 placeholder="Type your question..." />
             </div>
             {questions.length > 1 && (
-              <button onClick={() => removeQuestion(q.id)} className="mt-6 text-gray-300 hover:text-red-500">
+              <button onClick={() => removeQuestion(q.id)} aria-label="Remove question" className="mt-6 text-gray-400 hover:text-red-500">
                 <Trash2 className="h-4 w-4" />
               </button>
             )}
