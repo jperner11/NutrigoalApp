@@ -29,9 +29,12 @@ export default function ClientMessagesPage() {
       .select('*')
       .eq('id', id)
       .single()
-      .then(({ data }) => {
-        if (!cancelled && data) setClient(data as UserProfile)
-      })
+      .then(
+        ({ data }) => {
+          if (!cancelled && data) setClient(data as UserProfile)
+        },
+        () => {}
+      )
 
     async function resolveConversation() {
       const { data: existing } = await supabase
@@ -62,9 +65,12 @@ export default function ClientMessagesPage() {
       return created?.id ?? null
     }
 
-    resolveConversation().then((cid) => {
-      if (!cancelled) setConversationId(cid)
-    })
+    resolveConversation().then(
+      (cid) => {
+        if (!cancelled) setConversationId(cid)
+      },
+      () => {}
+    )
 
     return () => {
       cancelled = true
