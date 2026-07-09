@@ -1,16 +1,11 @@
 import { test, expect } from '@playwright/test'
+import { createTestUser, deleteTestUser, generateRecoveryLink } from '../lib/seed'
+import { loginAs } from '../fixtures'
 
 // F04 — Password reset request.
-// Shallow checks: the page renders, the /login "Forgot your password?" link is
-// present, and the /reset-password page loads without an HTTP error.
-//
-// NOTE: a general "forgot password" request flow (email input → send reset link)
-// does NOT exist in the current UI. The /reset-password page only serves the
-// post-invite "set your password" step (requires a valid token in the URL hash).
-// Visiting /reset-password without a token shows "invalid link" rather than an
-// email-request form. This is tracked in GitHub issue #<tbd> (label: qa).
-//
-// The fixme test below documents the expected (not-yet-implemented) behaviour.
+// /reset-password serves two modes: with a recovery/invite token in the URL hash
+// it renders the set-password form; without one it renders the email-request form
+// (supabase.auth.resetPasswordForEmail). Issue #62 (missing request UI) is fixed.
 
 test.describe('F04 — Password reset request', () => {
   test('/reset-password page responds OK', async ({ page }) => {
@@ -30,17 +25,10 @@ test.describe('F04 — Password reset request', () => {
     expect(href).toMatch(/reset-password/)
   })
 
-  // FIXME: This test documents the missing "forgot password" request UI.
-  // /reset-password should render an email-input form so users who are not
-  // arriving via an invite link can still request a password-reset email.
-  // Currently, visiting /reset-password without a valid token hash shows an
-  // "invalid link" banner instead of the request form.
-  // See: https://github.com/jperner11/NutrigoalApp/issues/62
-  test.fixme(
+  test(
     '/reset-password without a token shows an email-request form',
     async ({ page }) => {
       await page.goto('/reset-password', { waitUntil: 'networkidle' })
-      // Expect an email input and a "Send reset link" (or similar) button.
       await expect(
         page.getByRole('textbox', { name: /email/i }),
       ).toBeVisible()
@@ -49,4 +37,34 @@ test.describe('F04 — Password reset request', () => {
       ).toBeVisible()
     },
   )
+
+  test('submitting the request form shows the check-your-inbox state', async ({ page }) => {
+    await page.goto('/reset-password', { waitUntil: 'networkidle' })
+    await page.getByRole('textbox', { name: /email/i }).fill('treno-e2e+reset-req@e2e.treno.test')
+    await page.getByRole('button', { name: /send reset link/i }).click()
+    await expect(page.getByText(/check your inbox/i)).toBeVisible()
+  })
+
+  test('full loop: recovery link → set new password → sign in with it', async ({ page, baseURL }) => {
+    const user = await createTestUser('free')
+    const newPassword = `Reset!${Date.now().toString(36)}A1`
+    try {
+      // The link the reset email would contain (admin-minted; no inbox in e2e).
+      const link = await generateRecoveryLink(user.email, `${baseURL}/reset-password`)
+      await page.goto(link, { waitUntil: 'networkidle' })
+
+      await expect(page.getByLabel('New password', { exact: true })).toBeVisible()
+      await page.getByLabel('New password', { exact: true }).fill(newPassword)
+      await page.getByLabel('Confirm password', { exact: true }).fill(newPassword)
+      await page.getByRole('button', { name: /save password/i }).click()
+      await page.waitForURL('**/dashboard**', { timeout: 15_000 })
+
+      // Fresh context state: drop the recovery session, then sign in with the
+      // NEW password through the real login form (shared helper).
+      await page.context().clearCookies()
+      await loginAs(page, { ...user, password: newPassword })
+    } finally {
+      await deleteTestUser(user.id)
+    }
+  })
 })

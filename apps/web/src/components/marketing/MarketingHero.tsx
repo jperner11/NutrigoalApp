@@ -40,18 +40,9 @@ export default function MarketingHero() {
             {hero.subtitle}
           </p>
 
-          <div className="row fade-up mt-8 flex-wrap gap-2">
+          <div className="row fade-up mt-8 flex-wrap items-center gap-3">
             <Link href="/signup" className="btn btn-accent">
               {hero.ctas.forSelf}
-            </Link>
-            <Link href="/for-coaches" className="btn btn-ghost">
-              {hero.ctas.forCoach}
-            </Link>
-          </div>
-
-          <div className="row fade-up mt-6 flex-wrap gap-3">
-            <Link href="/signup" className="btn btn-primary">
-              {hero.ctas.buildPlan} →
             </Link>
             <Link href="/find-coach" className="btn btn-ghost">
               {hero.ctas.browseCoaches}
