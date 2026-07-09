@@ -24,6 +24,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Menu,
+  MessageSquarePlus,
   X,
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
@@ -148,6 +149,15 @@ export default function Sidebar({ userRole, userName, onSignOut }: SidebarProps)
             <p className="text-xs font-semibold tracking-[0.14em] text-[var(--brand-400)]/80">{getRolePlanLabel(userRole).toUpperCase()}</p>
           </div>
         )}
+
+        <Link
+          href="/feedback"
+          className="flex items-center space-x-3 px-3 py-2 rounded-xl text-sm text-[var(--muted-soft)] hover:bg-[rgba(245,241,234,0.06)] hover:text-white transition-all duration-200 w-full"
+          title={collapsed && !mobileOpen ? 'Send feedback' : undefined}
+        >
+          <MessageSquarePlus className="h-5 w-5 flex-shrink-0" />
+          {(!collapsed || mobileOpen) && <span>Send feedback</span>}
+        </Link>
 
         <button
           onClick={onSignOut}
