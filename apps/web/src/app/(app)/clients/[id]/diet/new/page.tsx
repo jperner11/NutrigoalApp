@@ -36,6 +36,7 @@ export default function NewClientDietPlanPage() {
   const router = useRouter()
   const { profile } = useUser()
   const [client, setClient] = useState<UserProfile | null>(null)
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [planName, setPlanName] = useState('')
   const [meals, setMeals] = useState<MealEntry[]>([
     { meal_type: 'breakfast', meal_name: 'Breakfast', foods: [] },
@@ -62,11 +63,13 @@ export default function NewClientDietPlanPage() {
     if (!profile) return
     if (!isTrainerRole(profile.role)) { router.push('/dashboard'); return }
     const supabase = createClient()
-    supabase.from('user_profiles').select('*').eq('id', id).single().then(({ data }) => {
+    supabase.from('user_profiles').select('*').eq('id', id).single().then(({ data, error }) => {
+      if (error) { setLoadError('Failed to load client. Please refresh.'); return }
       if (data) setClient(data as UserProfile)
     })
   }, [profile, id, router])
 
+  if (loadError) return <div className="text-[var(--fg-3)]">{loadError}</div>
   if (!profile || !client) return <div className="text-[var(--fg-3)]">Loading...</div>
 
   const totalCals = meals.reduce((s, m) => s + m.foods.reduce((a, f) => a + f.calories, 0), 0)
