@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import * as Sentry from '@sentry/nextjs'
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
@@ -181,4 +182,9 @@ function cacheFood(
       },
       { onConflict: 'source,external_id', ignoreDuplicates: true },
     )
+    .then(({ error }) => {
+      if (error) {
+        Sentry.captureException(error, { tags: { kind: 'api-route', route: 'food/nutrition', op: 'cacheFood' } })
+      }
+    })
 }

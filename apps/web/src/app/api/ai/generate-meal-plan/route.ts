@@ -3,6 +3,13 @@ import * as Sentry from '@sentry/nextjs'
 import { rateLimit, getClientIp } from '@/lib/rateLimit'
 import { createClient } from '@/lib/supabase/server'
 import { checkPlanGenerationAllowed, logPlanGeneration } from '@/lib/aiAuth'
+import {
+  buildAllergenBlock,
+  buildSafeProteinHint,
+  buildReferenceData,
+  buildCalorieDenseList,
+  findAllergenViolations,
+} from '@/lib/allergenSafety.mjs'
 
 export async function POST(request: Request) {
   const ip = getClientIp(request)
@@ -88,7 +95,7 @@ export async function POST(request: Request) {
     // Build dietary constraints section
     const constraints: string[] = []
     if (dietaryRestrictions.length > 0) constraints.push(`STRICT dietary restrictions: ${dietaryRestrictions.join(', ')}. NEVER include foods that violate these.`)
-    if (allergies.length > 0) constraints.push(`ALLERGIES (DANGEROUS — MUST AVOID): ${allergies.join(', ')}. Never include these under any circumstances.`)
+    if (allergies.length > 0) constraints.push(buildAllergenBlock(allergies))
     if (foodDislikes.length > 0) constraints.push(`Foods this person HATES and would never eat: ${foodDislikes.join(', ')}. Do not include these.`)
     if (favouriteFoods.length > 0) constraints.push(`FAVOURITE meals/dishes/foods: ${favouriteFoods.join(', ')}. Use these as inspiration — build meals that feel like these or include these ingredients.`)
     if (desiredOutcome) constraints.push(`DESIRED OUTCOME: ${desiredOutcome}. Build the meals so they support this in a realistic, motivating way.`)
@@ -195,6 +202,8 @@ ${mealTimingGuide}
 
 ${constraints.length > 0 ? 'DIETARY CONSTRAINTS (NON-NEGOTIABLE — ZERO TOLERANCE):\n' + constraints.map(c => '- ' + c).join('\n') : ''}
 
+${buildSafeProteinHint({ dietaryRestrictions, allergies, foodDislikes, protein, mealsPerDay })}
+
 ${healthNotes.length > 0 ? 'HEALTH CONSIDERATIONS:\n' + healthNotes.map(n => '- ' + n).join('\n') : ''}
 
 COOKING & LIFESTYLE:
@@ -265,8 +274,8 @@ Rules:
 - ALWAYS use grams (g) for solids and milliliters (ml) for liquids. Never cups, tablespoons, or "1 medium".
 - MACRO ACCURACY IS NON-NEGOTIABLE. The SUM of all meals MUST hit the daily calorie target within ±50 kcal.
 - VERIFICATION: After writing all meals, sum every ingredient's calories. If off by >50 kcal from ${calories}, adjust portions. Check protein (${protein}g ±5g), carbs (${carbs}g ±10g), fat (${fat}g ±5g).
-- If target is high (>2500), use LARGER portions and calorie-dense ingredients (nuts, olive oil, avocado, whole milk).
-- Reference data: chicken breast 100g=165cal/31P/0C/3.6F, rice(cooked) 100g=130cal/2.7P/28C/0.3F, oats 100g=389cal/13P/66C/7F, eggs 50g=78cal/6P/0.6C/5F, olive oil 15ml=120cal/0P/0C/14F, banana 120g=107cal/1.3P/27C/0.4F, salmon 100g=208cal/20P/0C/13F, sweet potato 100g=86cal/1.6P/20C/0.1F, peanut butter 30g=188cal/7P/6C/16F, whole milk 250ml=150cal/8P/12C/8F, almonds 30g=173cal/6P/6C/15F
+- If target is high (>2500), use LARGER portions and calorie-dense ingredients (${buildCalorieDenseList(allergies)}).
+- Reference data: ${buildReferenceData(allergies, dietaryRestrictions)}
 - Pre-workout = lighter, carb-focused. Post-workout = protein-heavy + fast carbs`
 
     // Calculate per-meal budgets to guide the AI
@@ -401,6 +410,21 @@ Return JSON only.`
       carbs: Math.round(meal.ingredients.reduce((s, i) => s + i.carbs, 0) * 10) / 10,
       fat: Math.round(meal.ingredients.reduce((s, i) => s + i.fat, 0) * 10) / 10,
     }))
+
+    // Programmatic allergen safety net — never serve a plan that mentions a
+    // prohibited ingredient, regardless of what the model claimed to do.
+    const violations = findAllergenViolations(finalMeals, allergies, dietaryRestrictions)
+    if (violations.length > 0) {
+      Sentry.captureMessage('meal-plan allergen violation blocked', {
+        level: 'error',
+        tags: { kind: 'api-route', route: 'ai/generate-meal-plan' },
+        extra: { violations, allergies },
+      })
+      return NextResponse.json(
+        { message: 'The generated plan failed the allergen safety check and was discarded. Please try again.' },
+        { status: 422 },
+      )
+    }
 
     return NextResponse.json({ meals: finalMeals, day_theme: dayTheme, supplements })
   } catch (err) {

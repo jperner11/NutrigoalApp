@@ -19,6 +19,11 @@
 import { readFileSync } from 'fs'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
+import {
+  buildAllergenBlock,
+  buildSafeProteinHint,
+  findAllergenViolations,
+} from '../../src/lib/allergenSafety.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const PERSONAS = JSON.parse(readFileSync(join(__dirname, 'personas.json'), 'utf8'))
@@ -90,7 +95,7 @@ function buildMealPrompts(p) {
 
   const constraints = []
   if (dietaryRestrictions.length > 0) constraints.push(`STRICT dietary restrictions: ${dietaryRestrictions.join(', ')}. NEVER include foods that violate these.`)
-  if (allergies.length > 0) constraints.push(`ALLERGIES (DANGEROUS — MUST AVOID): ${allergies.join(', ')}. Never include these under any circumstances.`)
+  if (allergies.length > 0) constraints.push(buildAllergenBlock(allergies))
   if (foodDislikes.length > 0) constraints.push(`Foods this person HATES and would never eat: ${foodDislikes.join(', ')}. Do not include these.`)
   if (favouriteFoods.length > 0) constraints.push(`FAVOURITE meals/dishes/foods: ${favouriteFoods.join(', ')}. Use these as inspiration.`)
   if (desiredOutcome) constraints.push(`DESIRED OUTCOME: ${desiredOutcome}.`)
@@ -162,6 +167,8 @@ CLIENT SCHEDULE:
 ${mealTimingGuide}
 
 ${constraints.length > 0 ? 'DIETARY CONSTRAINTS (NON-NEGOTIABLE — ZERO TOLERANCE):\n' + constraints.map(c => '- ' + c).join('\n') : ''}
+
+${buildSafeProteinHint({ dietaryRestrictions, allergies, foodDislikes, protein, mealsPerDay })}
 
 ${healthNotes.length > 0 ? 'HEALTH CONSIDERATIONS:\n' + healthNotes.map(n => '- ' + n).join('\n') : ''}
 
@@ -405,22 +412,14 @@ function buildJudgePrompt(persona, mealPlan, trainingPlan, rubric) {
       const meals = parsed.meals ?? []
       const totalCal = meals.reduce((s, m) => s + (m.ingredients ?? []).reduce((ms, i) => ms + (i.calories ?? 0), 0), 0)
       const totalProt = meals.reduce((s, m) => s + (m.ingredients ?? []).reduce((ms, i) => ms + (i.protein ?? 0), 0), 0)
-      const allergenCheck = persona.meal.allergies.map(a => {
-        const found = JSON.stringify(parsed).toLowerCase().includes(a.toLowerCase().replace(/s$/, ''))
-        return `  ${a}: ${found ? 'FOUND IN PLAN ⚠️' : 'not found ✓'}`
-      }).join('\n')
-      const diets = persona.meal.dietaryRestrictions.map(d => {
-        const planText = JSON.stringify(parsed).toLowerCase()
-        let violation = ''
-        if (d === 'vegan' && (planText.includes('chicken') || planText.includes('beef') || planText.includes('pork') || planText.includes('fish') || planText.includes('egg') || planText.includes('milk') || planText.includes('dairy') || planText.includes('cheese') || planText.includes('salmon') || planText.includes('tuna'))) {
-          violation = '⚠️ possible animal product found'
-        }
-        if (d === 'gluten-free' && (planText.includes('wheat') || planText.includes('bread') || planText.includes('pasta') || planText.includes('flour') || planText.includes('oat') || planText.includes('barley') || planText.includes('rye'))) {
-          violation = '⚠️ possible gluten source found'
-        }
-        return `  ${d}: ${violation || '✓'}`
-      }).join('\n')
-      return `Meal plan totals: ~${Math.round(totalCal)} kcal, ~${Math.round(totalProt)}g protein (targets: ${persona.meal.calories} kcal, ${persona.meal.protein}g protein)\nAllergen scan:\n${allergenCheck || '  none flagged'}\nDiet restriction scan:\n${diets || '  none flagged'}\nMeal titles: ${meals.map(m => m.title).join(' | ')}\nSupplements: ${JSON.stringify(parsed.supplements ?? [])}`
+      // Grounded scan shared with the production route — exception-aware, so
+      // "coconut milk" (vegan) or "gluten-free oats" never read as violations.
+      const scanViolations = findAllergenViolations(meals, persona.meal.allergies ?? [], persona.meal.dietaryRestrictions ?? [])
+      const scanReport = scanViolations.length === 0
+        ? '  Programmatic allergen + restriction scan: CLEAN. Do NOT report a safety violation unless you can name a specific offending ingredient from the list below. Plant milks (coconut/oat/soy/pea) are vegan and dairy-free; oats explicitly labelled gluten-free are acceptable for celiac.'
+        : scanViolations.map(v => `  ⚠️ ${v.term} found in ${v.where}: "${v.text}" (meal: ${v.meal})`).join('\n')
+      const allIngredients = meals.flatMap(m => (m.ingredients ?? []).map(i => i.name)).join(', ')
+      return `Meal plan totals: ~${Math.round(totalCal)} kcal, ~${Math.round(totalProt)}g protein (targets: ${persona.meal.calories} kcal, ${persona.meal.protein}g protein)\nSafety scan:\n${scanReport}\nAll ingredients: ${allIngredients}\nMeal titles: ${meals.map(m => m.title).join(' | ')}\nSupplements: ${JSON.stringify(parsed.supplements ?? [])}`
     } catch {
       return `[PARSE ERROR — raw content: ${mealPlan.slice(0, 300)}]`
     }
@@ -506,7 +505,15 @@ async function main() {
 
   const results = []
 
-  for (const persona of PERSONAS) {
+  // EVAL_PERSONA=<id or label substring> reruns a single persona cheaply after a
+  // prompt change (e.g. EVAL_PERSONA=vegan node run-eval.mjs).
+  const filter = (process.env.EVAL_PERSONA ?? '').toLowerCase()
+  const personas = filter
+    ? PERSONAS.filter(p => `${p.id} ${p.label}`.toLowerCase().includes(filter))
+    : PERSONAS
+  if (filter) console.log(`Persona filter "${filter}" → ${personas.length} persona(s)`)
+
+  for (const persona of personas) {
     console.log(`\n--- Evaluating: ${persona.label} ---`)
 
     let mealContent = null
@@ -524,6 +531,19 @@ async function main() {
       mealContent = content
       usageTotal += (usage?.total_tokens ?? 0)
       console.log(`  Meal plan: ${usage?.total_tokens ?? '?'} tokens`)
+
+      // Programmatic allergen scan — same safety net the production route runs.
+      // A violation here is an automatic FAIL regardless of judge scores.
+      try {
+        const parsedMeals = JSON.parse(content.replace(/^```json?\n?/, '').replace(/\n?```$/, '')).meals ?? []
+        const violations = findAllergenViolations(parsedMeals, persona.meal.allergies ?? [], persona.meal.dietaryRestrictions ?? [])
+        persona._allergenViolations = violations
+        console.log(violations.length === 0
+          ? '  Allergen scan: clean'
+          : `  Allergen scan: ${violations.length} VIOLATION(S) — ${violations.map(v => `${v.term} in ${v.where} "${v.text}"`).join('; ')}`)
+      } catch {
+        persona._allergenViolations = []
+      }
     } catch (err) {
       if (err.message.includes('401') || err.message.includes('quota') || err.message.includes('billing') || err.message.includes('insufficient')) {
         console.error('FATAL: OpenAI auth/quota/billing error. Stopping immediately.')
@@ -567,6 +587,14 @@ async function main() {
 
       const jsonStr = content.replace(/^```json?\n?/, '').replace(/\n?```$/, '')
       const judgeResult = JSON.parse(jsonStr)
+      if ((persona._allergenViolations ?? []).length > 0) {
+        judgeResult.pass = false
+        judgeResult.allergen_violations = persona._allergenViolations
+        judgeResult.findings = [
+          { dimension: 'safety', severity: 'critical', detail: `Programmatic allergen scan found: ${persona._allergenViolations.map(v => v.term).join(', ')}` },
+          ...(judgeResult.findings ?? []),
+        ]
+      }
       judgeResult.tokens_used = usageTotal
       judgeResult.raw_meal_plan = mealContent
       judgeResult.raw_training_plan = trainingContent

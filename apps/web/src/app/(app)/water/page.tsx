@@ -198,6 +198,7 @@ export default function WaterPage() {
               onChange={(e) =>
                 setCustomAmount(parseInt(e.target.value) || 50)
               }
+              aria-label="Custom water amount in milliliters"
               className="w-20 text-center"
               style={{
                 fontSize: 14,

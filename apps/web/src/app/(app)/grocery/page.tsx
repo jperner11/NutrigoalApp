@@ -172,11 +172,14 @@ export default function GroceryPage() {
           const items = grouped[category]
           const isCollapsed = collapsedCategories.has(category)
           const categoryChecked = items.filter(i => checkedItems.has(`${i.name}|${i.unit}`)).length
+          const panelId = `grocery-cat-${category.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`
 
           return (
             <div key={category} className="card overflow-hidden">
               <button
                 onClick={() => toggleCategory(category)}
+                aria-expanded={!isCollapsed}
+                aria-controls={panelId}
                 className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-gray-50 transition-colors"
               >
                 <div className="flex items-center gap-3">
@@ -193,7 +196,7 @@ export default function GroceryPage() {
               </button>
 
               {!isCollapsed && (
-                <div className="border-t border-gray-100">
+                <div id={panelId} className="border-t border-gray-100">
                   {items.map(item => {
                     const key = `${item.name}|${item.unit}`
                     const isChecked = checkedItems.has(key)
@@ -202,6 +205,8 @@ export default function GroceryPage() {
                       <button
                         key={key}
                         onClick={() => toggleCheck(key)}
+                        role="checkbox"
+                        aria-checked={isChecked}
                         className={`w-full flex items-center gap-3 px-5 py-3 border-b border-gray-50 last:border-b-0 transition-colors text-left ${
                           isChecked ? 'bg-green-50/50' : 'hover:bg-gray-50'
                         }`}
@@ -216,7 +221,7 @@ export default function GroceryPage() {
                         <span className={`flex-1 text-sm ${isChecked ? 'line-through text-gray-400' : 'text-gray-900'}`}>
                           {item.name}
                         </span>
-                        <span className={`text-sm font-medium ${isChecked ? 'text-gray-300' : 'text-gray-500'}`}>
+                        <span className={`text-sm font-medium ${isChecked ? 'text-gray-400' : 'text-gray-500'}`}>
                           {formatAmount(item.totalAmount)}{item.unit}
                         </span>
                       </button>

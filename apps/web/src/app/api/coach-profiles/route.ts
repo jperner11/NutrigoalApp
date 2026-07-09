@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 interface CoachOfferRow {
@@ -57,8 +58,8 @@ export async function GET() {
   }
 
   const coachIds = (data ?? []).map((profile) => profile.coach_id)
-  const { data: offers } = coachIds.length === 0
-    ? { data: [] as unknown[] }
+  const { data: offers, error: offersError } = coachIds.length === 0
+    ? { data: [] as unknown[], error: null }
     : await admin
       .from('coach_offers')
       .select('id, coach_id, title, description, price, billing_period, cta_label, is_active, sort_order, created_at, updated_at')
@@ -66,6 +67,10 @@ export async function GET() {
       .eq('is_active', true)
       .order('sort_order', { ascending: true })
       .order('created_at', { ascending: true })
+
+  if (offersError) {
+    Sentry.captureException(offersError, { tags: { kind: 'api-route', route: 'coach-profiles' } })
+  }
 
   const offersByCoachId = new Map<string, CoachOfferRow[]>()
   for (const offer of (offers as CoachOfferRow[] | null) ?? []) {

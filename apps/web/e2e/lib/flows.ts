@@ -139,11 +139,14 @@ export async function publishCoachProfile(
 
   // Capture the auto-generated slug from the disabled slug field. Poll, since the
   // value is populated client-side just after the tab renders.
+  // The slug is derived from the coach's name (buildCoachProfileSlug in
+  // src/lib/coachMarketplace.ts), e.g. "e2e-coach-c8e43f" — not a fixed "coach-"
+  // prefix. Only the slug field's disabled <input> is mounted on this tab.
   let slug: string | undefined
   await expect(async () => {
     slug = await page
       .locator('input[disabled]')
-      .evaluateAll((els) => (els as HTMLInputElement[]).map((e) => e.value).find((v) => /^coach-/.test(v)))
+      .evaluateAll((els) => (els as HTMLInputElement[]).map((e) => e.value).find((v) => !!v))
     expect(slug).toBeTruthy()
   }).toPass({ timeout: 20_000 })
 
@@ -164,7 +167,7 @@ export async function publishCoachProfile(
 
 /** Submit a verification request from the Marketplace tab (leaves status pending). */
 export async function requestVerification(page: Page, link = 'https://example.com/my-cert'): Promise<void> {
-  await page.getByRole('textbox', { name: /REPS \/ PT diploma/i }).fill(link)
+  await page.getByRole('textbox', { name: 'Certification link' }).fill(link)
   await page.getByRole('button', { name: /request verification/i }).click()
   await page.waitForTimeout(1000)
 }

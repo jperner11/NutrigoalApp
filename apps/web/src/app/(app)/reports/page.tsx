@@ -48,10 +48,10 @@ function StatCard({ label, value, subtitle, icon: Icon, color }: {
         <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${colorClasses[color] || colorClasses.purple}`}>
           <Icon className="h-4.5 w-4.5" />
         </div>
-        <span className="text-sm text-gray-600">{label}</span>
+        <span className="text-sm text-[var(--muted)]">{label}</span>
       </div>
-      <p className="text-2xl font-bold text-gray-900">{value}</p>
-      {subtitle && <p className="text-xs text-gray-500 mt-0.5">{subtitle}</p>}
+      <p className="text-2xl font-bold text-[var(--foreground)]">{value}</p>
+      {subtitle && <p className="text-xs text-[var(--muted-soft)] mt-0.5">{subtitle}</p>}
     </div>
   )
 }
@@ -61,10 +61,10 @@ function AdherenceBar({ label, percentage, color }: { label: string; percentage:
   return (
     <div>
       <div className="flex items-center justify-between mb-1.5">
-        <span className="text-sm font-medium text-gray-700">{label}</span>
-        <span className="text-sm font-bold text-gray-900">{percentage}%</span>
+        <span className="text-sm font-medium text-[var(--muted)]">{label}</span>
+        <span className="text-sm font-bold text-[var(--foreground)]">{percentage}%</span>
       </div>
-      <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
+      <div className="w-full h-2.5 bg-[var(--line)] rounded-full overflow-hidden">
         <div
           className={`h-full bg-gradient-to-r ${barColor} rounded-full transition-all duration-500`}
           style={{ width: `${Math.min(100, percentage)}%` }}
@@ -123,12 +123,12 @@ export default function ReportsPage() {
     return (
       <div className="max-w-4xl mx-auto space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Beta Reports</h1>
-          <p className="text-gray-600 mt-1">A quick operational view of onboarding and activation during the beta.</p>
+          <h1 className="text-3xl font-bold text-[var(--foreground)]">Beta Reports</h1>
+          <p className="text-[var(--muted)] mt-1">A quick operational view of onboarding and activation during the beta.</p>
         </div>
 
         {loading ? (
-          <div className="text-gray-500 text-center py-12">Loading beta metrics...</div>
+          <div className="text-[var(--muted-soft)] text-center py-12">Loading beta metrics...</div>
         ) : (
           <>
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
@@ -146,18 +146,18 @@ export default function ReportsPage() {
             </div>
 
             <div className="card p-5">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent beta activity</h2>
+              <h2 className="text-lg font-semibold text-[var(--foreground)] mb-4">Recent beta activity</h2>
               {recentEvents.length === 0 ? (
-                <p className="text-sm text-gray-500">No beta events recorded yet.</p>
+                <p className="text-sm text-[var(--muted-soft)]">No beta events recorded yet.</p>
               ) : (
                 <div className="space-y-3">
                   {recentEvents.map((event, index) => (
-                    <div key={`${event.event_name}-${event.created_at}-${index}`} className="flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50/70 px-4 py-3">
+                    <div key={`${event.event_name}-${event.created_at}-${index}`} className="flex items-center justify-between rounded-xl border border-[var(--line)] bg-[var(--background-elevated)] px-4 py-3">
                       <div>
-                        <div className="text-sm font-semibold text-gray-900">{event.event_name.replaceAll('_', ' ')}</div>
-                        <div className="text-xs text-gray-500">{new Date(event.created_at).toLocaleString('en-GB')}</div>
+                        <div className="text-sm font-semibold text-[var(--foreground)]">{event.event_name.replaceAll('_', ' ')}</div>
+                        <div className="text-xs text-[var(--muted-soft)]">{new Date(event.created_at).toLocaleString('en-GB')}</div>
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-[var(--muted-soft)]">
                         {typeof event.metadata?.invited_email === 'string' ? event.metadata.invited_email : ''}
                       </div>
                     </div>
@@ -175,8 +175,8 @@ export default function ReportsPage() {
     <div className="max-w-3xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Reports</h1>
-          <p className="text-gray-600 mt-1">Weekly summary of your progress.</p>
+          <h1 className="text-3xl font-bold text-[var(--foreground)]">Reports</h1>
+          <p className="text-[var(--muted)] mt-1">Weekly summary of your progress.</p>
         </div>
       </div>
 
@@ -184,27 +184,29 @@ export default function ReportsPage() {
       <div className="flex items-center justify-between card p-3 mb-6">
         <button
           onClick={() => setWeekOffset(prev => prev - 1)}
-          className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          aria-label="Previous week"
+          className="p-2 rounded-lg hover:bg-[var(--line)] transition-colors"
         >
-          <ChevronLeft className="h-5 w-5 text-gray-600" />
+          <ChevronLeft className="h-5 w-5 text-[var(--muted)]" />
         </button>
-        <span className="text-sm font-semibold text-gray-900">{weekLabel}</span>
+        <span className="text-sm font-semibold text-[var(--foreground)]">{weekLabel}</span>
         <button
           onClick={() => setWeekOffset(prev => Math.min(0, prev + 1))}
           disabled={weekOffset >= 0}
-          className="p-2 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-30"
+          aria-label="Next week"
+          className="p-2 rounded-lg hover:bg-[var(--line)] transition-colors disabled:opacity-30"
         >
-          <ChevronRight className="h-5 w-5 text-gray-600" />
+          <ChevronRight className="h-5 w-5 text-[var(--muted)]" />
         </button>
       </div>
 
       {loading ? (
-        <div className="text-gray-500 text-center py-12">Loading report...</div>
+        <div className="text-[var(--muted-soft)] text-center py-12">Loading report...</div>
       ) : report ? (
         <div className="space-y-6">
           {/* Adherence */}
           <div className="card p-5">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Adherence</h2>
+            <h2 className="text-lg font-semibold text-[var(--foreground)] mb-4">Adherence</h2>
             <div className="space-y-4">
               <AdherenceBar label="Calorie Target" percentage={report.calorieAdherence} color="purple" />
               <AdherenceBar label="Water Intake" percentage={report.waterAdherence} color="blue" />
@@ -213,7 +215,7 @@ export default function ReportsPage() {
 
           {/* Nutrition Stats */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-[var(--foreground)] mb-3 flex items-center gap-2">
               <Utensils className="h-5 w-5 text-purple-600" />
               Nutrition
             </h2>
@@ -251,7 +253,7 @@ export default function ReportsPage() {
 
           {/* Training Stats */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-[var(--foreground)] mb-3 flex items-center gap-2">
               <Dumbbell className="h-5 w-5 text-blue-600" />
               Training
             </h2>
@@ -275,7 +277,7 @@ export default function ReportsPage() {
 
           {/* Water & Weight */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-[var(--foreground)] mb-3 flex items-center gap-2">
               <Droplets className="h-5 w-5 text-cyan-600" />
               Water & Weight
             </h2>
