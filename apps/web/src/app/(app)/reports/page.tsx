@@ -184,6 +184,7 @@ export default function ReportsPage() {
       <div className="flex items-center justify-between card p-3 mb-6">
         <button
           onClick={() => setWeekOffset(prev => prev - 1)}
+          aria-label="Previous week"
           className="p-2 rounded-lg hover:bg-[var(--line)] transition-colors"
         >
           <ChevronLeft className="h-5 w-5 text-[var(--muted)]" />
@@ -192,6 +193,7 @@ export default function ReportsPage() {
         <button
           onClick={() => setWeekOffset(prev => Math.min(0, prev + 1))}
           disabled={weekOffset >= 0}
+          aria-label="Next week"
           className="p-2 rounded-lg hover:bg-[var(--line)] transition-colors disabled:opacity-30"
         >
           <ChevronRight className="h-5 w-5 text-[var(--muted)]" />
