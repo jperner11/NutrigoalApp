@@ -72,6 +72,23 @@ export async function createTestUser(
   return { id: data.user.id, email, password, role }
 }
 
+/**
+ * Mint a password-recovery link for a seeded user — what the reset email would
+ * contain — so F04 can prove the full forgot-password loop without an inbox.
+ */
+export async function generateRecoveryLink(email: string, redirectTo: string): Promise<string> {
+  const supabase = admin()
+  const { data, error } = await supabase.auth.admin.generateLink({
+    type: 'recovery',
+    email,
+    options: { redirectTo },
+  })
+  if (error || !data.properties?.action_link) {
+    throw new Error(`Failed to generate recovery link for ${email}: ${error?.message ?? 'no link'}`)
+  }
+  return data.properties.action_link
+}
+
 export async function deleteTestUser(userId: string): Promise<void> {
   const supabase = admin()
   // user_profiles.id REFERENCES auth.users(id) ON DELETE CASCADE, so deleting the
