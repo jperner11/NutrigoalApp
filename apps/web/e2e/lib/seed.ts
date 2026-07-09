@@ -146,7 +146,7 @@ export async function getTrainerLink(userId: string): Promise<{ role: string; pe
  * and /find-coach. Slug carries the e2e prefix so cleanup can match it (rows also
  * cascade when the auth user is deleted).
  */
-export async function publishCoachProfile(coachId: string, label: string): Promise<void> {
+export async function publishCoachProfile(coachId: string, label: string): Promise<{ slug: string }> {
   const supabase = admin()
   const slug = `${TEST_PREFIX}-${label}-${coachId.slice(0, 8)}`
   const { error } = await supabase.from('coach_public_profiles').upsert({
@@ -161,6 +161,7 @@ export async function publishCoachProfile(coachId: string, label: string): Promi
     accepting_new_clients: true,
   })
   if (error) throw new Error(`Failed to publish coach profile for ${coachId}: ${error.message}`)
+  return { slug }
 }
 
 export interface SeededPair {
