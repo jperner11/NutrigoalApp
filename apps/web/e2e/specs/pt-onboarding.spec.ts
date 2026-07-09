@@ -5,6 +5,8 @@ import { completeOnboarding, publishCoachProfile, requestVerification } from '..
 // Covers: coach completes onboarding, publishes a public marketplace profile, and
 // requests verification — asserting the profile renders publicly but WITHOUT a
 // verified badge while verification is only pending (the trust-layer guarantee).
+// The public-profile assertions below also cover F31 (a logged-out visitor viewing
+// a coach's public profile page).
 
 // The coach setup questionnaire renders for a brand-new coach: step 1 of 6 and the
 // first prompt are on screen. Reliable guard against a broken coach intake.
@@ -43,6 +45,11 @@ test('coach publishes a marketplace profile that renders publicly with no verifi
     await expect(publicPage.getByRole('heading', { name: /Srf|Coach|E2E/i }).first()).toBeVisible()
     // Verification is only pending → no "Verified" badge should appear.
     await expect(publicPage.getByText(/^verified$/i)).toHaveCount(0)
+    // F31: the profile's own content (headline, price, hire CTA) renders for a
+    // logged-out visitor — not just the name and gating state.
+    await expect(publicPage.getByText('Fat loss coaching for busy professionals')).toBeVisible()
+    await expect(publicPage.getByRole('link', { name: /request coaching/i })).toBeVisible()
+    await expect(publicPage.getByRole('link', { name: /back to discover/i })).toBeVisible()
   } finally {
     await publicCtx.close()
   }
