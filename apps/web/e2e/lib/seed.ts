@@ -85,12 +85,27 @@ export async function deleteTestUser(userId: string): Promise<void> {
 /**
  * Assign a seeded client to a seeded trainer — the state the invite-accept flow
  * (F40) ends in. Lets multi-user specs and volume seeding skip the email invite.
+ *
+ * Mirrors BOTH writes the real accept route makes (respond/route.ts): the
+ * `nutritionist_clients` row is what the "Nutritionists can view client profiles"
+ * RLS policy (migration 001) actually checks, so without it a trainer's browser
+ * session gets 0 rows back for their linked client despite personal_trainer_id
+ * being set — only updating user_profiles isn't enough to make the client visible
+ * to the trainer through the app's real RLS-gated queries.
  */
 export async function linkClientToTrainer(clientId: string, trainerId: string): Promise<void> {
   const supabase = admin()
+  const { error: relError } = await supabase
+    .from('nutritionist_clients')
+    .upsert(
+      { nutritionist_id: trainerId, client_id: clientId, status: 'active' },
+      { onConflict: 'nutritionist_id,client_id' },
+    )
+  if (relError) throw new Error(`Failed to link client ${clientId} to trainer ${trainerId}: ${relError.message}`)
+
   const { error } = await supabase
     .from('user_profiles')
-    .update({ personal_trainer_id: trainerId })
+    .update({ personal_trainer_id: trainerId, nutritionist_id: trainerId, role: 'personal_trainer_client' })
     .eq('id', clientId)
   if (error) throw new Error(`Failed to link client ${clientId} to trainer ${trainerId}: ${error.message}`)
 }
