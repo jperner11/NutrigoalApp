@@ -199,6 +199,7 @@ export async function publishCoachProfile(coachId: string, label: string): Promi
 export interface SeededPair {
   coach: SeededUser
   clients: SeededUser[]
+  slug: string
 }
 
 /**
@@ -207,14 +208,14 @@ export interface SeededPair {
  */
 export async function createLinkedPair(clientsPerCoach = 1): Promise<SeededPair> {
   const coach = await createTestUser('personal_trainer')
-  await publishCoachProfile(coach.id, 'pair')
+  const { slug } = await publishCoachProfile(coach.id, 'pair')
   const clients: SeededUser[] = []
   for (let i = 0; i < clientsPerCoach; i++) {
     const client = await createTestUser('free')
     await linkClientToTrainer(client.id, coach.id)
     clients.push(client)
   }
-  return { coach, clients }
+  return { coach, clients, slug }
 }
 
 /**
