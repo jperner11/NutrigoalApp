@@ -357,7 +357,7 @@ function TemplateForm({ template, trainerId, onSaved, onCancel }: {
   }
 
   return (
-    <div className="card p-6 mb-6 ring-2 ring-purple-200">
+    <div className="card p-6 mb-6 ring-2 ring-[var(--brand-200)]">
       <h2 className="text-lg font-bold text-gray-900 mb-4">
         {template ? 'Edit Template' : 'New Template'}
       </h2>
