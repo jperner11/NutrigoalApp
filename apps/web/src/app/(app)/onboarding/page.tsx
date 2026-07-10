@@ -1906,7 +1906,7 @@ export default function OnboardingPage() {
                   <p className="text-sm text-purple-800 leading-relaxed">
                     {isManagedClient
                       ? 'Your coach will see this intake in their dashboard, including your goals, restrictions, schedule, and main obstacles, so they can review your case and decide the right next step.'
-                      : 'Your personal AI coach will use everything you&apos;ve told us to create a meal plan and training structure that actually fit your life: favourite meals, snack habits, training level, schedule, recovery, and pace of progress. No bland template plans unless that&apos;s what you asked for.'}
+                      : "Your personal AI coach will use everything you've told us to create a meal plan and training structure that actually fit your life: favourite meals, snack habits, training level, schedule, recovery, and pace of progress. No bland template plans unless that's what you asked for."}
                   </p>
                 </div>
 
@@ -2071,9 +2071,9 @@ function ChipGrid({
 
 function ReviewRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between items-start py-2 px-3 bg-gray-50 rounded-lg">
-      <span className="text-sm text-gray-500">{label}</span>
-      <span className="text-sm font-semibold text-gray-900 text-right ml-2">{value}</span>
+    <div className="flex justify-between items-start gap-2 py-2 px-3 bg-gray-50 rounded-lg">
+      <span className="text-sm text-gray-500 flex-shrink-0">{label}</span>
+      <span className="text-sm font-semibold text-gray-900 text-right min-w-0 break-words">{value}</span>
     </div>
   )
 }
