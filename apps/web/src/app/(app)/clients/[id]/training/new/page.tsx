@@ -33,6 +33,7 @@ export default function NewClientTrainingPlanPage() {
   const router = useRouter()
   const { profile } = useUser()
   const [client, setClient] = useState<UserProfile | null>(null)
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [planName, setPlanName] = useState('')
   const [description, setDescription] = useState('')
   const [days, setDays] = useState<TrainingDay[]>([])
@@ -54,6 +55,7 @@ export default function NewClientTrainingPlanPage() {
       supabase.from('user_profiles').select('*').eq('id', id).single(),
       supabase.from('exercises').select('*'),
     ]).then(([clientRes, exRes]) => {
+      if (clientRes.error) { setLoadError('Failed to load client. Please refresh.'); setLoadingExercises(false); return }
       if (clientRes.data) setClient(clientRes.data as UserProfile)
       if (exRes.data) setExercises(exRes.data as Exercise[])
       setLoadingExercises(false)
@@ -68,6 +70,7 @@ export default function NewClientTrainingPlanPage() {
     })
   }, [exercises, searchQuery, filterBodyPart])
 
+  if (loadError) return <div className="text-[var(--fg-3)]">{loadError}</div>
   if (!profile || !client) return <div className="text-[var(--fg-3)]">Loading...</div>
 
   function addDay() {
