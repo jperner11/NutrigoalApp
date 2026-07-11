@@ -275,7 +275,7 @@ export default function SupplementsPage() {
                 <select
                   value={form.frequency}
                   onChange={(e) => setForm(f => ({ ...f, frequency: e.target.value }))}
-                  className={`${fieldClass} appearance-none`}
+                  className={`${fieldClass} appearance-none pr-8`}
                 >
                   {SUPPLEMENT_FREQUENCIES.map(f => (
                     <option key={f.value} value={f.value}>{f.label}</option>
@@ -290,7 +290,7 @@ export default function SupplementsPage() {
                 <select
                   value={form.time_of_day}
                   onChange={(e) => setForm(f => ({ ...f, time_of_day: e.target.value }))}
-                  className={`${fieldClass} appearance-none`}
+                  className={`${fieldClass} appearance-none pr-8`}
                 >
                   {SUPPLEMENT_TIMES.map(t => (
                     <option key={t.value} value={t.value}>{t.label}</option>
