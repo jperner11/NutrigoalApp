@@ -56,7 +56,10 @@ export default function SupplementWidget({ userId }: SupplementWidgetProps) {
         .eq('supplement_id', sup.id)
         .eq('date', today)
 
-      if (error) return
+      if (error) {
+        toast.error('Failed to unlog')
+        return
+      }
       setTodayLogs(prev => prev.filter(l => l.supplement_id !== sup.id))
     } else {
       const { data, error } = await supabase
@@ -65,7 +68,10 @@ export default function SupplementWidget({ userId }: SupplementWidgetProps) {
         .select()
         .single()
 
-      if (error) return
+      if (error) {
+        toast.error('Failed to log')
+        return
+      }
       setTodayLogs(prev => [...prev, data])
       toast.success(`${sup.name} taken!`)
     }
