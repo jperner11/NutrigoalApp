@@ -111,19 +111,19 @@ export default function LeadsPage() {
   }
 
   if (loading) {
-    return <div className="text-gray-500">Loading leads...</div>
+    return <div className="text-[var(--muted-soft)]">Loading leads...</div>
   }
 
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Marketplace Leads</h1>
-          <p className="mt-1 text-gray-600">
+          <h1 className="text-3xl font-bold text-[var(--foreground)]">Marketplace Leads</h1>
+          <p className="mt-1 text-[var(--muted)]">
             Review incoming coaching requests and convert the right fits into managed clients.
           </p>
         </div>
-        <div className="rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-600">
+        <div className="rounded-2xl border border-[var(--line)] bg-[var(--panel-strong)] px-4 py-3 text-sm text-[var(--muted)]">
           {pendingLeads.length} pending
         </div>
       </div>
@@ -143,25 +143,25 @@ export default function LeadsPage() {
 
       <section className="space-y-4">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Pending requests</h2>
-          <p className="text-sm text-gray-600">These people are waiting for your response.</p>
+          <h2 className="text-xl font-bold text-[var(--foreground)]">Pending requests</h2>
+          <p className="text-sm text-[var(--muted)]">These people are waiting for your response.</p>
         </div>
 
         {pendingLeads.length === 0 ? (
-          <div className="rounded-[28px] border border-dashed border-gray-200 bg-white px-6 py-14 text-center">
-            <Inbox className="mx-auto h-10 w-10 text-gray-300" />
-            <h3 className="mt-4 text-lg font-semibold text-gray-900">No pending leads right now.</h3>
-            <p className="mt-2 text-sm text-gray-500">Once your marketplace profile is live, incoming requests will appear here.</p>
+          <div className="rounded-[28px] border border-dashed border-[var(--line)] bg-[var(--panel-strong)] px-6 py-14 text-center">
+            <Inbox className="mx-auto h-10 w-10 text-[var(--muted-soft)]" />
+            <h3 className="mt-4 text-lg font-semibold text-[var(--foreground)]">No pending leads right now.</h3>
+            <p className="mt-2 text-sm text-[var(--muted-soft)]">Once your marketplace profile is live, incoming requests will appear here.</p>
           </div>
         ) : (
           <div className="space-y-4">
             {pendingLeads.map((lead) => (
-              <div key={lead.id} className="rounded-[30px] border border-gray-200 bg-white p-6 shadow-[0_16px_38px_rgba(15,23,42,0.05)]">
+              <div key={lead.id} className="rounded-[30px] border border-[var(--line)] bg-[var(--panel-strong)] p-6 shadow-[0_16px_38px_rgba(15,23,42,0.05)]">
                 <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
                   <div className="space-y-4">
                     <div>
-                      <h3 className="text-xl font-semibold text-gray-900">{lead.user?.full_name || lead.user?.email || 'Lead'}</h3>
-                      <div className="mt-1 flex flex-wrap items-center gap-3 text-sm text-gray-500">
+                      <h3 className="text-xl font-semibold text-[var(--foreground)]">{lead.user?.full_name || lead.user?.email || 'Lead'}</h3>
+                      <div className="mt-1 flex flex-wrap items-center gap-3 text-sm text-[var(--muted-soft)]">
                         <span className="inline-flex items-center gap-1.5"><Mail className="h-4 w-4" />{lead.user?.email}</span>
                         <span>{new Date(lead.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                       </div>
@@ -169,40 +169,40 @@ export default function LeadsPage() {
 
                     <div className="grid gap-3 md:grid-cols-2">
                       <div>
-                        <div className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">Goal summary</div>
-                        <div className="mt-1 text-sm text-gray-700">{lead.goal_summary}</div>
+                        <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted-soft)]">Goal summary</div>
+                        <div className="mt-1 text-sm text-[var(--muted)]">{lead.goal_summary}</div>
                       </div>
                       <div>
-                        <div className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">Selected offer</div>
-                        <div className="mt-1 text-sm text-gray-700">{lead.selected_offer_title || 'General coaching request'}</div>
+                        <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted-soft)]">Selected offer</div>
+                        <div className="mt-1 text-sm text-[var(--muted)]">{lead.selected_offer_title || 'General coaching request'}</div>
                       </div>
                       <div>
-                        <div className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">Training background</div>
-                        <div className="mt-1 text-sm text-gray-700">{lead.experience_level?.replace(/_/g, ' ') || lead.user?.training_experience?.replace(/_/g, ' ') || 'Not specified'}</div>
+                        <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted-soft)]">Training background</div>
+                        <div className="mt-1 text-sm text-[var(--muted)]">{lead.experience_level?.replace(/_/g, ' ') || lead.user?.training_experience?.replace(/_/g, ' ') || 'Not specified'}</div>
                       </div>
                       <div>
-                        <div className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">Preferred format</div>
-                        <div className="mt-1 text-sm text-gray-700">{lead.preferred_format || 'Not specified'}</div>
+                        <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted-soft)]">Preferred format</div>
+                        <div className="mt-1 text-sm text-[var(--muted)]">{lead.preferred_format || 'Not specified'}</div>
                       </div>
                       <div>
-                        <div className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">Budget</div>
-                        <div className="mt-1 text-sm text-gray-700">{lead.budget_label || 'Not specified'}</div>
+                        <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted-soft)]">Budget</div>
+                        <div className="mt-1 text-sm text-[var(--muted)]">{lead.budget_label || 'Not specified'}</div>
                       </div>
                     </div>
 
                     {lead.message && (
                       <div>
-                        <div className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">Message</div>
-                        <p className="mt-1 text-sm leading-6 text-gray-700">{lead.message}</p>
+                        <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted-soft)]">Message</div>
+                        <p className="mt-1 text-sm leading-6 text-[var(--muted)]">{lead.message}</p>
                       </div>
                     )}
 
                     <div className="max-w-[240px]">
-                      <div className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">Pipeline stage</div>
+                      <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted-soft)]">Pipeline stage</div>
                       <select
                         value={lead.stage}
                         onChange={(e) => updateLeadStage(lead.id, e.target.value as LeadRecord['stage'])}
-                        className="mt-1 w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700"
+                        className="mt-1 w-full rounded-xl border border-[var(--line)] bg-[var(--panel-strong)] px-3 py-2 text-sm text-[var(--muted)]"
                       >
                         {COACH_LEAD_STAGES.filter((stage) => stage !== 'won' && stage !== 'lost').map((stage) => (
                           <option key={stage} value={stage}>{formatLeadStage(stage)}</option>
@@ -241,20 +241,20 @@ export default function LeadsPage() {
       {handledLeads.length > 0 && (
         <section className="space-y-4">
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Handled requests</h2>
-            <p className="text-sm text-gray-600">Recent accepted and declined marketplace requests.</p>
+            <h2 className="text-xl font-bold text-[var(--foreground)]">Handled requests</h2>
+            <p className="text-sm text-[var(--muted)]">Recent accepted and declined marketplace requests.</p>
           </div>
 
           <div className="space-y-3">
             {handledLeads.map((lead) => (
-              <div key={lead.id} className="rounded-2xl border border-gray-200 bg-white p-5">
+              <div key={lead.id} className="rounded-2xl border border-[var(--line)] bg-[var(--panel-strong)] p-5">
                 <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                   <div>
-                    <div className="font-semibold text-gray-900">{lead.user?.full_name || lead.user?.email || 'Lead'}</div>
-                    <div className="mt-1 text-sm text-gray-600">{lead.goal_summary}</div>
+                    <div className="font-semibold text-[var(--foreground)]">{lead.user?.full_name || lead.user?.email || 'Lead'}</div>
+                    <div className="mt-1 text-sm text-[var(--muted)]">{lead.goal_summary}</div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className={`rounded-full px-3 py-1 text-xs font-semibold ${lead.status === 'accepted' ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-700'}`}>
+                    <span className={`rounded-full px-3 py-1 text-xs font-semibold ${lead.status === 'accepted' ? 'bg-emerald-50 text-emerald-700' : 'bg-[var(--line)] text-[var(--muted)]'}`}>
                       {lead.status}
                     </span>
                     <span className="rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-700">
