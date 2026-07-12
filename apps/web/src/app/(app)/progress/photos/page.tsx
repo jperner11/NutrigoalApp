@@ -369,12 +369,23 @@ export default function PhotosPage() {
                 {datePhotos.map((photo) => (
                   <div
                     key={photo.id}
-                    className="group relative aspect-[3/4] cursor-pointer overflow-hidden rounded-xl"
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`View ${photo.pose} photo from ${date}`}
+                    className="group relative aspect-[3/4] cursor-pointer overflow-hidden rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
                     style={{
                       background: 'var(--ink-3)',
                       border: '1px solid var(--line)',
+                      outlineColor: 'var(--acc)',
                     }}
                     onClick={() => setLightbox(photo)}
+                    onKeyDown={(e) => {
+                      if (e.target !== e.currentTarget) return
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        setLightbox(photo)
+                      }
+                    }}
                   >
                     <Image
                       src={photo.photo_url}
@@ -400,7 +411,7 @@ export default function PhotosPage() {
                         e.stopPropagation()
                         handleDelete(photo)
                       }}
-                      className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full opacity-0 transition group-hover:opacity-100"
+                      className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100 focus-visible:opacity-100"
                       style={{
                         background: 'rgba(19, 16, 18, 0.72)',
                         color: 'var(--foreground)',
