@@ -310,6 +310,7 @@ export default function CoachQuestionsPage() {
                     />
                     <button
                       onClick={() => setDraft({ ...draft, options: draft.options.filter((_, i) => i !== idx) })}
+                      aria-label={`Remove option ${idx + 1}`}
                       className="rounded-lg px-2 text-red-400 hover:bg-[var(--ink-3)]"
                     >
                       <X className="h-4 w-4" />
