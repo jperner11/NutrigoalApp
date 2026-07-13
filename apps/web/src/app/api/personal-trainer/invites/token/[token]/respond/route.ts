@@ -51,7 +51,7 @@ export async function POST(
   }
 
   if (action === 'decline') {
-    await admin
+    const { error: declineError } = await admin
       .from('personal_trainer_invites')
       .update({
         status: 'declined',
@@ -60,6 +60,10 @@ export async function POST(
         updated_at: new Date().toISOString(),
       })
       .eq('id', invite.id)
+
+    if (declineError) {
+      return NextResponse.json({ error: declineError.message }, { status: 400 })
+    }
 
     return NextResponse.json({ success: true, status: 'declined' })
   }
@@ -98,7 +102,7 @@ export async function POST(
     return NextResponse.json({ error: profileError.message }, { status: 400 })
   }
 
-  await admin
+  const { error: acceptError } = await admin
     .from('personal_trainer_invites')
     .update({
       status: 'accepted',
@@ -107,6 +111,10 @@ export async function POST(
       updated_at: new Date().toISOString(),
     })
     .eq('id', invite.id)
+
+  if (acceptError) {
+    return NextResponse.json({ error: acceptError.message }, { status: 400 })
+  }
 
   return NextResponse.json({ success: true, status: 'accepted' })
 }
