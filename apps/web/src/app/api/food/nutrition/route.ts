@@ -106,6 +106,7 @@ async function getSpoonacularNutrition(id: string, amount: number, unit: string)
   try {
     const response = await fetch(
       `https://api.spoonacular.com/food/ingredients/${spoonId}/information?amount=${amount}&unit=${encodeURIComponent(unit)}&apiKey=${apiKey}`,
+      { signal: AbortSignal.timeout(3000) },
     )
 
     if (!response.ok) {
