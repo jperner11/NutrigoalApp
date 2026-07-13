@@ -101,6 +101,7 @@ async function searchSpoonacular(query: string, limit: number): Promise<FoodResu
   try {
     const response = await fetch(
       `https://api.spoonacular.com/food/ingredients/search?query=${encodeURIComponent(query)}&number=${limit}&apiKey=${apiKey}`,
+      { signal: AbortSignal.timeout(3000) },
     )
     if (!response.ok) return []
 
