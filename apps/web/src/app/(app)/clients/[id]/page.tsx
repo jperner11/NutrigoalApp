@@ -346,7 +346,7 @@ function EditableMacros({ client, onUpdated }: { client: UserProfile; onUpdated:
       <div className="flex items-center justify-between mb-3">
         <span className="app-mono-label">Edit macro targets</span>
         <div className="flex items-center gap-2">
-          <button onClick={reset} className="rounded-lg p-1.5 text-[var(--fg-4)] hover:bg-[var(--ink-3)] hover:text-[var(--fg-2)]">
+          <button onClick={reset} aria-label="Cancel editing macro targets" className="rounded-lg p-1.5 text-[var(--fg-4)] hover:bg-[var(--ink-3)] hover:text-[var(--fg-2)]">
             <X className="h-4 w-4" />
           </button>
         </div>
