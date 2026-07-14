@@ -308,7 +308,7 @@ export default function TrainerDashboard({ trainerId, trainerName }: TrainerDash
                   <Link
                     key={client.id}
                     href={client.client ? `/clients/${client.client.id}` : '/clients'}
-                    className="flex items-center justify-between rounded-[22px] border border-[var(--line)] bg-[var(--surface-strong)] px-4 py-4 transition hover:border-[rgba(205, 242, 78,0.28)] hover:bg-[var(--brand-100)]"
+                    className="flex items-center justify-between rounded-[22px] border border-[var(--line)] bg-[var(--surface-strong)] px-4 py-4 transition hover:border-[rgba(205,242,78,0.28)] hover:bg-[var(--brand-100)]"
                   >
                     <div>
                       <div className="font-semibold text-[var(--foreground)]">{client.client?.full_name || client.client?.email || client.invited_email}</div>

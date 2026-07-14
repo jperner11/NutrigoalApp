@@ -99,7 +99,7 @@ export default function ProgressCheckIn({ userId, onPlanRegenerate }: ProgressCh
 
   const trendColor = (trend: string) => {
     if (trend === 'improving') return 'text-emerald-200 bg-[rgba(26,163,122,0.12)] border-[rgba(26,163,122,0.34)]'
-    if (trend === 'declining') return 'text-[var(--foreground)] bg-[var(--danger-bg)] border-[rgba(205, 242, 78,0.34)]'
+    if (trend === 'declining') return 'text-[var(--foreground)] bg-[var(--danger-bg)] border-[rgba(205,242,78,0.34)]'
     return 'text-amber-200 bg-[rgba(196,121,28,0.12)] border-[rgba(196,121,28,0.34)]'
   }
 
@@ -110,9 +110,9 @@ export default function ProgressCheckIn({ userId, onPlanRegenerate }: ProgressCh
       <div className="mb-6 space-y-2">
         <button
           onClick={runCheckIn}
-          className="group flex w-full items-center gap-4 rounded-xl border-2 border-dashed border-[rgba(205, 242, 78,0.34)] bg-[var(--brand-100)] px-5 py-4 transition-all hover:border-[rgba(205, 242, 78,0.52)] hover:bg-[rgba(205, 242, 78,0.16)]"
+          className="group flex w-full items-center gap-4 rounded-xl border-2 border-dashed border-[rgba(205,242,78,0.34)] bg-[var(--brand-100)] px-5 py-4 transition-all hover:border-[rgba(205,242,78,0.52)] hover:bg-[rgba(205,242,78,0.16)]"
         >
-          <div className="rounded-xl bg-[var(--brand-100)] p-2.5 transition-colors group-hover:bg-[rgba(205, 242, 78,0.18)]">
+          <div className="rounded-xl bg-[var(--brand-100)] p-2.5 transition-colors group-hover:bg-[rgba(205,242,78,0.18)]">
             <BarChart3 className="h-5 w-5 text-[var(--brand-400)]" />
           </div>
           <div className="flex-1 text-left">
