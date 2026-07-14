@@ -298,7 +298,7 @@ export default function NewClientDietPlanPage() {
                   {food.source && <span className="ml-1 text-[var(--fg-4)]">· {food.source === 'ai_parsed' ? 'AI' : food.source === 'custom' ? '★' : food.source === 'openfoodfacts' ? 'OFF' : 'SP'}</span>}
                 </p>
               </div>
-              <button onClick={() => removeFood(mi, fi)} className="text-[var(--fg-4)] hover:text-[var(--brand-400)]">
+              <button onClick={() => removeFood(mi, fi)} aria-label={`Remove ${food.name}`} className="text-[var(--fg-4)] hover:text-[var(--brand-400)]">
                 <Trash2 className="h-4 w-4" />
               </button>
             </div>

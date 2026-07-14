@@ -202,7 +202,7 @@ export default function NewClientTrainingPlanPage() {
               setDays(prev => { const u = [...prev]; u[di].name = e.target.value; return u })
             }} className="bg-transparent text-lg font-semibold text-[var(--fg)] outline-none" />
             {days.length > 1 && (
-              <button onClick={() => removeDay(di)} className="text-[var(--brand-400)] hover:text-[var(--brand-500)]">
+              <button onClick={() => removeDay(di)} aria-label={`Remove ${day.name}`} className="text-[var(--brand-400)] hover:text-[var(--brand-500)]">
                 <Trash2 className="h-4 w-4" />
               </button>
             )}
@@ -226,7 +226,7 @@ export default function NewClientTrainingPlanPage() {
                   className="w-14 rounded border border-[var(--line)] bg-[var(--ink-2)] px-2 py-1 text-center text-sm text-[var(--fg)]" />
                 <span className="text-xs text-[var(--fg-4)]">s</span>
               </div>
-              <button onClick={() => removeExercise(di, ei)} className="text-[var(--fg-4)] hover:text-[var(--brand-400)]">
+              <button onClick={() => removeExercise(di, ei)} aria-label={`Remove ${ex.exerciseName}`} className="text-[var(--fg-4)] hover:text-[var(--brand-400)]">
                 <Trash2 className="h-4 w-4" />
               </button>
             </div>
