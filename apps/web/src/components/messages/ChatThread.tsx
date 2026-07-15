@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { ArrowLeft, Send } from 'lucide-react'
 import Link from 'next/link'
+import { toast } from 'react-hot-toast'
 import type { Message } from '@/lib/supabase/types'
 import AppPageHeader from '@/components/ui/AppPageHeader'
 
@@ -120,6 +121,8 @@ export function ChatThread({
         .update({ last_message_at: new Date().toISOString() })
         .eq('id', conversationId)
         .then(() => {})
+    } else {
+      toast.error('Failed to send message. Please try again.')
     }
 
     setSending(false)
