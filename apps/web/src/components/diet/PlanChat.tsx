@@ -161,10 +161,18 @@ export default function PlanChat({ planId, meals, targets, userProfile, dayOfWee
               <h3 className="text-white font-semibold text-sm">AI Plan Assistant</h3>
             </div>
             <div className="flex items-center gap-1">
-              <button onClick={() => setIsOpen(false)} className="text-white/70 hover:text-white p-1 transition-colors">
+              <button
+                onClick={() => setIsOpen(false)}
+                aria-label="Minimize chat"
+                className="text-white/70 hover:text-white p-1 transition-colors"
+              >
                 <ChevronDown className="h-5 w-5" />
               </button>
-              <button onClick={() => { setIsOpen(false); setMessages([]) }} className="text-white/70 hover:text-white p-1 transition-colors">
+              <button
+                onClick={() => { setIsOpen(false); setMessages([]) }}
+                aria-label="Close chat"
+                className="text-white/70 hover:text-white p-1 transition-colors"
+              >
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -237,6 +245,7 @@ export default function PlanChat({ planId, meals, targets, userProfile, dayOfWee
               <button
                 onClick={handleSend}
                 disabled={isLoading || !input.trim()}
+                aria-label="Send message"
                 className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-2.5 rounded-xl hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
               >
                 <Send className="h-4 w-4" />
