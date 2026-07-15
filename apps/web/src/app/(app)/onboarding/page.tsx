@@ -2031,8 +2031,17 @@ function OptionCard({
 }) {
   return (
     <div
+      role="button"
+      tabIndex={0}
+      aria-pressed={selected}
       onClick={onClick}
-      className={`p-4 border-2 rounded-xl cursor-pointer transition-all ${
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          onClick()
+        }
+      }}
+      className={`p-4 border-2 rounded-xl cursor-pointer transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 ${
         selected
           ? 'border-purple-500 bg-purple-50'
           : 'border-gray-200 hover:border-gray-300'
