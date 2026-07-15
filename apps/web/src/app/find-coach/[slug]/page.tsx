@@ -119,10 +119,7 @@ export default async function CoachProfilePage({
                   ? 'ACCEPTING NEW CLIENTS'
                   : 'WAITLIST OPEN'}
               </div>
-              <h1
-                className="h2 mt-2.5"
-                style={{ fontSize: 56 }}
-              >
+              <h1 className="h2 mt-2.5">
                 {name}
               </h1>
               <div
