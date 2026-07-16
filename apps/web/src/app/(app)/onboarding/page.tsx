@@ -203,8 +203,13 @@ export default function OnboardingPage() {
       .eq('trainer_id', profile.id)
       .order('sort_order', { ascending: true })
       .order('created_at', { ascending: true })
-      .then(({ data }) => {
-        if (cancelled || !data) return
+      .then(({ data, error }) => {
+        if (cancelled) return
+        if (error) {
+          toast.error('Failed to load your custom intake questions: ' + error.message)
+          return
+        }
+        if (!data) return
         const rows = data as PersonalTrainerCustomIntakeQuestion[]
         initialTrainerQuestionIdsRef.current = rows.map((r) => r.id)
         setTrainerDraftQuestions(
