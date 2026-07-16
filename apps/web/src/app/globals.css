@@ -439,6 +439,7 @@ main {
   /* Status */
   --ok: #1aa37a;
   --warn: #c4791c;
+  --danger: #dc2626;
 
   /* Surface-strong — always-dark cards (greeting hero, PR card, footer, ForCoaches section) */
   --surface-strong: var(--background-elevated);

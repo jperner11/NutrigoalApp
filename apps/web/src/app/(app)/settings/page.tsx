@@ -1534,7 +1534,7 @@ export default function SettingsPage() {
                       <span className="chip" style={{ color: 'var(--warn)' }}>Under review</span>
                     )}
                     {verificationStatus === 'rejected' && (
-                      <span className="chip" style={{ color: 'var(--danger, #e5484d)' }}>Not approved</span>
+                      <span className="chip" style={{ color: 'var(--danger)' }}>Not approved</span>
                     )}
                   </div>
                   <p className="mt-1 text-sm leading-6" style={{ color: 'var(--fg-2)' }}>
