@@ -224,6 +224,7 @@ export default function DiscoverPage() {
           />
           <input
             type="text"
+            aria-label="Search coaches by name, specialty, or ideal client"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by coach name, specialty, or ideal client"
@@ -241,6 +242,7 @@ export default function DiscoverPage() {
         >
           <SlidersHorizontal className="h-4 w-4" style={{ color: 'var(--fg-4)' }} />
           <select
+            aria-label="Filter coaches by format"
             value={formatFilter}
             onChange={(e) => setFormatFilter(e.target.value)}
             className="w-full"
@@ -538,12 +540,14 @@ export default function DiscoverPage() {
               {selectedCoach.offers.length > 0 && (
                 <div>
                   <label
+                    htmlFor="lead-offer"
                     className="mono mb-2 block"
                     style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
                   >
                     CHOOSE AN OFFER
                   </label>
                   <select
+                    id="lead-offer"
                     value={leadForm.selected_offer_id}
                     onChange={(e) => setLeadForm((prev) => ({ ...prev, selected_offer_id: e.target.value }))}
                     style={inputStyle}
@@ -559,12 +563,14 @@ export default function DiscoverPage() {
               )}
               <div>
                 <label
+                  htmlFor="lead-goal-summary"
                   className="mono mb-2 block"
                   style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
                 >
                   WHAT DO YOU WANT HELP WITH? *
                 </label>
                 <input
+                  id="lead-goal-summary"
                   type="text"
                   value={leadForm.goal_summary}
                   onChange={(e) => setLeadForm((prev) => ({ ...prev, goal_summary: e.target.value }))}
@@ -575,12 +581,14 @@ export default function DiscoverPage() {
               <div className="grid gap-3.5 md:grid-cols-2">
                 <div>
                   <label
+                    htmlFor="lead-preferred-format"
                     className="mono mb-2 block"
                     style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
                   >
                     PREFERRED FORMAT
                   </label>
                   <input
+                    id="lead-preferred-format"
                     type="text"
                     value={leadForm.preferred_format}
                     onChange={(e) => setLeadForm((prev) => ({ ...prev, preferred_format: e.target.value }))}
@@ -590,12 +598,14 @@ export default function DiscoverPage() {
                 </div>
                 <div>
                   <label
+                    htmlFor="lead-budget"
                     className="mono mb-2 block"
                     style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
                   >
                     BUDGET
                   </label>
                   <input
+                    id="lead-budget"
                     type="text"
                     value={leadForm.budget_label}
                     onChange={(e) => setLeadForm((prev) => ({ ...prev, budget_label: e.target.value }))}
@@ -606,12 +616,14 @@ export default function DiscoverPage() {
               </div>
               <div>
                 <label
+                  htmlFor="lead-message"
                   className="mono mb-2 block"
                   style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
                 >
                   MESSAGE
                 </label>
                 <textarea
+                  id="lead-message"
                   value={leadForm.message}
                   onChange={(e) => setLeadForm((prev) => ({ ...prev, message: e.target.value }))}
                   placeholder="Anything useful about your schedule, experience, or what has not worked in the past."
