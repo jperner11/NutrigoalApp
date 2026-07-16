@@ -43,10 +43,15 @@ export async function GET(request: Request) {
     })
 
     if (!insertError) {
-      await supabase
+      const { error: updateError } = await supabase
         .from('feedback_schedules')
         .update({ last_triggered_at: now.toISOString() })
         .eq('id', schedule.id)
+
+      if (updateError) {
+        Sentry.captureException(updateError, { tags: { kind: 'cron', route: 'check-ins', scheduleId: schedule.id } })
+        continue
+      }
       created++
     }
   }
