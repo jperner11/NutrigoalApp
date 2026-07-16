@@ -196,6 +196,42 @@ export async function publishCoachProfile(coachId: string, label: string): Promi
   return { slug }
 }
 
+/**
+ * Seed an active custom intake question for a trainer (bypassing the real
+ * /coach-questions UI), so a linked managed-client's onboarding wizard picks up
+ * the extra "Coach Questions" step (see MANAGED_CLIENT_STEPS in
+ * onboarding/page.tsx, gated on `coachCustomQuestions.length > 0`). Mirrors the
+ * columns the real POST /api/personal-trainer/custom-intake/questions route
+ * inserts (migration 026). Cascades away when the trainer's auth user is deleted.
+ */
+export async function seedCustomIntakeQuestion(
+  trainerId: string,
+  opts: {
+    label: string
+    type?: 'short_text' | 'long_text' | 'single_select' | 'multi_select' | 'yes_no'
+    required?: boolean
+    options?: string[]
+  },
+): Promise<{ id: string; label: string }> {
+  const supabase = admin()
+  const { data, error } = await supabase
+    .from('personal_trainer_custom_intake_questions')
+    .insert({
+      trainer_id: trainerId,
+      label: opts.label,
+      type: opts.type ?? 'short_text',
+      required: opts.required ?? false,
+      options: opts.options ?? [],
+      is_active: true,
+    })
+    .select('id, label')
+    .single()
+  if (error || !data) {
+    throw new Error(`Failed to seed custom intake question for trainer ${trainerId}: ${error?.message ?? 'unknown error'}`)
+  }
+  return data
+}
+
 export interface SeededPair {
   coach: SeededUser
   clients: SeededUser[]
