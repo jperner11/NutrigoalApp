@@ -71,7 +71,7 @@ const labelStyle: React.CSSProperties = {
 function chipClass(active: boolean) {
   return [
     'chip transition',
-    active ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc)]' : 'hover:border-[var(--acc)]',
+    active ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]' : 'hover:border-[var(--acc)]',
   ].join(' ')
 }
 
@@ -870,7 +870,7 @@ export default function SettingsPage() {
   ].filter(Boolean) as string[]
   const statusTone: Record<string, React.CSSProperties> = {
     open: { color: 'var(--warn)' },
-    in_progress: { color: 'var(--acc)' },
+    in_progress: { color: 'var(--acc-text)' },
     resolved: { color: 'var(--ok)' },
   }
 
@@ -889,7 +889,7 @@ export default function SettingsPage() {
           <div className="row gap-3">
             <div
               className="flex h-10 w-10 items-center justify-center rounded-xl"
-              style={{ background: 'var(--ink-3)', color: 'var(--acc)' }}
+              style={{ background: 'var(--ink-3)', color: 'var(--acc-text)' }}
             >
               <Crown className="h-5 w-5" />
             </div>
@@ -1507,7 +1507,7 @@ export default function SettingsPage() {
                       {marketplaceProfile.location_label ? ` · ${marketplaceProfile.location_label}` : ''}
                     </div>
                     {marketplaceProfile.consultation_url && (
-                      <div className="text-sm" style={{ color: 'var(--acc)' }}>Consult link ready</div>
+                      <div className="text-sm" style={{ color: 'var(--acc-text)' }}>Consult link ready</div>
                     )}
                   </div>
                 </div>
@@ -1525,10 +1525,10 @@ export default function SettingsPage() {
 
                 <div className="card-2 p-5">
                   <div className="flex items-center gap-2">
-                    <BadgeCheck className="h-5 w-5" style={{ color: verificationStatus === 'verified' ? 'var(--acc)' : 'var(--fg-3)' }} />
+                    <BadgeCheck className="h-5 w-5" style={{ color: verificationStatus === 'verified' ? 'var(--acc-text)' : 'var(--fg-3)' }} />
                     <div className="serif" style={{ fontSize: 18, color: 'var(--fg)' }}>Verification</div>
                     {verificationStatus === 'verified' && (
-                      <span className="chip" style={{ color: 'var(--acc)' }}>Verified</span>
+                      <span className="chip" style={{ color: 'var(--acc-text)' }}>Verified</span>
                     )}
                     {verificationStatus === 'pending' && (
                       <span className="chip" style={{ color: 'var(--warn)' }}>Under review</span>
@@ -1719,7 +1719,7 @@ export default function SettingsPage() {
                     Need help with onboarding, invites, trainer-client linking, or a broken workflow? Contact support or review the public beta guidance.
                   </p>
                 </div>
-                <AlertTriangle className="h-5 w-5" style={{ color: 'var(--acc)' }} />
+                <AlertTriangle className="h-5 w-5" style={{ color: 'var(--acc-text)' }} />
               </div>
               <div className="mt-4 flex flex-wrap gap-3">
                 <a
@@ -1834,7 +1834,7 @@ export default function SettingsPage() {
             {/* Change Password */}
             <div className="card-2 p-5">
               <h3 className="serif mb-4 flex items-center gap-2" style={{ fontSize: 20, color: 'var(--fg)' }}>
-                <Lock className="h-5 w-5" style={{ color: 'var(--acc)' }} />
+                <Lock className="h-5 w-5" style={{ color: 'var(--acc-text)' }} />
                 Change Password
               </h3>
               <div className="space-y-3">
