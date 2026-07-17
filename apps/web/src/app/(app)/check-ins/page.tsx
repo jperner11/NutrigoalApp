@@ -363,14 +363,14 @@ function TemplateForm({ template, trainerId, onSaved, onCancel }: {
       </h2>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">Template Name</label>
-        <input type="text" value={name} onChange={e => setName(e.target.value)}
+        <label htmlFor="template-name" className="block text-sm font-medium text-gray-700 mb-1">Template Name</label>
+        <input id="template-name" type="text" value={name} onChange={e => setName(e.target.value)}
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
           placeholder="e.g. Weekly Check-in" />
       </div>
 
       <div className="flex items-center gap-3 mb-4">
-        <button type="button" onClick={() => setIsDefault(!isDefault)} className="flex items-center gap-2 text-sm text-gray-600">
+        <button type="button" onClick={() => setIsDefault(!isDefault)} aria-pressed={isDefault} className="flex items-center gap-2 text-sm text-gray-600">
           {isDefault ? <ToggleRight className="h-5 w-5 text-purple-600" /> : <ToggleLeft className="h-5 w-5 text-gray-400" />}
           Default template
         </button>
@@ -391,12 +391,14 @@ function TemplateForm({ template, trainerId, onSaved, onCancel }: {
             </div>
             <div className="flex-1">
               <select value={q.type} onChange={e => updateQuestion(q.id, 'type', e.target.value)}
+                aria-label={`Question ${idx + 1} type`}
                 className="text-xs font-medium text-purple-700 bg-purple-50 border border-purple-200 rounded-lg px-2 py-1 mb-2">
                 {QUESTION_TYPES.map(qt => (
                   <option key={qt.value} value={qt.value}>{qt.label}</option>
                 ))}
               </select>
               <input type="text" value={q.question} onChange={e => updateQuestion(q.id, 'question', e.target.value)}
+                aria-label={`Question ${idx + 1} text`}
                 className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg"
                 placeholder="Type your question..." />
             </div>
