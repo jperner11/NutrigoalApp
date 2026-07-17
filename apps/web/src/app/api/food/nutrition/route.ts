@@ -168,9 +168,8 @@ function cacheFood(
     fat: Math.round((offNutriments?.fat_100g ?? 0) * 10) / 10,
   }
 
-  void supabase
-    .from('foods')
-    .upsert(
+  Promise.resolve(
+    supabase.from('foods').upsert(
       {
         name,
         source,
@@ -182,10 +181,14 @@ function cacheFood(
         is_verified: false,
       },
       { onConflict: 'source,external_id', ignoreDuplicates: true },
-    )
+    ),
+  )
     .then(({ error }) => {
       if (error) {
         Sentry.captureException(error, { tags: { kind: 'api-route', route: 'food/nutrition', op: 'cacheFood' } })
       }
+    })
+    .catch((err) => {
+      Sentry.captureException(err, { tags: { kind: 'api-route', route: 'food/nutrition', op: 'cacheFood' } })
     })
 }
