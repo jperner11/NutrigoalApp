@@ -42,13 +42,51 @@ export async function generateWeeklyReport(
 ): Promise<WeeklyReport> {
   const supabase = createClient()
 
-  // Meal logs
-  const { data: mealLogs } = await supabase
-    .from('meal_logs')
-    .select('date, total_calories, total_protein, total_carbs, total_fat')
-    .eq('user_id', userId)
-    .gte('date', startDate)
-    .lte('date', endDate)
+  const [
+    { data: mealLogs },
+    { data: workoutLogs },
+    { data: cardioSessions },
+    { data: weightLogs },
+    { data: waterLogs },
+  ] = await Promise.all([
+    // Meal logs
+    supabase
+      .from('meal_logs')
+      .select('date, total_calories, total_protein, total_carbs, total_fat')
+      .eq('user_id', userId)
+      .gte('date', startDate)
+      .lte('date', endDate),
+    // Workout logs
+    supabase
+      .from('workout_logs')
+      .select('duration_minutes')
+      .eq('user_id', userId)
+      .gte('date', startDate)
+      .lte('date', endDate),
+    // Cardio sessions
+    supabase
+      .from('cardio_sessions')
+      .select('calories_burned')
+      .eq('user_id', userId)
+      .eq('is_completed', true)
+      .gte('date', startDate)
+      .lte('date', endDate),
+    // Weight logs
+    supabase
+      .from('weight_logs')
+      .select('date, weight_kg')
+      .eq('user_id', userId)
+      .gte('date', startDate)
+      .lte('date', endDate)
+      .order('date', { ascending: true }),
+    // Water logs
+    supabase
+      .from('water_logs')
+      .select('date, amount_ml')
+      .eq('user_id', userId)
+      .gte('date', startDate)
+      .lte('date', endDate),
+  ])
 
   const mealDays = new Set(mealLogs?.map(l => l.date) ?? [])
   const totalCal = mealLogs?.reduce((s, l) => s + (l.total_calories || 0), 0) ?? 0
@@ -56,40 +94,6 @@ export async function generateWeeklyReport(
   const totalCarbs = mealLogs?.reduce((s, l) => s + (l.total_carbs || 0), 0) ?? 0
   const totalFat = mealLogs?.reduce((s, l) => s + (l.total_fat || 0), 0) ?? 0
   const daysWithMeals = mealDays.size || 1
-
-  // Workout logs
-  const { data: workoutLogs } = await supabase
-    .from('workout_logs')
-    .select('duration_minutes')
-    .eq('user_id', userId)
-    .gte('date', startDate)
-    .lte('date', endDate)
-
-  // Cardio sessions
-  const { data: cardioSessions } = await supabase
-    .from('cardio_sessions')
-    .select('calories_burned')
-    .eq('user_id', userId)
-    .eq('is_completed', true)
-    .gte('date', startDate)
-    .lte('date', endDate)
-
-  // Weight logs
-  const { data: weightLogs } = await supabase
-    .from('weight_logs')
-    .select('date, weight_kg')
-    .eq('user_id', userId)
-    .gte('date', startDate)
-    .lte('date', endDate)
-    .order('date', { ascending: true })
-
-  // Water logs
-  const { data: waterLogs } = await supabase
-    .from('water_logs')
-    .select('date, amount_ml')
-    .eq('user_id', userId)
-    .gte('date', startDate)
-    .lte('date', endDate)
 
   const waterByDay = new Map<string, number>()
   waterLogs?.forEach(l => {
