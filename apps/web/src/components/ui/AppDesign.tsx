@@ -7,7 +7,7 @@ const toneColor: Record<Tone, string> = {
   accent: 'var(--acc)',
   success: 'var(--ok)',
   warn: 'var(--warn)',
-  danger: 'var(--brand-400)',
+  danger: 'var(--danger)',
   muted: 'var(--fg-3)',
 }
 
