@@ -250,13 +250,8 @@ export default function TrainingPage() {
 
           <ListCard
             className="mt-6"
-            eyebrow="Active program · week 3 of 8"
-            title={
-              <>
-                {activePlan.name}{' '}
-                <span className="italic-serif text-[var(--fg-3)]">Hybrid Cut.</span>
-              </>
-            }
+            eyebrow="Active program"
+            title={activePlan.name}
             meta={`${activeWorkouts.length} of ${activePlan.dayCount || activeWorkouts.length} sessions available · ${totalMinutes || 0} min under tension · ${formatPlanDate(activePlan.lastWorkout)}`}
             action={
               <Link href={`/training/${activePlan.id}`} className="btn btn-ghost">
@@ -292,7 +287,7 @@ export default function TrainingPage() {
                       key={workout.id}
                       tone={workoutIndex === 0 ? 'accent' : 'default'}
                       eyebrow={`${workout.name} · day ${workout.day_number}`}
-                      title={workoutIndex === 0 ? 'Heavy push, controlled tempo.' : workout.name}
+                      title={workout.name}
                       action={
                         <StatusPill>
                           {estimateDurationMinutes(workout.exercises)} min
