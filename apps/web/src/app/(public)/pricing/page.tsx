@@ -170,7 +170,7 @@ export default function PricingPage() {
                       top: -10,
                       left: 24,
                       background: 'var(--acc)',
-                      color: '#fff',
+                      color: '#0a0a0a',
                       fontSize: 10,
                       padding: '4px 10px',
                       borderRadius: 999,
