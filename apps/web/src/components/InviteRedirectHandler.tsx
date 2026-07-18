@@ -59,7 +59,7 @@ export default function InviteRedirectHandler() {
     void supabase.auth.getSession().then(async ({ data: sessionData }) => {
       if (!sessionData.session?.user?.email) return
       await redirectForInviteSession(sessionData.session.user.email)
-    })
+    }).catch(() => {})
 
     return () => subscription.unsubscribe()
   }, [])
