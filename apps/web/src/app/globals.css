@@ -1048,12 +1048,19 @@ input[type="checkbox"] {
 .hover\:bg-white:hover,
 .hover\:bg-gray-50:hover,
 .hover\:bg-slate-50:hover,
+.hover\:bg-gray-100:hover,
+.hover\:bg-slate-100:hover,
 .hover\:bg-purple-50:hover,
 .hover\:bg-red-50:hover,
 .hover\:bg-green-50:hover,
 .hover\:bg-amber-50:hover,
 .hover\:bg-yellow-50:hover {
   background-color: var(--line) !important;
+}
+
+.hover\:bg-gray-200:hover,
+.hover\:bg-slate-200:hover {
+  background-color: var(--line-strong) !important;
 }
 
 .text-gray-900,
