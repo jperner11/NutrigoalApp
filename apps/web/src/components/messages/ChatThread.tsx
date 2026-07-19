@@ -204,7 +204,7 @@ export function ChatThread({
                   style={{
                     background: isMe ? 'var(--acc)' : 'var(--ink-2)',
                     border: isMe ? '1px solid var(--acc)' : '1px solid var(--line)',
-                    color: isMe ? 'var(--ink-1)' : 'var(--fg)',
+                    color: isMe ? '#0a0a0a' : 'var(--fg)',
                     borderBottomRightRadius: isMe ? 4 : 18,
                     borderBottomLeftRadius: isMe ? 18 : 4,
                   }}
@@ -214,7 +214,7 @@ export function ChatThread({
                     className="mono mt-2"
                     style={{
                       fontSize: 10,
-                      color: isMe ? 'rgba(255,255,255,0.72)' : 'var(--fg-4)',
+                      color: isMe ? 'rgba(10,10,10,0.65)' : 'var(--fg-4)',
                       letterSpacing: '0.08em',
                     }}
                   >
