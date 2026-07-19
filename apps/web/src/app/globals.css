@@ -741,6 +741,11 @@ input[type="range"] {
   accent-color: var(--acc);
 }
 
+/* Checkboxes should match the brand accent instead of the browser default blue */
+input[type="checkbox"] {
+  accent-color: var(--acc);
+}
+
 /* ─── Authenticated app editorial system ─── */
 .app-workspace {
   width: 100%;
