@@ -49,7 +49,7 @@ export default function FeedbackPage() {
       />
 
       {sent ? (
-        <div className="rounded-[24px] border border-[var(--line)] bg-white/80 p-6 text-sm leading-6 text-[var(--muted)]">
+        <div className="surface-card p-6 text-sm leading-6 text-[var(--muted)]">
           <p className="font-semibold text-[var(--foreground)]">Got it — thank you!</p>
           <p className="mt-2">Your feedback is in. Send as many notes as you like.</p>
           <button
