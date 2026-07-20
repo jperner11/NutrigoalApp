@@ -2,6 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { Menu, X } from 'lucide-react'
 import BrandLogo from '@/components/brand/BrandLogo'
 import { landingCopy } from '@/lib/copy/landing'
 
@@ -15,6 +17,12 @@ const links = [
 
 export default function MarketingNav() {
   const pathname = usePathname()
+  const [mobileOpen, setMobileOpen] = useState(false)
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileOpen(false)
+  }, [pathname])
 
   return (
     <nav className="sticky top-0 z-40 border-b border-[var(--line)] bg-[rgba(19,16,18,0.88)] backdrop-blur-xl">
@@ -43,7 +51,17 @@ export default function MarketingNav() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Link href="/login" className="btn btn-ghost" style={{ color: 'rgba(255,255,255,0.82)', borderColor: 'rgba(255,255,255,0.18)' }}>
+          <button
+            type="button"
+            onClick={() => setMobileOpen((open) => !open)}
+            aria-expanded={mobileOpen}
+            aria-controls="marketing-mobile-menu"
+            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+            className="rounded-full p-2 text-white/70 transition hover:text-white md:hidden"
+          >
+            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+          <Link href="/login" className="btn btn-ghost hidden sm:inline-flex" style={{ color: 'rgba(255,255,255,0.82)', borderColor: 'rgba(255,255,255,0.18)' }}>
             {landingCopy.nav.signIn}
           </Link>
           <Link href="/signup" className="btn btn-accent">
@@ -51,6 +69,41 @@ export default function MarketingNav() {
           </Link>
         </div>
       </div>
+
+      {mobileOpen && (
+        <div
+          id="marketing-mobile-menu"
+          className="border-t border-[var(--line)] px-8 py-4 md:hidden"
+        >
+          <div className="flex flex-col gap-1 text-sm">
+            {links.map((l) => {
+              const active = pathname === l.href
+              return (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  aria-current={active ? 'page' : undefined}
+                  className="rounded-xl px-3 py-2.5 transition hover:text-white"
+                  style={{
+                    color: active ? 'var(--brand-400)' : 'rgba(255,255,255,0.72)',
+                    background: active ? 'rgba(205,242,78,0.14)' : 'transparent',
+                    fontWeight: active ? 600 : 400,
+                  }}
+                >
+                  {l.label}
+                </Link>
+              )
+            })}
+            <Link
+              href="/login"
+              className="rounded-xl px-3 py-2.5 transition hover:text-white sm:hidden"
+              style={{ color: 'rgba(255,255,255,0.72)' }}
+            >
+              {landingCopy.nav.signIn}
+            </Link>
+          </div>
+        </div>
+      )}
     </nav>
   )
 }
