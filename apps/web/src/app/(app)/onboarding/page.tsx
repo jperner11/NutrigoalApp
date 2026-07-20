@@ -224,6 +224,9 @@ export default function OnboardingPage() {
             })
           )
         )
+      },
+      () => {
+        if (!cancelled) toast.error('Failed to load your custom intake questions.')
       })
     return () => {
       cancelled = true
