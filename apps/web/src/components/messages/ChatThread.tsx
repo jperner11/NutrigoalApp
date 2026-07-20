@@ -52,12 +52,17 @@ export function ChatThread({
       .select('*')
       .eq('conversation_id', conversationId)
       .order('created_at', { ascending: true })
-      .then(({ data, error }) => {
-        if (cancelled) return
-        if (error) { setLoadError('Failed to load messages. Please refresh.'); return }
-        setMessages((data ?? []) as Message[])
-        setTimeout(scrollToBottom, 50)
-      })
+      .then(
+        ({ data, error }) => {
+          if (cancelled) return
+          if (error) { setLoadError('Failed to load messages. Please refresh.'); return }
+          setMessages((data ?? []) as Message[])
+          setTimeout(scrollToBottom, 50)
+        },
+        () => {
+          if (!cancelled) setLoadError('Failed to load messages. Please refresh.')
+        }
+      )
 
     // Mark peer messages as read (fire-and-forget, but still report failures)
     supabase
@@ -66,11 +71,16 @@ export function ChatThread({
       .eq('conversation_id', conversationId)
       .neq('sender_id', currentUserId)
       .is('read_at', null)
-      .then(({ error: readError }) => {
-        if (readError) {
-          Sentry.captureException(readError, { tags: { kind: 'component', component: 'ChatThread', op: 'markRead' } })
+      .then(
+        ({ error: readError }) => {
+          if (readError) {
+            Sentry.captureException(readError, { tags: { kind: 'component', component: 'ChatThread', op: 'markRead' } })
+          }
+        },
+        (err) => {
+          Sentry.captureException(err, { tags: { kind: 'component', component: 'ChatThread', op: 'markRead' } })
         }
-      })
+      )
 
     const channel = supabase
       .channel(`messages:${conversationId}`)
@@ -125,11 +135,16 @@ export function ChatThread({
         .from('conversations')
         .update({ last_message_at: new Date().toISOString() })
         .eq('id', conversationId)
-        .then(({ error: touchError }) => {
-          if (touchError) {
-            Sentry.captureException(touchError, { tags: { kind: 'component', component: 'ChatThread', op: 'touchConversation' } })
+        .then(
+          ({ error: touchError }) => {
+            if (touchError) {
+              Sentry.captureException(touchError, { tags: { kind: 'component', component: 'ChatThread', op: 'touchConversation' } })
+            }
+          },
+          (err) => {
+            Sentry.captureException(err, { tags: { kind: 'component', component: 'ChatThread', op: 'touchConversation' } })
           }
-        })
+        )
     } else {
       toast.error('Failed to send message. Please try again.')
     }
