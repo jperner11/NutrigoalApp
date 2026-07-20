@@ -175,12 +175,14 @@ export default function MeasurementsPage() {
 
           <div className="mb-4 max-w-[260px]">
             <label
+              htmlFor="measurements-date"
               className="mono mb-2 block"
               style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
             >
               DATE
             </label>
             <input
+              id="measurements-date"
               type="date"
               value={formDate}
               onChange={(e) => setFormDate(e.target.value)}
@@ -207,12 +209,14 @@ export default function MeasurementsPage() {
                 {MEASUREMENT_FIELDS.filter((f) => f.group === group).map((field) => (
                   <div key={field.key}>
                     <label
+                      htmlFor={`measurement-${field.key}`}
                       className="mb-1 block"
                       style={{ fontSize: 12, color: 'var(--fg-2)' }}
                     >
                       {field.label}
                     </label>
                     <input
+                      id={`measurement-${field.key}`}
                       type="number"
                       step="0.1"
                       value={formValues[field.key] ?? ''}
@@ -230,12 +234,14 @@ export default function MeasurementsPage() {
 
           <div className="mb-5">
             <label
+              htmlFor="measurements-notes"
               className="mono mb-2 block"
               style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
             >
               NOTES
             </label>
             <input
+              id="measurements-notes"
               type="text"
               value={formNotes}
               onChange={(e) => setFormNotes(e.target.value)}
