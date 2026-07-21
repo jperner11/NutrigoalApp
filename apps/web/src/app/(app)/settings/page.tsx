@@ -82,10 +82,12 @@ function TimeSelect({ value, onChange, label }: { value: string; onChange: (v: s
       times.push(`${String(h).padStart(2, '0')}:${m}`)
     }
   }
+  const id = `settings-time-${label.toLowerCase().replace(/\s+/g, '-')}`
   return (
     <div>
-      <label className={labelClass} style={labelStyle}>{label.toUpperCase()}</label>
+      <label htmlFor={id} className={labelClass} style={labelStyle}>{label.toUpperCase()}</label>
       <select
+        id={id}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className={fieldClass}
@@ -954,21 +956,21 @@ export default function SettingsPage() {
         {activeTab === 'profile' && (
           <div className="space-y-4">
             <div>
-              <label className={labelClass} style={labelStyle}>Full Name</label>
-              <input type="text" value={form.full_name} onChange={(e) => set('full_name', e.target.value)} className={inputClass} />
+              <label htmlFor="settings-full-name" className={labelClass} style={labelStyle}>Full Name</label>
+              <input id="settings-full-name" type="text" value={form.full_name} onChange={(e) => set('full_name', e.target.value)} className={inputClass} />
             </div>
             <div>
-              <label className={labelClass} style={labelStyle}>Email</label>
-              <input type="email" value={profile.email} disabled className={disabledFieldClass} style={fieldStyle} />
+              <label htmlFor="settings-email" className={labelClass} style={labelStyle}>Email</label>
+              <input id="settings-email" type="email" value={profile.email} disabled className={disabledFieldClass} style={fieldStyle} />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className={labelClass} style={labelStyle}>Age</label>
-                <input type="number" value={form.age} onChange={(e) => set('age', e.target.value)} className={inputClass} />
+                <label htmlFor="settings-age" className={labelClass} style={labelStyle}>Age</label>
+                <input id="settings-age" type="number" value={form.age} onChange={(e) => set('age', e.target.value)} className={inputClass} />
               </div>
               <div>
-                <label className={labelClass} style={labelStyle}>Gender</label>
-                <select value={form.gender} onChange={(e) => set('gender', e.target.value)} className={selectClass}>
+                <label htmlFor="settings-gender" className={labelClass} style={labelStyle}>Gender</label>
+                <select id="settings-gender" value={form.gender} onChange={(e) => set('gender', e.target.value)} className={selectClass}>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
                   <option value="other">Other</option>
@@ -977,17 +979,17 @@ export default function SettingsPage() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className={labelClass} style={labelStyle}>Height (cm)</label>
-                <input type="number" value={form.height_cm} onChange={(e) => set('height_cm', e.target.value)} className={inputClass} />
+                <label htmlFor="settings-height" className={labelClass} style={labelStyle}>Height (cm)</label>
+                <input id="settings-height" type="number" value={form.height_cm} onChange={(e) => set('height_cm', e.target.value)} className={inputClass} />
               </div>
               <div>
-                <label className={labelClass} style={labelStyle}>Weight (kg)</label>
-                <input type="number" value={form.weight_kg} onChange={(e) => set('weight_kg', e.target.value)} className={inputClass} />
+                <label htmlFor="settings-weight" className={labelClass} style={labelStyle}>Weight (kg)</label>
+                <input id="settings-weight" type="number" value={form.weight_kg} onChange={(e) => set('weight_kg', e.target.value)} className={inputClass} />
               </div>
             </div>
             <div>
-              <label className={labelClass} style={labelStyle}>Activity Level</label>
-              <select value={form.activity_level} onChange={(e) => set('activity_level', e.target.value)} className={selectClass}>
+              <label htmlFor="settings-activity-level" className={labelClass} style={labelStyle}>Activity Level</label>
+              <select id="settings-activity-level" value={form.activity_level} onChange={(e) => set('activity_level', e.target.value)} className={selectClass}>
                 <option value="">Select...</option>
                 {ACTIVITY_LEVELS.map(l => <option key={l.value} value={l.value}>{l.label} — {l.description}</option>)}
               </select>
@@ -999,19 +1001,19 @@ export default function SettingsPage() {
         {activeTab === 'goals' && (
           <div className="space-y-4">
             <div>
-              <label className={labelClass} style={labelStyle}>Fitness Goal</label>
-              <select value={form.goal} onChange={(e) => set('goal', e.target.value)} className={selectClass}>
+              <label htmlFor="settings-goal" className={labelClass} style={labelStyle}>Fitness Goal</label>
+              <select id="settings-goal" value={form.goal} onChange={(e) => set('goal', e.target.value)} className={selectClass}>
                 <option value="">Select...</option>
                 {FITNESS_GOALS.map(g => <option key={g.value} value={g.value}>{g.label} — {g.description}</option>)}
               </select>
             </div>
             <div>
-              <label className={labelClass} style={labelStyle}>Target Weight (kg)</label>
-              <input type="number" value={form.target_weight_kg} onChange={(e) => set('target_weight_kg', e.target.value)} className={inputClass} placeholder="Optional" />
+              <label htmlFor="settings-target-weight" className={labelClass} style={labelStyle}>Target Weight (kg)</label>
+              <input id="settings-target-weight" type="number" value={form.target_weight_kg} onChange={(e) => set('target_weight_kg', e.target.value)} className={inputClass} placeholder="Optional" />
             </div>
             <div>
-              <label className={labelClass} style={labelStyle}>Timeline</label>
-              <select value={form.goal_timeline} onChange={(e) => set('goal_timeline', e.target.value)} className={selectClass}>
+              <label htmlFor="settings-goal-timeline" className={labelClass} style={labelStyle}>Timeline</label>
+              <select id="settings-goal-timeline" value={form.goal_timeline} onChange={(e) => set('goal_timeline', e.target.value)} className={selectClass}>
                 <option value="">Select...</option>
                 {GOAL_TIMELINES.map(t => <option key={t.value} value={t.value}>{t.label} — {t.description}</option>)}
               </select>
@@ -1039,14 +1041,14 @@ export default function SettingsPage() {
             <TimeSelect label="Workout Time" value={form.workout_time} onChange={(v) => set('workout_time', v)} />
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className={labelClass} style={labelStyle}>Workout Days/Week</label>
-                <select value={form.workout_days_per_week} onChange={(e) => set('workout_days_per_week', Number(e.target.value))} className={selectClass}>
+                <label htmlFor="settings-workout-days" className={labelClass} style={labelStyle}>Workout Days/Week</label>
+                <select id="settings-workout-days" value={form.workout_days_per_week} onChange={(e) => set('workout_days_per_week', Number(e.target.value))} className={selectClass}>
                   {[1,2,3,4,5,6,7].map(n => <option key={n} value={n}>{n} days</option>)}
                 </select>
               </div>
               <div>
-                <label className={labelClass} style={labelStyle}>Meals/Day</label>
-                <select value={form.meals_per_day} onChange={(e) => set('meals_per_day', Number(e.target.value))} className={selectClass}>
+                <label htmlFor="settings-meals-per-day" className={labelClass} style={labelStyle}>Meals/Day</label>
+                <select id="settings-meals-per-day" value={form.meals_per_day} onChange={(e) => set('meals_per_day', Number(e.target.value))} className={selectClass}>
                   {[2,3,4,5,6].map(n => <option key={n} value={n}>{n} meals</option>)}
                 </select>
               </div>
@@ -1070,8 +1072,9 @@ export default function SettingsPage() {
               onChange={(v) => set('medical_conditions', v)}
             />
             <div>
-              <label className={labelClass} style={labelStyle}>Medications</label>
+              <label htmlFor="settings-medications" className={labelClass} style={labelStyle}>Medications</label>
               <input
+                id="settings-medications"
                 type="text"
                 value={form.medications.join(', ')}
                 onChange={(e) => set('medications', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
@@ -1086,15 +1089,15 @@ export default function SettingsPage() {
         {activeTab === 'fitness' && (
           <div className="space-y-4">
             <div>
-              <label className={labelClass} style={labelStyle}>Training Experience</label>
-              <select value={form.training_experience} onChange={(e) => set('training_experience', e.target.value)} className={selectClass}>
+              <label htmlFor="settings-training-experience" className={labelClass} style={labelStyle}>Training Experience</label>
+              <select id="settings-training-experience" value={form.training_experience} onChange={(e) => set('training_experience', e.target.value)} className={selectClass}>
                 <option value="">Select...</option>
                 {TRAINING_EXPERIENCE.map(t => <option key={t.value} value={t.value}>{t.label} — {t.description}</option>)}
               </select>
             </div>
             <div>
-              <label className={labelClass} style={labelStyle}>Equipment Access</label>
-              <select value={form.equipment_access} onChange={(e) => set('equipment_access', e.target.value)} className={selectClass}>
+              <label htmlFor="settings-equipment-access" className={labelClass} style={labelStyle}>Equipment Access</label>
+              <select id="settings-equipment-access" value={form.equipment_access} onChange={(e) => set('equipment_access', e.target.value)} className={selectClass}>
                 <option value="">Select...</option>
                 {EQUIPMENT_ACCESS.map(e => <option key={e.value} value={e.value}>{e.label} — {e.description}</option>)}
               </select>
@@ -1144,8 +1147,9 @@ export default function SettingsPage() {
               </div>
             </div>
             <div>
-              <label className={labelClass} style={labelStyle}>Allergies</label>
+              <label htmlFor="settings-allergies" className={labelClass} style={labelStyle}>Allergies</label>
               <input
+                id="settings-allergies"
                 type="text"
                 value={form.allergies.join(', ')}
                 onChange={(e) => set('allergies', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
@@ -1160,8 +1164,9 @@ export default function SettingsPage() {
               onChange={(v) => set('food_dislikes', v)}
             />
             <div>
-              <label className={labelClass} style={labelStyle}>Favourite Foods</label>
+              <label htmlFor="settings-favourite-foods" className={labelClass} style={labelStyle}>Favourite Foods</label>
               <input
+                id="settings-favourite-foods"
                 type="text"
                 value={form.favourite_foods.join(', ')}
                 onChange={(e) => set('favourite_foods', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
@@ -1170,15 +1175,15 @@ export default function SettingsPage() {
               />
             </div>
             <div>
-              <label className={labelClass} style={labelStyle}>Cooking Skill</label>
-              <select value={form.cooking_skill} onChange={(e) => set('cooking_skill', e.target.value)} className={selectClass}>
+              <label htmlFor="settings-cooking-skill" className={labelClass} style={labelStyle}>Cooking Skill</label>
+              <select id="settings-cooking-skill" value={form.cooking_skill} onChange={(e) => set('cooking_skill', e.target.value)} className={selectClass}>
                 <option value="">Select...</option>
                 {COOKING_SKILLS.map(c => <option key={c.value} value={c.value}>{c.label} — {c.description}</option>)}
               </select>
             </div>
             <div>
-              <label className={labelClass} style={labelStyle}>Meal Prep Preference</label>
-              <select value={form.meal_prep_preference} onChange={(e) => set('meal_prep_preference', e.target.value)} className={selectClass}>
+              <label htmlFor="settings-meal-prep-preference" className={labelClass} style={labelStyle}>Meal Prep Preference</label>
+              <select id="settings-meal-prep-preference" value={form.meal_prep_preference} onChange={(e) => set('meal_prep_preference', e.target.value)} className={selectClass}>
                 <option value="">Select...</option>
                 {MEAL_PREP_PREFERENCES.map(m => <option key={m.value} value={m.value}>{m.label} — {m.description}</option>)}
               </select>
@@ -1190,22 +1195,22 @@ export default function SettingsPage() {
         {activeTab === 'lifestyle' && (
           <div className="space-y-4">
             <div>
-              <label className={labelClass} style={labelStyle}>Work Type</label>
-              <select value={form.work_type} onChange={(e) => set('work_type', e.target.value)} className={selectClass}>
+              <label htmlFor="settings-work-type" className={labelClass} style={labelStyle}>Work Type</label>
+              <select id="settings-work-type" value={form.work_type} onChange={(e) => set('work_type', e.target.value)} className={selectClass}>
                 <option value="">Select...</option>
                 {WORK_TYPES.map(w => <option key={w.value} value={w.value}>{w.label} — {w.description}</option>)}
               </select>
             </div>
             <div>
-              <label className={labelClass} style={labelStyle}>Sleep Quality</label>
-              <select value={form.sleep_quality} onChange={(e) => set('sleep_quality', e.target.value)} className={selectClass}>
+              <label htmlFor="settings-sleep-quality" className={labelClass} style={labelStyle}>Sleep Quality</label>
+              <select id="settings-sleep-quality" value={form.sleep_quality} onChange={(e) => set('sleep_quality', e.target.value)} className={selectClass}>
                 <option value="">Select...</option>
                 {SLEEP_QUALITY_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label} — {s.description}</option>)}
               </select>
             </div>
             <div>
-              <label className={labelClass} style={labelStyle}>Stress Level</label>
-              <select value={form.stress_level} onChange={(e) => set('stress_level', e.target.value)} className={selectClass}>
+              <label htmlFor="settings-stress-level" className={labelClass} style={labelStyle}>Stress Level</label>
+              <select id="settings-stress-level" value={form.stress_level} onChange={(e) => set('stress_level', e.target.value)} className={selectClass}>
                 <option value="">Select...</option>
                 {STRESS_LEVELS.map(s => <option key={s.value} value={s.value}>{s.label} — {s.description}</option>)}
               </select>
@@ -1751,8 +1756,8 @@ export default function SettingsPage() {
               </p>
               <div className="mt-4 space-y-4">
                 <div>
-                  <label className={labelClass} style={labelStyle}>Category</label>
-                  <select value={supportCategory} onChange={(e) => setSupportCategory(e.target.value)} className={selectClass}>
+                  <label htmlFor="settings-support-category" className={labelClass} style={labelStyle}>Category</label>
+                  <select id="settings-support-category" value={supportCategory} onChange={(e) => setSupportCategory(e.target.value)} className={selectClass}>
                     <option value="bug">Bug</option>
                     <option value="invite">Invite / onboarding</option>
                     <option value="billing">Billing</option>
@@ -1760,8 +1765,9 @@ export default function SettingsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className={labelClass} style={labelStyle}>Subject</label>
+                  <label htmlFor="settings-support-subject" className={labelClass} style={labelStyle}>Subject</label>
                   <input
+                    id="settings-support-subject"
                     type="text"
                     value={supportSubject}
                     onChange={(e) => setSupportSubject(e.target.value)}
@@ -1770,8 +1776,9 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className={labelClass} style={labelStyle}>Message</label>
+                  <label htmlFor="settings-support-message" className={labelClass} style={labelStyle}>Message</label>
                   <textarea
+                    id="settings-support-message"
                     value={supportMessage}
                     onChange={(e) => setSupportMessage(e.target.value)}
                     className={`${inputClass} min-h-[120px]`}
@@ -1839,8 +1846,9 @@ export default function SettingsPage() {
               </h3>
               <div className="space-y-3">
                 <div>
-                  <label className={labelClass} style={labelStyle}>New Password</label>
+                  <label htmlFor="settings-new-password" className={labelClass} style={labelStyle}>New Password</label>
                   <input
+                    id="settings-new-password"
                     type="password"
                     value={passwords.newPassword}
                     onChange={(e) => setPasswords(p => ({ ...p, newPassword: e.target.value }))}
@@ -1850,8 +1858,9 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className={labelClass} style={labelStyle}>Confirm New Password</label>
+                  <label htmlFor="settings-confirm-password" className={labelClass} style={labelStyle}>Confirm New Password</label>
                   <input
+                    id="settings-confirm-password"
                     type="password"
                     value={passwords.confirmPassword}
                     onChange={(e) => setPasswords(p => ({ ...p, confirmPassword: e.target.value }))}
@@ -1901,6 +1910,7 @@ export default function SettingsPage() {
                     onChange={(e) => setDeleteConfirmText(e.target.value)}
                     className={inputClass}
                     placeholder="Type DELETE"
+                    aria-label="Type DELETE to confirm account deletion"
                   />
                   <div className="flex gap-3">
                     <button
