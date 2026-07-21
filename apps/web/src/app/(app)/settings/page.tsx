@@ -869,9 +869,9 @@ export default function SettingsPage() {
     profile.coach_style ? `Style: ${profile.coach_style.replace(/_/g, ' ')}` : null,
   ].filter(Boolean) as string[]
   const statusTone: Record<string, React.CSSProperties> = {
-    open: { color: 'var(--warn)' },
+    open: { color: 'var(--warn-text)' },
     in_progress: { color: 'var(--acc-text)' },
-    resolved: { color: 'var(--ok)' },
+    resolved: { color: 'var(--ok-text)' },
   }
 
   return (
@@ -1260,7 +1260,7 @@ export default function SettingsPage() {
                         <button type="button" onClick={() => moveTrainerQuestion(question.localKey, -1)} disabled={index === 0} className="btn btn-ghost px-3 py-1.5 text-xs disabled:opacity-40">Up</button>
                         <button type="button" onClick={() => moveTrainerQuestion(question.localKey, 1)} disabled={index === trainerQuestions.length - 1} className="btn btn-ghost px-3 py-1.5 text-xs disabled:opacity-40">Down</button>
                         {question.is_active && (
-                          <button type="button" onClick={() => archiveTrainerQuestion(question.localKey)} className="btn btn-ghost px-3 py-1.5 text-xs" style={{ color: 'var(--warn)' }}>
+                          <button type="button" onClick={() => archiveTrainerQuestion(question.localKey)} className="btn btn-ghost px-3 py-1.5 text-xs" style={{ color: 'var(--warn-text)' }}>
                             Archive
                           </button>
                         )}
@@ -1499,7 +1499,7 @@ export default function SettingsPage() {
                           {item}
                         </span>
                       )) : (
-                        <span className="text-sm" style={{ color: 'var(--warn)' }}>Complete your coach onboarding to improve how your listing appears in discovery.</span>
+                        <span className="text-sm" style={{ color: 'var(--warn-text)' }}>Complete your coach onboarding to improve how your listing appears in discovery.</span>
                       )}
                     </div>
                     <div className="text-sm" style={{ color: 'var(--fg-3)' }}>
@@ -1531,10 +1531,10 @@ export default function SettingsPage() {
                       <span className="chip" style={{ color: 'var(--acc-text)' }}>Verified</span>
                     )}
                     {verificationStatus === 'pending' && (
-                      <span className="chip" style={{ color: 'var(--warn)' }}>Under review</span>
+                      <span className="chip" style={{ color: 'var(--warn-text)' }}>Under review</span>
                     )}
                     {verificationStatus === 'rejected' && (
-                      <span className="chip" style={{ color: 'var(--danger)' }}>Not approved</span>
+                      <span className="chip" style={{ color: 'var(--danger-text)' }}>Not approved</span>
                     )}
                   </div>
                   <p className="mt-1 text-sm leading-6" style={{ color: 'var(--fg-2)' }}>
@@ -1621,7 +1621,7 @@ export default function SettingsPage() {
                               <button type="button" onClick={() => moveCoachOffer(offer.localKey, -1)} disabled={index === 0} className="btn btn-ghost px-3 py-1.5 text-xs disabled:opacity-40">Up</button>
                               <button type="button" onClick={() => moveCoachOffer(offer.localKey, 1)} disabled={index === coachOffers.length - 1} className="btn btn-ghost px-3 py-1.5 text-xs disabled:opacity-40">Down</button>
                               {offer.is_active && (
-                                <button type="button" onClick={() => archiveCoachOffer(offer.localKey)} className="btn btn-ghost px-3 py-1.5 text-xs" style={{ color: 'var(--warn)' }}>
+                                <button type="button" onClick={() => archiveCoachOffer(offer.localKey)} className="btn btn-ghost px-3 py-1.5 text-xs" style={{ color: 'var(--warn-text)' }}>
                                   Archive
                                 </button>
                               )}
@@ -1873,7 +1873,7 @@ export default function SettingsPage() {
 
             {/* Delete Account */}
             <div className="card-2 p-5">
-              <h3 className="serif mb-2 flex items-center gap-2" style={{ fontSize: 20, color: 'var(--warn)' }}>
+              <h3 className="serif mb-2 flex items-center gap-2" style={{ fontSize: 20, color: 'var(--warn-text)' }}>
                 <AlertTriangle className="h-5 w-5" />
                 Danger Zone
               </h3>
@@ -1885,14 +1885,14 @@ export default function SettingsPage() {
                   type="button"
                   onClick={() => setShowDeleteConfirm(true)}
                   className="btn btn-ghost"
-                  style={{ color: 'var(--warn)' }}
+                  style={{ color: 'var(--warn-text)' }}
                 >
                   <Trash2 className="h-4 w-4" />
                   <span>Delete Account</span>
                 </button>
               ) : (
                 <div className="card-2 space-y-3 p-4">
-                  <p className="text-sm font-medium" style={{ color: 'var(--warn)' }}>
+                  <p className="text-sm font-medium" style={{ color: 'var(--warn-text)' }}>
                     Type <span className="mono rounded px-1" style={{ background: 'var(--ink-3)' }}>DELETE</span> to confirm:
                   </p>
                   <input
