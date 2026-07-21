@@ -77,8 +77,9 @@ export default function InviteClientPage() {
 
       <form onSubmit={handleInvite} className="card p-6">
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">Client First Name</label>
+          <label htmlFor="client-first-name" className="block text-sm font-medium text-gray-700 mb-2">Client First Name</label>
           <input
+            id="client-first-name"
             type="text"
             value={clientFirstName}
             onChange={(e) => setClientFirstName(e.target.value)}
@@ -87,12 +88,13 @@ export default function InviteClientPage() {
           />
         </div>
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">Client Email</label>
+          <label htmlFor="client-email" className="block text-sm font-medium text-gray-700 mb-2">Client Email</label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Mail className="h-5 w-5 text-gray-400" />
             </div>
             <input
+              id="client-email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
