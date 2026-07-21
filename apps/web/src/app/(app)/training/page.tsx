@@ -93,59 +93,66 @@ export default function TrainingPage() {
         return
       }
 
-      const enriched = await Promise.all(
-        rawPlans.map(async (plan) => {
-          const { data: days } = await supabase
-            .from('training_plan_days')
-            .select('*')
-            .eq('training_plan_id', plan.id)
-            .order('day_number')
+      const planIds = rawPlans.map((plan) => plan.id)
 
-          const workouts = await Promise.all(
-            (days ?? []).map(async (day) => {
-              const { data: exercises } = await supabase
-                .from('training_plan_exercises')
-                .select('*, exercises(*)')
-                .eq('plan_day_id', day.id)
-                .order('order_index')
+      const { data: allDays } = await supabase
+        .from('training_plan_days')
+        .select('*')
+        .in('training_plan_id', planIds)
+        .order('day_number')
 
-              return {
-                ...day,
-                exercises: (exercises ?? []) as ExercisePreview[],
-              }
-            })
-          )
+      const dayIds = (allDays ?? []).map((day) => day.id)
 
-          const { data: lastLog } = await supabase
-            .from('workout_logs')
-            .select('date, plan_day_id')
-            .eq('user_id', profile!.id)
-            .not('plan_day_id', 'is', null)
-            .order('date', { ascending: false })
-            .limit(1)
+      const { data: allExercises } = dayIds.length
+        ? await supabase
+            .from('training_plan_exercises')
+            .select('*, exercises(*)')
+            .in('plan_day_id', dayIds)
+            .order('order_index')
+        : { data: [] as ExercisePreview[] }
 
-          let lastWorkout: string | null = null
-          if (lastLog && lastLog.length > 0) {
-            const { data: dayCheck } = await supabase
-              .from('training_plan_days')
-              .select('training_plan_id')
-              .eq('id', lastLog[0].plan_day_id!)
-              .eq('training_plan_id', plan.id)
-              .limit(1)
+      const { data: lastLog } = await supabase
+        .from('workout_logs')
+        .select('date, plan_day_id')
+        .eq('user_id', profile!.id)
+        .not('plan_day_id', 'is', null)
+        .order('date', { ascending: false })
+        .limit(1)
 
-            if (dayCheck && dayCheck.length > 0) {
-              lastWorkout = lastLog[0].date
-            }
-          }
+      const daysByPlan = new Map<string, TrainingPlanDay[]>()
+      for (const day of allDays ?? []) {
+        const list = daysByPlan.get(day.training_plan_id) ?? []
+        list.push(day)
+        daysByPlan.set(day.training_plan_id, list)
+      }
 
-          return {
-            ...plan,
-            dayCount: days?.length ?? 0,
-            lastWorkout,
-            workouts,
-          }
-        })
-      )
+      const exercisesByDay = new Map<string, ExercisePreview[]>()
+      for (const exercise of (allExercises ?? []) as ExercisePreview[]) {
+        const list = exercisesByDay.get(exercise.plan_day_id) ?? []
+        list.push(exercise)
+        exercisesByDay.set(exercise.plan_day_id, list)
+      }
+
+      const lastLogEntry = lastLog?.[0]
+      const lastWorkoutDayId = lastLogEntry?.plan_day_id ?? null
+      const lastWorkoutPlanId = lastWorkoutDayId
+        ? allDays?.find((day) => day.id === lastWorkoutDayId)?.training_plan_id ?? null
+        : null
+
+      const enriched = rawPlans.map((plan) => {
+        const days = daysByPlan.get(plan.id) ?? []
+        const workouts = days.map((day) => ({
+          ...day,
+          exercises: exercisesByDay.get(day.id) ?? [],
+        }))
+
+        return {
+          ...plan,
+          dayCount: days.length,
+          lastWorkout: lastWorkoutPlanId === plan.id ? lastLogEntry!.date : null,
+          workouts,
+        }
+      })
 
       setPlans(enriched)
       setLoading(false)
