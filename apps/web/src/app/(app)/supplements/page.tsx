@@ -234,8 +234,9 @@ export default function SupplementsPage() {
       {showForm && (
         <form onSubmit={handleAdd} className="card mb-6 space-y-4 p-6">
           <div>
-            <label className={labelClass}>SUPPLEMENT NAME</label>
+            <label htmlFor="supplement-name" className={labelClass}>SUPPLEMENT NAME</label>
             <input
+              id="supplement-name"
               type="text"
               value={form.name}
               onChange={(e) => setForm(f => ({ ...f, name: e.target.value }))}
@@ -260,8 +261,9 @@ export default function SupplementsPage() {
 
           <div className="grid gap-3 sm:grid-cols-3">
             <div>
-              <label className={labelClass}>DOSAGE</label>
+              <label htmlFor="supplement-dosage" className={labelClass}>DOSAGE</label>
               <input
+                id="supplement-dosage"
                 type="text"
                 value={form.dosage}
                 onChange={(e) => setForm(f => ({ ...f, dosage: e.target.value }))}
@@ -270,9 +272,10 @@ export default function SupplementsPage() {
               />
             </div>
             <div>
-              <label className={labelClass}>FREQUENCY</label>
+              <label htmlFor="supplement-frequency" className={labelClass}>FREQUENCY</label>
               <div className="relative">
                 <select
+                  id="supplement-frequency"
                   value={form.frequency}
                   onChange={(e) => setForm(f => ({ ...f, frequency: e.target.value }))}
                   className={`${fieldClass} appearance-none pr-8`}
@@ -285,9 +288,10 @@ export default function SupplementsPage() {
               </div>
             </div>
             <div>
-              <label className={labelClass}>TIME</label>
+              <label htmlFor="supplement-time" className={labelClass}>TIME</label>
               <div className="relative">
                 <select
+                  id="supplement-time"
                   value={form.time_of_day}
                   onChange={(e) => setForm(f => ({ ...f, time_of_day: e.target.value }))}
                   className={`${fieldClass} appearance-none pr-8`}
@@ -302,8 +306,9 @@ export default function SupplementsPage() {
           </div>
 
           <div>
-            <label className={labelClass}>NOTES</label>
+            <label htmlFor="supplement-notes" className={labelClass}>NOTES</label>
             <input
+              id="supplement-notes"
               type="text"
               value={form.notes}
               onChange={(e) => setForm(f => ({ ...f, notes: e.target.value }))}
