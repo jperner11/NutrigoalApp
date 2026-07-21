@@ -440,6 +440,12 @@ main {
   --ok: #1aa37a;
   --warn: #c4791c;
   --danger: #dc2626;
+  /* Readable status tones for text — same reasoning as --acc-text: the raw
+     status hues are tuned for small swatches/backgrounds, not text, and
+     fall short of WCAG AA (~2.6–3.9:1) on chip/card surfaces in light mode. */
+  --ok-text: #127356;
+  --warn-text: #935b15;
+  --danger-text: #c82020;
 
   /* Surface-strong — always-dark cards (greeting hero, PR card, footer, ForCoaches section) */
   --surface-strong: var(--background-elevated);
@@ -453,6 +459,12 @@ main {
     /* Dark panels are near-black, so the raw lime accent already reads
        fine as text there — only light mode needs the darker swap. */
     --acc-text: var(--brand-500);
+
+    /* --ok/--warn already clear WCAG AA on dark chip/card surfaces;
+       --danger needs lightening (~3:1 raw) to stay readable. */
+    --ok-text: var(--ok);
+    --warn-text: var(--warn);
+    --danger-text: #e76868;
   }
 }
 
