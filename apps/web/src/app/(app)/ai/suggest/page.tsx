@@ -57,20 +57,20 @@ export default function AISuggestPage() {
     }
   }
 
-  if (loadingUsage) return <div className="text-gray-500">Loading...</div>
+  if (loadingUsage) return <div className="text-[var(--muted)]">Loading...</div>
 
   return (
     <div className="max-w-3xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">AI Meal Suggestions</h1>
-        <p className="text-gray-900 mt-1">Get personalized meal ideas based on your nutrition targets.</p>
+        <h1 className="text-3xl font-bold text-[var(--foreground)]">AI Meal Suggestions</h1>
+        <p className="text-[var(--muted)] mt-1">Get personalized meal ideas based on your nutrition targets.</p>
       </div>
 
       {/* Usage Counter */}
       <div className="card p-4 mb-6 flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <Sparkles className="h-5 w-5 text-purple-600" />
-          <span className="text-sm text-gray-700">
+          <Sparkles className="h-5 w-5 text-[var(--acc-text)]" />
+          <span className="text-sm text-[var(--muted)]">
             {isClient ? (
               <span>AI features are managed by your trainer</span>
             ) : isFree ? (
@@ -83,7 +83,7 @@ export default function AISuggestPage() {
         {isFree && !isClient && (
           <a
             href="/pricing"
-            className="text-sm text-purple-600 hover:text-purple-800 font-medium"
+            className="text-sm text-[var(--acc-text)] hover:underline font-medium"
           >
             Upgrade to Pro
           </a>
@@ -92,21 +92,22 @@ export default function AISuggestPage() {
 
       {/* Prompt Form */}
       <form onSubmit={handleSubmit} className="card p-6 mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label htmlFor="ai-suggest-prompt" className="block text-sm font-medium text-[var(--foreground)] mb-2">
           What kind of meal are you looking for?
         </label>
         <textarea
+          id="ai-suggest-prompt"
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
           placeholder="e.g., Quick high-protein breakfast ideas under 400 calories, or a dinner recipe with chicken and vegetables..."
           rows={3}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none mb-4"
+          className="input-field resize-none mb-4"
           disabled={!canUse}
         />
         <button
           type="submit"
           disabled={isLoading || !canUse || !prompt.trim()}
-          className="flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-2.5 rounded-lg font-medium hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="btn btn-accent disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {!canUse ? (
             <>
@@ -115,7 +116,7 @@ export default function AISuggestPage() {
             </>
           ) : isLoading ? (
             <>
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
               <span>Generating...</span>
             </>
           ) : (
@@ -131,10 +132,10 @@ export default function AISuggestPage() {
       {response && (
         <div className="card p-6">
           <div className="flex items-center space-x-2 mb-4">
-            <Sparkles className="h-5 w-5 text-purple-600" />
-            <h3 className="font-semibold text-gray-900">AI Suggestion</h3>
+            <Sparkles className="h-5 w-5 text-[var(--acc-text)]" />
+            <h3 className="font-semibold text-[var(--foreground)]">AI Suggestion</h3>
           </div>
-          <div className="prose prose-sm max-w-none text-gray-700 whitespace-pre-wrap">
+          <div className="prose prose-sm max-w-none text-[var(--muted)] whitespace-pre-wrap">
             {response}
           </div>
         </div>
