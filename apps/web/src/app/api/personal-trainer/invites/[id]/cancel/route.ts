@@ -26,7 +26,7 @@ export async function POST(
 
   await ensureTrainerAccess(user.id, profile?.role)
 
-  const { data: invite } = await admin
+  const { data: invite, error } = await admin
     .from('personal_trainer_invites')
     .update({
       status: 'revoked',
@@ -38,6 +38,10 @@ export async function POST(
     .eq('status', 'pending')
     .select('id')
     .single()
+
+  if (error && error.code !== 'PGRST116') {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
 
   if (!invite) {
     return NextResponse.json({ error: 'Pending invite not found.' }, { status: 404 })
