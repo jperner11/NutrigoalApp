@@ -141,16 +141,6 @@ export default function MyNutritionistPage() {
             >
               {trainer.email}
             </div>
-            <div
-              className="mono mt-3"
-              style={{
-                fontSize: 11,
-                color: 'var(--ok)',
-                letterSpacing: '0.1em',
-              }}
-            >
-              ● Online · usually replies within a day
-            </div>
             <p
               className="mt-4"
               style={{ fontSize: 13, color: 'var(--fg-2)', lineHeight: 1.6 }}
