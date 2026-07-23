@@ -27,19 +27,24 @@ export async function GET(request: Request) {
     return NextResponse.json({ message: 'Failed to load expired trials' }, { status: 500 })
   }
 
+  const expiredIds = (expired ?? []).map((profile) => profile.id)
+
+  // A converted trial means a live subscription — keep their role.
+  const { data: activeSubs } = expiredIds.length
+    ? await admin
+        .from('subscriptions')
+        .select('user_id')
+        .in('user_id', expiredIds)
+        .in('status', ['active', 'trialing'])
+        .gt('current_period_end', nowIso)
+    : { data: [] as { user_id: string }[] }
+
+  const activeUserIds = new Set((activeSubs ?? []).map((sub) => sub.user_id))
+
   let downgraded = 0
 
   for (const profile of expired ?? []) {
-    // A converted trial means a live subscription — keep their role.
-    const { data: activeSub } = await admin
-      .from('subscriptions')
-      .select('id')
-      .eq('user_id', profile.id)
-      .in('status', ['active', 'trialing'])
-      .gt('current_period_end', nowIso)
-      .maybeSingle()
-
-    if (activeSub) continue
+    if (activeUserIds.has(profile.id)) continue
 
     const { error: updateError } = await admin
       .from('user_profiles')
