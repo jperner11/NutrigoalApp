@@ -27,13 +27,6 @@ export async function requireAuthedTrainer(): Promise<AuthedTrainer> {
   return { userId: user.id }
 }
 
-export async function requireAuthedUser(): Promise<{ userId: string }> {
-  const supabase = await createServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new ApiError('Unauthorized', 401)
-  return { userId: user.id }
-}
-
 export async function ensureCoachClientAccess(
   admin: SupabaseClient,
   coachId: string,
