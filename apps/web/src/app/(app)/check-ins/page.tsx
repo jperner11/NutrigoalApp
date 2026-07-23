@@ -204,7 +204,7 @@ function TemplateManager({ templates, trainerId, onRefresh }: {
       <div className="flex items-center justify-between mb-4">
         <p className="text-sm text-gray-500">Reusable question sets for scheduled check-ins.</p>
         <button onClick={() => { setCreating(true); setEditing(null) }}
-          className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all">
+          className="btn btn-accent">
           <Plus className="h-4 w-4" />
           New Template
         </button>
@@ -432,7 +432,7 @@ function TemplateForm({ template, trainerId, onSaved, onCancel }: {
           </button>
         )}
         <button onClick={handleSave} disabled={saving}
-          className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-2 rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50">
+          className="btn btn-accent flex-1 disabled:opacity-50">
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
           {saving ? 'Saving...' : template ? 'Save Changes' : 'Create Template'}
         </button>
@@ -767,7 +767,7 @@ function ActiveCheckIn({
               Save for later
             </button>
             <button onClick={onSubmit} disabled={submitting}
-              className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50">
+              className="btn btn-accent flex-1 disabled:opacity-50">
               {submitting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
               <span>{submitting ? 'Submitting...' : 'Submit check-in'}</span>
             </button>
