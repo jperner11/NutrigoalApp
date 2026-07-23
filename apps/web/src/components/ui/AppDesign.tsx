@@ -11,20 +11,6 @@ const toneColor: Record<Tone, string> = {
   muted: 'var(--fg-3)',
 }
 
-export function AppWorkspaceShell({
-  children,
-  className = '',
-}: {
-  children: ReactNode
-  className?: string
-}) {
-  return (
-    <div className={`app-workspace ${className}`.trim()}>
-      {children}
-    </div>
-  )
-}
-
 export function AppHeroPanel({
   eyebrow,
   title,
