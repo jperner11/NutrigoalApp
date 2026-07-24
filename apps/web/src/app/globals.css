@@ -1157,6 +1157,13 @@ input[type="checkbox"] {
   background-color: var(--ok) !important;
 }
 
+.border-green-500,
+.border-green-600,
+.border-emerald-500,
+.border-emerald-600 {
+  border-color: var(--ok) !important;
+}
+
 .bg-amber-500,
 .bg-amber-600,
 .bg-yellow-500,
