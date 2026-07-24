@@ -6,17 +6,23 @@ import {
   requireAuthedTrainer,
 } from '@/lib/supplementPlans'
 
+type ItemOwnershipRow = {
+  id: string
+  plan_id: string
+  supplement_plans: { coach_id: string } | { coach_id: string }[] | null
+}
+
 async function ensureItemOwnership(admin: ReturnType<typeof createAdminClient>, coachId: string, planId: string, itemId: string) {
-  const { data: row, error } = await admin
+  const { data, error } = await admin
     .from('supplement_plan_items')
     .select('id, plan_id, supplement_plans!inner(coach_id)')
     .eq('id', itemId)
     .eq('plan_id', planId)
     .maybeSingle()
   if (error) throw new ApiError(error.message, 400)
-  // @ts-expect-error nested join type
-  const ownerId: string | undefined = row?.supplement_plans?.coach_id
-  if (!row || ownerId !== coachId) throw new ApiError('Item not found.', 404)
+  const row = data as unknown as ItemOwnershipRow | null
+  const supplementPlan = Array.isArray(row?.supplement_plans) ? row.supplement_plans[0] : row?.supplement_plans
+  if (!row || supplementPlan?.coach_id !== coachId) throw new ApiError('Item not found.', 404)
 }
 
 export async function PATCH(req: Request, ctx: { params: Promise<{ planId: string; itemId: string }> }) {
