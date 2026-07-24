@@ -24,6 +24,16 @@ const TONES: Record<Tone, string> = {
   muted: 'var(--fg-3)',
 }
 
+// Readable variants for text (raw TONES are tuned for icons/swatches and fall
+// short of WCAG AA as text — see the --acc-text/--ok-text/--warn-text comments
+// in globals.css).
+const TEXT_TONES: Record<Tone, string> = {
+  acc: 'var(--acc-text)',
+  ok: 'var(--ok-text)',
+  warn: 'var(--warn-text)',
+  muted: 'var(--fg-3)',
+}
+
 export default function StatTile({
   label,
   value,
@@ -90,7 +100,7 @@ export default function StatTile({
           className="mono mt-1"
           style={{
             fontSize: 10,
-            color: TONES[changeTone],
+            color: TEXT_TONES[changeTone],
             letterSpacing: '0.04em',
           }}
         >
