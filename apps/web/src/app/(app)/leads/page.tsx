@@ -198,8 +198,14 @@ export default function LeadsPage() {
                     )}
 
                     <div className="max-w-[240px]">
-                      <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted-soft)]">Pipeline stage</div>
+                      <label
+                        htmlFor={`pipeline-stage-${lead.id}`}
+                        className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted-soft)]"
+                      >
+                        Pipeline stage
+                      </label>
                       <select
+                        id={`pipeline-stage-${lead.id}`}
                         value={lead.stage}
                         onChange={(e) => updateLeadStage(lead.id, e.target.value as LeadRecord['stage'])}
                         className="mt-1 w-full rounded-xl border border-[var(--line)] bg-[var(--panel-strong)] px-3 py-2 text-sm text-[var(--muted)]"
