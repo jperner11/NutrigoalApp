@@ -221,12 +221,12 @@ export default function AcceptInvitePage() {
           {loading ? (
             <div className="mt-8 text-[var(--muted)]">Loading invite details...</div>
           ) : !invite ? (
-            <div className="mt-8 rounded-[24px] border border-[var(--line)] bg-white/80 p-6 text-[var(--muted)]">
+            <div className="mt-8 rounded-[24px] border border-[var(--line)] bg-[var(--panel-strong)]/80 p-6 text-[var(--muted)]">
               We couldn&apos;t find this invite. Ask your trainer to resend it.
             </div>
           ) : (
             <>
-              <div className="mt-8 rounded-[28px] border border-[var(--line)] bg-white/80 p-6">
+              <div className="mt-8 rounded-[28px] border border-[var(--line)] bg-[var(--panel-strong)]/80 p-6">
                 <div className="flex items-start gap-4">
                   <div className="rounded-2xl bg-[var(--brand-100)] p-3">
                     <Mail className="h-5 w-5 text-[var(--brand-900)]" />
