@@ -61,6 +61,7 @@ export default function AIGenerateScreen() {
           mealsPerDay: profile.meals_per_day ?? 3,
           wakeTime: profile.wake_time ?? '07:00',
           workoutTime: profile.workout_time ?? '08:00',
+          sleepTime: profile.sleep_time ?? '23:00',
           dietaryPreferences: profile.dietary_preferences ?? [],
           allergies: profile.allergies ?? [],
           dietaryRestrictions: profile.dietary_restrictions ?? [],
