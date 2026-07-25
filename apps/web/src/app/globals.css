@@ -1121,7 +1121,8 @@ input[type="checkbox"] {
 .bg-sky-50,
 .bg-sky-100,
 .bg-red-50,
-.bg-red-100 {
+.bg-red-100,
+.bg-red-50\/90 {
   background-color: rgba(205, 242, 78, 0.14) !important;
 }
 
@@ -1136,7 +1137,8 @@ input[type="checkbox"] {
 .bg-amber-50,
 .bg-amber-100,
 .bg-yellow-50,
-.bg-yellow-100 {
+.bg-yellow-100,
+.bg-amber-50\/90 {
   background-color: rgba(196, 121, 28, 0.12) !important;
 }
 
