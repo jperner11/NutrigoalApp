@@ -12,6 +12,11 @@ export function rateLimit(
 
   if (!entry || now > entry.resetAt) {
     store.set(key, { count: 1, resetAt: now + windowMs })
+    if (store.size > 10_000) {
+      for (const [k, v] of store) {
+        if (now > v.resetAt) store.delete(k)
+      }
+    }
     return { success: true, remaining: limit - 1 }
   }
 
