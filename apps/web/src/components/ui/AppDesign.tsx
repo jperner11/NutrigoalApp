@@ -4,10 +4,10 @@ type Tone = 'default' | 'accent' | 'success' | 'warn' | 'danger' | 'muted'
 
 const toneColor: Record<Tone, string> = {
   default: 'var(--foreground)',
-  accent: 'var(--acc)',
-  success: 'var(--ok)',
-  warn: 'var(--warn)',
-  danger: 'var(--danger)',
+  accent: 'var(--acc-text)',
+  success: 'var(--ok-text)',
+  warn: 'var(--warn-text)',
+  danger: 'var(--danger-text)',
   muted: 'var(--fg-3)',
 }
 
