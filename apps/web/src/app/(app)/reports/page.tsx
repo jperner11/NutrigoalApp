@@ -27,25 +27,19 @@ function getWeekRange(offset: number): { start: string; end: string; label: stri
   return { start: fmt(monday), end: fmt(sunday), label }
 }
 
-function StatCard({ label, value, subtitle, icon: Icon, color }: {
+function StatCard({ label, value, subtitle, icon: Icon }: {
   label: string
   value: string | number
   subtitle?: string
   icon: React.ComponentType<{ className?: string }>
-  color: string
 }) {
-  const colorClasses: Record<string, string> = {
-    purple: 'bg-purple-50 text-purple-600',
-    blue: 'bg-blue-50 text-blue-600',
-    green: 'bg-green-50 text-green-600',
-    orange: 'bg-amber-50 text-amber-600',
-    pink: 'bg-pink-50 text-pink-600',
-  }
-
   return (
     <div className="card p-4">
       <div className="flex items-center gap-3 mb-2">
-        <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${colorClasses[color] || colorClasses.purple}`}>
+        <div
+          className="w-9 h-9 rounded-lg flex items-center justify-center"
+          style={{ background: 'var(--ink-3)', color: 'var(--acc)' }}
+        >
           <Icon className="h-4.5 w-4.5" />
         </div>
         <span className="text-sm text-[var(--muted)]">{label}</span>
@@ -56,8 +50,7 @@ function StatCard({ label, value, subtitle, icon: Icon, color }: {
   )
 }
 
-function AdherenceBar({ label, percentage, color }: { label: string; percentage: number; color: string }) {
-  const barColor = color === 'purple' ? 'from-purple-500 to-indigo-500' : 'from-blue-500 to-cyan-500'
+function AdherenceBar({ label, percentage }: { label: string; percentage: number }) {
   return (
     <div>
       <div className="flex items-center justify-between mb-1.5">
@@ -66,8 +59,8 @@ function AdherenceBar({ label, percentage, color }: { label: string; percentage:
       </div>
       <div className="w-full h-2.5 bg-[var(--line)] rounded-full overflow-hidden">
         <div
-          className={`h-full bg-gradient-to-r ${barColor} rounded-full transition-all duration-500`}
-          style={{ width: `${Math.min(100, percentage)}%` }}
+          className="h-full rounded-full transition-all duration-500"
+          style={{ width: `${Math.min(100, percentage)}%`, background: 'var(--acc)' }}
         />
       </div>
     </div>
@@ -132,17 +125,17 @@ export default function ReportsPage() {
         ) : (
           <>
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-              <StatCard label="Invites sent" value={getCount('client_invite_sent')} icon={BarChart3} color="blue" />
-              <StatCard label="Invites accepted" value={getCount('client_invite_accepted')} icon={TrendingUp} color="green" />
-              <StatCard label="Diet plans assigned" value={getCount('diet_plan_assigned')} icon={Utensils} color="orange" />
-              <StatCard label="Training plans assigned" value={getCount('training_plan_assigned')} icon={Dumbbell} color="purple" />
+              <StatCard label="Invites sent" value={getCount('client_invite_sent')} icon={BarChart3} />
+              <StatCard label="Invites accepted" value={getCount('client_invite_accepted')} icon={TrendingUp} />
+              <StatCard label="Diet plans assigned" value={getCount('diet_plan_assigned')} icon={Utensils} />
+              <StatCard label="Training plans assigned" value={getCount('training_plan_assigned')} icon={Dumbbell} />
             </div>
 
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-              <StatCard label="First meals logged" value={getCount('first_meal_logged')} icon={Utensils} color="orange" />
-              <StatCard label="First workouts logged" value={getCount('first_workout_logged')} icon={Dumbbell} color="blue" />
-              <StatCard label="First messages sent" value={getCount('first_message_sent')} icon={BarChart3} color="purple" />
-              <StatCard label="First feedback completed" value={getCount('first_feedback_completed')} icon={TrendingUp} color="green" />
+              <StatCard label="First meals logged" value={getCount('first_meal_logged')} icon={Utensils} />
+              <StatCard label="First workouts logged" value={getCount('first_workout_logged')} icon={Dumbbell} />
+              <StatCard label="First messages sent" value={getCount('first_message_sent')} icon={BarChart3} />
+              <StatCard label="First feedback completed" value={getCount('first_feedback_completed')} icon={TrendingUp} />
             </div>
 
             <div className="card p-5">
@@ -208,15 +201,15 @@ export default function ReportsPage() {
           <div className="card p-5">
             <h2 className="text-lg font-semibold text-[var(--foreground)] mb-4">Adherence</h2>
             <div className="space-y-4">
-              <AdherenceBar label="Calorie Target" percentage={report.calorieAdherence} color="purple" />
-              <AdherenceBar label="Water Intake" percentage={report.waterAdherence} color="blue" />
+              <AdherenceBar label="Calorie Target" percentage={report.calorieAdherence} />
+              <AdherenceBar label="Water Intake" percentage={report.waterAdherence} />
             </div>
           </div>
 
           {/* Nutrition Stats */}
           <div>
             <h2 className="text-lg font-semibold text-[var(--foreground)] mb-3 flex items-center gap-2">
-              <Utensils className="h-5 w-5 text-purple-600" />
+              <Utensils className="h-5 w-5 text-[var(--acc-text)]" />
               Nutrition
             </h2>
             <div className="grid grid-cols-2 gap-3">
@@ -225,28 +218,24 @@ export default function ReportsPage() {
                 value={report.avgCalories}
                 subtitle={`Target: ${report.targetCalories}`}
                 icon={BarChart3}
-                color="purple"
               />
               <StatCard
                 label="Avg Protein"
                 value={`${report.avgProtein}g`}
                 subtitle={`Target: ${report.targetProtein}g`}
                 icon={BarChart3}
-                color="pink"
               />
               <StatCard
                 label="Meals Logged"
                 value={report.mealsLogged}
                 subtitle={`${report.daysWithMeals} days tracked`}
                 icon={Utensils}
-                color="orange"
               />
               <StatCard
                 label="Avg Macros"
                 value={`${report.avgCarbs}C / ${report.avgFat}F`}
                 subtitle="Carbs / Fat (g)"
                 icon={BarChart3}
-                color="purple"
               />
             </div>
           </div>
@@ -254,7 +243,7 @@ export default function ReportsPage() {
           {/* Training Stats */}
           <div>
             <h2 className="text-lg font-semibold text-[var(--foreground)] mb-3 flex items-center gap-2">
-              <Dumbbell className="h-5 w-5 text-blue-600" />
+              <Dumbbell className="h-5 w-5 text-[var(--acc-text)]" />
               Training
             </h2>
             <div className="grid grid-cols-2 gap-3">
@@ -263,14 +252,12 @@ export default function ReportsPage() {
                 value={report.workoutsCompleted}
                 subtitle={report.totalWorkoutMinutes > 0 ? `${report.totalWorkoutMinutes} min total` : undefined}
                 icon={Dumbbell}
-                color="blue"
               />
               <StatCard
                 label="Cardio Sessions"
                 value={report.cardioSessions}
                 subtitle={report.totalCardioCalories > 0 ? `${report.totalCardioCalories} cal burned` : undefined}
                 icon={Dumbbell}
-                color="green"
               />
             </div>
           </div>
@@ -278,7 +265,7 @@ export default function ReportsPage() {
           {/* Water & Weight */}
           <div>
             <h2 className="text-lg font-semibold text-[var(--foreground)] mb-3 flex items-center gap-2">
-              <Droplets className="h-5 w-5 text-cyan-600" />
+              <Droplets className="h-5 w-5 text-[var(--acc-text)]" />
               Water & Weight
             </h2>
             <div className="grid grid-cols-2 gap-3">
@@ -287,7 +274,6 @@ export default function ReportsPage() {
                 value={`${report.avgWaterMl}ml`}
                 subtitle={`Target: ${report.targetWaterMl}ml · ${report.daysWithWater} days`}
                 icon={Droplets}
-                color="blue"
               />
               {report.weightChange !== null ? (
                 <StatCard
@@ -295,7 +281,6 @@ export default function ReportsPage() {
                   value={`${report.weightChange > 0 ? '+' : ''}${report.weightChange}kg`}
                   subtitle={`${report.startWeight}kg → ${report.endWeight}kg`}
                   icon={report.weightChange > 0 ? TrendingUp : report.weightChange < 0 ? TrendingDown : Minus}
-                  color={report.weightChange === 0 ? 'purple' : 'green'}
                 />
               ) : (
                 <StatCard
@@ -303,7 +288,6 @@ export default function ReportsPage() {
                   value="No data"
                   subtitle="Log weight to track changes"
                   icon={TrendingUp}
-                  color="purple"
                 />
               )}
             </div>
