@@ -67,10 +67,11 @@ export async function apiFetch<T = unknown>(url: string, init: ApiInit = {}): Pr
   }
 
   if (!response.ok) {
+    const errorPayload = payload && typeof payload === 'object' ? (payload as { error?: unknown; message?: unknown }) : null
     const message =
-      (payload && typeof payload === 'object' && payload !== null && 'error' in payload && typeof (payload as { error: unknown }).error === 'string'
-        ? (payload as { error: string }).error
-        : null) ?? `Request failed (${response.status})`
+      (typeof errorPayload?.error === 'string' && errorPayload.error) ||
+      (typeof errorPayload?.message === 'string' && errorPayload.message) ||
+      `Request failed (${response.status})`
     const err = new ApiError(message, response.status, payload, url)
     const scope = buildScope(url, context, { kind: 'api', status: response.status, payload })
     Sentry.captureException(err, {
