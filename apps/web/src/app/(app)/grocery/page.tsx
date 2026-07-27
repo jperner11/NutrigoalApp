@@ -158,9 +158,9 @@ export default function GroceryPage() {
             </button>
           )}
         </div>
-        <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+        <div className="w-full h-2 bg-[var(--line)] rounded-full overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full transition-all duration-300"
+            className="h-full bg-[var(--acc)] rounded-full transition-all duration-300"
             style={{ width: `${totalItems > 0 ? (checkedCount / totalItems) * 100 : 0}%` }}
           />
         </div>
@@ -184,7 +184,7 @@ export default function GroceryPage() {
               >
                 <div className="flex items-center gap-3">
                   <h3 className="font-semibold text-gray-900">{category}</h3>
-                  <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
+                  <span className="text-xs text-[var(--muted-soft)] bg-[var(--line)] px-2 py-0.5 rounded-full">
                     {categoryChecked}/{items.length}
                   </span>
                 </div>
@@ -208,7 +208,7 @@ export default function GroceryPage() {
                         role="checkbox"
                         aria-checked={isChecked}
                         className={`w-full flex items-center gap-3 px-5 py-3 border-b border-gray-50 last:border-b-0 transition-colors text-left ${
-                          isChecked ? 'bg-green-50/50' : 'hover:bg-gray-50'
+                          isChecked ? 'bg-[var(--success-bg)]' : 'hover:bg-gray-50'
                         }`}
                       >
                         <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
