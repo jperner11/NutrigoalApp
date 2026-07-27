@@ -42,18 +42,21 @@ export async function GET(request: Request) {
       status: 'pending',
     })
 
-    if (!insertError) {
-      const { error: updateError } = await supabase
-        .from('feedback_schedules')
-        .update({ last_triggered_at: now.toISOString() })
-        .eq('id', schedule.id)
-
-      if (updateError) {
-        Sentry.captureException(updateError, { tags: { kind: 'cron', route: 'check-ins', scheduleId: schedule.id } })
-        continue
-      }
-      created++
+    if (insertError) {
+      Sentry.captureException(insertError, { tags: { kind: 'cron', route: 'check-ins', scheduleId: schedule.id } })
+      continue
     }
+
+    const { error: updateError } = await supabase
+      .from('feedback_schedules')
+      .update({ last_triggered_at: now.toISOString() })
+      .eq('id', schedule.id)
+
+    if (updateError) {
+      Sentry.captureException(updateError, { tags: { kind: 'cron', route: 'check-ins', scheduleId: schedule.id } })
+      continue
+    }
+    created++
   }
 
   return NextResponse.json({ created, checked: schedules.length })
