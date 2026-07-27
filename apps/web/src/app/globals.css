@@ -1106,6 +1106,11 @@ input[type="checkbox"] {
   border-color: var(--line) !important;
 }
 
+.hover\:border-gray-300:hover,
+.hover\:border-slate-300:hover {
+  border-color: var(--line-strong) !important;
+}
+
 .bg-purple-50,
 .bg-purple-100,
 .bg-purple-200,
@@ -1153,7 +1158,8 @@ input[type="checkbox"] {
 .bg-pink-500,
 .bg-red-500,
 .bg-red-600,
-.bg-red-700 {
+.bg-red-700,
+.hover\:bg-purple-700:hover {
   background-color: var(--brand-500) !important;
 }
 
@@ -1210,7 +1216,8 @@ input[type="checkbox"] {
 .text-red-500,
 .text-red-600,
 .text-red-700,
-.text-red-800 {
+.text-red-800,
+.text-orange-500 {
   color: var(--acc) !important;
 }
 
@@ -1322,7 +1329,8 @@ input[type="checkbox"] {
 .focus\:ring-indigo-500:focus,
 .focus\:ring-blue-500:focus,
 .focus\:ring-sky-500:focus,
-.focus\:ring-red-500:focus {
+.focus\:ring-red-500:focus,
+.focus-visible\:ring-purple-500:focus-visible {
   --tw-ring-color: var(--focus) !important;
 }
 
