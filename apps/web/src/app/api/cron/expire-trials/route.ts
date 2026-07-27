@@ -40,18 +40,22 @@ export async function GET(request: Request) {
     : { data: [] as { user_id: string }[] }
 
   const activeUserIds = new Set((activeSubs ?? []).map((sub) => sub.user_id))
+  const idsToDowngrade = expiredIds.filter((id) => !activeUserIds.has(id))
 
   let downgraded = 0
 
-  for (const profile of expired ?? []) {
-    if (activeUserIds.has(profile.id)) continue
-
-    const { error: updateError } = await admin
+  if (idsToDowngrade.length) {
+    const { data: updated, error: updateError } = await admin
       .from('user_profiles')
       .update({ role: 'free' })
-      .eq('id', profile.id)
+      .in('id', idsToDowngrade)
+      .select('id')
 
-    if (!updateError) downgraded++
+    if (updateError) {
+      Sentry.captureException(updateError, { tags: { kind: 'cron', route: 'expire-trials' } })
+    } else {
+      downgraded = updated?.length ?? 0
+    }
   }
 
   return NextResponse.json({ checked: expired?.length ?? 0, downgraded })
