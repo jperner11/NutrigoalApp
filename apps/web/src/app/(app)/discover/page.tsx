@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { BadgeCheck, Compass, ExternalLink, Loader2, MapPin, MessageSquare, Search, SlidersHorizontal, Star, UserCheck } from 'lucide-react'
@@ -82,12 +82,25 @@ export default function DiscoverPage() {
     message: '',
     selected_offer_id: '',
   })
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     if (profile && isTrainerRole(profile.role)) {
       router.push('/dashboard')
     }
   }, [profile, router])
+
+  useEffect(() => {
+    if (!selectedCoach) return
+    closeButtonRef.current?.focus()
+
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') setSelectedCoach(null)
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [selectedCoach])
 
   useEffect(() => {
     async function loadCoaches() {
@@ -505,7 +518,12 @@ export default function DiscoverPage() {
           className="fixed inset-0 z-50 flex items-center justify-center px-4"
           style={{ background: 'rgba(13, 27, 42, 0.55)', backdropFilter: 'blur(4px)' }}
         >
-          <div className="card w-full max-w-2xl p-6">
+          <div
+            className="card w-full max-w-2xl p-6"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="request-coach-modal-title"
+          >
             <div className="row items-start justify-between gap-4">
               <div>
                 <div
@@ -515,6 +533,7 @@ export default function DiscoverPage() {
                   ✦ REQUEST COACHING
                 </div>
                 <div
+                  id="request-coach-modal-title"
                   className="serif mt-2"
                   style={{ fontSize: 26, lineHeight: 1.15 }}
                 >
@@ -528,6 +547,7 @@ export default function DiscoverPage() {
                 </p>
               </div>
               <button
+                ref={closeButtonRef}
                 type="button"
                 onClick={() => setSelectedCoach(null)}
                 className="btn btn-ghost shrink-0"
