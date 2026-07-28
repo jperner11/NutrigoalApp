@@ -163,7 +163,7 @@ export default function SupplementWidget({ userId }: SupplementWidgetProps) {
                     ? '2px solid var(--acc)'
                     : '2px solid var(--line-2)',
                   background: isTaken ? 'var(--acc)' : 'transparent',
-                  color: '#fff',
+                  color: '#131012',
                 }}
               >
                 {isTaken && <Check className="h-3 w-3" />}
