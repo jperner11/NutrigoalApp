@@ -104,8 +104,6 @@ export {
   calculateMacros,
   calculateWaterIntake,
   calculateNutritionTargets,
-  getActivityLevelName,
-  getGoalName,
 } from './nutrition'
 
 // Training
