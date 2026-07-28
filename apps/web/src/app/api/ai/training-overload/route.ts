@@ -26,7 +26,11 @@ export async function POST(request: Request) {
   const apiKey = process.env.OPENAI_API_KEY
 
   try {
-    const { exercises } = (await request.json()) as { exercises?: TrainingOverloadExerciseInput[] }
+    const body = (await request.json().catch(() => null)) as { exercises?: TrainingOverloadExerciseInput[] } | null
+    if (!body) {
+      return NextResponse.json({ message: 'Invalid request body' }, { status: 400 })
+    }
+    const { exercises } = body
 
     if (!Array.isArray(exercises) || exercises.length === 0) {
       return NextResponse.json({ message: 'Missing exercises' }, { status: 400 })
