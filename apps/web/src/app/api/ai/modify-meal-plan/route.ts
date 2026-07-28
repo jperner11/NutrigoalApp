@@ -32,7 +32,11 @@ export async function POST(request: Request) {
   if (auth.response) return auth.response
 
   try {
-    const { userMessage, currentMeals, targets, userProfile } = await request.json()
+    const body = await request.json().catch(() => null)
+    if (!body) {
+      return NextResponse.json({ message: 'Invalid request body' }, { status: 400 })
+    }
+    const { userMessage, currentMeals, targets, userProfile } = body
 
     if (!userMessage || !currentMeals) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 })

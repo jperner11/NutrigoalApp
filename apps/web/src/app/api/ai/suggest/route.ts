@@ -16,7 +16,11 @@ export async function POST(request: Request) {
     if (auth.response) return auth.response
     const userId = auth.userId
 
-    const { prompt, userProfile } = await request.json()
+    const body = await request.json().catch(() => null)
+    if (!body) {
+      return NextResponse.json({ message: 'Invalid request body' }, { status: 400 })
+    }
+    const { prompt, userProfile } = body
 
     if (!prompt) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 })

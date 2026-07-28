@@ -41,7 +41,10 @@ export async function POST(request: Request) {
   if (auth.response) return auth.response
 
   try {
-    const body = await request.json()
+    const body = await request.json().catch(() => null)
+    if (!body) {
+      return NextResponse.json({ message: 'Invalid request body' }, { status: 400 })
+    }
     const {
       calories, protein, carbs, fat,
       goal, gender, weight_kg, age, height_cm,
