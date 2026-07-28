@@ -403,7 +403,7 @@ function TemplateForm({ template, trainerId, onSaved, onCancel }: {
                 placeholder="Type your question..." />
             </div>
             {questions.length > 1 && (
-              <button onClick={() => removeQuestion(q.id)} aria-label="Remove question" className="mt-6 text-gray-400 hover:text-red-500">
+              <button onClick={() => removeQuestion(q.id)} aria-label="Remove question" className="mt-6 text-gray-400 hover:text-[var(--danger-text)]">
                 <Trash2 className="h-4 w-4" />
               </button>
             )}
@@ -427,7 +427,7 @@ function TemplateForm({ template, trainerId, onSaved, onCancel }: {
         </button>
         {template && (
           <button onClick={handleDelete} disabled={deleting}
-            className="px-4 py-2 border border-red-200 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50">
+            className="px-4 py-2 border border-[var(--danger)] rounded-lg text-sm font-medium text-[var(--danger-text)] hover:bg-[var(--danger-bg)] disabled:opacity-50">
             {deleting ? 'Deleting...' : 'Delete'}
           </button>
         )}
