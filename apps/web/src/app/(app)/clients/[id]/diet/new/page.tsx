@@ -63,13 +63,16 @@ export default function NewClientDietPlanPage() {
     if (!profile) return
     if (!isTrainerRole(profile.role)) { router.push('/dashboard'); return }
     const supabase = createClient()
+    let cancelled = false
     supabase.from('user_profiles').select('*').eq('id', id).single().then(
       ({ data, error }) => {
+        if (cancelled) return
         if (error) { setLoadError('Failed to load client. Please refresh.'); return }
         if (data) setClient(data as UserProfile)
       },
-      () => setLoadError('Failed to load client. Please refresh.')
+      () => { if (!cancelled) setLoadError('Failed to load client. Please refresh.') }
     )
+    return () => { cancelled = true }
   }, [profile, id, router])
 
   if (loadError) return <div className="text-[var(--fg-3)]">{loadError}</div>
