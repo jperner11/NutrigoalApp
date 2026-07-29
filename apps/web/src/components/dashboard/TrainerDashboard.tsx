@@ -101,19 +101,20 @@ export default function TrainerDashboard({ trainerId, trainerName }: TrainerDash
     const supabase = createClient()
 
     async function load() {
-      const { data: clientRows } = await supabase
-        .from('nutritionist_clients')
-        .select('id, client_id, invited_email, status, created_at, client:client_id(id, full_name, email, onboarding_completed)')
-        .eq('nutritionist_id', trainerId)
-        .eq('status', 'active')
-        .order('created_at', { ascending: false })
-
-      const { data: pendingInvites } = await supabase
-        .from('personal_trainer_invites')
-        .select('id, invited_email, status, expires_at, created_at')
-        .eq('personal_trainer_id', trainerId)
-        .eq('status', 'pending')
-        .order('created_at', { ascending: false })
+      const [{ data: clientRows }, { data: pendingInvites }] = await Promise.all([
+        supabase
+          .from('nutritionist_clients')
+          .select('id, client_id, invited_email, status, created_at, client:client_id(id, full_name, email, onboarding_completed)')
+          .eq('nutritionist_id', trainerId)
+          .eq('status', 'active')
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('personal_trainer_invites')
+          .select('id, invited_email, status, expires_at, created_at')
+          .eq('personal_trainer_id', trainerId)
+          .eq('status', 'pending')
+          .order('created_at', { ascending: false }),
+      ])
 
       const activeClients: ClientRow[] = ((clientRows as ClientRowQuery[] | null) ?? []).map((row) => ({
         ...row,
