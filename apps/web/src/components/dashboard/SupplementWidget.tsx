@@ -6,6 +6,7 @@ import { Pill, Check } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import Link from 'next/link'
 import type { UserSupplement, SupplementLog } from '@/lib/supabase/types'
+import { reportClientError } from '@/lib/apiClient'
 
 interface SupplementWidgetProps {
   userId: string
@@ -22,23 +23,28 @@ export default function SupplementWidget({ userId }: SupplementWidgetProps) {
     async function load() {
       const supabase = createClient()
 
-      const [supRes, logRes] = await Promise.all([
-        supabase
-          .from('user_supplements')
-          .select('*')
-          .eq('user_id', userId)
-          .eq('is_active', true)
-          .order('created_at'),
-        supabase
-          .from('supplement_logs')
-          .select('*')
-          .eq('user_id', userId)
-          .eq('date', today),
-      ])
+      try {
+        const [supRes, logRes] = await Promise.all([
+          supabase
+            .from('user_supplements')
+            .select('*')
+            .eq('user_id', userId)
+            .eq('is_active', true)
+            .order('created_at'),
+          supabase
+            .from('supplement_logs')
+            .select('*')
+            .eq('user_id', userId)
+            .eq('date', today),
+        ])
 
-      setSupplements(supRes.data ?? [])
-      setTodayLogs(logRes.data ?? [])
-      setLoading(false)
+        setSupplements(supRes.data ?? [])
+        setTodayLogs(logRes.data ?? [])
+      } catch (err) {
+        reportClientError(err, { feature: 'dashboard', action: 'supplement-widget-load' })
+      } finally {
+        setLoading(false)
+      }
     }
 
     load()

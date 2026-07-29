@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Dumbbell, Play, CheckCircle2 } from 'lucide-react'
 import Link from 'next/link'
+import { reportClientError } from '@/lib/apiClient'
 
 interface TodayTrainingPreviewProps {
   userId: string
@@ -33,91 +34,94 @@ export default function TodayTrainingPreview({ userId }: TodayTrainingPreviewPro
     async function load() {
       const supabase = createClient()
 
-      // Get active training plan
-      const { data: plans } = await supabase
-        .from('training_plans')
-        .select('id, days_per_week')
-        .eq('user_id', userId)
-        .eq('is_active', true)
-        .limit(1)
+      try {
+        // Get active training plan
+        const { data: plans } = await supabase
+          .from('training_plans')
+          .select('id, days_per_week')
+          .eq('user_id', userId)
+          .eq('is_active', true)
+          .limit(1)
 
-      if (!plans || plans.length === 0) {
-        setNoPlan(true)
-        setLoading(false)
-        return
-      }
-
-      const plan = plans[0]
-
-      // Get all days for this plan
-      const { data: days } = await supabase
-        .from('training_plan_days')
-        .select('id, day_number, name')
-        .eq('training_plan_id', plan.id)
-        .order('day_number')
-
-      if (!days || days.length === 0) {
-        setNoPlan(true)
-        setLoading(false)
-        return
-      }
-
-      // Determine which day to show: use day of week mapped to plan days
-      // Simple approach: use (dayOfWeek % daysPerWeek) to cycle through plan days
-      const dayOfWeek = new Date().getDay() // 0=Sun, 1=Mon...
-      // Map Mon=0, Tue=1... Sun=6 for training
-      const trainingDayIndex = dayOfWeek === 0 ? 6 : dayOfWeek - 1
-      const todayPlanDay = days[trainingDayIndex % days.length]
-
-      // Check if today's workout is already completed
-      const today = new Date().toISOString().split('T')[0]
-      const { count: completedCount } = await supabase
-        .from('workout_logs')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', userId)
-        .eq('date', today)
-        .eq('plan_day_id', todayPlanDay.id)
-
-      // Get exercises for this day
-      const { data: planExercises } = await supabase
-        .from('training_plan_exercises')
-        .select('sets, reps, exercise_id, order_index')
-        .eq('plan_day_id', todayPlanDay.id)
-        .order('order_index')
-
-      if (!planExercises || planExercises.length === 0) {
-        setNoPlan(true)
-        setLoading(false)
-        return
-      }
-
-      // Get exercise details
-      const exerciseIds = planExercises.map(e => e.exercise_id)
-      const { data: exercises } = await supabase
-        .from('exercises')
-        .select('id, name, body_part')
-        .in('id', exerciseIds)
-
-      const exerciseMap = new Map(exercises?.map(e => [e.id, e]) ?? [])
-
-      const exercisePreviews: ExercisePreview[] = planExercises.map(pe => {
-        const ex = exerciseMap.get(pe.exercise_id)
-        return {
-          name: ex?.name ?? 'Unknown',
-          sets: pe.sets,
-          reps: pe.reps,
-          body_part: ex?.body_part ?? '',
+        if (!plans || plans.length === 0) {
+          setNoPlan(true)
+          return
         }
-      })
 
-      setDay({
-        dayId: todayPlanDay.id,
-        dayName: todayPlanDay.name,
-        dayNumber: todayPlanDay.day_number,
-        exercises: exercisePreviews,
-        isCompleted: (completedCount ?? 0) > 0,
-      })
-      setLoading(false)
+        const plan = plans[0]
+
+        // Get all days for this plan
+        const { data: days } = await supabase
+          .from('training_plan_days')
+          .select('id, day_number, name')
+          .eq('training_plan_id', plan.id)
+          .order('day_number')
+
+        if (!days || days.length === 0) {
+          setNoPlan(true)
+          return
+        }
+
+        // Determine which day to show: use day of week mapped to plan days
+        // Simple approach: use (dayOfWeek % daysPerWeek) to cycle through plan days
+        const dayOfWeek = new Date().getDay() // 0=Sun, 1=Mon...
+        // Map Mon=0, Tue=1... Sun=6 for training
+        const trainingDayIndex = dayOfWeek === 0 ? 6 : dayOfWeek - 1
+        const todayPlanDay = days[trainingDayIndex % days.length]
+
+        // Check if today's workout is already completed
+        const today = new Date().toISOString().split('T')[0]
+        const { count: completedCount } = await supabase
+          .from('workout_logs')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', userId)
+          .eq('date', today)
+          .eq('plan_day_id', todayPlanDay.id)
+
+        // Get exercises for this day
+        const { data: planExercises } = await supabase
+          .from('training_plan_exercises')
+          .select('sets, reps, exercise_id, order_index')
+          .eq('plan_day_id', todayPlanDay.id)
+          .order('order_index')
+
+        if (!planExercises || planExercises.length === 0) {
+          setNoPlan(true)
+          return
+        }
+
+        // Get exercise details
+        const exerciseIds = planExercises.map(e => e.exercise_id)
+        const { data: exercises } = await supabase
+          .from('exercises')
+          .select('id, name, body_part')
+          .in('id', exerciseIds)
+
+        const exerciseMap = new Map(exercises?.map(e => [e.id, e]) ?? [])
+
+        const exercisePreviews: ExercisePreview[] = planExercises.map(pe => {
+          const ex = exerciseMap.get(pe.exercise_id)
+          return {
+            name: ex?.name ?? 'Unknown',
+            sets: pe.sets,
+            reps: pe.reps,
+            body_part: ex?.body_part ?? '',
+          }
+        })
+
+        setDay({
+          dayId: todayPlanDay.id,
+          dayName: todayPlanDay.name,
+          dayNumber: todayPlanDay.day_number,
+          exercises: exercisePreviews,
+          isCompleted: (completedCount ?? 0) > 0,
+        })
+      } catch (err) {
+        reportClientError(err, { feature: 'dashboard', action: 'today-training-preview-load' })
+        setNoPlan(true)
+      } finally {
+        setLoading(false)
+      }
     }
 
     load()
