@@ -231,7 +231,7 @@ export default function LeadsPage() {
                       type="button"
                       onClick={() => handleLead(lead.id, 'decline')}
                       disabled={workingId === lead.id}
-                      className="inline-flex items-center justify-center gap-2 rounded-xl border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-600 disabled:opacity-50"
+                      className="inline-flex items-center justify-center gap-2 rounded-xl border border-[var(--danger)] px-4 py-2.5 text-sm font-semibold text-[var(--danger-text)] hover:bg-[var(--danger-bg)] disabled:opacity-50"
                     >
                       <XCircle className="h-4 w-4" />
                       Decline
@@ -263,11 +263,11 @@ export default function LeadsPage() {
                     <span className={`rounded-full px-3 py-1 text-xs font-semibold ${lead.status === 'accepted' ? 'bg-emerald-50 text-emerald-700' : 'bg-[var(--line)] text-[var(--muted)]'}`}>
                       {lead.status}
                     </span>
-                    <span className="rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-700">
+                    <span className="rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold text-[var(--acc)]">
                       {formatLeadStage(lead.stage)}
                     </span>
                     {lead.status === 'accepted' && (
-                      <Link href={`/clients/${lead.user_id}`} className="text-sm font-semibold text-sky-700 hover:text-sky-900">
+                      <Link href={`/clients/${lead.user_id}`} className="text-sm font-semibold text-[var(--acc)] hover:opacity-80">
                         Open client
                       </Link>
                     )}
