@@ -30,7 +30,11 @@ function TrialBanner({ trialEndsAt }: { trialEndsAt: string }) {
           </Link>
         </span>
       </div>
-        <button onClick={() => setDismissed(true)} className="flex-shrink-0 rounded p-1 hover:bg-white/10">
+        <button
+          onClick={() => setDismissed(true)}
+          aria-label="Dismiss trial banner"
+          className="flex-shrink-0 rounded p-1 hover:bg-white/10"
+        >
         <X className="h-4 w-4" />
       </button>
       </div>
