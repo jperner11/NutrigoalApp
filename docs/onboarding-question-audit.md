@@ -28,13 +28,14 @@ few *missing* questions (safety, goal rate, coach credentials) and *disproportio
 | past plan challenges, derailers, motivation, snack profile, eat-out frequency | meal-plan prompt (the behavioral edge — genuinely used) |
 | medical conditions, medications, alcohol (+ frequency/details) | meal-plan prompt (safety + accuracy) |
 | sleep hours/quality, stress, water, cardio, lifts (squat/bench/deadlift), years training, secondary goal | training prompt + coach client view + coaching AI |
+| `bed_time` (stored as `sleep_time`) | meal-timing guide (`generate-meal-plan/route.ts`'s `buildMealTimingGuide`, which computes waking hours and the last-meal cutoff from it) + coaching prompt schedule line (`coachingPrompts.ts`) |
 
 ## Dead questions (collected, used nowhere)
 
-- **`bed_time`** — "What time do you go to bed?" Only `wake_time` is ever read. **Cut it**, or
-  wire it into sleep-window / meal-timing logic.
-
-(That was the only field with zero consumers across `src/`.)
+None found. (An earlier version of this audit flagged `bed_time` as dead — that was
+wrong even at the time: it's read as `sleep_time` in `coachingPrompts.ts` and
+`generate-meal-plan/route.ts`. Corrected here so a future pass doesn't waste a cycle
+"cutting" a field that's actually wired in.)
 
 ## The real opportunities
 
@@ -49,7 +50,6 @@ few *missing* questions (safety, goal rate, coach credentials) and *disproportio
    what, why, motivation) when snacking is one habit. Reduce to 1–2; reinvest the space in
    current-diet depth (typical day of eating, cooking ability/time, budget) which matters
    more for meal-plan quality.
-4. **Cut `bed_time`** (above).
 
 ### Coach questionnaire
 1. **Capture credentials/experience** for marketplace trust + matching: certification type,
