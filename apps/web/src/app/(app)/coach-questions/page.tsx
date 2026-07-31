@@ -238,7 +238,7 @@ export default function CoachQuestionsPage() {
                   <button onClick={() => startEdit(q)} aria-label="Edit question" className="rounded-lg p-1.5 text-[var(--fg-4)] hover:bg-[var(--ink-3)] hover:text-[var(--fg-2)]">
                     <Pencil className="h-4 w-4" />
                   </button>
-                  <button onClick={() => deleteQuestion(q.id)} aria-label="Delete question" className="rounded-lg p-1.5 text-red-400 hover:bg-[var(--ink-3)]">
+                  <button onClick={() => deleteQuestion(q.id)} aria-label="Delete question" className="rounded-lg p-1.5 text-[var(--danger-text)] hover:bg-[var(--ink-3)]">
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
@@ -311,7 +311,7 @@ export default function CoachQuestionsPage() {
                     <button
                       onClick={() => setDraft({ ...draft, options: draft.options.filter((_, i) => i !== idx) })}
                       aria-label={`Remove option ${idx + 1}`}
-                      className="rounded-lg px-2 text-red-400 hover:bg-[var(--ink-3)]"
+                      className="rounded-lg px-2 text-[var(--danger-text)] hover:bg-[var(--ink-3)]"
                     >
                       <X className="h-4 w-4" />
                     </button>
