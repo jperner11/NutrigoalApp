@@ -9,7 +9,7 @@ export type CustomIntakeQuestionType =
   | 'multi_select'
   | 'yes_no'
 
-export const CUSTOM_INTAKE_QUESTION_TYPES: CustomIntakeQuestionType[] = [
+const CUSTOM_INTAKE_QUESTION_TYPES: CustomIntakeQuestionType[] = [
   'short_text',
   'long_text',
   'single_select',

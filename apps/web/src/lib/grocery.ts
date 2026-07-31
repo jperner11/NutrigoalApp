@@ -83,7 +83,7 @@ const CATEGORY_ORDER = [
   'Nuts & Seeds', 'Legumes', 'Oils & Fats', 'Condiments', 'Beverages', 'Other',
 ]
 
-export function categorizeIngredient(name: string): string {
+function categorizeIngredient(name: string): string {
   const lower = name.toLowerCase().trim()
 
   // Exact match
