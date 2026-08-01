@@ -391,7 +391,7 @@ export default function ClientsPage() {
                       <button
                         onClick={() => cancelInvite(invite.id)}
                         disabled={workingId === invite.id}
-                        className="btn btn-secondary text-[var(--brand-400)] disabled:opacity-50"
+                        className="btn btn-secondary text-[var(--danger-text)] disabled:opacity-50"
                       >
                         <Ban className="h-4 w-4" />
                         Cancel
