@@ -70,7 +70,7 @@ export default function QuickWeightLog({ userId, currentWeight, onWeightLogged }
           className="mono"
           style={{
             fontSize: 10,
-            color: 'var(--acc)',
+            color: 'var(--acc-text)',
             letterSpacing: '0.1em',
           }}
         >
@@ -100,7 +100,7 @@ export default function QuickWeightLog({ userId, currentWeight, onWeightLogged }
             className="mono mt-1"
             style={{
               fontSize: 10,
-              color: 'var(--acc)',
+              color: 'var(--acc-text)',
               letterSpacing: '0.1em',
             }}
           >
