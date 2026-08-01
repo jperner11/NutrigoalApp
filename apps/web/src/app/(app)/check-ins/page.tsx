@@ -13,6 +13,7 @@ import type {
   FeedbackRequest, FeedbackQuestion, FeedbackResponse,
   FeedbackTemplate, FeedbackQuestionType, UserProfile,
 } from '@/lib/supabase/types'
+import { reportClientError } from '@/lib/apiClient'
 
 export default function CheckInsPage() {
   const { profile } = useUser()
@@ -43,13 +44,18 @@ function CoachCheckInsPage({ profile }: { profile: UserProfile }) {
 
   async function loadAll() {
     const supabase = createClient()
-    const [tRes, rRes] = await Promise.all([
-      supabase.from('feedback_templates').select('*').eq('trainer_id', profile.id).order('created_at', { ascending: false }),
-      supabase.from('feedback_requests').select('*, client:client_id(id, full_name, email)').eq('nutritionist_id', profile.id).order('created_at', { ascending: false }).limit(50),
-    ])
-    if (tRes.data) setTemplates(tRes.data as FeedbackTemplate[])
-    if (rRes.data) setRequests(rRes.data as (FeedbackRequest & { client?: UserProfile })[])
-    setLoading(false)
+    try {
+      const [tRes, rRes] = await Promise.all([
+        supabase.from('feedback_templates').select('*').eq('trainer_id', profile.id).order('created_at', { ascending: false }),
+        supabase.from('feedback_requests').select('*, client:client_id(id, full_name, email)').eq('nutritionist_id', profile.id).order('created_at', { ascending: false }).limit(50),
+      ])
+      if (tRes.data) setTemplates(tRes.data as FeedbackTemplate[])
+      if (rRes.data) setRequests(rRes.data as (FeedbackRequest & { client?: UserProfile })[])
+    } catch (err) {
+      reportClientError(err, { feature: 'check-ins', action: 'coach-load-all' })
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (loading) return <div className="text-gray-500">Loading check-ins...</div>
@@ -464,13 +470,18 @@ function ClientCheckInsPage({ profile }: { profile: UserProfile }) {
 
   async function loadCheckIns() {
     const supabase = createClient()
-    const { data } = await supabase
-      .from('feedback_requests')
-      .select('*')
-      .eq('client_id', profile.id)
-      .order('created_at', { ascending: false })
-    if (data) setRequests(data as FeedbackRequest[])
-    setLoading(false)
+    try {
+      const { data } = await supabase
+        .from('feedback_requests')
+        .select('*')
+        .eq('client_id', profile.id)
+        .order('created_at', { ascending: false })
+      if (data) setRequests(data as FeedbackRequest[])
+    } catch (err) {
+      reportClientError(err, { feature: 'check-ins', action: 'client-load-check-ins' })
+    } finally {
+      setLoading(false)
+    }
   }
 
   function openCheckIn(req: FeedbackRequest) {
