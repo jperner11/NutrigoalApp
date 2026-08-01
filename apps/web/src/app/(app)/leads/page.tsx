@@ -260,10 +260,10 @@ export default function LeadsPage() {
                     <div className="mt-1 text-sm text-[var(--muted)]">{lead.goal_summary}</div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className={`rounded-full px-3 py-1 text-xs font-semibold ${lead.status === 'accepted' ? 'bg-emerald-50 text-emerald-700' : 'bg-[var(--line)] text-[var(--muted)]'}`}>
+                    <span className={`rounded-full px-3 py-1 text-xs font-semibold ${lead.status === 'accepted' ? 'bg-[var(--success-bg)] text-[var(--ok-text)]' : 'bg-[var(--line)] text-[var(--muted)]'}`}>
                       {lead.status}
                     </span>
-                    <span className="rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold text-[var(--acc)]">
+                    <span className="rounded-full bg-[var(--acc-soft)] px-3 py-1 text-xs font-semibold text-[var(--acc-text)]">
                       {formatLeadStage(lead.stage)}
                     </span>
                     {lead.status === 'accepted' && (
