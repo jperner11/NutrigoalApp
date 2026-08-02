@@ -89,7 +89,7 @@ export default function ResetPasswordPage() {
         subscription.unsubscribe()
         void finishSessionInit()
       }
-    })
+    }).catch(() => {})
 
     const timeoutId = window.setTimeout(() => {
       subscription.unsubscribe()
