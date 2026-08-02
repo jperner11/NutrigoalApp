@@ -131,7 +131,7 @@ export default function GroceryPage() {
 
   function formatAmount(amount: number): string {
     if (amount >= 1000) return `${(amount / 1000).toFixed(1)}kg`
-    return `${Math.round(amount)}${amount < 10 ? '' : ''}`
+    return `${Math.round(amount)}`
   }
 
   return (
