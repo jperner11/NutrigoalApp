@@ -204,7 +204,7 @@ export default function SupplementsPage() {
         meta={
           <div className="app-card-topline min-w-[160px]">
             <span>TODAY</span>
-            <span style={{ color: 'var(--acc)' }}>{takenCount}/{totalActive}</span>
+            <span style={{ color: 'var(--acc-text)' }}>{takenCount}/{totalActive}</span>
           </div>
         }
       />
@@ -217,7 +217,7 @@ export default function SupplementsPage() {
               <Pill className="h-5 w-5 text-[var(--ok)]" />
               <h3 className="text-sm font-semibold text-[var(--fg)]">Daily stack</h3>
             </div>
-            <span className="app-status-pill text-xs" style={{ color: 'var(--ok)' }}>
+            <span className="app-status-pill text-xs" style={{ color: 'var(--ok-text)' }}>
               {takenCount}/{totalActive}
             </span>
           </div>
