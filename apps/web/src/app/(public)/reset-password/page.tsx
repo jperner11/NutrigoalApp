@@ -74,6 +74,7 @@ export default function ResetPasswordPage() {
       void supabase.auth
         .setSession({ access_token: accessToken, refresh_token: refreshToken })
         .then(() => finishSessionInit())
+        .catch(() => finishSessionInit())
       return
     }
 
