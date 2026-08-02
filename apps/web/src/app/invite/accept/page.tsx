@@ -83,93 +83,104 @@ export default function AcceptInvitePage() {
       let response: Response | null = null
       let payload: InvitePayload | InviteErrorPayload | null = null
 
-      if (resolvedToken) {
-        response = await fetch(`/api/personal-trainer/invites/token/${encodeURIComponent(resolvedToken)}`)
-        payload = await response.json().catch(() => null)
-      } else if (resolvedInviteId) {
-        response = await fetch(`/api/personal-trainer/invites/id/${encodeURIComponent(resolvedInviteId)}`)
-        payload = await response.json().catch(() => null)
-      } else {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user?.email) {
-          if (mounted) setLoading(false)
-          return
-        }
-
-        const { data: invite } = await supabase
-          .from('personal_trainer_invites')
-          .select('id, invite_token')
-          .ilike('invited_email', user.email)
-          .eq('status', 'pending')
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .maybeSingle()
-
-        if (!invite?.invite_token) {
-          if (mounted) setLoading(false)
-          return
-        }
-
-        resolvedToken = invite.invite_token
-        resolvedInviteId = invite.id
-        setToken(invite.invite_token)
-        setInviteId(invite.id)
-
-        response = await fetch(`/api/personal-trainer/invites/token/${encodeURIComponent(invite.invite_token)}`)
-        payload = await response.json().catch(() => null)
-      }
-
-      if (!mounted || !response) return
-
-      if (response.ok && payload && 'invite' in payload) {
-        if (payload.token && payload.token !== resolvedToken) {
-          setToken(payload.token)
-        }
-
-        if (payload.invite?.id && payload.invite.id !== resolvedInviteId) {
-          setInviteId(payload.invite.id)
-        }
-
-        if (!payload.currentUser) {
+      try {
+        if (resolvedToken) {
+          response = await fetch(`/api/personal-trainer/invites/token/${encodeURIComponent(resolvedToken)}`)
+          payload = await response.json().catch(() => null)
+        } else if (resolvedInviteId) {
+          response = await fetch(`/api/personal-trainer/invites/id/${encodeURIComponent(resolvedInviteId)}`)
+          payload = await response.json().catch(() => null)
+        } else {
           const { data: { user } } = await supabase.auth.getUser()
-          if (user) {
-            const { data: profile } = await supabase
-              .from('user_profiles')
-              .select('id, email, role, personal_trainer_id, nutritionist_id')
-              .eq('id', user.id)
-              .single()
+          if (!user?.email) {
+            if (mounted) setLoading(false)
+            return
+          }
 
-            if (profile && payload.invite) {
-              const emailMatches = profile.email?.toLowerCase() === payload.invite.invited_email.toLowerCase()
-              const assignedTrainerId = profile.personal_trainer_id ?? profile.nutritionist_id ?? null
-              const inviteTrainerId = payload.invite.trainer?.id ?? null
+          const { data: invite } = await supabase
+            .from('personal_trainer_invites')
+            .select('id, invite_token')
+            .ilike('invited_email', user.email)
+            .eq('status', 'pending')
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle()
 
-              payload.currentUser = {
-                id: profile.id,
-                email: profile.email,
-                role: profile.role,
-                emailMatches,
-                alreadyAssignedToOtherTrainer: Boolean(
-                  assignedTrainerId && inviteTrainerId && assignedTrainerId !== inviteTrainerId
-                ),
+          if (!invite?.invite_token) {
+            if (mounted) setLoading(false)
+            return
+          }
+
+          resolvedToken = invite.invite_token
+          resolvedInviteId = invite.id
+          setToken(invite.invite_token)
+          setInviteId(invite.id)
+
+          response = await fetch(`/api/personal-trainer/invites/token/${encodeURIComponent(invite.invite_token)}`)
+          payload = await response.json().catch(() => null)
+        }
+
+        if (!mounted || !response) return
+
+        if (response.ok && payload && 'invite' in payload) {
+          if (payload.token && payload.token !== resolvedToken) {
+            setToken(payload.token)
+          }
+
+          if (payload.invite?.id && payload.invite.id !== resolvedInviteId) {
+            setInviteId(payload.invite.id)
+          }
+
+          if (!payload.currentUser) {
+            const { data: { user } } = await supabase.auth.getUser()
+            if (user) {
+              const { data: profile } = await supabase
+                .from('user_profiles')
+                .select('id, email, role, personal_trainer_id, nutritionist_id')
+                .eq('id', user.id)
+                .single()
+
+              if (profile && payload.invite) {
+                const emailMatches = profile.email?.toLowerCase() === payload.invite.invited_email.toLowerCase()
+                const assignedTrainerId = profile.personal_trainer_id ?? profile.nutritionist_id ?? null
+                const inviteTrainerId = payload.invite.trainer?.id ?? null
+
+                payload.currentUser = {
+                  id: profile.id,
+                  email: profile.email,
+                  role: profile.role,
+                  emailMatches,
+                  alreadyAssignedToOtherTrainer: Boolean(
+                    assignedTrainerId && inviteTrainerId && assignedTrainerId !== inviteTrainerId
+                  ),
+                }
               }
             }
           }
+
+          setData(payload)
+          setLoading(false)
+          return
         }
 
-        setData(payload)
+        const errorMessage = payload && 'error' in payload ? payload.error : null
+        reportClientError(new Error(`Invite load failed: ${errorMessage ?? 'unknown'}`), {
+          feature: 'invite-accept',
+          action: 'load',
+          extra: { status: response.status, token: resolvedToken, inviteId: resolvedInviteId },
+        })
+        toast.error(errorMessage ?? 'Could not load invite.')
         setLoading(false)
-        return
+      } catch (err) {
+        if (!mounted) return
+        reportClientError(err, {
+          feature: 'invite-accept',
+          action: 'load',
+          extra: { token: resolvedToken, inviteId: resolvedInviteId },
+        })
+        toast.error('Could not load invite.')
+        setLoading(false)
       }
-
-      const errorMessage = payload && 'error' in payload ? payload.error : null
-      reportClientError(new Error(`Invite load failed: ${errorMessage ?? 'unknown'}`), {
-        feature: 'invite-accept',
-        action: 'load',
-        extra: { status: response.status, token: resolvedToken, inviteId: resolvedInviteId },
-      })
-      toast.error(errorMessage ?? 'Could not load invite.')
-      setLoading(false)
     }
 
     void loadInvite()
