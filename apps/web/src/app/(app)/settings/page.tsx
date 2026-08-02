@@ -32,7 +32,7 @@ import { SUPPORT_EMAIL } from '@/lib/site'
 import { COACH_MARKETPLACE_CURRENCIES, COACH_OFFER_BILLING_PERIODS, buildCoachProfileSlug, formatCoachPriceRange, formatOfferPrice } from '@/lib/coachMarketplace'
 import { isTrainerRole } from '@treno/shared'
 import { AppHeroPanel } from '@/components/ui/AppDesign'
-import { apiFetch, ApiError } from '@/lib/apiClient'
+import { apiFetch, ApiError, reportClientError } from '@/lib/apiClient'
 
 const TABS = [
   { key: 'profile', label: 'Profile', icon: User },
@@ -262,15 +262,20 @@ export default function SettingsPage() {
       if (!profile) return
       setLoadingSupportHistory(true)
       const supabase = createClient()
-      const { data } = await supabase
-        .from('support_requests')
-        .select('id, category, subject, status, created_at')
-        .eq('user_id', profile.id)
-        .order('created_at', { ascending: false })
-        .limit(5)
+      try {
+        const { data } = await supabase
+          .from('support_requests')
+          .select('id, category, subject, status, created_at')
+          .eq('user_id', profile.id)
+          .order('created_at', { ascending: false })
+          .limit(5)
 
-      setSupportHistory(data ?? [])
-      setLoadingSupportHistory(false)
+        setSupportHistory(data ?? [])
+      } catch (err) {
+        reportClientError(err, { feature: 'settings', action: 'load-support-history' })
+      } finally {
+        setLoadingSupportHistory(false)
+      }
     }
 
     loadSupportHistory()
@@ -281,19 +286,24 @@ export default function SettingsPage() {
       if (!profile || !isTrainer || trainerQuestionInitialized) return
       setLoadingTrainerQuestions(true)
       const supabase = createClient()
-      const { data } = await supabase
-        .from('personal_trainer_custom_intake_questions')
-        .select('*')
-        .eq('trainer_id', profile.id)
-        .order('sort_order', { ascending: true })
-        .order('created_at', { ascending: true })
+      try {
+        const { data } = await supabase
+          .from('personal_trainer_custom_intake_questions')
+          .select('*')
+          .eq('trainer_id', profile.id)
+          .order('sort_order', { ascending: true })
+          .order('created_at', { ascending: true })
 
-      setTrainerQuestions(((data as PersonalTrainerCustomIntakeQuestion[] | null) ?? []).map((question) => ({
-        ...question,
-        localKey: question.id,
-      })))
-      setTrainerQuestionInitialized(true)
-      setLoadingTrainerQuestions(false)
+        setTrainerQuestions(((data as PersonalTrainerCustomIntakeQuestion[] | null) ?? []).map((question) => ({
+          ...question,
+          localKey: question.id,
+        })))
+        setTrainerQuestionInitialized(true)
+      } catch (err) {
+        reportClientError(err, { feature: 'settings', action: 'load-trainer-questions' })
+      } finally {
+        setLoadingTrainerQuestions(false)
+      }
     }
 
     loadTrainerQuestions()
@@ -315,35 +325,40 @@ export default function SettingsPage() {
 
       setLoadingMarketplaceProfile(true)
       const supabase = createClient()
-      const { data } = await supabase
-        .from('coach_public_profiles')
-        .select('*')
-        .eq('coach_id', profile.id)
-        .maybeSingle()
+      try {
+        const { data } = await supabase
+          .from('coach_public_profiles')
+          .select('*')
+          .eq('coach_id', profile.id)
+          .maybeSingle()
 
-      const fallbackSlug = buildCoachProfileSlug(profile.full_name || profile.email || 'coach', profile.id)
-      const row = data as CoachPublicProfile | null
+        const fallbackSlug = buildCoachProfileSlug(profile.full_name || profile.email || 'coach', profile.id)
+        const row = data as CoachPublicProfile | null
 
-      setMarketplaceProfile({
-        coach_id: profile.id,
-        slug: row?.slug ?? fallbackSlug,
-        is_public: row?.is_public ?? false,
-        headline: row?.headline ?? '',
-        bio: row?.bio ?? '',
-        location_label: row?.location_label ?? '',
-        consultation_url: row?.consultation_url ?? '',
-        price_from: row?.price_from ?? null,
-        price_to: row?.price_to ?? null,
-        currency: row?.currency ?? 'GBP',
-        accepting_new_clients: row?.accepting_new_clients ?? true,
-        created_at: row?.created_at ?? new Date().toISOString(),
-        updated_at: row?.updated_at ?? new Date().toISOString(),
-      })
-      setVerificationStatus(profile.coach_verification_status ?? 'unverified')
-      setCredentialUrl(profile.coach_credential_url ?? '')
-      setCredentialNote(profile.coach_credential_note ?? '')
-      setMarketplaceInitialized(true)
-      setLoadingMarketplaceProfile(false)
+        setMarketplaceProfile({
+          coach_id: profile.id,
+          slug: row?.slug ?? fallbackSlug,
+          is_public: row?.is_public ?? false,
+          headline: row?.headline ?? '',
+          bio: row?.bio ?? '',
+          location_label: row?.location_label ?? '',
+          consultation_url: row?.consultation_url ?? '',
+          price_from: row?.price_from ?? null,
+          price_to: row?.price_to ?? null,
+          currency: row?.currency ?? 'GBP',
+          accepting_new_clients: row?.accepting_new_clients ?? true,
+          created_at: row?.created_at ?? new Date().toISOString(),
+          updated_at: row?.updated_at ?? new Date().toISOString(),
+        })
+        setVerificationStatus(profile.coach_verification_status ?? 'unverified')
+        setCredentialUrl(profile.coach_credential_url ?? '')
+        setCredentialNote(profile.coach_credential_note ?? '')
+        setMarketplaceInitialized(true)
+      } catch (err) {
+        reportClientError(err, { feature: 'settings', action: 'load-marketplace-profile' })
+      } finally {
+        setLoadingMarketplaceProfile(false)
+      }
     }
 
     loadMarketplaceProfile()
@@ -355,19 +370,24 @@ export default function SettingsPage() {
 
       setLoadingCoachOffers(true)
       const supabase = createClient()
-      const { data } = await supabase
-        .from('coach_offers')
-        .select('*')
-        .eq('coach_id', profile.id)
-        .order('sort_order', { ascending: true })
-        .order('created_at', { ascending: true })
+      try {
+        const { data } = await supabase
+          .from('coach_offers')
+          .select('*')
+          .eq('coach_id', profile.id)
+          .order('sort_order', { ascending: true })
+          .order('created_at', { ascending: true })
 
-      setCoachOffers(((data as CoachOffer[] | null) ?? []).map((offer) => ({
-        ...offer,
-        localKey: offer.id,
-      })))
-      setCoachOffersInitialized(true)
-      setLoadingCoachOffers(false)
+        setCoachOffers(((data as CoachOffer[] | null) ?? []).map((offer) => ({
+          ...offer,
+          localKey: offer.id,
+        })))
+        setCoachOffersInitialized(true)
+      } catch (err) {
+        reportClientError(err, { feature: 'settings', action: 'load-coach-offers' })
+      } finally {
+        setLoadingCoachOffers(false)
+      }
     }
 
     loadCoachOffers()
