@@ -36,7 +36,9 @@ test('free-tier gating holds on Pro-only surfaces', async ({ clientPage }) => {
   await expect(clientPage.getByText(/cardio tracking is on pro/i)).toBeVisible()
   await expect(clientPage.getByRole('link', { name: /upgrade to pro/i }).first()).toBeVisible()
 
-  // Supplements is Pro-only too.
+  // Supplements is Pro-only too. Let the previous page's client-side routing
+  // settle first — WebKit aborts a goto that races an in-flight navigation.
+  await clientPage.waitForLoadState('networkidle')
   await clientPage.goto('/supplements')
   await expect(clientPage.getByText(/supplement tracking is a pro tool/i)).toBeVisible()
 })

@@ -309,12 +309,14 @@ export default function CardioPage() {
             <div className="col mt-5 gap-3.5">
               <div>
                 <label
+                  htmlFor="cardio-activity"
                   className="mono mb-2 block"
                   style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
                 >
                   ACTIVITY
                 </label>
                 <select
+                  id="cardio-activity"
                   value={formData.cardio_type_id}
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, cardio_type_id: e.target.value }))
@@ -331,12 +333,14 @@ export default function CardioPage() {
 
               <div>
                 <label
+                  htmlFor="cardio-date"
                   className="mono mb-2 block"
                   style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
                 >
                   DATE
                 </label>
                 <input
+                  id="cardio-date"
                   type="date"
                   value={formData.date}
                   onChange={(e) =>
@@ -348,12 +352,14 @@ export default function CardioPage() {
 
               <div>
                 <label
+                  htmlFor="cardio-duration"
                   className="mono mb-2 block"
                   style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
                 >
                   DURATION (MINUTES)
                 </label>
                 <input
+                  id="cardio-duration"
                   type="number"
                   min={1}
                   value={formData.duration_minutes}
@@ -369,12 +375,14 @@ export default function CardioPage() {
 
               <div>
                 <label
+                  htmlFor="cardio-avg-bpm"
                   className="mono mb-2 block"
                   style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
                 >
                   AVG HEART RATE — OPTIONAL
                 </label>
                 <input
+                  id="cardio-avg-bpm"
                   type="number"
                   min={40}
                   max={220}

@@ -97,29 +97,41 @@ export default function TrainingPlanDetailPage() {
       return
     }
 
-    const enrichedDays = await Promise.all(
-      daysData.map(async (day) => {
-        const { data: exerciseData } = await supabase
-          .from('training_plan_exercises')
-          .select('*, exercises(*)')
-          .eq('plan_day_id', day.id)
-          .order('order_index')
+    const dayIds = daysData.map((day) => day.id)
 
-        const { data: lastLog } = await supabase
-          .from('workout_logs')
-          .select('date')
-          .eq('plan_day_id', day.id)
-          .eq('user_id', profile.id)
-          .order('date', { ascending: false })
-          .limit(1)
+    const [{ data: exerciseData }, { data: logData }] = await Promise.all([
+      supabase
+        .from('training_plan_exercises')
+        .select('*, exercises(*)')
+        .in('plan_day_id', dayIds)
+        .order('order_index'),
+      supabase
+        .from('workout_logs')
+        .select('date, plan_day_id')
+        .in('plan_day_id', dayIds)
+        .eq('user_id', profile.id)
+        .order('date', { ascending: false }),
+    ])
 
-        return {
-          ...day,
-          exercises: (exerciseData ?? []) as (TrainingPlanExercise & { exercises: Exercise })[],
-          lastWorkout: lastLog && lastLog.length > 0 ? lastLog[0].date : null,
-        }
-      })
-    )
+    const exercisesByDay = new Map<string, (TrainingPlanExercise & { exercises: Exercise })[]>()
+    for (const exercise of (exerciseData ?? []) as (TrainingPlanExercise & { exercises: Exercise; plan_day_id: string })[]) {
+      const list = exercisesByDay.get(exercise.plan_day_id) ?? []
+      list.push(exercise)
+      exercisesByDay.set(exercise.plan_day_id, list)
+    }
+
+    const lastWorkoutByDay = new Map<string, string>()
+    for (const log of (logData ?? []) as { date: string; plan_day_id: string | null }[]) {
+      if (log.plan_day_id && !lastWorkoutByDay.has(log.plan_day_id)) {
+        lastWorkoutByDay.set(log.plan_day_id, log.date)
+      }
+    }
+
+    const enrichedDays = daysData.map((day) => ({
+      ...day,
+      exercises: exercisesByDay.get(day.id) ?? [],
+      lastWorkout: lastWorkoutByDay.get(day.id) ?? null,
+    }))
 
     setDays(enrichedDays)
     setLoading(false)

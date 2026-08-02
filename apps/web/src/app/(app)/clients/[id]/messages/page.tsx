@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import * as Sentry from '@sentry/nextjs'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
 import type { UserProfile } from '@/lib/supabase/types'
@@ -14,6 +15,7 @@ export default function ClientMessagesPage() {
   const router = useRouter()
   const [client, setClient] = useState<UserProfile | null>(null)
   const [conversationId, setConversationId] = useState<string | null>(null)
+  const [resolved, setResolved] = useState(false)
 
   useEffect(() => {
     if (!profile) return
@@ -33,7 +35,9 @@ export default function ClientMessagesPage() {
         ({ data }) => {
           if (!cancelled && data) setClient(data as UserProfile)
         },
-        () => {}
+        (err) => {
+          Sentry.captureException(err, { tags: { kind: 'page', page: 'clients/[id]/messages', op: 'loadClient' } })
+        }
       )
 
     async function resolveConversation() {
@@ -67,9 +71,15 @@ export default function ClientMessagesPage() {
 
     resolveConversation().then(
       (cid) => {
-        if (!cancelled) setConversationId(cid)
+        if (!cancelled) {
+          setConversationId(cid)
+          setResolved(true)
+        }
       },
-      () => {}
+      (err) => {
+        if (!cancelled) setResolved(true)
+        Sentry.captureException(err, { tags: { kind: 'page', page: 'clients/[id]/messages', op: 'resolveConversation' } })
+      }
     )
 
     return () => {
@@ -79,6 +89,12 @@ export default function ClientMessagesPage() {
 
   if (!profile) return null
 
+  const missingMessage = !resolved
+    ? 'Loading conversation...'
+    : !conversationId
+      ? 'Unable to start this conversation. Please refresh and try again.'
+      : null
+
   return (
     <ChatThread
       conversationId={conversationId}
@@ -87,6 +103,7 @@ export default function ClientMessagesPage() {
       peerName={client?.full_name || null}
       peerEmail={client?.email || null}
       backHref={`/clients/${id}`}
+      missingConversationMessage={missingMessage}
     />
   )
 }

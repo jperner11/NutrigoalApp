@@ -1,9 +1,11 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import * as Sentry from '@sentry/nextjs'
 import { createClient } from '@/lib/supabase/client'
 import { ArrowLeft, Send } from 'lucide-react'
 import Link from 'next/link'
+import { toast } from 'react-hot-toast'
 import type { Message } from '@/lib/supabase/types'
 import AppPageHeader from '@/components/ui/AppPageHeader'
 
@@ -50,21 +52,35 @@ export function ChatThread({
       .select('*')
       .eq('conversation_id', conversationId)
       .order('created_at', { ascending: true })
-      .then(({ data, error }) => {
-        if (cancelled) return
-        if (error) { setLoadError('Failed to load messages. Please refresh.'); return }
-        setMessages((data ?? []) as Message[])
-        setTimeout(scrollToBottom, 50)
-      })
+      .then(
+        ({ data, error }) => {
+          if (cancelled) return
+          if (error) { setLoadError('Failed to load messages. Please refresh.'); return }
+          setMessages((data ?? []) as Message[])
+          setTimeout(scrollToBottom, 50)
+        },
+        () => {
+          if (!cancelled) setLoadError('Failed to load messages. Please refresh.')
+        }
+      )
 
-    // Mark peer messages as read (fire-and-forget, ignore errors)
+    // Mark peer messages as read (fire-and-forget, but still report failures)
     supabase
       .from('messages')
       .update({ read_at: new Date().toISOString() })
       .eq('conversation_id', conversationId)
       .neq('sender_id', currentUserId)
       .is('read_at', null)
-      .then(() => {})
+      .then(
+        ({ error: readError }) => {
+          if (readError) {
+            Sentry.captureException(readError, { tags: { kind: 'component', component: 'ChatThread', op: 'markRead' } })
+          }
+        },
+        (err) => {
+          Sentry.captureException(err, { tags: { kind: 'component', component: 'ChatThread', op: 'markRead' } })
+        }
+      )
 
     const channel = supabase
       .channel(`messages:${conversationId}`)
@@ -119,7 +135,18 @@ export function ChatThread({
         .from('conversations')
         .update({ last_message_at: new Date().toISOString() })
         .eq('id', conversationId)
-        .then(() => {})
+        .then(
+          ({ error: touchError }) => {
+            if (touchError) {
+              Sentry.captureException(touchError, { tags: { kind: 'component', component: 'ChatThread', op: 'touchConversation' } })
+            }
+          },
+          (err) => {
+            Sentry.captureException(err, { tags: { kind: 'component', component: 'ChatThread', op: 'touchConversation' } })
+          }
+        )
+    } else {
+      toast.error('Failed to send message. Please try again.')
     }
 
     setSending(false)
@@ -192,7 +219,7 @@ export function ChatThread({
                   style={{
                     background: isMe ? 'var(--acc)' : 'var(--ink-2)',
                     border: isMe ? '1px solid var(--acc)' : '1px solid var(--line)',
-                    color: isMe ? 'var(--ink-1)' : 'var(--fg)',
+                    color: isMe ? '#0a0a0a' : 'var(--fg)',
                     borderBottomRightRadius: isMe ? 4 : 18,
                     borderBottomLeftRadius: isMe ? 18 : 4,
                   }}
@@ -202,7 +229,7 @@ export function ChatThread({
                     className="mono mt-2"
                     style={{
                       fontSize: 10,
-                      color: isMe ? 'rgba(255,255,255,0.72)' : 'var(--fg-4)',
+                      color: isMe ? 'rgba(10,10,10,0.65)' : 'var(--fg-4)',
                       letterSpacing: '0.08em',
                     }}
                   >

@@ -41,7 +41,7 @@ export default function SupportPage() {
         <h2 className="font-display text-3xl font-bold text-[var(--foreground)]">{supportCopy.include.title}</h2>
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           {supportCopy.include.items.map((item) => (
-            <div key={item} className="rounded-[24px] border border-[var(--line)] bg-white/70 p-5 text-sm leading-7 text-[var(--muted)]">
+            <div key={item} className="surface-card p-5 text-sm leading-7 text-[var(--muted)]">
               {item}
             </div>
           ))}
@@ -52,7 +52,7 @@ export default function SupportPage() {
         <h2 className="font-display text-3xl font-bold text-[var(--foreground)]">{supportCopy.helpWith.title}</h2>
         <div className="mt-6 space-y-4">
           {supportCopy.helpWith.items.map((item) => (
-            <div key={item.title} className="rounded-[24px] border border-[var(--line)] bg-white/70 p-6">
+            <div key={item.title} className="surface-card p-6">
               <h3 className="text-lg font-semibold text-[var(--foreground)]">{item.title}</h3>
               <p className="mt-3 text-sm leading-7 text-[var(--muted)]">{item.body}</p>
             </div>

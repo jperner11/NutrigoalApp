@@ -90,7 +90,7 @@ export default function MyNutritionistPage() {
         <div className="card p-10 text-center">
           <div
             className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl"
-            style={{ background: 'var(--ink-3)', color: 'var(--acc)' }}
+            style={{ background: 'var(--ink-3)', color: 'var(--acc-text)' }}
           >
             <UserCheck className="h-6 w-6" />
           </div>
@@ -141,16 +141,6 @@ export default function MyNutritionistPage() {
             >
               {trainer.email}
             </div>
-            <div
-              className="mono mt-3"
-              style={{
-                fontSize: 11,
-                color: 'var(--ok)',
-                letterSpacing: '0.1em',
-              }}
-            >
-              ● Online · usually replies within a day
-            </div>
             <p
               className="mt-4"
               style={{ fontSize: 13, color: 'var(--fg-2)', lineHeight: 1.6 }}
@@ -166,7 +156,7 @@ export default function MyNutritionistPage() {
       <div className="mt-4 grid gap-3 md:grid-cols-2">
         <Link href="/diet" className="card-2 p-5 transition hover:border-[var(--acc)]">
           <div className="row gap-2">
-            <Utensils className="h-4 w-4" style={{ color: 'var(--acc)' }} />
+            <Utensils className="h-4 w-4" style={{ color: 'var(--acc-text)' }} />
             <div
               className="mono"
               style={{
@@ -203,7 +193,7 @@ export default function MyNutritionistPage() {
             className="mono mt-3"
             style={{
               fontSize: 10,
-              color: 'var(--acc)',
+              color: 'var(--acc-text)',
               letterSpacing: '0.1em',
             }}
           >
@@ -213,7 +203,7 @@ export default function MyNutritionistPage() {
 
         <Link href="/training" className="card-2 p-5 transition hover:border-[var(--acc)]">
           <div className="row gap-2">
-            <Dumbbell className="h-4 w-4" style={{ color: 'var(--acc)' }} />
+            <Dumbbell className="h-4 w-4" style={{ color: 'var(--acc-text)' }} />
             <div
               className="mono"
               style={{
@@ -250,7 +240,7 @@ export default function MyNutritionistPage() {
             className="mono mt-3"
             style={{
               fontSize: 10,
-              color: 'var(--acc)',
+              color: 'var(--acc-text)',
               letterSpacing: '0.1em',
             }}
           >
@@ -269,7 +259,7 @@ export default function MyNutritionistPage() {
             letterSpacing: '0.14em',
           }}
         >
-          <span style={{ color: 'var(--acc)', marginRight: 6 }}>✦</span>
+          <span style={{ color: 'var(--acc-text)', marginRight: 6 }}>✦</span>
           STAY IN TOUCH
         </div>
         <div className="col gap-3">
@@ -279,7 +269,7 @@ export default function MyNutritionistPage() {
           >
             <div
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
-              style={{ background: 'var(--ink-3)', color: 'var(--acc)' }}
+              style={{ background: 'var(--ink-3)', color: 'var(--acc-text)' }}
             >
               <MessageSquare className="h-5 w-5" />
             </div>
@@ -302,7 +292,7 @@ export default function MyNutritionistPage() {
           >
             <div
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
-              style={{ background: 'var(--ink-3)', color: 'var(--acc)' }}
+              style={{ background: 'var(--ink-3)', color: 'var(--acc-text)' }}
             >
               <FileText className="h-5 w-5" />
             </div>

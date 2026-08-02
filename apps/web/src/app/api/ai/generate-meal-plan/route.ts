@@ -38,8 +38,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'AI service not configured' }, { status: 503 })
   }
 
+  const body = await request.json().catch(() => null)
+  if (!body) {
+    return NextResponse.json({ message: 'Invalid request body' }, { status: 400 })
+  }
+
   try {
-    const body = await request.json()
     const {
       calories, protein, carbs, fat,
       goal, gender, weight_kg, age, height_cm,

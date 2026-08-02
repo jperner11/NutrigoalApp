@@ -49,7 +49,12 @@ export default function GeneratePlansPage() {
 
   useEffect(() => {
     if (!profile || startedRef.current) return
-    if (!profile.daily_calories || !profile.daily_protein) return
+    if (!profile.daily_calories || !profile.daily_protein) {
+      startedRef.current = true
+      toast.error('Your nutrition targets aren\'t set up yet. Please complete onboarding first.')
+      router.push('/dashboard')
+      return
+    }
     startedRef.current = true
 
     generateAll()

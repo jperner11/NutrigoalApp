@@ -63,10 +63,16 @@ export default function NewClientDietPlanPage() {
     if (!profile) return
     if (!isTrainerRole(profile.role)) { router.push('/dashboard'); return }
     const supabase = createClient()
-    supabase.from('user_profiles').select('*').eq('id', id).single().then(({ data, error }) => {
-      if (error) { setLoadError('Failed to load client. Please refresh.'); return }
-      if (data) setClient(data as UserProfile)
-    })
+    let cancelled = false
+    supabase.from('user_profiles').select('*').eq('id', id).single().then(
+      ({ data, error }) => {
+        if (cancelled) return
+        if (error) { setLoadError('Failed to load client. Please refresh.'); return }
+        if (data) setClient(data as UserProfile)
+      },
+      () => { if (!cancelled) setLoadError('Failed to load client. Please refresh.') }
+    )
+    return () => { cancelled = true }
   }, [profile, id, router])
 
   if (loadError) return <div className="text-[var(--fg-3)]">{loadError}</div>
@@ -295,7 +301,7 @@ export default function NewClientDietPlanPage() {
                   {food.source && <span className="ml-1 text-[var(--fg-4)]">· {food.source === 'ai_parsed' ? 'AI' : food.source === 'custom' ? '★' : food.source === 'openfoodfacts' ? 'OFF' : 'SP'}</span>}
                 </p>
               </div>
-              <button onClick={() => removeFood(mi, fi)} className="text-[var(--fg-4)] hover:text-[var(--brand-400)]">
+              <button onClick={() => removeFood(mi, fi)} aria-label={`Remove ${food.name}`} className="text-[var(--fg-4)] hover:text-[var(--brand-400)]">
                 <Trash2 className="h-4 w-4" />
               </button>
             </div>

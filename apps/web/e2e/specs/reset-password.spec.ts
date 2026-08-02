@@ -1,11 +1,15 @@
-import { test, expect } from '@playwright/test'
 import { createTestUser, deleteTestUser, generateRecoveryLink } from '../lib/seed'
-import { loginAs } from '../fixtures'
+import { test, expect, loginAs } from '../fixtures'
 
 // F04 — Password reset request.
 // /reset-password serves two modes: with a recovery/invite token in the URL hash
 // it renders the set-password form; without one it renders the email-request form
 // (supabase.auth.resetPasswordForEmail). Issue #62 (missing request UI) is fixed.
+//
+// Uses the `../fixtures` test/expect (not raw @playwright/test) so its `page`
+// fixture gets routeSupabaseThroughNode() automatically — this spec drives
+// browser->Supabase calls directly (resetPasswordForEmail, the recovery link),
+// which need the proxy workaround for canonical issue #57.
 
 test.describe('F04 — Password reset request', () => {
   test('/reset-password page responds OK', async ({ page }) => {

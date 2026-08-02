@@ -13,6 +13,7 @@ import type {
   FeedbackRequest, FeedbackQuestion, FeedbackResponse,
   FeedbackTemplate, FeedbackQuestionType, UserProfile,
 } from '@/lib/supabase/types'
+import { reportClientError } from '@/lib/apiClient'
 
 export default function CheckInsPage() {
   const { profile } = useUser()
@@ -43,13 +44,18 @@ function CoachCheckInsPage({ profile }: { profile: UserProfile }) {
 
   async function loadAll() {
     const supabase = createClient()
-    const [tRes, rRes] = await Promise.all([
-      supabase.from('feedback_templates').select('*').eq('trainer_id', profile.id).order('created_at', { ascending: false }),
-      supabase.from('feedback_requests').select('*, client:client_id(id, full_name, email)').eq('nutritionist_id', profile.id).order('created_at', { ascending: false }).limit(50),
-    ])
-    if (tRes.data) setTemplates(tRes.data as FeedbackTemplate[])
-    if (rRes.data) setRequests(rRes.data as (FeedbackRequest & { client?: UserProfile })[])
-    setLoading(false)
+    try {
+      const [tRes, rRes] = await Promise.all([
+        supabase.from('feedback_templates').select('*').eq('trainer_id', profile.id).order('created_at', { ascending: false }),
+        supabase.from('feedback_requests').select('*, client:client_id(id, full_name, email)').eq('nutritionist_id', profile.id).order('created_at', { ascending: false }).limit(50),
+      ])
+      if (tRes.data) setTemplates(tRes.data as FeedbackTemplate[])
+      if (rRes.data) setRequests(rRes.data as (FeedbackRequest & { client?: UserProfile })[])
+    } catch (err) {
+      reportClientError(err, { feature: 'check-ins', action: 'coach-load-all' })
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (loading) return <div className="text-gray-500">Loading check-ins...</div>
@@ -204,7 +210,7 @@ function TemplateManager({ templates, trainerId, onRefresh }: {
       <div className="flex items-center justify-between mb-4">
         <p className="text-sm text-gray-500">Reusable question sets for scheduled check-ins.</p>
         <button onClick={() => { setCreating(true); setEditing(null) }}
-          className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all">
+          className="btn btn-accent">
           <Plus className="h-4 w-4" />
           New Template
         </button>
@@ -357,20 +363,20 @@ function TemplateForm({ template, trainerId, onSaved, onCancel }: {
   }
 
   return (
-    <div className="card p-6 mb-6 ring-2 ring-purple-200">
+    <div className="card p-6 mb-6 ring-2 ring-[var(--brand-200)]">
       <h2 className="text-lg font-bold text-gray-900 mb-4">
         {template ? 'Edit Template' : 'New Template'}
       </h2>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">Template Name</label>
-        <input type="text" value={name} onChange={e => setName(e.target.value)}
+        <label htmlFor="template-name" className="block text-sm font-medium text-gray-700 mb-1">Template Name</label>
+        <input id="template-name" type="text" value={name} onChange={e => setName(e.target.value)}
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
           placeholder="e.g. Weekly Check-in" />
       </div>
 
       <div className="flex items-center gap-3 mb-4">
-        <button type="button" onClick={() => setIsDefault(!isDefault)} className="flex items-center gap-2 text-sm text-gray-600">
+        <button type="button" onClick={() => setIsDefault(!isDefault)} aria-pressed={isDefault} className="flex items-center gap-2 text-sm text-gray-600">
           {isDefault ? <ToggleRight className="h-5 w-5 text-purple-600" /> : <ToggleLeft className="h-5 w-5 text-gray-400" />}
           Default template
         </button>
@@ -391,17 +397,19 @@ function TemplateForm({ template, trainerId, onSaved, onCancel }: {
             </div>
             <div className="flex-1">
               <select value={q.type} onChange={e => updateQuestion(q.id, 'type', e.target.value)}
+                aria-label={`Question ${idx + 1} type`}
                 className="text-xs font-medium text-purple-700 bg-purple-50 border border-purple-200 rounded-lg px-2 py-1 mb-2">
                 {QUESTION_TYPES.map(qt => (
                   <option key={qt.value} value={qt.value}>{qt.label}</option>
                 ))}
               </select>
               <input type="text" value={q.question} onChange={e => updateQuestion(q.id, 'question', e.target.value)}
+                aria-label={`Question ${idx + 1} text`}
                 className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg"
                 placeholder="Type your question..." />
             </div>
             {questions.length > 1 && (
-              <button onClick={() => removeQuestion(q.id)} aria-label="Remove question" className="mt-6 text-gray-400 hover:text-red-500">
+              <button onClick={() => removeQuestion(q.id)} aria-label="Remove question" className="mt-6 text-gray-400 hover:text-[var(--danger-text)]">
                 <Trash2 className="h-4 w-4" />
               </button>
             )}
@@ -425,12 +433,12 @@ function TemplateForm({ template, trainerId, onSaved, onCancel }: {
         </button>
         {template && (
           <button onClick={handleDelete} disabled={deleting}
-            className="px-4 py-2 border border-red-200 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50">
+            className="px-4 py-2 border border-[var(--danger)] rounded-lg text-sm font-medium text-[var(--danger-text)] hover:bg-[var(--danger-bg)] disabled:opacity-50">
             {deleting ? 'Deleting...' : 'Delete'}
           </button>
         )}
         <button onClick={handleSave} disabled={saving}
-          className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-2 rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50">
+          className="btn btn-accent flex-1 disabled:opacity-50">
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
           {saving ? 'Saving...' : template ? 'Save Changes' : 'Create Template'}
         </button>
@@ -462,13 +470,18 @@ function ClientCheckInsPage({ profile }: { profile: UserProfile }) {
 
   async function loadCheckIns() {
     const supabase = createClient()
-    const { data } = await supabase
-      .from('feedback_requests')
-      .select('*')
-      .eq('client_id', profile.id)
-      .order('created_at', { ascending: false })
-    if (data) setRequests(data as FeedbackRequest[])
-    setLoading(false)
+    try {
+      const { data } = await supabase
+        .from('feedback_requests')
+        .select('*')
+        .eq('client_id', profile.id)
+        .order('created_at', { ascending: false })
+      if (data) setRequests(data as FeedbackRequest[])
+    } catch (err) {
+      reportClientError(err, { feature: 'check-ins', action: 'client-load-check-ins' })
+    } finally {
+      setLoading(false)
+    }
   }
 
   function openCheckIn(req: FeedbackRequest) {
@@ -765,7 +778,7 @@ function ActiveCheckIn({
               Save for later
             </button>
             <button onClick={onSubmit} disabled={submitting}
-              className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50">
+              className="btn btn-accent flex-1 disabled:opacity-50">
               {submitting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
               <span>{submitting ? 'Submitting...' : 'Submit check-in'}</span>
             </button>

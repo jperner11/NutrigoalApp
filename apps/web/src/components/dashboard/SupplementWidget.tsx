@@ -6,6 +6,7 @@ import { Pill, Check } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import Link from 'next/link'
 import type { UserSupplement, SupplementLog } from '@/lib/supabase/types'
+import { reportClientError } from '@/lib/apiClient'
 
 interface SupplementWidgetProps {
   userId: string
@@ -22,23 +23,28 @@ export default function SupplementWidget({ userId }: SupplementWidgetProps) {
     async function load() {
       const supabase = createClient()
 
-      const [supRes, logRes] = await Promise.all([
-        supabase
-          .from('user_supplements')
-          .select('*')
-          .eq('user_id', userId)
-          .eq('is_active', true)
-          .order('created_at'),
-        supabase
-          .from('supplement_logs')
-          .select('*')
-          .eq('user_id', userId)
-          .eq('date', today),
-      ])
+      try {
+        const [supRes, logRes] = await Promise.all([
+          supabase
+            .from('user_supplements')
+            .select('*')
+            .eq('user_id', userId)
+            .eq('is_active', true)
+            .order('created_at'),
+          supabase
+            .from('supplement_logs')
+            .select('*')
+            .eq('user_id', userId)
+            .eq('date', today),
+        ])
 
-      setSupplements(supRes.data ?? [])
-      setTodayLogs(logRes.data ?? [])
-      setLoading(false)
+        setSupplements(supRes.data ?? [])
+        setTodayLogs(logRes.data ?? [])
+      } catch (err) {
+        reportClientError(err, { feature: 'dashboard', action: 'supplement-widget-load' })
+      } finally {
+        setLoading(false)
+      }
     }
 
     load()
@@ -56,7 +62,10 @@ export default function SupplementWidget({ userId }: SupplementWidgetProps) {
         .eq('supplement_id', sup.id)
         .eq('date', today)
 
-      if (error) return
+      if (error) {
+        toast.error('Failed to unlog')
+        return
+      }
       setTodayLogs(prev => prev.filter(l => l.supplement_id !== sup.id))
     } else {
       const { data, error } = await supabase
@@ -65,7 +74,10 @@ export default function SupplementWidget({ userId }: SupplementWidgetProps) {
         .select()
         .single()
 
-      if (error) return
+      if (error) {
+        toast.error('Failed to log')
+        return
+      }
       setTodayLogs(prev => [...prev, data])
       toast.success(`${sup.name} taken!`)
     }
@@ -157,7 +169,7 @@ export default function SupplementWidget({ userId }: SupplementWidgetProps) {
                     ? '2px solid var(--acc)'
                     : '2px solid var(--line-2)',
                   background: isTaken ? 'var(--acc)' : 'transparent',
-                  color: '#fff',
+                  color: '#131012',
                 }}
               >
                 {isTaken && <Check className="h-3 w-3" />}

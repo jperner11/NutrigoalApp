@@ -129,7 +129,7 @@ export default function ClientDetailPage() {
               <AnamnesisRow icon={<AlertTriangle className="h-4 w-4 text-red-500" />} label="Injuries" value={client.injuries.join(', ')} />
             )}
             {client.medical_conditions?.length > 0 && (
-              <AnamnesisRow icon={<Stethoscope className="h-4 w-4 text-orange-500" />} label="Conditions" value={client.medical_conditions.join(', ')} />
+              <AnamnesisRow icon={<Stethoscope className="h-4 w-4 text-[var(--warn)]" />} label="Conditions" value={client.medical_conditions.join(', ')} />
             )}
             {client.dietary_restrictions?.length > 0 && (
               <AnamnesisRow icon={<Leaf className="h-4 w-4 text-green-500" />} label="Diet Restrictions" value={client.dietary_restrictions.join(', ')} />
@@ -151,11 +151,11 @@ export default function ClientDetailPage() {
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             {client.desired_outcome && <AnamnesisRow icon={<Target className="h-4 w-4 text-blue-500" />} label="Desired outcome" value={client.desired_outcome} />}
             {client.past_dieting_challenges && <AnamnesisRow icon={<AlertTriangle className="h-4 w-4 text-amber-500" />} label="Past challenges" value={client.past_dieting_challenges} />}
-            {client.weekly_derailers && <AnamnesisRow icon={<ClipboardList className="h-4 w-4 text-rose-500" />} label="Derailers" value={client.weekly_derailers} />}
+            {client.weekly_derailers && <AnamnesisRow icon={<ClipboardList className="h-4 w-4 text-[var(--acc)]" />} label="Derailers" value={client.weekly_derailers} />}
             {client.equipment_access && <AnamnesisRow icon={<Weight className="h-4 w-4 text-indigo-500" />} label="Equipment" value={client.equipment_access.replace(/_/g, ' ')} />}
             {client.workout_days_per_week && <AnamnesisRow icon={<Dumbbell className="h-4 w-4 text-[var(--brand-400)]" />} label="Training availability" value={`${client.workout_days_per_week} days / week`} />}
             {client.max_session_minutes && <AnamnesisRow icon={<Activity className="h-4 w-4 text-emerald-500" />} label="Session length" value={`${client.max_session_minutes} min`} />}
-            {client.plan_preference && <AnamnesisRow icon={<ClipboardList className="h-4 w-4 text-cyan-500" />} label="Plan style" value={client.plan_preference.replace(/_/g, ' ')} />}
+            {client.plan_preference && <AnamnesisRow icon={<ClipboardList className="h-4 w-4 text-[var(--acc)]" />} label="Plan style" value={client.plan_preference.replace(/_/g, ' ')} />}
             {client.sleep_quality && <AnamnesisRow icon={<Stethoscope className="h-4 w-4 text-slate-500" />} label="Recovery context" value={`${client.sleep_quality}${client.stress_level ? ` · stress ${client.stress_level}` : ''}`} />}
           </div>
         </div>
@@ -173,7 +173,7 @@ export default function ClientDetailPage() {
                 return (
                   <AnamnesisRow
                     key={response.id}
-                    icon={<ClipboardList className="h-4 w-4 text-violet-500" />}
+                    icon={<ClipboardList className="h-4 w-4 text-[var(--acc)]" />}
                     label={response.question?.label ?? 'Custom question'}
                     value={value}
                   />
@@ -346,7 +346,7 @@ function EditableMacros({ client, onUpdated }: { client: UserProfile; onUpdated:
       <div className="flex items-center justify-between mb-3">
         <span className="app-mono-label">Edit macro targets</span>
         <div className="flex items-center gap-2">
-          <button onClick={reset} className="rounded-lg p-1.5 text-[var(--fg-4)] hover:bg-[var(--ink-3)] hover:text-[var(--fg-2)]">
+          <button onClick={reset} aria-label="Cancel editing macro targets" className="rounded-lg p-1.5 text-[var(--fg-4)] hover:bg-[var(--ink-3)] hover:text-[var(--fg-2)]">
             <X className="h-4 w-4" />
           </button>
         </div>

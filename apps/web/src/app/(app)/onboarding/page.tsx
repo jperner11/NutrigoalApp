@@ -203,8 +203,13 @@ export default function OnboardingPage() {
       .eq('trainer_id', profile.id)
       .order('sort_order', { ascending: true })
       .order('created_at', { ascending: true })
-      .then(({ data }) => {
-        if (cancelled || !data) return
+      .then(({ data, error }) => {
+        if (cancelled) return
+        if (error) {
+          toast.error('Failed to load your custom intake questions: ' + error.message)
+          return
+        }
+        if (!data) return
         const rows = data as PersonalTrainerCustomIntakeQuestion[]
         initialTrainerQuestionIdsRef.current = rows.map((r) => r.id)
         setTrainerDraftQuestions(
@@ -219,6 +224,9 @@ export default function OnboardingPage() {
             })
           )
         )
+      },
+      () => {
+        if (!cancelled) toast.error('Failed to load your custom intake questions.')
       })
     return () => {
       cancelled = true
@@ -953,7 +961,7 @@ export default function OnboardingPage() {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 border border-gray-200">
+            <div className="bg-[var(--panel-strong)] rounded-2xl p-6 border border-[var(--line)]">
               <h3 className="text-sm font-bold text-purple-700 uppercase tracking-wider mb-4">Setup summary</h3>
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <ReviewRow label="Display name" value={fullName || 'Not set'} />
@@ -1804,31 +1812,31 @@ export default function OnboardingPage() {
                 <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl p-6 border border-purple-100">
                   <h3 className="text-sm font-bold text-purple-700 uppercase tracking-wider mb-4">Daily Nutrition Targets</h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div className="bg-white/80 rounded-xl p-4 text-center">
+                    <div className="bg-[var(--panel-strong)]/80 rounded-xl p-4 text-center">
                       <div className="text-2xl font-bold text-purple-700">{targets.calories}</div>
-                      <div className="text-xs text-gray-600 mt-1">kcal / day</div>
+                      <div className="text-xs text-[var(--muted-soft)] mt-1">kcal / day</div>
                     </div>
-                    <div className="bg-white/80 rounded-xl p-4 text-center">
+                    <div className="bg-[var(--panel-strong)]/80 rounded-xl p-4 text-center">
                       <div className="text-2xl font-bold text-red-600">{targets.protein}g</div>
-                      <div className="text-xs text-gray-600 mt-1">Protein</div>
+                      <div className="text-xs text-[var(--muted-soft)] mt-1">Protein</div>
                     </div>
-                    <div className="bg-white/80 rounded-xl p-4 text-center">
+                    <div className="bg-[var(--panel-strong)]/80 rounded-xl p-4 text-center">
                       <div className="text-2xl font-bold text-yellow-600">{targets.carbs}g</div>
-                      <div className="text-xs text-gray-600 mt-1">Carbs</div>
+                      <div className="text-xs text-[var(--muted-soft)] mt-1">Carbs</div>
                     </div>
-                    <div className="bg-white/80 rounded-xl p-4 text-center">
+                    <div className="bg-[var(--panel-strong)]/80 rounded-xl p-4 text-center">
                       <div className="text-2xl font-bold text-green-600">{targets.fat}g</div>
-                      <div className="text-xs text-gray-600 mt-1">Fat</div>
+                      <div className="text-xs text-[var(--muted-soft)] mt-1">Fat</div>
                     </div>
-                    <div className="bg-white/80 rounded-xl p-4 text-center">
+                    <div className="bg-[var(--panel-strong)]/80 rounded-xl p-4 text-center">
                       <div className="text-2xl font-bold text-blue-600">{(targets.water / 1000).toFixed(1)}L</div>
-                      <div className="text-xs text-gray-600 mt-1">Water</div>
+                      <div className="text-xs text-[var(--muted-soft)] mt-1">Water</div>
                     </div>
                   </div>
                 </div>
 
                 {/* Key Details */}
-                <div className="bg-white rounded-2xl p-6 border border-gray-200">
+                <div className="bg-[var(--panel-strong)] rounded-2xl p-6 border border-[var(--line)]">
                   <h3 className="text-sm font-bold text-purple-700 uppercase tracking-wider mb-4">Your Profile</h3>
                   <div className="grid grid-cols-2 gap-3">
                     <ReviewRow label="Goal" value={FITNESS_GOALS.find(g => g.value === goal)?.label ?? goal} />
@@ -1873,7 +1881,7 @@ export default function OnboardingPage() {
                 </div>
 
                 {/* Schedule */}
-                <div className="bg-white rounded-2xl p-6 border border-gray-200">
+                <div className="bg-[var(--panel-strong)] rounded-2xl p-6 border border-[var(--line)]">
                   <h3 className="text-sm font-bold text-purple-700 uppercase tracking-wider mb-4">Schedule</h3>
                   <div className="grid grid-cols-2 gap-3">
                     <ReviewRow label="Wake up" value={fmt12(wakeTime)} />
@@ -1888,7 +1896,7 @@ export default function OnboardingPage() {
                 </div>
 
                 {isManagedClient && coachCustomQuestions.length > 0 && (
-                  <div className="bg-white rounded-2xl p-6 border border-gray-200">
+                  <div className="bg-[var(--panel-strong)] rounded-2xl p-6 border border-[var(--line)]">
                     <h3 className="text-sm font-bold text-purple-700 uppercase tracking-wider mb-4">Coach questions</h3>
                     <div className="grid grid-cols-1 gap-3">
                       {coachCustomQuestions.map((question) => {
@@ -1906,7 +1914,7 @@ export default function OnboardingPage() {
                   <p className="text-sm text-purple-800 leading-relaxed">
                     {isManagedClient
                       ? 'Your coach will see this intake in their dashboard, including your goals, restrictions, schedule, and main obstacles, so they can review your case and decide the right next step.'
-                      : 'Your personal AI coach will use everything you&apos;ve told us to create a meal plan and training structure that actually fit your life: favourite meals, snack habits, training level, schedule, recovery, and pace of progress. No bland template plans unless that&apos;s what you asked for.'}
+                      : "Your personal AI coach will use everything you've told us to create a meal plan and training structure that actually fit your life: favourite meals, snack habits, training level, schedule, recovery, and pace of progress. No bland template plans unless that's what you asked for."}
                   </p>
                 </div>
 
@@ -1928,7 +1936,7 @@ export default function OnboardingPage() {
                     className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-xl text-base font-semibold transition-all disabled:opacity-50 ${
                       isManagedClient
                         ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:shadow-lg'
-                        : 'border-2 border-gray-200 text-gray-700 hover:bg-gray-50'
+                        : 'border-2 border-[var(--line)] text-[var(--foreground)] hover:bg-[var(--background-elevated)]'
                     }`}
                   >
                     <span>{saving ? 'Saving...' : isManagedClient ? 'Submit intake to coach' : 'Go to Dashboard'}</span>
@@ -2031,8 +2039,17 @@ function OptionCard({
 }) {
   return (
     <div
+      role="button"
+      tabIndex={0}
+      aria-pressed={selected}
       onClick={onClick}
-      className={`p-4 border-2 rounded-xl cursor-pointer transition-all ${
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          onClick()
+        }
+      }}
+      className={`p-4 border-2 rounded-xl cursor-pointer transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 ${
         selected
           ? 'border-purple-500 bg-purple-50'
           : 'border-gray-200 hover:border-gray-300'
@@ -2071,9 +2088,9 @@ function ChipGrid({
 
 function ReviewRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between items-start py-2 px-3 bg-gray-50 rounded-lg">
-      <span className="text-sm text-gray-500">{label}</span>
-      <span className="text-sm font-semibold text-gray-900 text-right ml-2">{value}</span>
+    <div className="flex justify-between items-start gap-2 py-2 px-3 bg-[var(--background-elevated)] rounded-lg">
+      <span className="text-sm text-[var(--muted-soft)] flex-shrink-0">{label}</span>
+      <span className="text-sm font-semibold text-[var(--foreground)] text-right min-w-0 break-words">{value}</span>
     </div>
   )
 }

@@ -141,7 +141,7 @@ export default function WaterPage() {
               </>
             ) : (
               <>
-                <span style={{ color: 'var(--acc)' }}>{remaining}ml</span>{' '}
+                <span style={{ color: 'var(--acc-text)' }}>{remaining}ml</span>{' '}
                 <span className="italic-serif" style={{ color: 'var(--fg-3)' }}>
                   to go.
                 </span>

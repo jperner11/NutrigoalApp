@@ -4,25 +4,11 @@ type Tone = 'default' | 'accent' | 'success' | 'warn' | 'danger' | 'muted'
 
 const toneColor: Record<Tone, string> = {
   default: 'var(--foreground)',
-  accent: 'var(--acc)',
-  success: 'var(--ok)',
-  warn: 'var(--warn)',
-  danger: 'var(--brand-400)',
+  accent: 'var(--acc-text)',
+  success: 'var(--ok-text)',
+  warn: 'var(--warn-text)',
+  danger: 'var(--danger-text)',
   muted: 'var(--fg-3)',
-}
-
-export function AppWorkspaceShell({
-  children,
-  className = '',
-}: {
-  children: ReactNode
-  className?: string
-}) {
-  return (
-    <div className={`app-workspace ${className}`.trim()}>
-      {children}
-    </div>
-  )
 }
 
 export function AppHeroPanel({

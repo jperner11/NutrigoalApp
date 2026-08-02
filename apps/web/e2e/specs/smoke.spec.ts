@@ -46,7 +46,17 @@ test('a logged-in user can sign out and is denied re-entry', async ({ page, clie
   await loginAs(page, client)
   await expect(page).toHaveURL(/\/(dashboard|onboarding)/, { timeout: 15_000 })
 
-  await page.getByRole('button', { name: /sign out/i }).click()
+  // On mobile viewports the sidebar is off-canvas — open the hamburger first,
+  // exactly as a real thumb would. The open+tap runs as ONE retryable unit:
+  // Sidebar closes the drawer on any pathname event (Sidebar.tsx close-on-route-
+  // change effect), and on WebKit a late router event can snap it shut between
+  // opening and tapping — the retry re-opens and taps again, like a real user.
+  const signOut = page.getByRole('button', { name: /sign out/i })
+  const hamburger = page.getByRole('button', { name: 'Open menu' })
+  await expect(async () => {
+    if (await hamburger.isVisible()) await hamburger.click()
+    await signOut.click({ timeout: 2_000 })
+  }).toPass({ timeout: 20_000 })
   await expect(page).toHaveURL(/\/login/, { timeout: 15_000 })
 
   // After sign-out the session is gone; protected routes must still redirect.

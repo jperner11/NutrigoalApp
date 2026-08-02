@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { BadgeCheck, Compass, ExternalLink, Loader2, MapPin, MessageSquare, Search, SlidersHorizontal, Star, UserCheck } from 'lucide-react'
@@ -82,12 +82,25 @@ export default function DiscoverPage() {
     message: '',
     selected_offer_id: '',
   })
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     if (profile && isTrainerRole(profile.role)) {
       router.push('/dashboard')
     }
   }, [profile, router])
+
+  useEffect(() => {
+    if (!selectedCoach) return
+    closeButtonRef.current?.focus()
+
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') setSelectedCoach(null)
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [selectedCoach])
 
   useEffect(() => {
     async function loadCoaches() {
@@ -224,6 +237,7 @@ export default function DiscoverPage() {
           />
           <input
             type="text"
+            aria-label="Search coaches by name, specialty, or ideal client"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by coach name, specialty, or ideal client"
@@ -241,6 +255,7 @@ export default function DiscoverPage() {
         >
           <SlidersHorizontal className="h-4 w-4" style={{ color: 'var(--fg-4)' }} />
           <select
+            aria-label="Filter coaches by format"
             value={formatFilter}
             onChange={(e) => setFormatFilter(e.target.value)}
             className="w-full"
@@ -503,7 +518,12 @@ export default function DiscoverPage() {
           className="fixed inset-0 z-50 flex items-center justify-center px-4"
           style={{ background: 'rgba(13, 27, 42, 0.55)', backdropFilter: 'blur(4px)' }}
         >
-          <div className="card w-full max-w-2xl p-6">
+          <div
+            className="card w-full max-w-2xl p-6"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="request-coach-modal-title"
+          >
             <div className="row items-start justify-between gap-4">
               <div>
                 <div
@@ -513,6 +533,7 @@ export default function DiscoverPage() {
                   ✦ REQUEST COACHING
                 </div>
                 <div
+                  id="request-coach-modal-title"
                   className="serif mt-2"
                   style={{ fontSize: 26, lineHeight: 1.15 }}
                 >
@@ -526,6 +547,7 @@ export default function DiscoverPage() {
                 </p>
               </div>
               <button
+                ref={closeButtonRef}
                 type="button"
                 onClick={() => setSelectedCoach(null)}
                 className="btn btn-ghost shrink-0"
@@ -538,12 +560,14 @@ export default function DiscoverPage() {
               {selectedCoach.offers.length > 0 && (
                 <div>
                   <label
+                    htmlFor="lead-offer"
                     className="mono mb-2 block"
                     style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
                   >
                     CHOOSE AN OFFER
                   </label>
                   <select
+                    id="lead-offer"
                     value={leadForm.selected_offer_id}
                     onChange={(e) => setLeadForm((prev) => ({ ...prev, selected_offer_id: e.target.value }))}
                     style={inputStyle}
@@ -559,12 +583,14 @@ export default function DiscoverPage() {
               )}
               <div>
                 <label
+                  htmlFor="lead-goal-summary"
                   className="mono mb-2 block"
                   style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
                 >
                   WHAT DO YOU WANT HELP WITH? *
                 </label>
                 <input
+                  id="lead-goal-summary"
                   type="text"
                   value={leadForm.goal_summary}
                   onChange={(e) => setLeadForm((prev) => ({ ...prev, goal_summary: e.target.value }))}
@@ -575,12 +601,14 @@ export default function DiscoverPage() {
               <div className="grid gap-3.5 md:grid-cols-2">
                 <div>
                   <label
+                    htmlFor="lead-preferred-format"
                     className="mono mb-2 block"
                     style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
                   >
                     PREFERRED FORMAT
                   </label>
                   <input
+                    id="lead-preferred-format"
                     type="text"
                     value={leadForm.preferred_format}
                     onChange={(e) => setLeadForm((prev) => ({ ...prev, preferred_format: e.target.value }))}
@@ -590,12 +618,14 @@ export default function DiscoverPage() {
                 </div>
                 <div>
                   <label
+                    htmlFor="lead-budget"
                     className="mono mb-2 block"
                     style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
                   >
                     BUDGET
                   </label>
                   <input
+                    id="lead-budget"
                     type="text"
                     value={leadForm.budget_label}
                     onChange={(e) => setLeadForm((prev) => ({ ...prev, budget_label: e.target.value }))}
@@ -606,12 +636,14 @@ export default function DiscoverPage() {
               </div>
               <div>
                 <label
+                  htmlFor="lead-message"
                   className="mono mb-2 block"
                   style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
                 >
                   MESSAGE
                 </label>
                 <textarea
+                  id="lead-message"
                   value={leadForm.message}
                   onChange={(e) => setLeadForm((prev) => ({ ...prev, message: e.target.value }))}
                   placeholder="Anything useful about your schedule, experience, or what has not worked in the past."

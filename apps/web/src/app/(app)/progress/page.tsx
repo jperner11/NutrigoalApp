@@ -455,19 +455,19 @@ export default function ProgressPage() {
             <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="weightGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#cdf24e" stopOpacity={0.32} />
-                  <stop offset="95%" stopColor="#cdf24e" stopOpacity={0} />
+                  <stop offset="5%" stopColor="var(--acc)" stopOpacity={0.32} />
+                  <stop offset="95%" stopColor="var(--acc)" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(245, 241, 234, 0.10)" />
-              <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#8a847d' }} stroke="rgba(245, 241, 234, 0.20)" />
-              <YAxis domain={[yMin, yMax]} tick={{ fontSize: 11, fill: '#8a847d' }} unit="kg" stroke="rgba(245, 241, 234, 0.20)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--line)" />
+              <XAxis dataKey="label" tick={{ fontSize: 11, fill: 'var(--fg-4)' }} stroke="var(--line-strong)" />
+              <YAxis domain={[yMin, yMax]} tick={{ fontSize: 11, fill: 'var(--fg-4)' }} unit="kg" stroke="var(--line-strong)" />
               <Tooltip
                 contentStyle={{
                   borderRadius: '12px',
-                  border: '1px solid rgba(245, 241, 234, 0.20)',
-                  background: '#1a1719',
-                  color: '#f5f1ea',
+                  border: '1px solid var(--line-strong)',
+                  background: 'var(--panel-strong)',
+                  color: 'var(--fg)',
                   boxShadow: '0 8px 24px rgba(0, 0, 0, 0.28)',
                   fontSize: 12,
                 }}
@@ -480,20 +480,20 @@ export default function ProgressPage() {
               {targetWeight && (
                 <ReferenceLine
                   y={targetWeight}
-                  stroke="#cdf24e"
+                  stroke="var(--acc)"
                   strokeDasharray="6 4"
                   strokeOpacity={0.55}
-                  label={{ value: `Target: ${targetWeight}kg`, position: 'right', fill: '#cdf24e', fontSize: 11 }}
+                  label={{ value: `Target: ${targetWeight}kg`, position: 'right', fill: 'var(--acc-text)', fontSize: 11 }}
                 />
               )}
               <Area
                 type="monotone"
                 dataKey="weight"
-                stroke="#cdf24e"
+                stroke="var(--acc)"
                 strokeWidth={2.5}
                 fill="url(#weightGradient)"
-                dot={{ r: 4, fill: '#cdf24e', stroke: '#1a1719', strokeWidth: 2 }}
-                activeDot={{ r: 6, fill: '#f5f1ea', stroke: '#1a1719', strokeWidth: 2 }}
+                dot={{ r: 4, fill: 'var(--acc)', stroke: 'var(--panel-strong)', strokeWidth: 2 }}
+                activeDot={{ r: 6, fill: 'var(--fg)', stroke: 'var(--panel-strong)', strokeWidth: 2 }}
               />
             </AreaChart>
           </ResponsiveContainer>

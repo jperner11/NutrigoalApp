@@ -33,12 +33,3 @@ export function reportSupabaseError(
   })
   return true
 }
-
-export async function runQuery<T>(
-  builder: PromiseLike<{ data: T | null; error: PostgrestError | null }>,
-  context: SupabaseContext = {},
-): Promise<{ data: T | null; error: PostgrestError | null }> {
-  const result = await builder
-  if (result.error) reportSupabaseError(result.error, context)
-  return result
-}

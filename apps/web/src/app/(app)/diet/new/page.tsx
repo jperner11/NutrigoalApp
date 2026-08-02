@@ -386,8 +386,9 @@ export default function NewDietPlanPage() {
       <ListCard className="mb-6" eyebrow="PLAN DETAILS">
         <div className="space-y-4">
           <div>
-            <label className="app-mono-label mb-2 block">Plan name</label>
+            <label htmlFor="diet-plan-name" className="app-mono-label mb-2 block">Plan name</label>
             <input
+              id="diet-plan-name"
               type="text"
               value={planName}
               onChange={(e) => setPlanName(e.target.value)}
@@ -396,8 +397,9 @@ export default function NewDietPlanPage() {
             />
           </div>
           <div>
-            <label className="app-mono-label mb-2 block">Notes</label>
+            <label htmlFor="diet-plan-notes" className="app-mono-label mb-2 block">Notes</label>
             <textarea
+              id="diet-plan-notes"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               className="input-field min-h-[92px]"
@@ -426,8 +428,9 @@ export default function NewDietPlanPage() {
             { key: 'dinner', label: 'Dinner', placeholder: 'e.g. salmon, sweet potato, asparagus' },
           ].map(slot => (
             <div key={slot.key}>
-              <label className="app-mono-label mb-2 block">{slot.label} ingredients</label>
+              <label htmlFor={`diet-meal-pref-${slot.key}`} className="app-mono-label mb-2 block">{slot.label} ingredients</label>
               <input
+                id={`diet-meal-pref-${slot.key}`}
                 type="text"
                 value={mealPrefs[slot.key as keyof typeof mealPrefs]}
                 onChange={(e) => setMealPrefs(prev => ({ ...prev, [slot.key]: e.target.value }))}
@@ -454,8 +457,9 @@ export default function NewDietPlanPage() {
 
           {includeSnack && (
             <div>
-              <label className="app-mono-label mb-2 block">Snack ingredients</label>
+              <label htmlFor="diet-meal-pref-snack" className="app-mono-label mb-2 block">Snack ingredients</label>
               <input
+                id="diet-meal-pref-snack"
                 type="text"
                 value={mealPrefs.snack}
                 onChange={(e) => setMealPrefs(prev => ({ ...prev, snack: e.target.value }))}

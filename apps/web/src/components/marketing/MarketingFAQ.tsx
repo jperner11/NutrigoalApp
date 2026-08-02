@@ -19,43 +19,50 @@ export default function MarketingFAQ() {
         className="col"
         style={{ borderTop: '1px solid var(--line)' }}
       >
-        {marketingFaqCopy.questions.map((item, i) => (
-          <div
-            key={item.q}
-            style={{
-              borderBottom: '1px solid var(--line)',
-              padding: '24px 4px',
-            }}
-          >
-            <button
-              onClick={() => setOpen(open === i ? -1 : i)}
-              className="flex w-full items-center justify-between text-left"
-              style={{ cursor: 'pointer' }}
+        {marketingFaqCopy.questions.map((item, i) => {
+          const panelId = `faq-answer-${i}`
+          return (
+            <div
+              key={item.q}
+              style={{
+                borderBottom: '1px solid var(--line)',
+                padding: '24px 4px',
+              }}
             >
-              <div className="serif" style={{ fontSize: 22, lineHeight: 1.25 }}>
-                {item.q}
-              </div>
-              <span
-                className="mono ml-6 shrink-0"
-                style={{ color: 'var(--acc)', fontSize: 18 }}
+              <button
+                onClick={() => setOpen(open === i ? -1 : i)}
+                aria-expanded={open === i}
+                aria-controls={panelId}
+                className="flex w-full items-center justify-between text-left"
+                style={{ cursor: 'pointer' }}
               >
-                {open === i ? '−' : '+'}
-              </span>
-            </button>
-            {open === i && (
-              <div
-                className="mt-4 max-w-[720px]"
-                style={{
-                  fontSize: 15,
-                  color: 'var(--fg-2)',
-                  lineHeight: 1.6,
-                }}
-              >
-                {item.a}
-              </div>
-            )}
-          </div>
-        ))}
+                <div className="serif" style={{ fontSize: 22, lineHeight: 1.25 }}>
+                  {item.q}
+                </div>
+                <span
+                  className="mono ml-6 shrink-0"
+                  style={{ color: 'var(--acc)', fontSize: 18 }}
+                  aria-hidden="true"
+                >
+                  {open === i ? '−' : '+'}
+                </span>
+              </button>
+              {open === i && (
+                <div
+                  id={panelId}
+                  className="mt-4 max-w-[720px]"
+                  style={{
+                    fontSize: 15,
+                    color: 'var(--fg-2)',
+                    lineHeight: 1.6,
+                  }}
+                >
+                  {item.a}
+                </div>
+              )}
+            </div>
+          )
+        })}
       </div>
     </section>
   )

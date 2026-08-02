@@ -302,11 +302,11 @@ export default function DashboardPage() {
         accent={`${firstName}.`}
         subtitle={
           <>
-            You have <span className="text-[var(--acc)]">{todayStats.caloriesConsumed} kcal</span> logged
+            You have <span className="text-[var(--acc-text)]">{todayStats.caloriesConsumed} kcal</span> logged
             {todayStats.workoutsCompleted > 0 ? (
-              <> and <span className="text-[var(--acc)]">{todayStats.workoutsCompleted} session{todayStats.workoutsCompleted === 1 ? '' : 's'}</span> complete.</>
+              <> and <span className="text-[var(--acc-text)]">{todayStats.workoutsCompleted} session{todayStats.workoutsCompleted === 1 ? '' : 's'}</span> complete.</>
             ) : (
-              <> and <span className="text-[var(--acc)]">your next session</span> waiting.</>
+              <> and <span className="text-[var(--acc-text)]">your next session</span> waiting.</>
             )}{' '}
             Let&apos;s keep moving.
           </>

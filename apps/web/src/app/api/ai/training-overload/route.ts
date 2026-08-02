@@ -26,7 +26,11 @@ export async function POST(request: Request) {
   const apiKey = process.env.OPENAI_API_KEY
 
   try {
-    const { exercises } = (await request.json()) as { exercises?: TrainingOverloadExerciseInput[] }
+    const body = (await request.json().catch(() => null)) as { exercises?: TrainingOverloadExerciseInput[] } | null
+    if (!body) {
+      return NextResponse.json({ message: 'Invalid request body' }, { status: 400 })
+    }
+    const { exercises } = body
 
     if (!Array.isArray(exercises) || exercises.length === 0) {
       return NextResponse.json({ message: 'Missing exercises' }, { status: 400 })
@@ -86,22 +90,28 @@ export async function POST(request: Request) {
       return NextResponse.json({ suggestions: fallbackSuggestions })
     }
 
-    const data = await response.json()
-    const content = data.choices?.[0]?.message?.content?.trim() ?? '{}'
-    const parsed = JSON.parse(content) as {
-      suggestions?: { exercise_id: string; suggestedWeight: number | null; reason: string | null }[]
-    }
+    let merged = fallbackSuggestions
 
-    const suggestionMap = new Map((parsed.suggestions ?? []).map((suggestion) => [suggestion.exercise_id, suggestion]))
-
-    const merged = fallbackSuggestions.map((fallback) => {
-      const ai = suggestionMap.get(fallback.exercise_id)
-      return {
-        exercise_id: fallback.exercise_id,
-        suggestedWeight: typeof ai?.suggestedWeight === 'number' ? ai.suggestedWeight : fallback.suggestedWeight,
-        reason: ai?.reason?.trim() || fallback.reason,
+    try {
+      const data = await response.json()
+      const content = data.choices?.[0]?.message?.content?.trim() ?? '{}'
+      const parsed = JSON.parse(content) as {
+        suggestions?: { exercise_id: string; suggestedWeight: number | null; reason: string | null }[]
       }
-    })
+
+      const suggestionMap = new Map((parsed.suggestions ?? []).map((suggestion) => [suggestion.exercise_id, suggestion]))
+
+      merged = fallbackSuggestions.map((fallback) => {
+        const ai = suggestionMap.get(fallback.exercise_id)
+        return {
+          exercise_id: fallback.exercise_id,
+          suggestedWeight: typeof ai?.suggestedWeight === 'number' ? ai.suggestedWeight : fallback.suggestedWeight,
+          reason: ai?.reason?.trim() || fallback.reason,
+        }
+      })
+    } catch (parseError) {
+      Sentry.captureException(parseError, { tags: { kind: 'api-route', route: 'ai/training-overload', stage: 'parse' } })
+    }
 
     return NextResponse.json({ suggestions: merged })
   } catch (error) {

@@ -33,6 +33,7 @@ export default function NewClientTrainingPlanPage() {
   const router = useRouter()
   const { profile } = useUser()
   const [client, setClient] = useState<UserProfile | null>(null)
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [planName, setPlanName] = useState('')
   const [description, setDescription] = useState('')
   const [days, setDays] = useState<TrainingDay[]>([])
@@ -54,6 +55,7 @@ export default function NewClientTrainingPlanPage() {
       supabase.from('user_profiles').select('*').eq('id', id).single(),
       supabase.from('exercises').select('*'),
     ]).then(([clientRes, exRes]) => {
+      if (clientRes.error) { setLoadError('Failed to load client. Please refresh.'); setLoadingExercises(false); return }
       if (clientRes.data) setClient(clientRes.data as UserProfile)
       if (exRes.data) setExercises(exRes.data as Exercise[])
       setLoadingExercises(false)
@@ -68,6 +70,7 @@ export default function NewClientTrainingPlanPage() {
     })
   }, [exercises, searchQuery, filterBodyPart])
 
+  if (loadError) return <div className="text-[var(--fg-3)]">{loadError}</div>
   if (!profile || !client) return <div className="text-[var(--fg-3)]">Loading...</div>
 
   function addDay() {
@@ -199,7 +202,7 @@ export default function NewClientTrainingPlanPage() {
               setDays(prev => { const u = [...prev]; u[di].name = e.target.value; return u })
             }} className="bg-transparent text-lg font-semibold text-[var(--fg)] outline-none" />
             {days.length > 1 && (
-              <button onClick={() => removeDay(di)} className="text-[var(--brand-400)] hover:text-[var(--brand-500)]">
+              <button onClick={() => removeDay(di)} aria-label={`Remove ${day.name}`} className="text-[var(--brand-400)] hover:text-[var(--brand-500)]">
                 <Trash2 className="h-4 w-4" />
               </button>
             )}
@@ -223,7 +226,7 @@ export default function NewClientTrainingPlanPage() {
                   className="w-14 rounded border border-[var(--line)] bg-[var(--ink-2)] px-2 py-1 text-center text-sm text-[var(--fg)]" />
                 <span className="text-xs text-[var(--fg-4)]">s</span>
               </div>
-              <button onClick={() => removeExercise(di, ei)} className="text-[var(--fg-4)] hover:text-[var(--brand-400)]">
+              <button onClick={() => removeExercise(di, ei)} aria-label={`Remove ${ex.exerciseName}`} className="text-[var(--fg-4)] hover:text-[var(--brand-400)]">
                 <Trash2 className="h-4 w-4" />
               </button>
             </div>

@@ -6,11 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Turborepo monorepo for **Treno** (previously TrenoApp / Performance Clinic), using npm workspaces (`npm@11.9.0`).
 
-- `apps/web/` — Next.js 15 web app (primary). Also reachable via the `TrenoApp/` symlink at the repo root.
+- `apps/web/` — Next.js 15 web app (primary).
 - `apps/mobile/` — Expo 55 + React Native app.
 - `packages/shared/` — `@treno/shared`: types, role helpers, nutrition/training/cardio calculations, constants. Consumed by both apps; web's `next.config` has `transpilePackages: ['@treno/shared']`.
 
-**For detailed web-app architecture, routes, auth layers, roles/tiers, API endpoints, and lib modules, read `apps/web/CLAUDE.md`.** That file is the authoritative reference — do not duplicate its contents here.
+For web-app architecture (routes, project structure, tech stack), see `apps/web/README.md`. There is no `apps/web/CLAUDE.md` in this repo — don't rely on one existing.
 
 ## Commands (from monorepo root)
 

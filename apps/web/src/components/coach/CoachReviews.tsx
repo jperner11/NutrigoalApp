@@ -86,6 +86,8 @@ export default function CoachReviews({
           setBody(json.myReview.body ?? '')
         }
       }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to load reviews.')
     } finally {
       setLoading(false)
     }
@@ -114,6 +116,8 @@ export default function CoachReviews({
       }
       toast.success(myReview ? 'Review updated.' : 'Thanks for your review!')
       await load()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to save review.')
     } finally {
       setSaving(false)
     }

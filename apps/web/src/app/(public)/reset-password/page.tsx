@@ -74,6 +74,7 @@ export default function ResetPasswordPage() {
       void supabase.auth
         .setSession({ access_token: accessToken, refresh_token: refreshToken })
         .then(() => finishSessionInit())
+        .catch(() => finishSessionInit())
       return
     }
 
@@ -89,7 +90,7 @@ export default function ResetPasswordPage() {
         subscription.unsubscribe()
         void finishSessionInit()
       }
-    })
+    }).catch(() => {})
 
     const timeoutId = window.setTimeout(() => {
       subscription.unsubscribe()

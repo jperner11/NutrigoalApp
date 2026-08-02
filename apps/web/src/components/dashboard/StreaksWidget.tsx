@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Flame, Utensils, Droplets, Dumbbell } from 'lucide-react'
+import { reportClientError } from '@/lib/apiClient'
 
 interface StreaksWidgetProps {
   userId: string
@@ -28,33 +29,38 @@ export default function StreaksWidget({ userId }: StreaksWidgetProps) {
       ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90)
       const startStr = ninetyDaysAgo.toISOString().split('T')[0]
 
-      const [mealRes, waterRes, workoutRes] = await Promise.all([
-        supabase
-          .from('meal_logs')
-          .select('date')
-          .eq('user_id', userId)
-          .gte('date', startStr)
-          .order('date', { ascending: false }),
-        supabase
-          .from('water_logs')
-          .select('date')
-          .eq('user_id', userId)
-          .gte('date', startStr)
-          .order('date', { ascending: false }),
-        supabase
-          .from('workout_logs')
-          .select('date')
-          .eq('user_id', userId)
-          .gte('date', startStr)
-          .order('date', { ascending: false }),
-      ])
+      try {
+        const [mealRes, waterRes, workoutRes] = await Promise.all([
+          supabase
+            .from('meal_logs')
+            .select('date')
+            .eq('user_id', userId)
+            .gte('date', startStr)
+            .order('date', { ascending: false }),
+          supabase
+            .from('water_logs')
+            .select('date')
+            .eq('user_id', userId)
+            .gte('date', startStr)
+            .order('date', { ascending: false }),
+          supabase
+            .from('workout_logs')
+            .select('date')
+            .eq('user_id', userId)
+            .gte('date', startStr)
+            .order('date', { ascending: false }),
+        ])
 
-      setStreaks({
-        meals: calcStreak(mealRes.data?.map(d => d.date) ?? []),
-        water: calcStreak(waterRes.data?.map(d => d.date) ?? []),
-        workouts: calcStreak(workoutRes.data?.map(d => d.date) ?? []),
-      })
-      setLoading(false)
+        setStreaks({
+          meals: calcStreak(mealRes.data?.map(d => d.date) ?? []),
+          water: calcStreak(waterRes.data?.map(d => d.date) ?? []),
+          workouts: calcStreak(workoutRes.data?.map(d => d.date) ?? []),
+        })
+      } catch (err) {
+        reportClientError(err, { feature: 'dashboard', action: 'streaks-widget-load' })
+      } finally {
+        setLoading(false)
+      }
     }
 
     calcStreaks()

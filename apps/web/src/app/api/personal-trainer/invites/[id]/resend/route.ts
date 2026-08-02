@@ -32,12 +32,16 @@ export async function POST(
 
   await ensureTrainerAccess(user.id, profile?.role)
 
-  const { data: invite } = await admin
+  const { data: invite, error } = await admin
     .from('personal_trainer_invites')
     .select('*')
     .eq('id', id)
     .eq('personal_trainer_id', user.id)
     .single()
+
+  if (error && error.code !== 'PGRST116') {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
 
   if (!invite) {
     return NextResponse.json({ error: 'Invite not found.' }, { status: 404 })

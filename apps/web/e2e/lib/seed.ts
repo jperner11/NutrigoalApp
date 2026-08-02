@@ -153,9 +153,10 @@ export async function seedPendingInvite(trainerId: string, invitedEmail: string)
  * Force a seeded user's tier directly (bypassing billing/Stripe entirely). The
  * signup trigger (migration 055) only ever bootstraps 'free' or 'personal_trainer'
  * from metadata, so Pro/Unlimited-gated specs (F15, F16) need this to get a
- * paid-tier client without touching real Stripe.
+ * paid-tier client without touching real Stripe. Also accepts 'free' so a spec
+ * can simulate a downgrade/cancellation (F61) without re-seeding a whole user.
  */
-export async function upgradeUserRole(userId: string, role: 'pro' | 'unlimited'): Promise<void> {
+export async function upgradeUserRole(userId: string, role: 'pro' | 'unlimited' | 'free'): Promise<void> {
   const supabase = admin()
   const { error } = await supabase.from('user_profiles').update({ role }).eq('id', userId)
   if (error) throw new Error(`Failed to upgrade user ${userId} to ${role}: ${error.message}`)
@@ -199,6 +200,7 @@ export async function publishCoachProfile(coachId: string, label: string): Promi
 export interface SeededPair {
   coach: SeededUser
   clients: SeededUser[]
+  slug: string
 }
 
 /**
@@ -207,14 +209,14 @@ export interface SeededPair {
  */
 export async function createLinkedPair(clientsPerCoach = 1): Promise<SeededPair> {
   const coach = await createTestUser('personal_trainer')
-  await publishCoachProfile(coach.id, 'pair')
+  const { slug } = await publishCoachProfile(coach.id, 'pair')
   const clients: SeededUser[] = []
   for (let i = 0; i < clientsPerCoach; i++) {
     const client = await createTestUser('free')
     await linkClientToTrainer(client.id, coach.id)
     clients.push(client)
   }
-  return { coach, clients }
+  return { coach, clients, slug }
 }
 
 /**

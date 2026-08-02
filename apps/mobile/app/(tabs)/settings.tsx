@@ -14,6 +14,11 @@ export default function SettingsScreen() {
   const colors = useBrandColors()
   const styles = useThemedStyles(makeStyles)
   const supportStatusStyles = useThemedStyles(makeSupportStatusStyles)
+  const supportStatusTextColor = {
+    open: colors.warning,
+    in_progress: colors.brand500,
+    resolved: colors.success,
+  }
 
   const { profile, signOut } = useAuth()
   const tier = profile?.role ?? 'free'
@@ -197,7 +202,9 @@ export default function SettingsScreen() {
                     </Text>
                   </View>
                   <View style={[styles.supportStatusBadge, supportStatusStyles[request.status]]}>
-                    <Text style={styles.supportStatusText}>{request.status.replace('_', ' ')}</Text>
+                    <Text style={[styles.supportStatusText, { color: supportStatusTextColor[request.status] }]}>
+                      {request.status.replace('_', ' ')}
+                    </Text>
                   </View>
                 </View>
               ))}
@@ -266,16 +273,16 @@ const makeStyles = (c: BrandColors) => StyleSheet.create({
 
 const makeSupportStatusStyles = (c: BrandColors) => StyleSheet.create({
   open: {
-    backgroundColor: '#FEF3C7',
-    borderColor: '#FCD34D',
+    backgroundColor: c.warningBg,
+    borderColor: c.warning,
   },
   in_progress: {
-    backgroundColor: '#E0F2FE',
-    borderColor: '#7DD3FC',
+    backgroundColor: c.accentBg,
+    borderColor: c.brand500,
   },
   resolved: {
-    backgroundColor: '#DCFCE7',
-    borderColor: '#86EFAC',
+    backgroundColor: c.successBg,
+    borderColor: c.success,
   },
 })
 

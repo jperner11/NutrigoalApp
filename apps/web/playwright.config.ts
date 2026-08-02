@@ -13,6 +13,10 @@ const browserProxy = process.env.HTTPS_PROXY
   ? { server: process.env.HTTPS_PROXY, bypass: 'localhost,127.0.0.1,::1' }
   : undefined
 
+// Core user-facing specs also run on mobile viewports — testers are mostly on
+// phones. Deep multi-user/coach specs stay desktop-only to keep runtime sane.
+const MOBILE_SPECS = /smoke|signup|reset-password|client-onboarding|log-meal|log-workout/
+
 export default defineConfig({
   testDir: './e2e/specs',
   // Each spec seeds its own users, so files are independent and can run in parallel.
@@ -72,6 +76,30 @@ export default defineConfig({
             : {}),
       },
     },
+    {
+      // Android-class coverage. Chromium engine → safe everywhere, including the
+      // cloud sandbox (shares the chromium binary/exec-path handling above).
+      name: 'mobile-chrome',
+      testMatch: MOBILE_SPECS,
+      use: {
+        ...devices['Pixel 7'],
+        ...(process.env.PLAYWRIGHT_EXEC_PATH
+          ? { launchOptions: { executablePath: process.env.PLAYWRIGHT_EXEC_PATH } }
+          : {}),
+      },
+    },
+    // iPhone-class coverage (WebKit — the engine Safari users actually get).
+    // Opt-in via E2E_WEBKIT=1: CI sets it; the cloud sandbox does NOT (webkit's
+    // system deps aren't in its image, and a missing browser aborts the whole run).
+    ...(process.env.E2E_WEBKIT === '1'
+      ? [
+          {
+            name: 'mobile-safari',
+            testMatch: MOBILE_SPECS,
+            use: { ...devices['iPhone 14'] },
+          },
+        ]
+      : []),
   ],
 
   // When pointed at localhost, Playwright starts the app for us — crucially with the

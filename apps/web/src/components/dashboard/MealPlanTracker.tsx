@@ -8,6 +8,7 @@ import Link from 'next/link'
 import type { DietPlan, DietPlanMeal, FoodItem } from '@/lib/supabase/types'
 import { isFeatureLocked } from '@/lib/tierUtils'
 import type { UserRole } from '@/lib/supabase/types'
+import { reportClientError } from '@/lib/apiClient'
 
 interface MealMeta {
   label?: string
@@ -67,74 +68,77 @@ export default function MealPlanTracker({ userId, userRole = 'free', onMacrosUpd
   async function loadPlanAndLogs() {
     const supabase = createClient()
 
-    // Get active diet plan
-    const { data: plans } = await supabase
-      .from('diet_plans')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('is_active', true)
-      .order('created_at', { ascending: false })
-      .limit(1)
-
-    if (!plans || plans.length === 0) {
-      setLoading(false)
-      return
-    }
-
-    const plan = plans[0]
-    setActivePlan(plan)
-
-    // Get meals for this plan (matching today's day_of_week or null = every day)
-    const { data: planMeals } = await supabase
-      .from('diet_plan_meals')
-      .select('*')
-      .eq('diet_plan_id', plan.id)
-      .or(`day_of_week.eq.${dayOfWeek},day_of_week.is.null`)
-
-    setMeals(planMeals ?? [])
-
-    // Get today's meal logs that reference this plan's meals
-    const { data: logs } = await supabase
-      .from('meal_logs')
-      .select('diet_plan_meal_id, total_calories, total_protein, total_carbs, total_fat')
-      .eq('user_id', userId)
-      .eq('date', today)
-      .not('diet_plan_meal_id', 'is', null)
-
-    const loggedIds = new Set<string>()
-    let totalCal = 0, totalPro = 0, totalCarbs = 0, totalFat = 0
-
-    logs?.forEach(log => {
-      if (log.diet_plan_meal_id) {
-        loggedIds.add(log.diet_plan_meal_id)
-      }
-      totalCal += log.total_calories
-      totalPro += log.total_protein ?? 0
-      totalCarbs += log.total_carbs ?? 0
-      totalFat += log.total_fat ?? 0
-    })
-
-    setLoggedMealIds(loggedIds)
-    onMacrosUpdate({
-      calories: totalCal,
-      protein: totalPro,
-      carbs: totalCarbs,
-      fat: totalFat,
-    })
-
-    // Load free user's selected meal
-    if (isFreeUser) {
-      const { data: selection } = await supabase
-        .from('user_tier_selections')
-        .select('selected_id')
+    try {
+      // Get active diet plan
+      const { data: plans } = await supabase
+        .from('diet_plans')
+        .select('*')
         .eq('user_id', userId)
-        .eq('selection_type', 'meal')
-        .single()
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
+        .limit(1)
 
-      if (selection) setSelectedMealId(selection.selected_id)
+      if (!plans || plans.length === 0) {
+        return
+      }
+
+      const plan = plans[0]
+      setActivePlan(plan)
+
+      // Get meals for this plan (matching today's day_of_week or null = every day)
+      const { data: planMeals } = await supabase
+        .from('diet_plan_meals')
+        .select('*')
+        .eq('diet_plan_id', plan.id)
+        .or(`day_of_week.eq.${dayOfWeek},day_of_week.is.null`)
+
+      setMeals(planMeals ?? [])
+
+      // Get today's meal logs that reference this plan's meals
+      const { data: logs } = await supabase
+        .from('meal_logs')
+        .select('diet_plan_meal_id, total_calories, total_protein, total_carbs, total_fat')
+        .eq('user_id', userId)
+        .eq('date', today)
+        .not('diet_plan_meal_id', 'is', null)
+
+      const loggedIds = new Set<string>()
+      let totalCal = 0, totalPro = 0, totalCarbs = 0, totalFat = 0
+
+      logs?.forEach(log => {
+        if (log.diet_plan_meal_id) {
+          loggedIds.add(log.diet_plan_meal_id)
+        }
+        totalCal += log.total_calories
+        totalPro += log.total_protein ?? 0
+        totalCarbs += log.total_carbs ?? 0
+        totalFat += log.total_fat ?? 0
+      })
+
+      setLoggedMealIds(loggedIds)
+      onMacrosUpdate({
+        calories: totalCal,
+        protein: totalPro,
+        carbs: totalCarbs,
+        fat: totalFat,
+      })
+
+      // Load free user's selected meal
+      if (isFreeUser) {
+        const { data: selection } = await supabase
+          .from('user_tier_selections')
+          .select('selected_id')
+          .eq('user_id', userId)
+          .eq('selection_type', 'meal')
+          .single()
+
+        if (selection) setSelectedMealId(selection.selected_id)
+      }
+    } catch (err) {
+      reportClientError(err, { feature: 'dashboard', action: 'meal-plan-tracker-load' })
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
   async function toggleMeal(meal: DietPlanMeal) {

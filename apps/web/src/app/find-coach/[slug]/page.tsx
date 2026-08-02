@@ -36,36 +36,58 @@ interface CoachProfile {
   } | null
 }
 
+const COACH_PROFILE_SELECT = `
+  coach_id, slug, headline, bio, location_label,
+  price_from, price_to, currency, accepting_new_clients, consultation_url,
+  rating_avg, rating_count,
+  coach:coach_id (
+    id, full_name, avatar_url, coach_verification_status,
+    coach_specialties, coach_formats,
+    coach_check_in_frequency, coach_ideal_client, coach_style
+  )
+`
+
+type CoachProfileRow = Omit<CoachProfile, 'coach'> & {
+  coach: CoachProfile['coach'] | CoachProfile['coach'][]
+}
+
+function toCoachProfile(row: CoachProfileRow): CoachProfile {
+  const coach = Array.isArray(row.coach) ? row.coach[0] ?? null : row.coach
+  return { ...row, coach }
+}
+
 async function getCoach(slug: string): Promise<CoachProfile | null> {
   const admin = createAdminClient()
+
+  // Fast path: most rows have a stored slug that matches directly, so try
+  // an indexed single-row lookup before falling back to a full table scan.
+  const { data: exactMatch, error: exactError } = await admin
+    .from('coach_public_profiles')
+    .select(COACH_PROFILE_SELECT)
+    .eq('is_public', true)
+    .eq('slug', slug)
+    .maybeSingle()
+
+  if (!exactError && exactMatch) return toCoachProfile(exactMatch as unknown as CoachProfileRow)
+
+  // Fallback for legacy rows whose stored slug doesn't match the current
+  // slug-generation logic: scan public profiles and compare the computed slug.
   const { data, error } = await admin
     .from('coach_public_profiles')
-    .select(`
-      coach_id, slug, headline, bio, location_label,
-      price_from, price_to, currency, accepting_new_clients, consultation_url,
-      rating_avg, rating_count,
-      coach:coach_id (
-        id, full_name, avatar_url, coach_verification_status,
-        coach_specialties, coach_formats,
-        coach_check_in_frequency, coach_ideal_client, coach_style
-      )
-    `)
+    .select(COACH_PROFILE_SELECT)
     .eq('is_public', true)
 
   if (error || !data) return null
 
-  type Row = Omit<CoachProfile, 'coach'> & { coach: CoachProfile['coach'] | CoachProfile['coach'][] }
-  const row = (data as unknown as Row[]).find((r) => {
-    const storedSlug = r.slug
+  const row = (data as unknown as CoachProfileRow[]).find((r) => {
     const computed = buildCoachProfileSlug(
       Array.isArray(r.coach) ? r.coach[0]?.full_name : r.coach?.full_name,
       r.coach_id,
     )
-    return storedSlug === slug || computed === slug
+    return computed === slug
   })
   if (!row) return null
-  const coach = Array.isArray(row.coach) ? row.coach[0] ?? null : row.coach
-  return { ...row, coach }
+  return toCoachProfile(row)
 }
 
 export default async function CoachProfilePage({
@@ -119,10 +141,7 @@ export default async function CoachProfilePage({
                   ? 'ACCEPTING NEW CLIENTS'
                   : 'WAITLIST OPEN'}
               </div>
-              <h1
-                className="h2 mt-2.5"
-                style={{ fontSize: 56 }}
-              >
+              <h1 className="h2 mt-2.5">
                 {name}
               </h1>
               <div

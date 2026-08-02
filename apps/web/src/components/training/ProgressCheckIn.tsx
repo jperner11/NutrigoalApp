@@ -92,15 +92,15 @@ export default function ProgressCheckIn({ userId, onPlanRegenerate }: ProgressCh
   }
 
   const trendIcon = (trend: string) => {
-    if (trend === 'improving') return <TrendingUp className="h-4 w-4 text-emerald-300" />
+    if (trend === 'improving') return <TrendingUp className="h-4 w-4 text-[var(--ok-text)]" />
     if (trend === 'declining') return <TrendingDown className="h-4 w-4 text-[var(--brand-400)]" />
-    return <Minus className="h-4 w-4 text-amber-300" />
+    return <Minus className="h-4 w-4 text-[var(--warn-text)]" />
   }
 
   const trendColor = (trend: string) => {
-    if (trend === 'improving') return 'text-emerald-200 bg-[rgba(26,163,122,0.12)] border-[rgba(26,163,122,0.34)]'
-    if (trend === 'declining') return 'text-[var(--foreground)] bg-[var(--danger-bg)] border-[rgba(205, 242, 78,0.34)]'
-    return 'text-amber-200 bg-[rgba(196,121,28,0.12)] border-[rgba(196,121,28,0.34)]'
+    if (trend === 'improving') return 'text-[var(--ok-text)] bg-[rgba(26,163,122,0.12)] border-[rgba(26,163,122,0.34)]'
+    if (trend === 'declining') return 'text-[var(--foreground)] bg-[var(--danger-bg)] border-[rgba(205,242,78,0.34)]'
+    return 'text-[var(--warn-text)] bg-[rgba(196,121,28,0.12)] border-[rgba(196,121,28,0.34)]'
   }
 
   if (checking || (!eligible && !result)) return null
@@ -110,9 +110,9 @@ export default function ProgressCheckIn({ userId, onPlanRegenerate }: ProgressCh
       <div className="mb-6 space-y-2">
         <button
           onClick={runCheckIn}
-          className="group flex w-full items-center gap-4 rounded-xl border-2 border-dashed border-[rgba(205, 242, 78,0.34)] bg-[var(--brand-100)] px-5 py-4 transition-all hover:border-[rgba(205, 242, 78,0.52)] hover:bg-[rgba(205, 242, 78,0.16)]"
+          className="group flex w-full items-center gap-4 rounded-xl border-2 border-dashed border-[rgba(205,242,78,0.34)] bg-[var(--brand-100)] px-5 py-4 transition-all hover:border-[rgba(205,242,78,0.52)] hover:bg-[rgba(205,242,78,0.16)]"
         >
-          <div className="rounded-xl bg-[var(--brand-100)] p-2.5 transition-colors group-hover:bg-[rgba(205, 242, 78,0.18)]">
+          <div className="rounded-xl bg-[var(--brand-100)] p-2.5 transition-colors group-hover:bg-[rgba(205,242,78,0.18)]">
             <BarChart3 className="h-5 w-5 text-[var(--brand-400)]" />
           </div>
           <div className="flex-1 text-left">
@@ -172,8 +172,8 @@ export default function ProgressCheckIn({ userId, onPlanRegenerate }: ProgressCh
         </div>
         <div className="flex items-center gap-3">
           <div className="hidden sm:flex items-center gap-2 text-xs">
-            {improving > 0 && <span className="font-medium text-emerald-300">{improving} up</span>}
-            {stalled > 0 && <span className="font-medium text-amber-300">{stalled} flat</span>}
+            {improving > 0 && <span className="font-medium text-[var(--ok-text)]">{improving} up</span>}
+            {stalled > 0 && <span className="font-medium text-[var(--warn-text)]">{stalled} flat</span>}
             {declining > 0 && <span className="font-medium text-[var(--brand-400)]">{declining} down</span>}
           </div>
           {expanded ? <ChevronUp className="h-4 w-4 text-[var(--muted-soft)]" /> : <ChevronDown className="h-4 w-4 text-[var(--muted-soft)]" />}
@@ -189,7 +189,7 @@ export default function ProgressCheckIn({ userId, onPlanRegenerate }: ProgressCh
               <p className="text-xs text-[var(--muted)]">Workouts</p>
             </div>
             <div className="rounded-lg bg-[rgba(26,163,122,0.12)] p-3 text-center">
-              <Target className="mx-auto mb-1 h-4 w-4 text-emerald-300" />
+              <Target className="mx-auto mb-1 h-4 w-4 text-[var(--ok-text)]" />
               <p className="text-lg font-bold text-[var(--foreground)]">{consistency}%</p>
               <p className="text-xs text-[var(--muted)]">Consistency</p>
             </div>
@@ -246,11 +246,11 @@ export default function ProgressCheckIn({ userId, onPlanRegenerate }: ProgressCh
 
               {result.aiAnalysis.plan_adjustments?.length > 0 && (
                 <div className="rounded-xl border border-[rgba(196,121,28,0.34)] bg-[rgba(196,121,28,0.12)] p-4">
-                  <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-amber-300">Suggested Plan Changes</h4>
+                  <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--warn-text)]">Suggested Plan Changes</h4>
                   <ul className="space-y-1.5">
                     {result.aiAnalysis.plan_adjustments.map((adj, i) => (
-                      <li key={i} className="flex gap-2 text-sm text-amber-100">
-                        <span className="text-amber-300">•</span>
+                      <li key={i} className="flex gap-2 text-sm text-[var(--warn-text)]">
+                        <span className="text-[var(--warn-text)]">•</span>
                         <span>{adj}</span>
                       </li>
                     ))}

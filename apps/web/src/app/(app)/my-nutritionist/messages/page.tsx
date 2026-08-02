@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import * as Sentry from '@sentry/nextjs'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
 import { isManagedClientRole } from '@treno/shared'
@@ -43,7 +44,9 @@ export default function MyNutritionistMessagesPage() {
         ({ data }) => {
           if (!cancelled && data) setTrainer(data as TrainerInfo)
         },
-        () => {}
+        (err) => {
+          Sentry.captureException(err, { tags: { kind: 'page', page: 'my-nutritionist/messages', op: 'loadTrainer' } })
+        }
       )
 
     // Client cannot create a conversation (RLS: only coach can INSERT).
@@ -60,8 +63,9 @@ export default function MyNutritionistMessagesPage() {
           setConversationId(data?.id ?? null)
           setResolved(true)
         },
-        () => {
+        (err) => {
           if (!cancelled) setResolved(true)
+          Sentry.captureException(err, { tags: { kind: 'page', page: 'my-nutritionist/messages', op: 'loadConversation' } })
         }
       )
 

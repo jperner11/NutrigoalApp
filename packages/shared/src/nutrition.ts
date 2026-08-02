@@ -128,25 +128,3 @@ export function calculateNutritionTargets(metrics: UserMetrics): NutritionTarget
     water
   }
 }
-
-// Helper function to get activity level display name
-export function getActivityLevelName(level: UserMetrics['activityLevel']): string {
-  const names = {
-    sedentary: 'Sedentary (little to no exercise)',
-    lightly_active: 'Lightly Active (light exercise 1-3 days per week)',
-    moderately_active: 'Moderately Active (moderate exercise 3-5 days per week)',
-    very_active: 'Very Active (hard exercise 6-7 days per week)',
-    extremely_active: 'Extremely Active (very hard exercise, physical job)'
-  }
-  return names[level]
-}
-
-// Helper function to get goal display name
-export function getGoalName(goal: UserMetrics['goal']): string {
-  const names = {
-    bulking: 'Build Muscle (Bulking)',
-    cutting: 'Lose Weight (Cutting)',
-    maintenance: 'Maintain Current Weight'
-  }
-  return names[goal]
-} 

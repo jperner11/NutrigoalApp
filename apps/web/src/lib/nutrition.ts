@@ -6,6 +6,4 @@ export {
   calculateMacros,
   calculateWaterIntake,
   calculateNutritionTargets,
-  getActivityLevelName,
-  getGoalName,
 } from '@treno/shared'

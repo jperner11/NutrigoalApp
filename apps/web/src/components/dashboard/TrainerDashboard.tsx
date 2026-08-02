@@ -14,6 +14,7 @@ import {
   Users,
 } from 'lucide-react'
 import AppPageHeader from '@/components/ui/AppPageHeader'
+import { reportClientError } from '@/lib/apiClient'
 
 interface TrainerDashboardProps {
   trainerId: string
@@ -101,111 +102,117 @@ export default function TrainerDashboard({ trainerId, trainerName }: TrainerDash
     const supabase = createClient()
 
     async function load() {
-      const { data: clientRows } = await supabase
-        .from('nutritionist_clients')
-        .select('id, client_id, invited_email, status, created_at, client:client_id(id, full_name, email, onboarding_completed)')
-        .eq('nutritionist_id', trainerId)
-        .eq('status', 'active')
-        .order('created_at', { ascending: false })
+      try {
+        const [{ data: clientRows }, { data: pendingInvites }] = await Promise.all([
+          supabase
+            .from('nutritionist_clients')
+            .select('id, client_id, invited_email, status, created_at, client:client_id(id, full_name, email, onboarding_completed)')
+            .eq('nutritionist_id', trainerId)
+            .eq('status', 'active')
+            .order('created_at', { ascending: false }),
+          supabase
+            .from('personal_trainer_invites')
+            .select('id, invited_email, status, expires_at, created_at')
+            .eq('personal_trainer_id', trainerId)
+            .eq('status', 'pending')
+            .order('created_at', { ascending: false }),
+        ])
 
-      const { data: pendingInvites } = await supabase
-        .from('personal_trainer_invites')
-        .select('id, invited_email, status, expires_at, created_at')
-        .eq('personal_trainer_id', trainerId)
-        .eq('status', 'pending')
-        .order('created_at', { ascending: false })
+        const activeClients: ClientRow[] = ((clientRows as ClientRowQuery[] | null) ?? []).map((row) => ({
+          ...row,
+          client: row.client?.[0] ?? null,
+        }))
+        const clientIds = activeClients.map((row) => row.client_id).filter(Boolean) as string[]
 
-      const activeClients: ClientRow[] = ((clientRows as ClientRowQuery[] | null) ?? []).map((row) => ({
-        ...row,
-        client: row.client?.[0] ?? null,
-      }))
-      const clientIds = activeClients.map((row) => row.client_id).filter(Boolean) as string[]
+        const [
+          { data: activeDietPlans },
+          { data: activeTrainingPlans },
+          { data: conversations },
+          { data: feedbackRequests },
+          { data: mealLogs },
+          { data: workoutLogs },
+        ] = await Promise.all([
+          clientIds.length > 0
+            ? supabase.from('diet_plans').select('user_id').in('user_id', clientIds).eq('is_active', true)
+            : Promise.resolve({ data: [] }),
+          clientIds.length > 0
+            ? supabase.from('training_plans').select('user_id').in('user_id', clientIds).eq('is_active', true)
+            : Promise.resolve({ data: [] }),
+          supabase.from('conversations').select('id, client_id').eq('nutritionist_id', trainerId),
+          supabase
+            .from('feedback_requests')
+            .select('id, client_id, created_at, status')
+            .eq('nutritionist_id', trainerId)
+            .eq('status', 'pending'),
+          clientIds.length > 0
+            ? supabase.from('meal_logs').select('user_id, logged_at').in('user_id', clientIds).order('logged_at', { ascending: false }).limit(12)
+            : Promise.resolve({ data: [] }),
+          clientIds.length > 0
+            ? supabase.from('workout_logs').select('user_id, logged_at').in('user_id', clientIds).order('logged_at', { ascending: false }).limit(12)
+            : Promise.resolve({ data: [] }),
+        ])
 
-      const [
-        { data: activeDietPlans },
-        { data: activeTrainingPlans },
-        { data: conversations },
-        { data: feedbackRequests },
-        { data: mealLogs },
-        { data: workoutLogs },
-      ] = await Promise.all([
-        clientIds.length > 0
-          ? supabase.from('diet_plans').select('user_id').in('user_id', clientIds).eq('is_active', true)
-          : Promise.resolve({ data: [] }),
-        clientIds.length > 0
-          ? supabase.from('training_plans').select('user_id').in('user_id', clientIds).eq('is_active', true)
-          : Promise.resolve({ data: [] }),
-        supabase.from('conversations').select('id, client_id').eq('nutritionist_id', trainerId),
-        supabase
-          .from('feedback_requests')
-          .select('id, client_id, created_at, status')
-          .eq('nutritionist_id', trainerId)
-          .eq('status', 'pending'),
-        clientIds.length > 0
-          ? supabase.from('meal_logs').select('user_id, logged_at').in('user_id', clientIds).order('logged_at', { ascending: false }).limit(12)
-          : Promise.resolve({ data: [] }),
-        clientIds.length > 0
-          ? supabase.from('workout_logs').select('user_id, logged_at').in('user_id', clientIds).order('logged_at', { ascending: false }).limit(12)
-          : Promise.resolve({ data: [] }),
-      ])
+        const activeDietSet = new Set((activeDietPlans ?? []).map((plan) => plan.user_id))
+        const activeTrainingSet = new Set((activeTrainingPlans ?? []).map((plan) => plan.user_id))
+        const noPlanClients = activeClients.filter((row) => {
+          if (!row.client_id) return false
+          return !activeDietSet.has(row.client_id) || !activeTrainingSet.has(row.client_id)
+        })
+        const intakePendingClients = activeClients.filter((row) => row.client && !row.client.onboarding_completed)
 
-      const activeDietSet = new Set((activeDietPlans ?? []).map((plan) => plan.user_id))
-      const activeTrainingSet = new Set((activeTrainingPlans ?? []).map((plan) => plan.user_id))
-      const noPlanClients = activeClients.filter((row) => {
-        if (!row.client_id) return false
-        return !activeDietSet.has(row.client_id) || !activeTrainingSet.has(row.client_id)
-      })
-      const intakePendingClients = activeClients.filter((row) => row.client && !row.client.onboarding_completed)
+        const conversationRows = conversations ?? []
+        const conversationIds = conversationRows.map((conversation) => conversation.id)
+        let unreadMessages = 0
+        if (conversationIds.length > 0) {
+          const { count } = await supabase
+            .from('messages')
+            .select('*', { count: 'exact', head: true })
+            .in('conversation_id', conversationIds)
+            .neq('sender_id', trainerId)
+            .is('read_at', null)
+          unreadMessages = count ?? 0
+        }
 
-      const conversationRows = conversations ?? []
-      const conversationIds = conversationRows.map((conversation) => conversation.id)
-      let unreadMessages = 0
-      if (conversationIds.length > 0) {
-        const { count } = await supabase
-          .from('messages')
-          .select('*', { count: 'exact', head: true })
-          .in('conversation_id', conversationIds)
-          .neq('sender_id', trainerId)
-          .is('read_at', null)
-        unreadMessages = count ?? 0
+        const feedbackThreshold = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
+        const overdueFeedback = (feedbackRequests ?? []).filter((request) => new Date(request.created_at) < feedbackThreshold).length
+
+        const clientNameById = new Map(
+          activeClients
+            .filter((client) => client.client)
+            .map((client) => [client.client!.id, client.client!.full_name || client.client!.email])
+        )
+
+        const recentActivity = [
+          ...(mealLogs ?? []).map((log) => ({
+            id: `meal-${log.user_id}-${log.logged_at}`,
+            clientName: clientNameById.get(log.user_id) || 'Client',
+            label: 'logged a meal',
+            at: log.logged_at,
+          })),
+          ...(workoutLogs ?? []).map((log) => ({
+            id: `workout-${log.user_id}-${log.logged_at}`,
+            clientName: clientNameById.get(log.user_id) || 'Client',
+            label: 'completed a workout',
+            at: log.logged_at,
+          })),
+        ]
+          .sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime())
+          .slice(0, 6)
+
+        setState({
+          activeClients,
+          pendingInvites: pendingInvites ?? [],
+          noPlanClients,
+          intakePendingClients,
+          unreadMessages,
+          overdueFeedback,
+          recentActivity,
+        })
+      } catch (err) {
+        reportClientError(err, { feature: 'dashboard', action: 'trainer-dashboard-load' })
+      } finally {
+        setLoading(false)
       }
-
-      const feedbackThreshold = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
-      const overdueFeedback = (feedbackRequests ?? []).filter((request) => new Date(request.created_at) < feedbackThreshold).length
-
-      const clientNameById = new Map(
-        activeClients
-          .filter((client) => client.client)
-          .map((client) => [client.client!.id, client.client!.full_name || client.client!.email])
-      )
-
-      const recentActivity = [
-        ...(mealLogs ?? []).map((log) => ({
-          id: `meal-${log.user_id}-${log.logged_at}`,
-          clientName: clientNameById.get(log.user_id) || 'Client',
-          label: 'logged a meal',
-          at: log.logged_at,
-        })),
-        ...(workoutLogs ?? []).map((log) => ({
-          id: `workout-${log.user_id}-${log.logged_at}`,
-          clientName: clientNameById.get(log.user_id) || 'Client',
-          label: 'completed a workout',
-          at: log.logged_at,
-        })),
-      ]
-        .sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime())
-        .slice(0, 6)
-
-      setState({
-        activeClients,
-        pendingInvites: pendingInvites ?? [],
-        noPlanClients,
-        intakePendingClients,
-        unreadMessages,
-        overdueFeedback,
-        recentActivity,
-      })
-      setLoading(false)
     }
 
     load()
@@ -308,7 +315,7 @@ export default function TrainerDashboard({ trainerId, trainerName }: TrainerDash
                   <Link
                     key={client.id}
                     href={client.client ? `/clients/${client.client.id}` : '/clients'}
-                    className="flex items-center justify-between rounded-[22px] border border-[var(--line)] bg-[var(--surface-strong)] px-4 py-4 transition hover:border-[rgba(205, 242, 78,0.28)] hover:bg-[var(--brand-100)]"
+                    className="flex items-center justify-between rounded-[22px] border border-[var(--line)] bg-[var(--surface-strong)] px-4 py-4 transition hover:border-[rgba(205,242,78,0.28)] hover:bg-[var(--brand-100)]"
                   >
                     <div>
                       <div className="font-semibold text-[var(--foreground)]">{client.client?.full_name || client.client?.email || client.invited_email}</div>

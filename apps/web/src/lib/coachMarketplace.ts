@@ -2,7 +2,7 @@ export const COACH_MARKETPLACE_CURRENCIES = ['GBP', 'EUR', 'USD'] as const
 export const COACH_OFFER_BILLING_PERIODS = ['one_time', 'weekly', 'monthly'] as const
 export const COACH_LEAD_STAGES = ['new', 'contacted', 'consult_booked', 'won', 'lost'] as const
 
-export function slugifyCoachName(value: string) {
+function slugifyCoachName(value: string) {
   return value
     .toLowerCase()
     .trim()

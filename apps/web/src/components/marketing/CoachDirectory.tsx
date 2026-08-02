@@ -115,13 +115,15 @@ export default function CoachDirectory() {
         className="card mb-8 grid items-end gap-4 p-5 lg:grid-cols-[1.6fr_1fr_auto] lg:gap-6"
       >
         <div>
-          <div
+          <label
+            htmlFor="coach-search"
             className="mono mb-2"
-            style={{ fontSize: 10, color: 'var(--fg-4)', letterSpacing: '0.12em' }}
+            style={{ display: 'block', fontSize: 10, color: 'var(--fg-4)', letterSpacing: '0.12em' }}
           >
             SEARCH
-          </div>
+          </label>
           <input
+            id="coach-search"
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Goal, name, style…"
@@ -139,13 +141,15 @@ export default function CoachDirectory() {
         </div>
 
         <div>
-          <div
+          <label
+            htmlFor="coach-budget"
             className="mono mb-2"
-            style={{ fontSize: 10, color: 'var(--fg-4)', letterSpacing: '0.12em' }}
+            style={{ display: 'block', fontSize: 10, color: 'var(--fg-4)', letterSpacing: '0.12em' }}
           >
             BUDGET — UP TO £{budget}/MO
-          </div>
+          </label>
           <input
+            id="coach-budget"
             type="range"
             min={60}
             max={300}
@@ -174,6 +178,7 @@ export default function CoachDirectory() {
           <button
             type="button"
             onClick={() => setAcceptingOnly((v) => !v)}
+            aria-pressed={acceptingOnly}
             className="chip"
             style={{
               cursor: 'pointer',

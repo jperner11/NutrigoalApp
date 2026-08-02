@@ -74,7 +74,7 @@ async function searchLocal(query: string, limit: number): Promise<FoodResult[]> 
   const { data, error } = await supabase
     .from('foods')
     .select('id, name, brand, source, calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g, default_amount, default_unit')
-    .or(`name.ilike.%${query}%`)
+    .ilike('name', `%${query}%`)
     .order('is_verified', { ascending: false })
     .limit(limit)
 
@@ -101,6 +101,7 @@ async function searchSpoonacular(query: string, limit: number): Promise<FoodResu
   try {
     const response = await fetch(
       `https://api.spoonacular.com/food/ingredients/search?query=${encodeURIComponent(query)}&number=${limit}&apiKey=${apiKey}`,
+      { signal: AbortSignal.timeout(3000) },
     )
     if (!response.ok) return []
 

@@ -111,14 +111,14 @@ export default function GroceryPage() {
     })
   }
 
-  if (loading) return <div className="text-gray-500">Loading...</div>
+  if (loading) return <div className="text-[var(--muted)]">Loading...</div>
 
   if (groceryItems.length === 0) {
     return (
       <div className="max-w-2xl mx-auto text-center py-16">
-        <ShoppingCart className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-        <h2 className="text-xl font-bold text-gray-900 mb-2">No Grocery List</h2>
-        <p className="text-gray-500">
+        <ShoppingCart className="h-12 w-12 text-[var(--muted-soft)] mx-auto mb-4" />
+        <h2 className="text-xl font-bold text-[var(--foreground)] mb-2">No Grocery List</h2>
+        <p className="text-[var(--muted)]">
           You need an active meal plan to generate a grocery list. Create or activate a diet plan first.
         </p>
       </div>
@@ -131,14 +131,14 @@ export default function GroceryPage() {
 
   function formatAmount(amount: number): string {
     if (amount >= 1000) return `${(amount / 1000).toFixed(1)}kg`
-    return `${Math.round(amount)}${amount < 10 ? '' : ''}`
+    return `${Math.round(amount)}`
   }
 
   return (
     <div className="max-w-2xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Grocery List</h1>
-        <p className="text-gray-600 mt-1">
+        <h1 className="text-3xl font-bold text-[var(--foreground)]">Grocery List</h1>
+        <p className="text-[var(--muted)] mt-1">
           Weekly shopping list from <span className="font-medium">{planName}</span>
         </p>
       </div>
@@ -146,21 +146,21 @@ export default function GroceryPage() {
       {/* Progress */}
       <div className="card p-4 mb-6">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-gray-700">
+          <span className="text-sm font-medium text-[var(--muted)]">
             {checkedCount} of {totalItems} items checked
           </span>
           {checkedCount > 0 && (
             <button
               onClick={() => setCheckedItems(new Set())}
-              className="text-xs text-purple-600 hover:text-purple-800 font-medium"
+              className="text-xs text-[var(--acc-text)] hover:underline font-medium"
             >
               Clear all
             </button>
           )}
         </div>
-        <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+        <div className="w-full h-2 bg-[var(--line)] rounded-full overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full transition-all duration-300"
+            className="h-full bg-[var(--acc)] rounded-full transition-all duration-300"
             style={{ width: `${totalItems > 0 ? (checkedCount / totalItems) * 100 : 0}%` }}
           />
         </div>
@@ -180,23 +180,23 @@ export default function GroceryPage() {
                 onClick={() => toggleCategory(category)}
                 aria-expanded={!isCollapsed}
                 aria-controls={panelId}
-                className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-gray-50 transition-colors"
+                className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-[var(--ink-2)] transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <h3 className="font-semibold text-gray-900">{category}</h3>
-                  <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
+                  <h3 className="font-semibold text-[var(--foreground)]">{category}</h3>
+                  <span className="text-xs text-[var(--muted-soft)] bg-[var(--line)] px-2 py-0.5 rounded-full">
                     {categoryChecked}/{items.length}
                   </span>
                 </div>
                 {isCollapsed ? (
-                  <ChevronDown className="h-4 w-4 text-gray-400" />
+                  <ChevronDown className="h-4 w-4 text-[var(--muted-soft)]" />
                 ) : (
-                  <ChevronUp className="h-4 w-4 text-gray-400" />
+                  <ChevronUp className="h-4 w-4 text-[var(--muted-soft)]" />
                 )}
               </button>
 
               {!isCollapsed && (
-                <div id={panelId} className="border-t border-gray-100">
+                <div id={panelId} className="border-t border-[var(--line)]">
                   {items.map(item => {
                     const key = `${item.name}|${item.unit}`
                     const isChecked = checkedItems.has(key)
@@ -207,21 +207,21 @@ export default function GroceryPage() {
                         onClick={() => toggleCheck(key)}
                         role="checkbox"
                         aria-checked={isChecked}
-                        className={`w-full flex items-center gap-3 px-5 py-3 border-b border-gray-50 last:border-b-0 transition-colors text-left ${
-                          isChecked ? 'bg-green-50/50' : 'hover:bg-gray-50'
+                        className={`w-full flex items-center gap-3 px-5 py-3 border-b border-[var(--line)] last:border-b-0 transition-colors text-left ${
+                          isChecked ? 'bg-[var(--success-bg)]' : 'hover:bg-[var(--ink-2)]'
                         }`}
                       >
                         <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
                           isChecked
-                            ? 'bg-green-500 border-green-500'
-                            : 'border-gray-300'
+                            ? 'bg-[var(--ok)] border-[var(--ok)]'
+                            : 'border-[var(--line-strong)]'
                         }`}>
                           {isChecked && <Check className="h-3 w-3 text-white" />}
                         </div>
-                        <span className={`flex-1 text-sm ${isChecked ? 'line-through text-gray-400' : 'text-gray-900'}`}>
+                        <span className={`flex-1 text-sm ${isChecked ? 'line-through text-[var(--muted-soft)]' : 'text-[var(--foreground)]'}`}>
                           {item.name}
                         </span>
-                        <span className={`text-sm font-medium ${isChecked ? 'text-gray-400' : 'text-gray-500'}`}>
+                        <span className={`text-sm font-medium ${isChecked ? 'text-[var(--muted-soft)]' : 'text-[var(--muted)]'}`}>
                           {formatAmount(item.totalAmount)}{item.unit}
                         </span>
                       </button>
