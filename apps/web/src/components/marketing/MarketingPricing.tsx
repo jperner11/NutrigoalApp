@@ -83,7 +83,7 @@ export default function MarketingPricing() {
                   top: -10,
                   left: 24,
                   background: 'var(--acc)',
-                  color: '#fff',
+                  color: '#0a0a0a',
                   fontSize: 10,
                   padding: '4px 10px',
                   borderRadius: 999,
@@ -113,7 +113,7 @@ export default function MarketingPricing() {
                   className="row gap-2.5"
                   style={{ fontSize: 13 }}
                 >
-                  <span style={{ color: 'var(--acc)' }}>✓</span> {f}
+                  <span style={{ color: 'var(--acc-text)' }}>✓</span> {f}
                 </div>
               ))}
             </div>
@@ -138,7 +138,7 @@ export default function MarketingPricing() {
           className="mono"
           style={{
             fontSize: 11,
-            color: 'var(--acc)',
+            color: 'var(--acc-text)',
             letterSpacing: '0.14em',
           }}
         >
@@ -164,7 +164,7 @@ export default function MarketingPricing() {
         <div className="grid gap-2.5 sm:grid-cols-2">
           {coachPlan.features.slice(0, 6).map((f) => (
             <div key={f} className="row gap-2.5" style={{ fontSize: 13 }}>
-              <span style={{ color: 'var(--acc)' }}>✓</span> {f}
+              <span style={{ color: 'var(--acc-text)' }}>✓</span> {f}
             </div>
           ))}
         </div>
