@@ -282,31 +282,40 @@ PROGRAMMING RULES:
     const validBodyParts = new Set(['chest', 'back', 'shoulders', 'biceps', 'triceps', 'legs', 'core', 'full_body'])
     const validEquipment = new Set(['barbell', 'dumbbell', 'machine', 'cable', 'bodyweight', 'band'])
 
+    // Collect exercises missing from the DB (deduped by name) so they can be
+    // created in a single bulk insert instead of one round trip per exercise.
+    const newExercises = new Map<string, { name: string; body_part: string; equipment: string; is_compound: boolean }>()
     for (const day of (parsed.days ?? [])) {
       for (const ex of (day.exercises ?? [])) {
         const key = ex.name.toLowerCase()
-        if (exerciseMap.has(key)) {
-          ex.exercise_id = exerciseMap.get(key)
-        } else {
-          // Create the exercise
-          const bodyPart = validBodyParts.has(ex.body_part) ? ex.body_part : 'full_body'
-          const equip = validEquipment.has(ex.equipment) ? ex.equipment : 'bodyweight'
-          const { data: newEx } = await adminSupabase
-            .from('exercises')
-            .insert({
-              name: ex.name,
-              body_part: bodyPart,
-              equipment: equip,
-              is_compound: ['chest', 'back', 'legs', 'full_body'].includes(bodyPart) && (day.exercises.indexOf(ex) < 3),
-            })
-            .select('id')
-            .single()
+        if (exerciseMap.has(key) || newExercises.has(key)) continue
 
-          if (newEx) {
-            ex.exercise_id = newEx.id
-            exerciseMap.set(key, newEx.id)
-          }
-        }
+        const bodyPart = validBodyParts.has(ex.body_part) ? ex.body_part : 'full_body'
+        const equip = validEquipment.has(ex.equipment) ? ex.equipment : 'bodyweight'
+        newExercises.set(key, {
+          name: ex.name,
+          body_part: bodyPart,
+          equipment: equip,
+          is_compound: ['chest', 'back', 'legs', 'full_body'].includes(bodyPart) && (day.exercises.indexOf(ex) < 3),
+        })
+      }
+    }
+
+    if (newExercises.size > 0) {
+      const { data: insertedExercises } = await adminSupabase
+        .from('exercises')
+        .insert(Array.from(newExercises.values()))
+        .select('id, name')
+
+      for (const inserted of (insertedExercises ?? [])) {
+        exerciseMap.set(inserted.name.toLowerCase(), inserted.id)
+      }
+    }
+
+    for (const day of (parsed.days ?? [])) {
+      for (const ex of (day.exercises ?? [])) {
+        const id = exerciseMap.get(ex.name.toLowerCase())
+        if (id) ex.exercise_id = id
       }
     }
 
