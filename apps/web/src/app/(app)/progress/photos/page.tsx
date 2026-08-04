@@ -57,6 +57,14 @@ export default function PhotosPage() {
 
   useEffect(() => { loadPhotos() }, [loadPhotos])
 
+  // Revoke the blob URL whenever it changes or the component unmounts, so
+  // reselecting a photo repeatedly doesn't leak memory.
+  useEffect(() => {
+    return () => {
+      if (preview) URL.revokeObjectURL(preview)
+    }
+  }, [preview])
+
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
@@ -66,6 +74,11 @@ export default function PhotosPage() {
     }
     setSelectedFile(file)
     setPreview(URL.createObjectURL(file))
+  }
+
+  function clearPreview() {
+    setSelectedFile(null)
+    setPreview(null)
   }
 
   async function handleUpload() {
@@ -101,8 +114,7 @@ export default function PhotosPage() {
     } else {
       toast.success('Photo uploaded.')
       setShowForm(false)
-      setSelectedFile(null)
-      setPreview(null)
+      clearPreview()
       setFormNotes('')
       loadPhotos()
     }
@@ -257,10 +269,7 @@ export default function PhotosPage() {
                   style={{ border: '1px solid var(--line-2)' }}
                 />
                 <button
-                  onClick={() => {
-                    setSelectedFile(null)
-                    setPreview(null)
-                  }}
+                  onClick={clearPreview}
                   className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full"
                   style={{
                     background: 'rgba(19, 16, 18, 0.72)',
@@ -339,8 +348,7 @@ export default function PhotosPage() {
             <button
               onClick={() => {
                 setShowForm(false)
-                setSelectedFile(null)
-                setPreview(null)
+                clearPreview()
               }}
               className="btn btn-ghost"
             >
