@@ -192,6 +192,14 @@ export default function OnboardingPage() {
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [avatarPreview, setAvatarPreview] = useState<string | null>(profile?.avatar_url ?? null)
 
+  // Revoke the blob URL whenever it changes or the component unmounts, so
+  // reselecting a photo repeatedly doesn't leak memory. profile.avatar_url
+  // is a real remote URL, not a blob one, so revoking it is a harmless no-op.
+  useEffect(() => {
+    return () => {
+      if (avatarPreview?.startsWith('blob:')) URL.revokeObjectURL(avatarPreview)
+    }
+  }, [avatarPreview])
 
   useEffect(() => {
     if (!profile || !isTrainer) return
