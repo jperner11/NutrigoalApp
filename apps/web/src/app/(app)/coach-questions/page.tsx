@@ -9,6 +9,7 @@ import {
   Plus, Pencil, Trash2, Loader2, Check, X, ArrowUp, ArrowDown, ClipboardList,
 } from 'lucide-react'
 import { AppHeroPanel, AppSectionHeader, EmptyStateCard } from '@/components/ui/AppDesign'
+import { reportClientError } from '@/lib/apiClient'
 import type { PersonalTrainerCustomIntakeQuestion } from '@/lib/supabase/types'
 
 const QUESTION_TYPES: { value: PersonalTrainerCustomIntakeQuestion['type']; label: string }[] = [
@@ -47,15 +48,20 @@ export default function CoachQuestionsPage() {
   const [draft, setDraft] = useState<DraftQuestion | null>(null)
 
   const fetchQuestions = useCallback(async () => {
-    const res = await fetch('/api/personal-trainer/custom-intake/questions')
-    const json = await res.json()
-    if (!res.ok) {
-      toast.error(json.error || 'Failed to load questions')
+    try {
+      const res = await fetch('/api/personal-trainer/custom-intake/questions')
+      const json = await res.json()
+      if (!res.ok) {
+        toast.error(json.error || 'Failed to load questions')
+        return
+      }
+      setQuestions(json.questions ?? [])
+    } catch (err) {
+      reportClientError(err, { feature: 'coach-questions', action: 'load-questions' })
+      toast.error('Failed to load questions')
+    } finally {
       setLoading(false)
-      return
     }
-    setQuestions(json.questions ?? [])
-    setLoading(false)
   }, [])
 
   useEffect(() => {
