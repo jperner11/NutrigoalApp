@@ -240,7 +240,7 @@ export default function ClientsPage() {
                     </p>
                   </div>
                 </div>
-                <span className="app-status-pill text-xs" style={{ color: 'var(--warn)' }}>
+                <span className="app-status-pill text-xs" style={{ color: 'var(--warn-text)' }}>
                   Needs plan
                 </span>
               </Link>
@@ -314,10 +314,10 @@ export default function ClientsPage() {
                       {row.client?.email ?? row.invited_email}
                     </p>
                     <div className="mt-2 flex flex-wrap gap-2">
-                      <span className="app-status-pill text-xs" style={{ color: row.hasDietPlan ? 'var(--ok)' : 'var(--warn)' }}>
+                      <span className="app-status-pill text-xs" style={{ color: row.hasDietPlan ? 'var(--ok-text)' : 'var(--warn-text)' }}>
                         {row.hasDietPlan ? 'Diet assigned' : 'Diet needed'}
                       </span>
-                      <span className="app-status-pill text-xs" style={{ color: row.hasTrainingPlan ? 'var(--ok)' : 'var(--warn)' }}>
+                      <span className="app-status-pill text-xs" style={{ color: row.hasTrainingPlan ? 'var(--ok-text)' : 'var(--warn-text)' }}>
                         {row.hasTrainingPlan ? 'Training assigned' : 'Training needed'}
                       </span>
                     </div>
@@ -367,7 +367,7 @@ export default function ClientsPage() {
                         <div className="mt-2 flex flex-wrap gap-3 text-xs text-[var(--fg-4)]">
                           <span>Sent {new Date(invite.last_sent_at).toLocaleDateString('en-GB')}</span>
                           <span>Expires {new Date(invite.expires_at).toLocaleDateString('en-GB')}</span>
-                          <span className={expired ? 'font-semibold text-[var(--warn)]' : ''}>{expired ? 'Needs attention' : 'Awaiting client acceptance'}</span>
+                          <span className={expired ? 'font-semibold text-[var(--warn-text)]' : ''}>{expired ? 'Needs attention' : 'Awaiting client acceptance'}</span>
                         </div>
                       </div>
                     </div>
