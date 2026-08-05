@@ -49,23 +49,28 @@ export default function SupplementsPage() {
     if (!profile) return
     const supabase = createClient()
 
-    const [supRes, logRes] = await Promise.all([
-      supabase
-        .from('user_supplements')
-        .select('*')
-        .eq('user_id', profile.id)
-        .eq('is_active', true)
-        .order('created_at'),
-      supabase
-        .from('supplement_logs')
-        .select('*')
-        .eq('user_id', profile.id)
-        .eq('date', today),
-    ])
+    try {
+      const [supRes, logRes] = await Promise.all([
+        supabase
+          .from('user_supplements')
+          .select('*')
+          .eq('user_id', profile.id)
+          .eq('is_active', true)
+          .order('created_at'),
+        supabase
+          .from('supplement_logs')
+          .select('*')
+          .eq('user_id', profile.id)
+          .eq('date', today),
+      ])
 
-    setSupplements(supRes.data ?? [])
-    setTodayLogs(logRes.data ?? [])
-    setLoading(false)
+      setSupplements(supRes.data ?? [])
+      setTodayLogs(logRes.data ?? [])
+    } catch {
+      toast.error('Failed to load supplements')
+    } finally {
+      setLoading(false)
+    }
   }, [profile, today])
 
   useEffect(() => { load() }, [load])
