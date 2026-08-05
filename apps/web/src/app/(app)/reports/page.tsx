@@ -7,6 +7,7 @@ import { BarChart3, Utensils, Dumbbell, Droplets, TrendingUp, TrendingDown, Minu
 import { generateWeeklyReport } from '@/lib/reports'
 import type { WeeklyReport } from '@/lib/reports'
 import { isTrainerRole } from '@treno/shared'
+import { toast } from 'react-hot-toast'
 
 function getWeekRange(offset: number): { start: string; end: string; label: string } {
   const now = new Date()
@@ -82,27 +83,31 @@ export default function ReportsPage() {
 
   async function loadReport() {
     setLoading(true)
-    if (isTrainerRole(profile!.role)) {
-      const supabase = createClient()
-      const { data } = await supabase
-        .from('beta_events')
-        .select('event_name, created_at, metadata')
-        .eq('user_id', profile!.id)
-        .order('created_at', { ascending: false })
-        .limit(100)
-      setTrainerEvents((data as Array<{ event_name: string; created_at: string; metadata: Record<string, unknown> }>) ?? [])
-      setLoading(false)
-      return
-    }
+    try {
+      if (isTrainerRole(profile!.role)) {
+        const supabase = createClient()
+        const { data } = await supabase
+          .from('beta_events')
+          .select('event_name, created_at, metadata')
+          .eq('user_id', profile!.id)
+          .order('created_at', { ascending: false })
+          .limit(100)
+        setTrainerEvents((data as Array<{ event_name: string; created_at: string; metadata: Record<string, unknown> }>) ?? [])
+        return
+      }
 
-    const { start, end } = getWeekRange(weekOffset)
-    const data = await generateWeeklyReport(profile!.id, start, end, {
-      calories: profile!.daily_calories,
-      protein: profile!.daily_protein,
-      waterMl: profile!.daily_water_ml,
-    })
-    setReport(data)
-    setLoading(false)
+      const { start, end } = getWeekRange(weekOffset)
+      const data = await generateWeeklyReport(profile!.id, start, end, {
+        calories: profile!.daily_calories,
+        protein: profile!.daily_protein,
+        waterMl: profile!.daily_water_ml,
+      })
+      setReport(data)
+    } catch {
+      toast.error('Failed to load report')
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (!profile) return null
