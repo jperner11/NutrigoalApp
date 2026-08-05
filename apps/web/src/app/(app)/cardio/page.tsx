@@ -157,7 +157,7 @@ export default function CardioPage() {
         <div className="card p-10 text-center">
           <div
             className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl"
-            style={{ background: 'var(--ink-3)', color: 'var(--acc)' }}
+            style={{ background: 'var(--ink-3)', color: 'var(--acc-text)' }}
           >
             <Lock className="h-6 w-6" />
           </div>
@@ -272,7 +272,7 @@ export default function CardioPage() {
                           className="mono"
                           style={{
                             fontSize: 9,
-                            color: 'var(--acc)',
+                            color: 'var(--acc-text)',
                             letterSpacing: '0.1em',
                           }}
                         >
