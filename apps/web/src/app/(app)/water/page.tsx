@@ -22,14 +22,20 @@ export default function WaterPage() {
   const loadToday = useCallback(async () => {
     if (!profile) return
     const supabase = createClient()
-    const { data } = await supabase
-      .from('water_logs')
-      .select('amount_ml')
-      .eq('user_id', profile.id)
-      .eq('date', today)
 
-    setTodayTotal(data?.reduce((sum, log) => sum + log.amount_ml, 0) ?? 0)
-    setLoading(false)
+    try {
+      const { data } = await supabase
+        .from('water_logs')
+        .select('amount_ml')
+        .eq('user_id', profile.id)
+        .eq('date', today)
+
+      setTodayTotal(data?.reduce((sum, log) => sum + log.amount_ml, 0) ?? 0)
+    } catch {
+      toast.error('Failed to load water intake')
+    } finally {
+      setLoading(false)
+    }
   }, [profile, today])
 
   useEffect(() => {
