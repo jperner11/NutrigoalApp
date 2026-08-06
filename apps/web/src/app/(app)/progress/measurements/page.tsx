@@ -72,19 +72,22 @@ export default function MeasurementsPage() {
   const loadMeasurements = useCallback(async () => {
     if (!profile) return
     const supabase = createClient()
-    const { data, error } = await supabase
-      .from('body_measurements')
-      .select('*')
-      .eq('user_id', profile.id)
-      .order('date', { ascending: false })
-      .limit(20)
 
-    if (error) {
-      toast.error('Failed to load measurements')
-    } else {
+    try {
+      const { data, error } = await supabase
+        .from('body_measurements')
+        .select('*')
+        .eq('user_id', profile.id)
+        .order('date', { ascending: false })
+        .limit(20)
+
+      if (error) throw error
       setMeasurements(data ?? [])
+    } catch {
+      toast.error('Failed to load measurements')
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }, [profile])
 
   useEffect(() => { loadMeasurements() }, [loadMeasurements])
