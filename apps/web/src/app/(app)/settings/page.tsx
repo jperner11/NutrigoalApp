@@ -113,6 +113,7 @@ function ChipSelect({ options, selected, onChange, label }: {
           <button
             key={opt}
             type="button"
+            aria-pressed={selected.includes(opt)}
             onClick={() => onChange(
               selected.includes(opt) ? selected.filter(s => s !== opt) : [...selected, opt]
             )}
@@ -1129,6 +1130,7 @@ export default function SettingsPage() {
                   <button
                     key={s.value}
                     type="button"
+                    aria-pressed={form.training_style.includes(s.value)}
                     onClick={() => set('training_style',
                       form.training_style.includes(s.value)
                         ? form.training_style.filter(v => v !== s.value)
@@ -1154,6 +1156,7 @@ export default function SettingsPage() {
                   <button
                     key={r.value}
                     type="button"
+                    aria-pressed={form.dietary_restrictions.includes(r.value)}
                     onClick={() => set('dietary_restrictions',
                       form.dietary_restrictions.includes(r.value)
                         ? form.dietary_restrictions.filter(v => v !== r.value)
