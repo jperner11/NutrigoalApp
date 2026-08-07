@@ -91,18 +91,21 @@ export default function ProgressPage() {
   const loadLogs = useCallback(async () => {
     if (!profile) return
     const supabase = createClient()
-    const { data, error } = await supabase
-      .from('weight_logs')
-      .select('*')
-      .eq('user_id', profile.id)
-      .order('date', { ascending: true })
 
-    if (error) {
+    try {
+      const { data, error } = await supabase
+        .from('weight_logs')
+        .select('*')
+        .eq('user_id', profile.id)
+        .order('date', { ascending: true })
+
+      if (error) throw error
+      setLogs(data ?? [])
+    } catch {
       toast.error('Failed to load weight logs')
-      return
+    } finally {
+      setLoading(false)
     }
-    setLogs(data ?? [])
-    setLoading(false)
   }, [profile])
 
   useEffect(() => { loadLogs() }, [loadLogs])
