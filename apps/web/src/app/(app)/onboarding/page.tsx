@@ -1979,7 +1979,7 @@ export default function OnboardingPage() {
 
       <div
         className="eyebrow mb-4"
-        style={{ color: 'var(--acc)' }}
+        style={{ color: 'var(--acc-text)' }}
       >
         {isTrainer ? 'YOUR COACHING PROFILE' : "LET'S MEET YOU"} · {String(step + 1).padStart(2, '0')} / {String(steps.length).padStart(2, '0')}
       </div>
