@@ -44,15 +44,22 @@ export default function PhotosPage() {
   const loadPhotos = useCallback(async () => {
     if (!profile) return
     const supabase = createClient()
-    const { data } = await supabase
-      .from('progress_photos')
-      .select('*')
-      .eq('user_id', profile.id)
-      .order('date', { ascending: false })
-      .limit(50)
 
-    setPhotos(data ?? [])
-    setLoading(false)
+    try {
+      const { data, error } = await supabase
+        .from('progress_photos')
+        .select('*')
+        .eq('user_id', profile.id)
+        .order('date', { ascending: false })
+        .limit(50)
+
+      if (error) throw error
+      setPhotos(data ?? [])
+    } catch {
+      toast.error('Failed to load photos')
+    } finally {
+      setLoading(false)
+    }
   }, [profile])
 
   useEffect(() => { loadPhotos() }, [loadPhotos])
