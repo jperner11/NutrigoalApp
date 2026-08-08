@@ -90,6 +90,8 @@ export function BaseClientIntakePreview({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        aria-controls="base-intake-categories"
         className="w-full flex items-start gap-3 px-5 py-4 text-left"
       >
         <Info className="h-5 w-5 text-indigo-600 flex-shrink-0 mt-0.5" />
@@ -111,7 +113,10 @@ export function BaseClientIntakePreview({
       </button>
 
       {open && (
-        <div className="px-5 pb-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div
+          id="base-intake-categories"
+          className="px-5 pb-5 grid grid-cols-1 md:grid-cols-2 gap-4"
+        >
           {BASE_INTAKE_CATEGORIES.map((cat) => (
             <div
               key={cat.title}
