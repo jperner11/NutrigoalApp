@@ -367,7 +367,7 @@ export default function MealPlanTracker({ userId, userRole = 'free', onMacrosUpd
                       style={{
                         borderColor: isEaten ? 'var(--acc)' : 'var(--line-2)',
                         background: isEaten ? 'var(--acc)' : 'var(--ink-2)',
-                        color: isEaten ? 'var(--ink-1)' : 'var(--fg-3)',
+                        color: isEaten ? '#0a0a0a' : 'var(--fg-3)',
                       }}
                       aria-label={isEaten ? `Unmark ${meal.meal_name}` : `Mark ${meal.meal_name} eaten`}
                     >
