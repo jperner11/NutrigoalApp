@@ -48,27 +48,35 @@ export default function CardioPage() {
     const supabase = createClient()
 
     async function load() {
-      const [{ data: types }, { data: sessionsData }] = await Promise.all([
-        supabase.from('cardio_types').select('*').order('name'),
-        supabase
-          .from('cardio_sessions')
-          .select('*, cardio_types(*)')
-          .eq('user_id', profile!.id)
-          .order('date', { ascending: false })
-          .limit(20),
-      ])
+      try {
+        const [{ data: types, error: typesError }, { data: sessionsData, error: sessionsError }] = await Promise.all([
+          supabase.from('cardio_types').select('*').order('name'),
+          supabase
+            .from('cardio_sessions')
+            .select('*, cardio_types(*)')
+            .eq('user_id', profile!.id)
+            .order('date', { ascending: false })
+            .limit(20),
+        ])
 
-      setCardioTypes(types ?? [])
-      if (types?.length) {
-        setFormData(prev => ({ ...prev, cardio_type_id: types[0].id }))
+        if (typesError) throw typesError
+        if (sessionsError) throw sessionsError
+
+        setCardioTypes(types ?? [])
+        if (types?.length) {
+          setFormData(prev => ({ ...prev, cardio_type_id: types[0].id }))
+        }
+
+        const mapped = (sessionsData ?? []).map((s) => ({
+          ...s,
+          cardio_type: s.cardio_types as unknown as CardioType,
+        }))
+        setSessions(mapped)
+      } catch {
+        toast.error('Failed to load cardio data')
+      } finally {
+        setLoading(false)
       }
-
-      const mapped = (sessionsData ?? []).map((s) => ({
-        ...s,
-        cardio_type: s.cardio_types as unknown as CardioType,
-      }))
-      setSessions(mapped)
-      setLoading(false)
     }
 
     load()
