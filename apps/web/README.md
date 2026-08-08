@@ -65,10 +65,8 @@ STRIPE_SECRET_KEY=your_stripe_secret
 
 ### Database
 
-Run the migrations in your Supabase SQL Editor in order:
-
-1. `supabase/migrations/001_initial_schema.sql` — core tables, RLS policies, seed data
-2. `supabase/migrations/002_add_meal_log_plan_reference.sql` — links meal logs to diet plan meals
+Run every file in `supabase/migrations/` against your Supabase project, in
+filename (numeric prefix) order, via the Supabase SQL Editor or CLI.
 
 ### Run
 
