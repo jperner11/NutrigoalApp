@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Dumbbell, Play, CheckCircle2 } from 'lucide-react'
 import Link from 'next/link'
 import { reportClientError } from '@/lib/apiClient'
+import { getMondayIndexedDay } from '@/lib/date'
 
 interface TodayTrainingPreviewProps {
   userId: string
@@ -64,9 +65,7 @@ export default function TodayTrainingPreview({ userId }: TodayTrainingPreviewPro
 
         // Determine which day to show: use day of week mapped to plan days
         // Simple approach: use (dayOfWeek % daysPerWeek) to cycle through plan days
-        const dayOfWeek = new Date().getDay() // 0=Sun, 1=Mon...
-        // Map Mon=0, Tue=1... Sun=6 for training
-        const trainingDayIndex = dayOfWeek === 0 ? 6 : dayOfWeek - 1
+        const trainingDayIndex = getMondayIndexedDay()
         const todayPlanDay = days[trainingDayIndex % days.length]
 
         // Check if today's workout is already completed

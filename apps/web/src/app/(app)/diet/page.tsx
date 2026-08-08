@@ -11,6 +11,7 @@ import Link from 'next/link'
 import type { DietPlan, DietPlanMeal } from '@/lib/supabase/types'
 import { AppHeroPanel, AppSectionHeader, EmptyStateCard, ListCard } from '@/components/ui/AppDesign'
 import { isManagedClientRole } from '@treno/shared'
+import { getMondayIndexedDay } from '@/lib/date'
 
 const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const
 
@@ -70,7 +71,7 @@ function formatMacros(calories: number | null | undefined, protein: number | nul
 }
 
 function getTodayIndex() {
-  return (new Date().getDay() + 6) % 7
+  return getMondayIndexedDay()
 }
 
 function getDayMeals(meals: DietPlanMeal[], dayIndex: number) {
