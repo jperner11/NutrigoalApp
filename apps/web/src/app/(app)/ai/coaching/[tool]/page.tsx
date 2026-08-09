@@ -196,7 +196,7 @@ export default function CoachingToolPage() {
           <div className="row mb-6 items-start gap-4">
             <div
               className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
-              style={{ background: 'var(--ink-3)', color: 'var(--acc)' }}
+              style={{ background: 'var(--ink-3)', color: 'var(--acc-text)' }}
             >
               <Icon className="h-6 w-6" />
             </div>
@@ -275,7 +275,7 @@ export default function CoachingToolPage() {
             <div className="mt-6">
               <div className="card-2 p-5">
                 <div className="row gap-2">
-                  <Sparkles className="h-4 w-4" style={{ color: 'var(--acc)' }} />
+                  <Sparkles className="h-4 w-4" style={{ color: 'var(--acc-text)' }} />
                   <div
                     className="mono"
                     style={{ fontSize: 10, color: 'var(--fg-4)', letterSpacing: '0.12em' }}
