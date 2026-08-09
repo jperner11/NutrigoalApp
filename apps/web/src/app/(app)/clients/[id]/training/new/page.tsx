@@ -59,7 +59,10 @@ export default function NewClientTrainingPlanPage() {
       if (clientRes.data) setClient(clientRes.data as UserProfile)
       if (exRes.data) setExercises(exRes.data as Exercise[])
       setLoadingExercises(false)
-    }).catch(() => setLoadingExercises(false))
+    }).catch(() => {
+      setLoadError('Failed to load client. Please refresh.')
+      setLoadingExercises(false)
+    })
   }, [profile, id, router])
 
   const filteredExercises = useMemo(() => {
