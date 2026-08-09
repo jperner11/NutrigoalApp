@@ -56,41 +56,46 @@ export default function ClientDetailPage() {
     const trainerId = profile.id
     const supabase = createClient()
     async function load() {
-      const [clientRes, dietRes, trainingRes, mealLogRes, workoutLogRes, weightRes, feedbackRes, conversationRes, customResponseRes] = await Promise.all([
-        supabase.from('user_profiles').select('*').eq('id', id).single(),
-        supabase.from('diet_plans').select('*').eq('user_id', id).order('created_at', { ascending: false }),
-        supabase.from('training_plans').select('*').eq('user_id', id).order('created_at', { ascending: false }),
-        supabase.from('meal_logs').select('date').eq('user_id', id).order('date', { ascending: false }).limit(1),
-        supabase.from('workout_logs').select('date').eq('user_id', id).order('date', { ascending: false }).limit(1),
-        supabase.from('weight_logs').select('weight_kg, date').eq('user_id', id).order('date', { ascending: false }).limit(1),
-        supabase.from('feedback_requests').select('id', { count: 'exact', head: true }).eq('nutritionist_id', trainerId).eq('client_id', id).eq('status', 'pending'),
-        supabase.from('conversations').select('id').eq('nutritionist_id', trainerId).eq('client_id', id).maybeSingle(),
-        supabase.from('personal_trainer_custom_intake_responses').select('id, response_text, response_json, question:question_id(label)').eq('trainer_id', trainerId).eq('client_id', id),
-      ])
-      if (clientRes.data) setClient(clientRes.data as UserProfile)
-      if (dietRes.data) setDietPlans(dietRes.data as DietPlan[])
-      if (trainingRes.data) setTrainingPlans(trainingRes.data as TrainingPlan[])
-      setCustomResponses((customResponseRes.data as CustomIntakeResponseRow[] | null) ?? [])
+      try {
+        const [clientRes, dietRes, trainingRes, mealLogRes, workoutLogRes, weightRes, feedbackRes, conversationRes, customResponseRes] = await Promise.all([
+          supabase.from('user_profiles').select('*').eq('id', id).single(),
+          supabase.from('diet_plans').select('*').eq('user_id', id).order('created_at', { ascending: false }),
+          supabase.from('training_plans').select('*').eq('user_id', id).order('created_at', { ascending: false }),
+          supabase.from('meal_logs').select('date').eq('user_id', id).order('date', { ascending: false }).limit(1),
+          supabase.from('workout_logs').select('date').eq('user_id', id).order('date', { ascending: false }).limit(1),
+          supabase.from('weight_logs').select('weight_kg, date').eq('user_id', id).order('date', { ascending: false }).limit(1),
+          supabase.from('feedback_requests').select('id', { count: 'exact', head: true }).eq('nutritionist_id', trainerId).eq('client_id', id).eq('status', 'pending'),
+          supabase.from('conversations').select('id').eq('nutritionist_id', trainerId).eq('client_id', id).maybeSingle(),
+          supabase.from('personal_trainer_custom_intake_responses').select('id, response_text, response_json, question:question_id(label)').eq('trainer_id', trainerId).eq('client_id', id),
+        ])
+        if (clientRes.data) setClient(clientRes.data as UserProfile)
+        if (dietRes.data) setDietPlans(dietRes.data as DietPlan[])
+        if (trainingRes.data) setTrainingPlans(trainingRes.data as TrainingPlan[])
+        setCustomResponses((customResponseRes.data as CustomIntakeResponseRow[] | null) ?? [])
 
-      let unreadMessageCount = 0
-      if (conversationRes.data?.id) {
-        const { count } = await supabase
-          .from('messages')
-          .select('*', { count: 'exact', head: true })
-          .eq('conversation_id', conversationRes.data.id)
-          .neq('sender_id', trainerId)
-          .is('read_at', null)
-        unreadMessageCount = count ?? 0
+        let unreadMessageCount = 0
+        if (conversationRes.data?.id) {
+          const { count } = await supabase
+            .from('messages')
+            .select('*', { count: 'exact', head: true })
+            .eq('conversation_id', conversationRes.data.id)
+            .neq('sender_id', trainerId)
+            .is('read_at', null)
+          unreadMessageCount = count ?? 0
+        }
+
+        setOverview({
+          lastMealDate: mealLogRes.data?.[0]?.date ?? null,
+          lastWorkoutDate: workoutLogRes.data?.[0]?.date ?? null,
+          latestWeight: weightRes.data?.[0]?.weight_kg ?? null,
+          pendingFeedbackCount: feedbackRes.count ?? 0,
+          unreadMessageCount,
+        })
+      } catch {
+        toast.error('Failed to load client data')
+      } finally {
+        setLoading(false)
       }
-
-      setOverview({
-        lastMealDate: mealLogRes.data?.[0]?.date ?? null,
-        lastWorkoutDate: workoutLogRes.data?.[0]?.date ?? null,
-        latestWeight: weightRes.data?.[0]?.weight_kg ?? null,
-        pendingFeedbackCount: feedbackRes.count ?? 0,
-        unreadMessageCount,
-      })
-      setLoading(false)
     }
     load()
   }, [profile, id, router])
