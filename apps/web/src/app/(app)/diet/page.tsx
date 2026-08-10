@@ -233,7 +233,7 @@ export default function DietPage() {
                           className="mono"
                           style={{
                             fontSize: 11,
-                            color: isToday ? 'var(--acc)' : 'var(--fg-3)',
+                            color: isToday ? 'var(--acc-text)' : 'var(--fg-3)',
                             letterSpacing: '0.12em',
                           }}
                         >
@@ -268,7 +268,7 @@ export default function DietPage() {
                   className="mono"
                   style={{ fontSize: 10, color: 'var(--fg-4)', letterSpacing: '0.12em' }}
                 >
-                  <span style={{ color: 'var(--acc)', marginRight: 6 }}>✦</span>
+                  <span style={{ color: 'var(--acc-text)', marginRight: 6 }}>✦</span>
                   GROCERY
                 </div>
                 <div className="col mt-4 gap-3">
@@ -295,7 +295,7 @@ export default function DietPage() {
                   className="mono"
                   style={{ fontSize: 10, color: 'var(--fg-4)', letterSpacing: '0.12em' }}
                 >
-                  <span style={{ color: 'var(--acc)', marginRight: 6 }}>✦</span>
+                  <span style={{ color: 'var(--acc-text)', marginRight: 6 }}>✦</span>
                   PLAN LIBRARY
                 </div>
                 <div className="col mt-4 gap-2">
