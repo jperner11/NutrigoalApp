@@ -35,6 +35,8 @@ export default function FeedbackPage() {
       setSent(true)
       setMessage('')
       toast.success('Feedback sent — thank you!')
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to send feedback. Please try again.')
     } finally {
       setIsSending(false)
     }
