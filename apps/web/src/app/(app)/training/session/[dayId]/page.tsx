@@ -109,97 +109,105 @@ export default function WorkoutSessionPage() {
     async function loadSession() {
       const supabase = createClient()
 
-      // Fetch day info
-      const { data: dayData } = await supabase
-        .from('training_plan_days')
-        .select('*')
-        .eq('id', dayId)
-        .single()
+      try {
+        // Fetch day info
+        const { data: dayData, error: dayError } = await supabase
+          .from('training_plan_days')
+          .select('*')
+          .eq('id', dayId)
+          .single()
 
-      if (dayData) {
-        setDayName(dayData.name)
-      }
-
-      // Fetch exercises for this day
-      const { data: planExercises } = await supabase
-        .from('training_plan_exercises')
-        .select('*, exercises(*)')
-        .eq('plan_day_id', dayId)
-        .order('order_index')
-
-      if (!planExercises || planExercises.length === 0) {
-        setLoading(false)
-        return
-      }
-
-      // Fetch last workout log for this plan day
-      const { data: lastLogs } = await supabase
-        .from('workout_logs')
-        .select('*')
-        .eq('plan_day_id', dayId)
-        .eq('user_id', profile!.id)
-        .order('date', { ascending: false })
-        .limit(1)
-
-      const lastLog = lastLogs && lastLogs.length > 0 ? lastLogs[0] : null
-      const lastExercises: WorkoutExerciseLog[] = lastLog?.exercises ?? []
-
-      let hasOverloadSuggestion = false
-
-      const sessionExercises: SessionExercise[] = planExercises.map((pe: PlanExerciseRow) => {
-        const exercise = pe.exercises
-        const targetReps = pe.reps || '8-12'
-        const restSeconds = pe.rest_seconds ?? 90
-        const isCompound = exercise?.is_compound ?? false
-        const targetSets = pe.sets || 3
-
-        // Find last session data for this exercise
-        const lastExData = lastExercises.find(
-          (le: WorkoutExerciseLog) => le.exercise_id === pe.exercise_id
-        )
-        const lastSets: WorkoutSetLog[] = lastExData?.sets ?? []
-
-        // Calculate progressive overload suggestion
-        const suggestion = calculateSuggestion(lastSets, targetReps, isCompound)
-        if (suggestion && suggestion.suggestedWeight !== (lastSets[0]?.weight_kg ?? 0)) {
-          hasOverloadSuggestion = true
+        if (dayError) throw dayError
+        if (dayData) {
+          setDayName(dayData.name)
         }
 
-        const { min: repMin } = parseRepRange(targetReps)
+        // Fetch exercises for this day
+        const { data: planExercises, error: exercisesError } = await supabase
+          .from('training_plan_exercises')
+          .select('*, exercises(*)')
+          .eq('plan_day_id', dayId)
+          .order('order_index')
 
-        const sets: SessionSet[] = Array.from({ length: targetSets }, (_, i) => {
-          const lastSet = lastSets[i]
-          const prefillWeight = suggestion
-            ? suggestion.suggestedWeight
-            : lastSet?.weight_kg ?? 0
-          const prefillReps = lastSet?.reps ?? repMin
+        if (exercisesError) throw exercisesError
+        if (!planExercises || planExercises.length === 0) {
+          return
+        }
+
+        // Fetch last workout log for this plan day
+        const { data: lastLogs, error: logsError } = await supabase
+          .from('workout_logs')
+          .select('*')
+          .eq('plan_day_id', dayId)
+          .eq('user_id', profile!.id)
+          .order('date', { ascending: false })
+          .limit(1)
+
+        if (logsError) throw logsError
+
+        const lastLog = lastLogs && lastLogs.length > 0 ? lastLogs[0] : null
+        const lastExercises: WorkoutExerciseLog[] = lastLog?.exercises ?? []
+
+        let hasOverloadSuggestion = false
+
+        const sessionExercises: SessionExercise[] = planExercises.map((pe: PlanExerciseRow) => {
+          const exercise = pe.exercises
+          const targetReps = pe.reps || '8-12'
+          const restSeconds = pe.rest_seconds ?? 90
+          const isCompound = exercise?.is_compound ?? false
+          const targetSets = pe.sets || 3
+
+          // Find last session data for this exercise
+          const lastExData = lastExercises.find(
+            (le: WorkoutExerciseLog) => le.exercise_id === pe.exercise_id
+          )
+          const lastSets: WorkoutSetLog[] = lastExData?.sets ?? []
+
+          // Calculate progressive overload suggestion
+          const suggestion = calculateSuggestion(lastSets, targetReps, isCompound)
+          if (suggestion && suggestion.suggestedWeight !== (lastSets[0]?.weight_kg ?? 0)) {
+            hasOverloadSuggestion = true
+          }
+
+          const { min: repMin } = parseRepRange(targetReps)
+
+          const sets: SessionSet[] = Array.from({ length: targetSets }, (_, i) => {
+            const lastSet = lastSets[i]
+            const prefillWeight = suggestion
+              ? suggestion.suggestedWeight
+              : lastSet?.weight_kg ?? 0
+            const prefillReps = lastSet?.reps ?? repMin
+
+            return {
+              set_number: i + 1,
+              weight_kg: prefillWeight,
+              reps: prefillReps,
+              completed: false,
+              suggestedWeight: suggestion?.suggestedWeight ?? null,
+              suggestedReason: suggestion?.reason ?? null,
+            }
+          })
 
           return {
-            set_number: i + 1,
-            weight_kg: prefillWeight,
-            reps: prefillReps,
-            completed: false,
-            suggestedWeight: suggestion?.suggestedWeight ?? null,
-            suggestedReason: suggestion?.reason ?? null,
+            exercise_id: pe.exercise_id,
+            exercise_name: exercise?.name ?? 'Unknown Exercise',
+            body_part: exercise?.body_part ?? 'full_body',
+            equipment: exercise?.equipment ?? 'bodyweight',
+            targetSets,
+            targetReps,
+            restSeconds,
+            isCompound,
+            sets,
           }
         })
 
-        return {
-          exercise_id: pe.exercise_id,
-          exercise_name: exercise?.name ?? 'Unknown Exercise',
-          body_part: exercise?.body_part ?? 'full_body',
-          equipment: exercise?.equipment ?? 'bodyweight',
-          targetSets,
-          targetReps,
-          restSeconds,
-          isCompound,
-          sets,
-        }
-      })
-
-      setExercises(sessionExercises)
-      setShowOverloadBanner(hasOverloadSuggestion)
-      setLoading(false)
+        setExercises(sessionExercises)
+        setShowOverloadBanner(hasOverloadSuggestion)
+      } catch {
+        toast.error('Failed to load workout session')
+      } finally {
+        setLoading(false)
+      }
     }
 
     loadSession()
