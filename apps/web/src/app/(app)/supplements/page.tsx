@@ -365,8 +365,7 @@ export default function SupplementsPage() {
             return (
               <div
                 key={sup.id}
-                className="card-flat overflow-hidden transition hover:border-[var(--line-strong)]"
-                style={isTaken ? { borderColor: 'rgba(26, 163, 122, 0.42)', background: 'rgba(26, 163, 122, 0.08)' } : undefined}
+                className={`card-flat overflow-hidden transition ${isTaken ? 'border-[var(--ok)] bg-[var(--success-bg)]' : 'hover:border-[var(--line-strong)]'}`}
               >
                 <div className="flex items-center p-4">
                   <button
