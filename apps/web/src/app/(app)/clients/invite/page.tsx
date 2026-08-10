@@ -105,7 +105,7 @@ export default function InviteClientPage() {
           </div>
         </div>
 
-        <div className="mb-6 rounded-2xl border border-sky-100 bg-sky-50 px-4 py-3 text-sm leading-6 text-slate-700">
+        <div className="mb-6 rounded-2xl border border-[var(--line)] bg-[var(--panel-strong)] px-4 py-3 text-sm leading-6 text-[var(--muted)]">
           We&apos;ll send a secure invite link. Existing members receive a join request and new clients will be asked to create their account before accepting.
         </div>
 
