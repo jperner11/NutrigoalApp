@@ -232,7 +232,7 @@ export default function DietPage() {
                           className="mono"
                           style={{
                             fontSize: 11,
-                            color: isToday ? 'var(--acc)' : 'var(--fg-3)',
+                            color: isToday ? 'var(--acc-text)' : 'var(--fg-3)',
                             letterSpacing: '0.12em',
                           }}
                         >
@@ -267,7 +267,7 @@ export default function DietPage() {
                   className="mono"
                   style={{ fontSize: 10, color: 'var(--fg-4)', letterSpacing: '0.12em' }}
                 >
-                  <span style={{ color: 'var(--acc)', marginRight: 6 }}>✦</span>
+                  <span style={{ color: 'var(--acc-text)', marginRight: 6 }}>✦</span>
                   GROCERY
                 </div>
                 <div className="col mt-4 gap-3">
@@ -294,7 +294,7 @@ export default function DietPage() {
                   className="mono"
                   style={{ fontSize: 10, color: 'var(--fg-4)', letterSpacing: '0.12em' }}
                 >
-                  <span style={{ color: 'var(--acc)', marginRight: 6 }}>✦</span>
+                  <span style={{ color: 'var(--acc-text)', marginRight: 6 }}>✦</span>
                   PLAN LIBRARY
                 </div>
                 <div className="col mt-4 gap-2">
@@ -314,7 +314,7 @@ export default function DietPage() {
                         </div>
                         <div className="row shrink-0 gap-1">
                           {plan.created_by !== profile?.id && <span className="chip">FROM PT</span>}
-                          {plan.is_active && <span className="chip" style={{ color: 'var(--acc)' }}>ACTIVE</span>}
+                          {plan.is_active && <span className="chip" style={{ color: 'var(--acc-text)' }}>ACTIVE</span>}
                         </div>
                       </div>
                     </Link>
@@ -358,7 +358,7 @@ export default function DietPage() {
                       </div>
                     </div>
                     {companion.calorie_warning && (
-                      <div className="card-2 p-3" style={{ color: 'var(--warn)', fontSize: 13, lineHeight: 1.55 }}>
+                      <div className="card-2 p-3" style={{ color: 'var(--warn-text)', fontSize: 13, lineHeight: 1.55 }}>
                         {companion.calorie_warning}
                       </div>
                     )}
@@ -474,7 +474,7 @@ export default function DietPage() {
                                   {swap.current}
                                 </span>
                                 <span style={{ color: 'var(--fg-4)' }}> -&gt; </span>
-                                <span style={{ color: 'var(--ok)' }}>{swap.swap}</span>
+                                <span style={{ color: 'var(--ok-text)' }}>{swap.swap}</span>
                                 <span className="mono ml-2" style={{ fontSize: 10, color: 'var(--fg-4)' }}>
                                   ~{swap.calories} cal
                                 </span>
