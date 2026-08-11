@@ -40,6 +40,7 @@ export default function PhotosPage() {
   const [uploading, setUploading] = useState(false)
   const [lightbox, setLightbox] = useState<ProgressPhoto | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const lightboxCloseRef = useRef<HTMLButtonElement>(null)
 
   const loadPhotos = useCallback(async () => {
     if (!profile) return
@@ -161,6 +162,21 @@ export default function PhotosPage() {
   function prevPhoto() {
     if (lightboxIndex > 0) setLightbox(photos[lightboxIndex - 1])
   }
+
+  useEffect(() => {
+    if (!lightbox) return
+    lightboxCloseRef.current?.focus()
+
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') setLightbox(null)
+      if (e.key === 'ArrowLeft') prevPhoto()
+      if (e.key === 'ArrowRight') nextPhoto()
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lightbox])
 
   if (loading) {
     return (
@@ -464,8 +480,12 @@ export default function PhotosPage() {
           className="fixed inset-0 z-50 flex items-center justify-center"
           style={{ background: 'rgba(19, 16, 18, 0.92)', backdropFilter: 'blur(6px)' }}
           onClick={() => setLightbox(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${lightbox.pose} photo from ${lightbox.date}`}
         >
           <button
+            ref={lightboxCloseRef}
             onClick={() => setLightbox(null)}
             className="absolute right-4 top-4 p-2 transition"
             style={{ color: 'rgba(245, 241, 234, 0.7)' }}
