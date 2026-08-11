@@ -121,19 +121,25 @@ export default function CardioPage() {
 
     toast.success(`Logged ${formData.duration_minutes} min of ${selectedType.name} — ${caloriesBurned} cal burned.`)
 
-    const { data } = await supabase
-      .from('cardio_sessions')
-      .select('*, cardio_types(*)')
-      .eq('user_id', profile.id)
-      .order('date', { ascending: false })
-      .limit(20)
+    try {
+      const { data, error: refetchError } = await supabase
+        .from('cardio_sessions')
+        .select('*, cardio_types(*)')
+        .eq('user_id', profile.id)
+        .order('date', { ascending: false })
+        .limit(20)
 
-    setSessions(
-      (data ?? []).map((s) => ({
-        ...s,
-        cardio_type: s.cardio_types as unknown as CardioType,
-      }))
-    )
+      if (refetchError) throw refetchError
+
+      setSessions(
+        (data ?? []).map((s) => ({
+          ...s,
+          cardio_type: s.cardio_types as unknown as CardioType,
+        }))
+      )
+    } catch {
+      toast.error('Session logged, but the list failed to refresh — reload to see it.')
+    }
 
     setFormData(prev => ({
       ...prev,
