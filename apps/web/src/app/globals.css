@@ -623,6 +623,17 @@ main {
   border: 1px solid var(--line-strong);
 }
 
+.btn.btn-danger {
+  background: var(--danger-bg);
+  color: var(--danger-text);
+  border: 1px solid var(--danger);
+}
+
+.btn.btn-danger:hover {
+  background: var(--danger);
+  color: #fff;
+}
+
 .btn-ghost {
   background: transparent;
   border: 1px solid var(--line-2);
