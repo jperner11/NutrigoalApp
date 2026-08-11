@@ -15,6 +15,7 @@ import type {
   FeedbackSchedule, FeedbackQuestionType, UserProfile, CheckInRecurrence,
 } from '@/lib/supabase/types'
 import { isTrainerRole } from '@treno/shared'
+import { reportClientError } from '@/lib/apiClient'
 
 const QUESTION_TYPES: { value: FeedbackQuestionType; label: string }[] = [
   { value: 'text', label: 'Text' },
@@ -63,17 +64,23 @@ export default function ClientFeedbackPage() {
   async function loadAll() {
     if (!profile) return
     const supabase = createClient()
-    const [clientRes, feedbackRes, templateRes, scheduleRes] = await Promise.all([
-      supabase.from('user_profiles').select('*').eq('id', id).single(),
-      supabase.from('feedback_requests').select('*').eq('nutritionist_id', profile.id).eq('client_id', id).order('created_at', { ascending: false }),
-      supabase.from('feedback_templates').select('*').eq('trainer_id', profile.id).order('created_at', { ascending: false }),
-      supabase.from('feedback_schedules').select('*, template:template_id(*)').eq('trainer_id', profile.id).eq('client_id', id).maybeSingle(),
-    ])
-    if (clientRes.data) setClient(clientRes.data as UserProfile)
-    if (feedbackRes.data) setRequests(feedbackRes.data as FeedbackRequest[])
-    if (templateRes.data) setTemplates(templateRes.data as FeedbackTemplate[])
-    setSchedule(scheduleRes.data as (FeedbackSchedule & { template?: FeedbackTemplate }) | null)
-    setLoading(false)
+    try {
+      const [clientRes, feedbackRes, templateRes, scheduleRes] = await Promise.all([
+        supabase.from('user_profiles').select('*').eq('id', id).single(),
+        supabase.from('feedback_requests').select('*').eq('nutritionist_id', profile.id).eq('client_id', id).order('created_at', { ascending: false }),
+        supabase.from('feedback_templates').select('*').eq('trainer_id', profile.id).order('created_at', { ascending: false }),
+        supabase.from('feedback_schedules').select('*, template:template_id(*)').eq('trainer_id', profile.id).eq('client_id', id).maybeSingle(),
+      ])
+      if (clientRes.data) setClient(clientRes.data as UserProfile)
+      if (feedbackRes.data) setRequests(feedbackRes.data as FeedbackRequest[])
+      if (templateRes.data) setTemplates(templateRes.data as FeedbackTemplate[])
+      setSchedule(scheduleRes.data as (FeedbackSchedule & { template?: FeedbackTemplate }) | null)
+    } catch (err) {
+      reportClientError(err, { feature: 'clients/[id]/feedback', action: 'load-all' })
+      toast.error('Failed to load check-ins')
+    } finally {
+      setLoading(false)
+    }
   }
 
   function addQuestion(type: FeedbackQuestionType) {
