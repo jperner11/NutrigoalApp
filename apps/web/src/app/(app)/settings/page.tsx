@@ -1940,7 +1940,7 @@ export default function SettingsPage() {
                       type="button"
                       onClick={handleDeleteAccount}
                       disabled={deleteConfirmText !== 'DELETE' || deleting}
-                      className="btn btn-accent disabled:opacity-50"
+                      className="btn btn-danger disabled:opacity-50"
                     >
                       <Trash2 className="h-4 w-4" />
                       <span>{deleting ? 'Deleting...' : 'Permanently Delete'}</span>
