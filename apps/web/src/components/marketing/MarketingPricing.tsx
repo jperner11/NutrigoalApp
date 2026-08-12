@@ -1,8 +1,6 @@
 import Link from 'next/link'
 import { PRICING } from '@/lib/constants'
-
-const formatPrice = (price: number) =>
-  price === 0 ? '$0' : `$${price.toFixed(price % 1 === 0 ? 0 : 2)}`
+import { formatPrice } from '@/lib/format'
 
 const tiers = [
   {

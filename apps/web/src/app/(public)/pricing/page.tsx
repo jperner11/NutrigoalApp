@@ -8,15 +8,13 @@ import MarketingNav from '@/components/marketing/MarketingNav'
 import PublicFooter from '@/components/marketing/PublicFooter'
 import { PRICING } from '@/lib/constants'
 import { apiFetch, ApiError } from '@/lib/apiClient'
+import { formatPrice } from '@/lib/format'
 import {
   CHECKOUT_INTENT_STORAGE_KEY,
   type CheckoutIntentPlan,
   getCheckoutSignupHref,
   parseCheckoutIntent,
 } from '@/lib/checkoutIntent'
-
-const formatPrice = (price: number) =>
-  price === 0 ? '$0' : `$${price.toFixed(price % 1 === 0 ? 0 : 2)}`
 
 const tiers = [
   {
