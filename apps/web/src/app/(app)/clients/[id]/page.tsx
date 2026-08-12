@@ -358,26 +358,26 @@ function EditableMacros({ client, onUpdated }: { client: UserProfile; onUpdated:
       </div>
       <div className="grid grid-cols-4 gap-3">
         <div>
-          <label className="app-mono-label mb-1 block">Calories</label>
-          <input type="number" value={calories} onChange={e => setCalories(e.target.value)}
+          <label htmlFor="client-macro-calories" className="app-mono-label mb-1 block">Calories</label>
+          <input id="client-macro-calories" type="number" value={calories} onChange={e => setCalories(e.target.value)}
             className="input-field px-3 py-2 text-sm"
             placeholder="kcal" />
         </div>
         <div>
-          <label className="app-mono-label mb-1 block">Protein</label>
-          <input type="number" value={protein} onChange={e => setProtein(e.target.value)}
+          <label htmlFor="client-macro-protein" className="app-mono-label mb-1 block">Protein</label>
+          <input id="client-macro-protein" type="number" value={protein} onChange={e => setProtein(e.target.value)}
             className="input-field px-3 py-2 text-sm"
             placeholder="g" />
         </div>
         <div>
-          <label className="app-mono-label mb-1 block">Carbs</label>
-          <input type="number" value={carbs} onChange={e => setCarbs(e.target.value)}
+          <label htmlFor="client-macro-carbs" className="app-mono-label mb-1 block">Carbs</label>
+          <input id="client-macro-carbs" type="number" value={carbs} onChange={e => setCarbs(e.target.value)}
             className="input-field px-3 py-2 text-sm"
             placeholder="g" />
         </div>
         <div>
-          <label className="app-mono-label mb-1 block">Fat</label>
-          <input type="number" value={fat} onChange={e => setFat(e.target.value)}
+          <label htmlFor="client-macro-fat" className="app-mono-label mb-1 block">Fat</label>
+          <input id="client-macro-fat" type="number" value={fat} onChange={e => setFat(e.target.value)}
             className="input-field px-3 py-2 text-sm"
             placeholder="g" />
         </div>
