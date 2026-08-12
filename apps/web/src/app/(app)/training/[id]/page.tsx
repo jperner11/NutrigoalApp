@@ -54,70 +54,79 @@ export default function TrainingPlanDetailPage() {
     if (!profile || !params.id) return
     const supabase = createClient()
 
-    const { data: planData, error: planError } = await supabase
-      .from('training_plans')
-      .select('*')
-      .eq('id', params.id)
-      .single()
+    try {
+      const { data: planData, error: planError } = await supabase
+        .from('training_plans')
+        .select('*')
+        .eq('id', params.id)
+        .single()
 
-    if (planError || !planData) {
-      toast.error('Training plan not found')
-      router.push('/training')
-      return
-    }
-
-    setPlan(planData)
-
-    const { data: daysData } = await supabase
-      .from('training_plan_days')
-      .select('*')
-      .eq('training_plan_id', params.id)
-      .order('day_number')
-
-    if (!daysData || daysData.length === 0) {
-      setDays([])
-      setLoading(false)
-      return
-    }
-
-    const dayIds = daysData.map((day) => day.id)
-
-    const [{ data: exerciseData }, { data: logData }] = await Promise.all([
-      supabase
-        .from('training_plan_exercises')
-        .select('*, exercises(*)')
-        .in('plan_day_id', dayIds)
-        .order('order_index'),
-      supabase
-        .from('workout_logs')
-        .select('date, plan_day_id')
-        .in('plan_day_id', dayIds)
-        .eq('user_id', profile.id)
-        .order('date', { ascending: false }),
-    ])
-
-    const exercisesByDay = new Map<string, (TrainingPlanExercise & { exercises: Exercise })[]>()
-    for (const exercise of (exerciseData ?? []) as (TrainingPlanExercise & { exercises: Exercise; plan_day_id: string })[]) {
-      const list = exercisesByDay.get(exercise.plan_day_id) ?? []
-      list.push(exercise)
-      exercisesByDay.set(exercise.plan_day_id, list)
-    }
-
-    const lastWorkoutByDay = new Map<string, string>()
-    for (const log of (logData ?? []) as { date: string; plan_day_id: string | null }[]) {
-      if (log.plan_day_id && !lastWorkoutByDay.has(log.plan_day_id)) {
-        lastWorkoutByDay.set(log.plan_day_id, log.date)
+      if (planError || !planData) {
+        toast.error('Training plan not found')
+        router.push('/training')
+        return
       }
+
+      setPlan(planData)
+
+      const { data: daysData, error: daysError } = await supabase
+        .from('training_plan_days')
+        .select('*')
+        .eq('training_plan_id', params.id)
+        .order('day_number')
+
+      if (daysError) throw daysError
+
+      if (!daysData || daysData.length === 0) {
+        setDays([])
+        return
+      }
+
+      const dayIds = daysData.map((day) => day.id)
+
+      const [{ data: exerciseData, error: exerciseError }, { data: logData, error: logError }] = await Promise.all([
+        supabase
+          .from('training_plan_exercises')
+          .select('*, exercises(*)')
+          .in('plan_day_id', dayIds)
+          .order('order_index'),
+        supabase
+          .from('workout_logs')
+          .select('date, plan_day_id')
+          .in('plan_day_id', dayIds)
+          .eq('user_id', profile.id)
+          .order('date', { ascending: false }),
+      ])
+
+      if (exerciseError) throw exerciseError
+      if (logError) throw logError
+
+      const exercisesByDay = new Map<string, (TrainingPlanExercise & { exercises: Exercise })[]>()
+      for (const exercise of (exerciseData ?? []) as (TrainingPlanExercise & { exercises: Exercise; plan_day_id: string })[]) {
+        const list = exercisesByDay.get(exercise.plan_day_id) ?? []
+        list.push(exercise)
+        exercisesByDay.set(exercise.plan_day_id, list)
+      }
+
+      const lastWorkoutByDay = new Map<string, string>()
+      for (const log of (logData ?? []) as { date: string; plan_day_id: string | null }[]) {
+        if (log.plan_day_id && !lastWorkoutByDay.has(log.plan_day_id)) {
+          lastWorkoutByDay.set(log.plan_day_id, log.date)
+        }
+      }
+
+      const enrichedDays = daysData.map((day) => ({
+        ...day,
+        exercises: exercisesByDay.get(day.id) ?? [],
+        lastWorkout: lastWorkoutByDay.get(day.id) ?? null,
+      }))
+
+      setDays(enrichedDays)
+    } catch {
+      toast.error('Failed to load training plan')
+    } finally {
+      setLoading(false)
     }
-
-    const enrichedDays = daysData.map((day) => ({
-      ...day,
-      exercises: exercisesByDay.get(day.id) ?? [],
-      lastWorkout: lastWorkoutByDay.get(day.id) ?? null,
-    }))
-
-    setDays(enrichedDays)
-    setLoading(false)
   }, [profile, params.id, router])
 
   useEffect(() => {
