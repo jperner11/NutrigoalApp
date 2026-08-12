@@ -41,32 +41,34 @@ export default function ProgressCheckIn({ userId, onPlanRegenerate }: ProgressCh
   const checkEligibility = useCallback(async () => {
     const supabase = createClient()
 
-    const { data: lastCheckIn } = await supabase
-      .from('training_check_ins')
-      .select('check_in_date')
-      .eq('user_id', userId)
-      .order('check_in_date', { ascending: false })
-      .limit(1)
-      .single()
+    try {
+      const { data: lastCheckIn } = await supabase
+        .from('training_check_ins')
+        .select('check_in_date')
+        .eq('user_id', userId)
+        .order('check_in_date', { ascending: false })
+        .limit(1)
+        .single()
 
-    if (lastCheckIn) {
-      setLastCheckInDate(lastCheckIn.check_in_date)
-      const lastDate = new Date(lastCheckIn.check_in_date)
-      const daysSince = Math.floor((Date.now() - lastDate.getTime()) / (1000 * 60 * 60 * 24))
-      if (daysSince < 14) {
-        setChecking(false)
-        return
+      if (lastCheckIn) {
+        setLastCheckInDate(lastCheckIn.check_in_date)
+        const lastDate = new Date(lastCheckIn.check_in_date)
+        const daysSince = Math.floor((Date.now() - lastDate.getTime()) / (1000 * 60 * 60 * 24))
+        if (daysSince < 14) {
+          return
+        }
       }
+
+      // Check if user has any workout logs
+      const { count } = await supabase
+        .from('workout_logs')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', userId)
+
+      setEligible((count ?? 0) > 0)
+    } finally {
+      setChecking(false)
     }
-
-    // Check if user has any workout logs
-    const { count } = await supabase
-      .from('workout_logs')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', userId)
-
-    setEligible((count ?? 0) > 0)
-    setChecking(false)
   }, [userId])
 
   useEffect(() => {
