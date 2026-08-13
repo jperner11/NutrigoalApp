@@ -116,7 +116,7 @@ export default function ClientDetailPage() {
         accent={client.onboarding_completed ? 'ready.' : 'intake pending.'}
         subtitle={`${client.email} · ${client.gender}, ${client.age}y · ${client.weight_kg}kg · ${client.height_cm}cm${client.goal ? ` · ${client.goal}` : ''}`}
         meta={
-          <span className="app-status-pill" style={{ color: client.onboarding_completed ? 'var(--ok)' : 'var(--warn)' }}>
+          <span className="app-status-pill" style={{ color: client.onboarding_completed ? 'var(--ok-text)' : 'var(--warn-text)' }}>
             {client.onboarding_completed ? 'Intake complete' : 'Intake pending'}
           </span>
         }
