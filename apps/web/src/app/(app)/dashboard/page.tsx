@@ -219,20 +219,21 @@ export default function DashboardPage() {
       }
 
       if (isTrainerRole(profile!.role)) {
-        const { count } = await supabase
-          .from('nutritionist_clients')
-          .select('*', { count: 'exact', head: true })
-          .eq('nutritionist_id', profile!.id)
-          .eq('status', 'active')
+        // Active client count and pending invite count are independent of each other
+        const [{ count }, { count: pendingCount }] = await Promise.all([
+          supabase
+            .from('nutritionist_clients')
+            .select('*', { count: 'exact', head: true })
+            .eq('nutritionist_id', profile!.id)
+            .eq('status', 'active'),
+          supabase
+            .from('personal_trainer_invites')
+            .select('*', { count: 'exact', head: true })
+            .eq('personal_trainer_id', profile!.id)
+            .eq('status', 'pending'),
+        ])
 
         setClientCount(count ?? 0)
-
-        const { count: pendingCount } = await supabase
-          .from('personal_trainer_invites')
-          .select('*', { count: 'exact', head: true })
-          .eq('personal_trainer_id', profile!.id)
-          .eq('status', 'pending')
-
         setPendingInviteCount(pendingCount ?? 0)
       } else if (isManagedClientRole(profile!.role)) {
         const trainerId = profile!.personal_trainer_id ?? profile!.nutritionist_id
