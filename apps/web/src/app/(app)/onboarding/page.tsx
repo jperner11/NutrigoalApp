@@ -2030,14 +2030,14 @@ function StepHeader({ icon, title, subtitle }: { icon: React.ReactNode; title: s
   return (
     <div className="text-center mb-2">
       <div className="flex justify-center mb-4">{icon}</div>
-      <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{title}</h2>
-      <p className="text-gray-600">{subtitle}</p>
+      <h2 className="text-2xl md:text-3xl font-bold text-[var(--foreground)] mb-2">{title}</h2>
+      <p className="text-[var(--muted)]">{subtitle}</p>
     </div>
   )
 }
 
 function Label({ children }: { children: React.ReactNode }) {
-  return <label className="block text-sm font-semibold text-gray-700 mb-2">{children}</label>
+  return <label className="block text-sm font-semibold text-[var(--muted)] mb-2">{children}</label>
 }
 
 function OptionCard({
@@ -2057,14 +2057,14 @@ function OptionCard({
           onClick()
         }
       }}
-      className={`p-4 border-2 rounded-xl cursor-pointer transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 ${
+      className={`p-4 border-2 rounded-xl cursor-pointer transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--acc)] focus-visible:ring-offset-2 ${
         selected
-          ? 'border-purple-500 bg-purple-50'
-          : 'border-gray-200 hover:border-gray-300'
+          ? 'border-[var(--acc)] bg-[var(--ink-3)]'
+          : 'border-[var(--line)] hover:border-[var(--line-2)]'
       }`}
     >
-      <h3 className={`font-semibold ${selected ? 'text-purple-700' : 'text-gray-900'}`}>{title}</h3>
-      <p className="text-sm text-gray-600 mt-0.5">{description}</p>
+      <h3 className={`font-semibold ${selected ? 'text-[var(--acc-text)]' : 'text-[var(--foreground)]'}`}>{title}</h3>
+      <p className="text-sm text-[var(--muted)] mt-0.5">{description}</p>
     </div>
   )
 }
@@ -2083,8 +2083,8 @@ function ChipGrid({
           onClick={() => onToggle(item.value)}
           className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
             selected.includes(item.value)
-              ? 'bg-purple-600 text-white shadow-sm'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              ? 'bg-[var(--acc)] text-[#0a0a0a] shadow-sm'
+              : 'bg-[var(--ink-2)] text-[var(--muted)] hover:bg-[var(--line-2)]'
           }`}
         >
           {item.label}
