@@ -222,7 +222,7 @@ export default function LeadsPage() {
                       type="button"
                       onClick={() => handleLead(lead.id, 'accept')}
                       disabled={workingId === lead.id}
-                      className="inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--ok)] px-4 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
+                      className="inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--ok)] px-4 py-2.5 text-sm font-semibold text-[#0a0a0a] hover:opacity-90 disabled:opacity-50"
                     >
                       {workingId === lead.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserCheck className="h-4 w-4" />}
                       Accept lead
