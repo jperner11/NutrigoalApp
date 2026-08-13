@@ -96,42 +96,41 @@ export default function DashboardPage() {
     const today = new Date().toISOString().split('T')[0]
 
     async function loadTodayStats() {
-      // Load meal logs for today
-      const { data: mealLogs } = await supabase
-        .from('meal_logs')
-        .select('total_calories, total_protein, total_carbs, total_fat')
-        .eq('user_id', profile!.id)
-        .eq('date', today)
+      // Load meal, water, workout and cardio logs for today (independent queries)
+      const [
+        { data: mealLogs },
+        { data: waterLogs },
+        { count: workoutCount },
+        { data: cardioSessions },
+      ] = await Promise.all([
+        supabase
+          .from('meal_logs')
+          .select('total_calories, total_protein, total_carbs, total_fat')
+          .eq('user_id', profile!.id)
+          .eq('date', today),
+        supabase
+          .from('water_logs')
+          .select('amount_ml')
+          .eq('user_id', profile!.id)
+          .eq('date', today),
+        supabase
+          .from('workout_logs')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', profile!.id)
+          .eq('date', today),
+        supabase
+          .from('cardio_sessions')
+          .select('duration_minutes')
+          .eq('user_id', profile!.id)
+          .eq('date', today)
+          .eq('is_completed', true),
+      ])
 
       const caloriesConsumed = mealLogs?.reduce((sum, log) => sum + log.total_calories, 0) ?? 0
       const proteinConsumed = mealLogs?.reduce((sum, log) => sum + (log.total_protein ?? 0), 0) ?? 0
       const carbsConsumed = mealLogs?.reduce((sum, log) => sum + (log.total_carbs ?? 0), 0) ?? 0
       const fatConsumed = mealLogs?.reduce((sum, log) => sum + (log.total_fat ?? 0), 0) ?? 0
-
-      // Load water logs for today
-      const { data: waterLogs } = await supabase
-        .from('water_logs')
-        .select('amount_ml')
-        .eq('user_id', profile!.id)
-        .eq('date', today)
-
       const waterConsumed = waterLogs?.reduce((sum, log) => sum + log.amount_ml, 0) ?? 0
-
-      // Load workout logs for today
-      const { count: workoutCount } = await supabase
-        .from('workout_logs')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', profile!.id)
-        .eq('date', today)
-
-      // Load cardio sessions for today
-      const { data: cardioSessions } = await supabase
-        .from('cardio_sessions')
-        .select('duration_minutes')
-        .eq('user_id', profile!.id)
-        .eq('date', today)
-        .eq('is_completed', true)
-
       const cardioMinutes = cardioSessions?.reduce((sum, s) => sum + s.duration_minutes, 0) ?? 0
 
       setTodayStats({
@@ -151,11 +150,36 @@ export default function DashboardPage() {
 
       // Avg daily calorie goal % over past 7 days
       const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0]
-      const { data: weekMealLogs } = await supabase
-        .from('meal_logs')
-        .select('date, total_calories')
-        .eq('user_id', profile!.id)
-        .gte('date', sevenDaysAgo)
+
+      // Weekly stats and latest weight data are all independent of each other
+      const [
+        { data: weekMealLogs },
+        { count: weekWorkoutCount },
+        { data: weekWaterLogs },
+        { data: recentWeights },
+      ] = await Promise.all([
+        supabase
+          .from('meal_logs')
+          .select('date, total_calories')
+          .eq('user_id', profile!.id)
+          .gte('date', sevenDaysAgo),
+        supabase
+          .from('workout_logs')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', profile!.id)
+          .gte('date', weekStartStr),
+        supabase
+          .from('water_logs')
+          .select('date, amount_ml')
+          .eq('user_id', profile!.id)
+          .gte('date', sevenDaysAgo),
+        supabase
+          .from('weight_logs')
+          .select('weight_kg, date')
+          .eq('user_id', profile!.id)
+          .order('date', { ascending: false })
+          .limit(2),
+      ])
 
       let avgGoalPct: number | null = null
       if (weekMealLogs && weekMealLogs.length > 0 && profile!.daily_calories) {
@@ -166,20 +190,6 @@ export default function DashboardPage() {
         const pcts = Array.from(dailyTotals.values()).map(c => (c / profile!.daily_calories!) * 100)
         avgGoalPct = Math.round(pcts.reduce((a, b) => a + b, 0) / pcts.length)
       }
-
-      // Workouts this week
-      const { count: weekWorkoutCount } = await supabase
-        .from('workout_logs')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', profile!.id)
-        .gte('date', weekStartStr)
-
-      // Avg water this week
-      const { data: weekWaterLogs } = await supabase
-        .from('water_logs')
-        .select('date, amount_ml')
-        .eq('user_id', profile!.id)
-        .gte('date', sevenDaysAgo)
 
       let avgWaterMl: number | null = null
       if (weekWaterLogs && weekWaterLogs.length > 0) {
@@ -196,14 +206,6 @@ export default function DashboardPage() {
         workoutsThisWeek: weekWorkoutCount ?? 0,
         avgWaterMl,
       })
-
-      // Latest weight data
-      const { data: recentWeights } = await supabase
-        .from('weight_logs')
-        .select('weight_kg, date')
-        .eq('user_id', profile!.id)
-        .order('date', { ascending: false })
-        .limit(2)
 
       if (recentWeights && recentWeights.length > 0) {
         const current = recentWeights[0].weight_kg
