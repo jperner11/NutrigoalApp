@@ -453,7 +453,7 @@ export default function WorkoutSessionPage() {
 
       {/* Rest Timer Overlay */}
       {restTimerActive && restTimerSeconds > 0 && (
-        <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-5 mb-4 text-white">
+        <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-5 mb-4 text-[#0a0a0a]">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <Timer className="h-5 w-5" />
@@ -464,7 +464,7 @@ export default function WorkoutSessionPage() {
                 setRestTimerActive(false)
                 setRestTimerSeconds(0)
               }}
-              className="text-sm font-medium bg-white/20 hover:bg-white/30 px-3 py-1 rounded-full transition-colors"
+              className="text-sm font-medium bg-[#0a0a0a]/10 hover:bg-[#0a0a0a]/15 px-3 py-1 rounded-full transition-colors"
             >
               Skip Rest
             </button>
@@ -478,9 +478,9 @@ export default function WorkoutSessionPage() {
           </div>
 
           {/* Progress Bar */}
-          <div className="h-2 bg-white/20 rounded-full overflow-hidden">
+          <div className="h-2 bg-[#0a0a0a]/15 rounded-full overflow-hidden">
             <div
-              className="h-full bg-white rounded-full transition-all duration-1000"
+              className="h-full bg-[#0a0a0a] rounded-full transition-all duration-1000"
               style={{ width: `${restProgressPercent}%` }}
             />
           </div>
@@ -615,11 +615,11 @@ export default function WorkoutSessionPage() {
             <button
               onClick={finishWorkout}
               disabled={saving}
-              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:shadow-lg hover:shadow-purple-200 active:scale-[0.98] transition-all disabled:opacity-50"
+              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold text-[#0a0a0a] bg-gradient-to-r from-purple-600 to-indigo-600 hover:shadow-lg hover:shadow-purple-200 active:scale-[0.98] transition-all disabled:opacity-50"
             >
               {saving ? (
                 <>
-                  <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <div className="h-4 w-4 border-2 border-[#0a0a0a]/30 border-t-[#0a0a0a] rounded-full animate-spin" />
                   Saving...
                 </>
               ) : (
@@ -634,7 +634,7 @@ export default function WorkoutSessionPage() {
               onClick={() => goToExercise(currentExerciseIndex + 1)}
               className={`flex-1 flex items-center justify-center gap-1.5 py-3 rounded-xl text-sm font-semibold transition-all active:scale-[0.98] ${
                 allSetsCompleted
-                  ? 'text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:shadow-lg hover:shadow-purple-200'
+                  ? 'text-[#0a0a0a] bg-gradient-to-r from-purple-600 to-indigo-600 hover:shadow-lg hover:shadow-purple-200'
                   : 'text-gray-700 bg-gray-100 hover:bg-gray-200'
               }`}
             >
