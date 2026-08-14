@@ -10,6 +10,7 @@ import {
 import { useRouter } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import * as Sentry from '@sentry/react-native'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
 import { WATER_QUICK_ADD, isManagedClientRole, isTrainerRole } from '@treno/shared'
@@ -106,13 +107,20 @@ function ClientHome({ userId }: { userId: string | null }) {
   }
 
   useEffect(() => {
-    fetchDashboardData()
+    fetchDashboardData().catch((err) => {
+      Sentry.captureException(err, { tags: { kind: 'dashboard-load', screen: 'client-home' } })
+    })
   }, [userId, profile?.role])
 
   const onRefresh = async () => {
     setRefreshing(true)
-    await fetchDashboardData()
-    setRefreshing(false)
+    try {
+      await fetchDashboardData()
+    } catch (err) {
+      Sentry.captureException(err, { tags: { kind: 'dashboard-refresh', screen: 'client-home' } })
+    } finally {
+      setRefreshing(false)
+    }
   }
 
   const addWater = async (amount: number) => {
@@ -310,13 +318,20 @@ function TrainerHome() {
   }
 
   useEffect(() => {
-    fetchTrainerData()
+    fetchTrainerData().catch((err) => {
+      Sentry.captureException(err, { tags: { kind: 'dashboard-load', screen: 'trainer-home' } })
+    })
   }, [user?.id])
 
   const onRefresh = async () => {
     setRefreshing(true)
-    await fetchTrainerData()
-    setRefreshing(false)
+    try {
+      await fetchTrainerData()
+    } catch (err) {
+      Sentry.captureException(err, { tags: { kind: 'dashboard-refresh', screen: 'trainer-home' } })
+    } finally {
+      setRefreshing(false)
+    }
   }
 
   return (
