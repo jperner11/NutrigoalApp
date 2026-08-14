@@ -267,7 +267,7 @@ export default function LeadsPage() {
                       {formatLeadStage(lead.stage)}
                     </span>
                     {lead.status === 'accepted' && (
-                      <Link href={`/clients/${lead.user_id}`} className="text-sm font-semibold text-[var(--acc)] hover:opacity-80">
+                      <Link href={`/clients/${lead.user_id}`} className="text-sm font-semibold text-[var(--acc-text)] hover:opacity-80">
                         Open client
                       </Link>
                     )}
