@@ -58,46 +58,57 @@ export default function ClientsPage() {
     const supabase = createClient()
 
     async function loadClients() {
-      const [{ data: clientRows }, { data: inviteRows }] = await Promise.all([
-        supabase
-          .from('nutritionist_clients')
-          .select('id, status, invited_email, created_at, client:client_id(id, full_name, email, onboarding_completed)')
-          .eq('nutritionist_id', trainerId)
-          .eq('status', 'active')
-          .order('created_at', { ascending: false }),
-        supabase
-          .from('personal_trainer_invites')
-          .select('id, invited_email, client_first_name, status, expires_at, last_sent_at, created_at, invite_token')
-          .eq('personal_trainer_id', trainerId)
-          .in('status', ['pending', 'expired'])
-          .order('created_at', { ascending: false }),
-      ])
-
-      const activeRows = (clientRows as unknown as ActiveClientRow[]) ?? []
-      const clientIds = activeRows.map((row) => row.client?.id).filter(Boolean) as string[]
-
-      let activeDietSet = new Set<string>()
-      let activeTrainingSet = new Set<string>()
-
-      if (clientIds.length > 0) {
-        const [{ data: dietRows }, { data: trainingRows }] = await Promise.all([
-          supabase.from('diet_plans').select('user_id').in('user_id', clientIds).eq('is_active', true),
-          supabase.from('training_plans').select('user_id').in('user_id', clientIds).eq('is_active', true),
+      try {
+        const [{ data: clientRows, error: clientsError }, { data: inviteRows, error: invitesError }] = await Promise.all([
+          supabase
+            .from('nutritionist_clients')
+            .select('id, status, invited_email, created_at, client:client_id(id, full_name, email, onboarding_completed)')
+            .eq('nutritionist_id', trainerId)
+            .eq('status', 'active')
+            .order('created_at', { ascending: false }),
+          supabase
+            .from('personal_trainer_invites')
+            .select('id, invited_email, client_first_name, status, expires_at, last_sent_at, created_at, invite_token')
+            .eq('personal_trainer_id', trainerId)
+            .in('status', ['pending', 'expired'])
+            .order('created_at', { ascending: false }),
         ])
 
-        activeDietSet = new Set((dietRows ?? []).map((row) => row.user_id))
-        activeTrainingSet = new Set((trainingRows ?? []).map((row) => row.user_id))
-      }
+        if (clientsError) throw clientsError
+        if (invitesError) throw invitesError
 
-      setActiveClients(
-        activeRows.map((row) => ({
-          ...row,
-          hasDietPlan: row.client?.id ? activeDietSet.has(row.client.id) : false,
-          hasTrainingPlan: row.client?.id ? activeTrainingSet.has(row.client.id) : false,
-        }))
-      )
-      setPendingInvites((inviteRows as PendingInviteRow[]) ?? [])
-      setLoading(false)
+        const activeRows = (clientRows as unknown as ActiveClientRow[]) ?? []
+        const clientIds = activeRows.map((row) => row.client?.id).filter(Boolean) as string[]
+
+        let activeDietSet = new Set<string>()
+        let activeTrainingSet = new Set<string>()
+
+        if (clientIds.length > 0) {
+          const [{ data: dietRows, error: dietError }, { data: trainingRows, error: trainingError }] = await Promise.all([
+            supabase.from('diet_plans').select('user_id').in('user_id', clientIds).eq('is_active', true),
+            supabase.from('training_plans').select('user_id').in('user_id', clientIds).eq('is_active', true),
+          ])
+
+          if (dietError) throw dietError
+          if (trainingError) throw trainingError
+
+          activeDietSet = new Set((dietRows ?? []).map((row) => row.user_id))
+          activeTrainingSet = new Set((trainingRows ?? []).map((row) => row.user_id))
+        }
+
+        setActiveClients(
+          activeRows.map((row) => ({
+            ...row,
+            hasDietPlan: row.client?.id ? activeDietSet.has(row.client.id) : false,
+            hasTrainingPlan: row.client?.id ? activeTrainingSet.has(row.client.id) : false,
+          }))
+        )
+        setPendingInvites((inviteRows as PendingInviteRow[]) ?? [])
+      } catch {
+        toast.error('Failed to load clients')
+      } finally {
+        setLoading(false)
+      }
     }
 
     loadClients()
