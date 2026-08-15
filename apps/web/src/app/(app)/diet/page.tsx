@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
+import { reportClientError } from '@/lib/apiClient'
+import toast from 'react-hot-toast'
 import {
   Utensils, Plus, Lightbulb, TrendingUp,
   Droplets, ArrowRightLeft, Pill, X,
@@ -109,34 +111,45 @@ export default function DietPage() {
   const [plans, setPlans] = useState<DietPlan[]>([])
   const [planMeals, setPlanMeals] = useState<DietPlanMeal[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState(false)
 
   useEffect(() => {
     if (!profile) return
     const supabase = createClient()
 
     async function loadPlans() {
-      const { data } = await supabase
-        .from('diet_plans')
-        .select('*')
-        .eq('user_id', profile!.id)
-        .order('created_at', { ascending: false })
-
-      const loadedPlans = data ?? []
-      setPlans(loadedPlans)
-
-      const focusPlan = loadedPlans.find(plan => plan.is_active) ?? loadedPlans[0]
-      if (focusPlan) {
-        const { data: mealsData } = await supabase
-          .from('diet_plan_meals')
+      try {
+        const { data, error } = await supabase
+          .from('diet_plans')
           .select('*')
-          .eq('diet_plan_id', focusPlan.id)
+          .eq('user_id', profile!.id)
+          .order('created_at', { ascending: false })
 
-        setPlanMeals(mealsData ?? [])
-      } else {
-        setPlanMeals([])
+        if (error) throw error
+
+        const loadedPlans = data ?? []
+        setPlans(loadedPlans)
+
+        const focusPlan = loadedPlans.find(plan => plan.is_active) ?? loadedPlans[0]
+        if (focusPlan) {
+          const { data: mealsData, error: mealsError } = await supabase
+            .from('diet_plan_meals')
+            .select('*')
+            .eq('diet_plan_id', focusPlan.id)
+
+          if (mealsError) throw mealsError
+
+          setPlanMeals(mealsData ?? [])
+        } else {
+          setPlanMeals([])
+        }
+      } catch (err) {
+        reportClientError(err, { feature: 'diet', action: 'diet-list-load' })
+        toast.error('Failed to load diet plans')
+        setLoadError(true)
+      } finally {
+        setLoading(false)
       }
-
-      setLoading(false)
     }
 
     loadPlans()
@@ -149,6 +162,21 @@ export default function DietPage() {
           <div className="h-full w-1/3 animate-pulse rounded-full bg-[var(--acc)]" />
         </div>
       </ListCard>
+    )
+  }
+
+  if (loadError) {
+    return (
+      <EmptyStateCard
+        icon={<Utensils className="h-6 w-6" />}
+        title="Couldn't load diet plans."
+        body="Something went wrong loading your diet plans. Please try again."
+        action={
+          <button className="btn btn-accent" onClick={() => window.location.reload()}>
+            Retry
+          </button>
+        }
+      />
     )
   }
 
