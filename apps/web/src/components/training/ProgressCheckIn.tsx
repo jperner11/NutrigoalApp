@@ -8,7 +8,7 @@ import {
   Calendar, Dumbbell, Target,
 } from 'lucide-react'
 import type { ExerciseProgress } from '@treno/shared'
-import { apiFetch } from '@/lib/apiClient'
+import { apiFetch, reportClientError } from '@/lib/apiClient'
 
 interface CheckInResult {
   exerciseProgress: ExerciseProgress[]
@@ -66,6 +66,8 @@ export default function ProgressCheckIn({ userId, onPlanRegenerate }: ProgressCh
         .eq('user_id', userId)
 
       setEligible((count ?? 0) > 0)
+    } catch (err) {
+      reportClientError(err, { feature: 'training', action: 'check-in-eligibility', extra: { userId } })
     } finally {
       setChecking(false)
     }
