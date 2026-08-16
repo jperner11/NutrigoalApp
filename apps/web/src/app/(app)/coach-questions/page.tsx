@@ -214,10 +214,10 @@ export default function CoachQuestionsPage() {
               <div key={q.id} className="card flex items-start justify-between gap-3 p-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <ClipboardList className="h-4 w-4 text-violet-500" />
+                    <ClipboardList className="h-4 w-4 text-[var(--acc)]" />
                     <span className="font-semibold text-[var(--fg)]">{q.label}</span>
                     <span className="app-status-pill text-xs">{QUESTION_TYPES.find((t) => t.value === q.type)?.label ?? q.type}</span>
-                    {q.required && <span className="text-xs text-amber-500">required</span>}
+                    {q.required && <span className="text-xs text-[var(--warn-text)]">required</span>}
                     {!q.is_active && <span className="text-xs text-[var(--fg-4)]">inactive</span>}
                   </div>
                   {q.help_text && <p className="mt-1 text-xs text-[var(--fg-3)]">{q.help_text}</p>}
