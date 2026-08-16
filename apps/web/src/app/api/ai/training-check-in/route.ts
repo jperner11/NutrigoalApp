@@ -201,6 +201,10 @@ Return ONLY valid JSON:
         response: (aiAnalysis.overall_summary ?? '').substring(0, 500),
         tokens_used: tokensUsed,
       })
+    } else {
+      Sentry.captureException(new Error(`OpenAI request failed: ${openaiResponse.status}`), {
+        tags: { kind: 'api-route', route: 'ai/training-check-in', op: 'openai' },
+      })
     }
 
     // Save check-in
