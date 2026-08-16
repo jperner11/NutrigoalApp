@@ -16,7 +16,7 @@ export default function PrivacyPage() {
           <p>We use this data to provide the app, personalise plans, support coach-client relationships, generate AI-assisted features, improve product performance, detect misuse, and communicate important service updates.</p>
           <p>If you join a Personal Trainer through an invite, that trainer can view and manage the information needed to coach you inside the product, including assigned plans, compliance data, progress entries, messages, and check-ins.</p>
           <p>We do not sell personal data. We may rely on service providers for hosting, authentication, analytics, payments, and AI infrastructure where necessary to operate the service securely.</p>
-          <p>You may request account deletion and deletion of associated personal data through the app settings or by contacting <a className="font-semibold text-[var(--brand-700)]" href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>.</p>
+          <p>You may request account deletion and deletion of associated personal data through the app settings or by contacting <a className="font-semibold text-[var(--acc-text)]" href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>.</p>
           <p>Private beta access is limited and support may be more direct and manual than in a final production launch.</p>
         </div>
       </section>

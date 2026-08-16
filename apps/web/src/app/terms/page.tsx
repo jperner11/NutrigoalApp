@@ -17,7 +17,7 @@ export default function TermsPage() {
           <p>The product is provided as a private beta and may change, improve, or contain defects while testing is ongoing.</p>
           <p>We may suspend or remove access for misuse, abuse, fraud, unauthorised data access, or behaviour that creates risk for other users or the service.</p>
           <p>Where paid plans apply, billing, cancellation, and subscription management are handled through the payment systems and account settings made available in the product.</p>
-          <p>These terms are governed by the laws of {LEGAL_JURISDICTION}. Questions can be sent to <a className="font-semibold text-[var(--brand-700)]" href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>.</p>
+          <p>These terms are governed by the laws of {LEGAL_JURISDICTION}. Questions can be sent to <a className="font-semibold text-[var(--acc-text)]" href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>.</p>
         </div>
       </section>
     </PublicPageShell>
