@@ -167,6 +167,7 @@ function CheckInCard({ request }: { request: FeedbackRequest & { client?: UserPr
                 {q.type === 'photo' && Array.isArray(resp?.answer) ? (
                   <div className="flex flex-wrap gap-2 mt-1">
                     {(resp.answer as string[]).map((url, j) => (
+                      // eslint-disable-next-line @next/next/no-img-element
                       <img key={j} src={url} alt={`Photo ${j + 1}`} className="h-20 w-20 rounded-lg object-cover border border-[var(--line)]" />
                     ))}
                     {(resp.answer as string[]).length === 0 && <span className="text-sm text-[var(--muted-soft)]">No photos</span>}
@@ -749,6 +750,7 @@ function ActiveCheckIn({
                 <div>
                   <div className="flex flex-wrap gap-3 mb-3">
                     {((answers[q.id] as string[]) ?? []).map((url, i) => (
+                      // eslint-disable-next-line @next/next/no-img-element
                       <img key={i} src={url} alt={`Photo ${i + 1}`}
                         className="h-24 w-24 rounded-xl object-cover border border-[var(--line)]" />
                     ))}

@@ -453,6 +453,7 @@ function FeedbackCard({ request }: { request: FeedbackRequest }) {
                 {q.type === 'photo' && Array.isArray(resp?.answer) ? (
                   <div className="flex flex-wrap gap-2 mt-1">
                     {(resp.answer as string[]).map((url, j) => (
+                      // eslint-disable-next-line @next/next/no-img-element
                       <img key={j} src={url} alt={`Photo ${j + 1}`} className="h-20 w-20 rounded-lg object-cover border border-[var(--line-strong)]" />
                     ))}
                     {(resp.answer as string[]).length === 0 && <span className="text-sm text-[var(--fg-4)]">No photos</span>}

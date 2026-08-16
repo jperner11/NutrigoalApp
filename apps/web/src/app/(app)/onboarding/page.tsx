@@ -720,6 +720,7 @@ export default function OnboardingPage() {
             <div className="flex flex-col items-center gap-4">
               <div className="relative">
                 {avatarPreview ? (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={avatarPreview}
                     alt="Profile"
