@@ -600,8 +600,8 @@ export default function NewDietPlanPage() {
                         <p className="text-sm font-medium text-[var(--fg)]">{food.amount} {food.unit} {food.name}</p>
                       </div>
                       <div className="col-span-2 text-right text-sm text-[var(--fg-2)]">{food.calories}</div>
-                      <div className="col-span-1 text-right text-sm text-[var(--ok)]">{food.protein}g</div>
-                      <div className="col-span-1 text-right text-sm text-[var(--warn)]">{food.carbs}g</div>
+                      <div className="col-span-1 text-right text-sm text-[var(--ok-text)]">{food.protein}g</div>
+                      <div className="col-span-1 text-right text-sm text-[var(--warn-text)]">{food.carbs}g</div>
                       <div className="col-span-1 text-right text-sm text-[var(--brand-400)]">{food.fat}g</div>
                       <div className="col-span-2 text-right">
                         <button
