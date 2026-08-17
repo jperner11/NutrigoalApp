@@ -68,21 +68,22 @@ export default function TodayTrainingPreview({ userId }: TodayTrainingPreviewPro
         const trainingDayIndex = getMondayIndexedDay()
         const todayPlanDay = days[trainingDayIndex % days.length]
 
-        // Check if today's workout is already completed
+        // Check if today's workout is already completed, and get exercises for
+        // this day — these two reads are independent, so run them in parallel.
         const today = new Date().toISOString().split('T')[0]
-        const { count: completedCount } = await supabase
-          .from('workout_logs')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', userId)
-          .eq('date', today)
-          .eq('plan_day_id', todayPlanDay.id)
-
-        // Get exercises for this day
-        const { data: planExercises } = await supabase
-          .from('training_plan_exercises')
-          .select('sets, reps, exercise_id, order_index')
-          .eq('plan_day_id', todayPlanDay.id)
-          .order('order_index')
+        const [{ count: completedCount }, { data: planExercises }] = await Promise.all([
+          supabase
+            .from('workout_logs')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', userId)
+            .eq('date', today)
+            .eq('plan_day_id', todayPlanDay.id),
+          supabase
+            .from('training_plan_exercises')
+            .select('sets, reps, exercise_id, order_index')
+            .eq('plan_day_id', todayPlanDay.id)
+            .order('order_index'),
+        ])
 
         if (!planExercises || planExercises.length === 0) {
           setNoPlan(true)
