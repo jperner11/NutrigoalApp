@@ -38,7 +38,7 @@ export default function MarketingHowItWorks() {
                     className="mono"
                     style={{
                       fontSize: 11,
-                      color: 'var(--acc)',
+                      color: 'var(--acc-text)',
                       letterSpacing: '0.14em',
                     }}
                   >
