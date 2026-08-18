@@ -607,7 +607,7 @@ function WorkoutSession({ dayId, user, profile, onDone }: any) {
               keyboardType="numeric"
               editable={!set.completed}
               placeholder={set.suggestedWeight ? `${set.suggestedWeight}` : '0'}
-              placeholderTextColor="#c4b5fd"
+              placeholderTextColor={colors.textSubtle}
             />
             <TextInput
               style={[s.setInput]}
@@ -616,7 +616,7 @@ function WorkoutSession({ dayId, user, profile, onDone }: any) {
               keyboardType="numeric"
               editable={!set.completed}
               placeholder={currentEx.reps.split('-').pop() || '12'}
-              placeholderTextColor="#c4b5fd"
+              placeholderTextColor={colors.textSubtle}
             />
             <TouchableOpacity style={[s.checkBtn, set.completed && s.checkBtnDone]} onPress={() => toggleComplete(si)}>
               <Ionicons name={set.completed ? 'checkmark-circle' : 'ellipse-outline'} size={28} color={set.completed ? colors.brand500 : colors.textSubtle} />
