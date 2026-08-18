@@ -261,11 +261,12 @@ function TemplateManager({ templates, trainerId, onRefresh }: {
                   <button onClick={async () => {
                     const supabase = createClient()
                     const newQuestions = (t.questions as FeedbackQuestion[]).map(q => ({ ...q, id: String(Date.now()) + Math.random().toString(36).slice(2, 6) }))
-                    await supabase.from('feedback_templates').insert({
+                    const { error } = await supabase.from('feedback_templates').insert({
                       trainer_id: trainerId,
                       name: `${t.name} (copy)`,
                       questions: newQuestions,
                     })
+                    if (error) { toast.error(error.message); return }
                     toast.success('Template duplicated')
                     onRefresh()
                   }}
