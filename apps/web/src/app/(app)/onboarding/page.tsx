@@ -928,7 +928,7 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-6">
             <StepHeader
-              icon={<ClipboardList className="h-12 w-12 text-purple-600" />}
+              icon={<ClipboardList className="h-12 w-12 text-[var(--acc-text)]" />}
               title="Your custom client intake"
               subtitle="Add questions your clients must answer after the base onboarding. Check what we already collect first so you don't duplicate it."
             />
@@ -971,7 +971,7 @@ export default function OnboardingPage() {
             </div>
 
             <div className="bg-[var(--panel-strong)] rounded-2xl p-6 border border-[var(--line)]">
-              <h3 className="text-sm font-bold text-purple-700 uppercase tracking-wider mb-4">Setup summary</h3>
+              <h3 className="text-sm font-bold text-[var(--acc-text)] uppercase tracking-wider mb-4">Setup summary</h3>
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <ReviewRow label="Display name" value={fullName || 'Not set'} />
                 <ReviewRow label="Headline" value={profileHeadline || 'Not set'} />
@@ -987,9 +987,9 @@ export default function OnboardingPage() {
               </div>
             </div>
 
-            <div className="flex gap-3 bg-purple-50 border border-purple-200 rounded-2xl p-5">
-              <Sparkles className="h-5 w-5 text-purple-600 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-purple-800 leading-relaxed">
+            <div className="flex gap-3 bg-[var(--ink-3)] border border-[var(--line-2)] rounded-2xl p-5">
+              <Sparkles className="h-5 w-5 text-[var(--acc-text)] flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-[var(--muted)] leading-relaxed">
                 Clients will be guided through a coach-led intake after they accept your invite, and your dashboard will flag who is still pending versus ready for review.
               </p>
             </div>
@@ -997,7 +997,7 @@ export default function OnboardingPage() {
             <button
               onClick={handleTrainerFinish}
               disabled={saving}
-              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-4 rounded-xl text-base font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+              className="btn-accent w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl text-base font-semibold disabled:opacity-50"
             >
               <span>{saving ? 'Saving...' : 'Finish coach setup'}</span>
               <ArrowRight className="h-5 w-5" />
