@@ -20,9 +20,10 @@ A modern web application for tracking nutrition, hydration, workouts, and cardio
 - **Monitor progress** — view client meal logs, water intake, and workout history
 
 ### Pricing Tiers
-- **Free** — basic tracking, 1 AI suggestion (lifetime)
-- **Pro ($14.99/mo)** — full planning, 5 AI suggestions/month, analytics
-- **Nutritionist ($49.99/mo)** — everything in Pro + 10 clients, 20 AI suggestions/month
+- **Free ($0)** — plan previews, water intake tracking, weight logging, and coach discovery
+- **Pro ($4.99/mo)** — full meal & training plans, cardio/supplement tracking, AI suggestions, weekly plan regeneration
+- **Unlimited ($9.99/mo)** — everything in Pro plus unlimited plan regeneration and priority AI generation
+- **Coach Pro ($24.99/mo)** — up to 15 clients, plan delivery, client messaging, custom intake questions, and a public coach profile
 
 ## Tech Stack
 
