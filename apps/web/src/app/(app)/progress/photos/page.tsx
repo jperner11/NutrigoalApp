@@ -425,7 +425,7 @@ export default function PhotosPage() {
                       className="object-cover transition-transform duration-300 group-hover:scale-105"
                       sizes="(max-width: 768px) 50vw, 280px"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[rgba(13,27,42,0.55)] via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[rgba(19,16,18,0.55)] via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
                     <span
                       className="chip absolute bottom-2 left-2"
                       style={{
