@@ -1808,7 +1808,7 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-6">
             <StepHeader
-              icon={<Calculator className="h-12 w-12 text-purple-600" />}
+              icon={<Calculator className="h-12 w-12 text-[var(--acc-text)]" />}
               title="Your Profile Summary"
               subtitle={isManagedClient
                 ? 'Review the intake your coach will use to assess your case and build your plan.'
@@ -1818,11 +1818,11 @@ export default function OnboardingPage() {
             {targets && (
               <>
                 {/* Nutrition Targets */}
-                <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl p-6 border border-purple-100">
-                  <h3 className="text-sm font-bold text-purple-700 uppercase tracking-wider mb-4">Daily Nutrition Targets</h3>
+                <div className="bg-[var(--ink-3)] rounded-2xl p-6 border border-[var(--line-2)]">
+                  <h3 className="text-sm font-bold text-[var(--acc-text)] uppercase tracking-wider mb-4">Daily Nutrition Targets</h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div className="bg-[var(--panel-strong)]/80 rounded-xl p-4 text-center">
-                      <div className="text-2xl font-bold text-purple-700">{targets.calories}</div>
+                      <div className="text-2xl font-bold text-[var(--acc-text)]">{targets.calories}</div>
                       <div className="text-xs text-[var(--muted-soft)] mt-1">kcal / day</div>
                     </div>
                     <div className="bg-[var(--panel-strong)]/80 rounded-xl p-4 text-center">
@@ -1846,7 +1846,7 @@ export default function OnboardingPage() {
 
                 {/* Key Details */}
                 <div className="bg-[var(--panel-strong)] rounded-2xl p-6 border border-[var(--line)]">
-                  <h3 className="text-sm font-bold text-purple-700 uppercase tracking-wider mb-4">Your Profile</h3>
+                  <h3 className="text-sm font-bold text-[var(--acc-text)] uppercase tracking-wider mb-4">Your Profile</h3>
                   <div className="grid grid-cols-2 gap-3">
                     <ReviewRow label="Goal" value={FITNESS_GOALS.find(g => g.value === goal)?.label ?? goal} />
                     {targetWeight && <ReviewRow label="Target weight" value={`${targetWeight} kg`} />}
@@ -1891,7 +1891,7 @@ export default function OnboardingPage() {
 
                 {/* Schedule */}
                 <div className="bg-[var(--panel-strong)] rounded-2xl p-6 border border-[var(--line)]">
-                  <h3 className="text-sm font-bold text-purple-700 uppercase tracking-wider mb-4">Schedule</h3>
+                  <h3 className="text-sm font-bold text-[var(--acc-text)] uppercase tracking-wider mb-4">Schedule</h3>
                   <div className="grid grid-cols-2 gap-3">
                     <ReviewRow label="Wake up" value={fmt12(wakeTime)} />
                     <ReviewRow label="Bedtime" value={fmt12(sleepTime)} />
@@ -1906,7 +1906,7 @@ export default function OnboardingPage() {
 
                 {isManagedClient && coachCustomQuestions.length > 0 && (
                   <div className="bg-[var(--panel-strong)] rounded-2xl p-6 border border-[var(--line)]">
-                    <h3 className="text-sm font-bold text-purple-700 uppercase tracking-wider mb-4">Coach questions</h3>
+                    <h3 className="text-sm font-bold text-[var(--acc-text)] uppercase tracking-wider mb-4">Coach questions</h3>
                     <div className="grid grid-cols-1 gap-3">
                       {coachCustomQuestions.map((question) => {
                         const answer = coachQuestionAnswers[question.id]
@@ -1918,9 +1918,9 @@ export default function OnboardingPage() {
                 )}
 
                 {/* AI Note */}
-                <div className="flex gap-3 bg-purple-50 border border-purple-200 rounded-2xl p-5">
-                  <Sparkles className="h-5 w-5 text-purple-600 flex-shrink-0 mt-0.5" />
-                  <p className="text-sm text-purple-800 leading-relaxed">
+                <div className="flex gap-3 bg-[var(--ink-3)] border border-[var(--line-2)] rounded-2xl p-5">
+                  <Sparkles className="h-5 w-5 text-[var(--acc-text)] flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-[var(--muted)] leading-relaxed">
                     {isManagedClient
                       ? 'Your coach will see this intake in their dashboard, including your goals, restrictions, schedule, and main obstacles, so they can review your case and decide the right next step.'
                       : "Your personal AI coach will use everything you've told us to create a meal plan and training structure that actually fit your life: favourite meals, snack habits, training level, schedule, recovery, and pace of progress. No bland template plans unless that's what you asked for."}
@@ -1933,7 +1933,7 @@ export default function OnboardingPage() {
                     <button
                       onClick={() => handleFinish('ai-generate')}
                       disabled={saving}
-                      className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-4 rounded-xl text-base font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+                      className="btn-accent flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-xl text-base font-semibold disabled:opacity-50"
                     >
                       <Sparkles className="h-5 w-5" />
                       <span>{saving ? 'Saving...' : 'Generate AI Plans'}</span>
@@ -1944,7 +1944,7 @@ export default function OnboardingPage() {
                     disabled={saving}
                     className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-xl text-base font-semibold transition-all disabled:opacity-50 ${
                       isManagedClient
-                        ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:shadow-lg'
+                        ? 'btn-accent'
                         : 'border-2 border-[var(--line)] text-[var(--foreground)] hover:bg-[var(--background-elevated)]'
                     }`}
                   >
