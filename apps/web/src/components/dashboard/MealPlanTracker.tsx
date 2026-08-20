@@ -144,6 +144,7 @@ export default function MealPlanTracker({ userId, userRole = 'free', onMacrosUpd
   async function toggleMeal(meal: DietPlanMeal) {
     const supabase = createClient()
     const isCurrentlyLogged = loggedMealIds.has(meal.id)
+    const newLogged = new Set(loggedMealIds)
 
     if (isCurrentlyLogged) {
       // Uncheck: delete the meal log
@@ -159,7 +160,6 @@ export default function MealPlanTracker({ userId, userRole = 'free', onMacrosUpd
         return
       }
 
-      const newLogged = new Set(loggedMealIds)
       newLogged.delete(meal.id)
       setLoggedMealIds(newLogged)
       toast.success(`${meal.meal_name} unmarked`)
@@ -182,7 +182,6 @@ export default function MealPlanTracker({ userId, userRole = 'free', onMacrosUpd
         return
       }
 
-      const newLogged = new Set(loggedMealIds)
       newLogged.add(meal.id)
       setLoggedMealIds(newLogged)
       toast.success(`${meal.meal_name} logged!`)
@@ -191,16 +190,9 @@ export default function MealPlanTracker({ userId, userRole = 'free', onMacrosUpd
     // Recalculate macros
     const allMeals = meals
     let totalCal = 0, totalPro = 0, totalCarbs = 0, totalFat = 0
-    const updatedLogged = new Set(loggedMealIds)
-
-    if (isCurrentlyLogged) {
-      updatedLogged.delete(meal.id)
-    } else {
-      updatedLogged.add(meal.id)
-    }
 
     allMeals.forEach(m => {
-      if (updatedLogged.has(m.id)) {
+      if (newLogged.has(m.id)) {
         totalCal += m.total_calories
         totalPro += m.total_protein
         totalCarbs += m.total_carbs
