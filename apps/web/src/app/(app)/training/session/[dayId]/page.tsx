@@ -89,7 +89,7 @@ export default function WorkoutSessionPage() {
 
   // ─── Rest Timer ─────────────────────────────────────
   useEffect(() => {
-    if (!restTimerActive || restTimerSeconds <= 0) return
+    if (!restTimerActive) return
     const interval = setInterval(() => {
       setRestTimerSeconds(prev => {
         if (prev <= 1) {
@@ -100,7 +100,7 @@ export default function WorkoutSessionPage() {
       })
     }, 1000)
     return () => clearInterval(interval)
-  }, [restTimerActive, restTimerSeconds])
+  }, [restTimerActive])
 
   // ─── Load Data ──────────────────────────────────────
   useEffect(() => {
