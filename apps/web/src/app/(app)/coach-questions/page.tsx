@@ -135,28 +135,38 @@ export default function CoachQuestionsPage() {
 
   async function deleteQuestion(id: string) {
     if (!confirm('Delete this question? Existing client responses will also be removed.')) return
-    const res = await fetch(`/api/personal-trainer/custom-intake/questions/${id}`, { method: 'DELETE' })
-    const json = await res.json().catch(() => ({}))
-    if (!res.ok) {
-      toast.error(json.error || 'Failed to delete')
-      return
+    try {
+      const res = await fetch(`/api/personal-trainer/custom-intake/questions/${id}`, { method: 'DELETE' })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        toast.error(json.error || 'Failed to delete')
+        return
+      }
+      toast.success('Question deleted')
+      await fetchQuestions()
+    } catch (err) {
+      reportClientError(err, { feature: 'coach-questions', action: 'delete-question' })
+      toast.error('Failed to delete')
     }
-    toast.success('Question deleted')
-    await fetchQuestions()
   }
 
   async function toggleActive(q: PersonalTrainerCustomIntakeQuestion) {
-    const res = await fetch(`/api/personal-trainer/custom-intake/questions/${q.id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ is_active: !q.is_active }),
-    })
-    if (!res.ok) {
-      const json = await res.json().catch(() => ({}))
-      toast.error(json.error || 'Failed to update')
-      return
+    try {
+      const res = await fetch(`/api/personal-trainer/custom-intake/questions/${q.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_active: !q.is_active }),
+      })
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}))
+        toast.error(json.error || 'Failed to update')
+        return
+      }
+      await fetchQuestions()
+    } catch (err) {
+      reportClientError(err, { feature: 'coach-questions', action: 'toggle-question-active' })
+      toast.error('Failed to update')
     }
-    await fetchQuestions()
   }
 
   async function move(q: PersonalTrainerCustomIntakeQuestion, dir: -1 | 1) {
