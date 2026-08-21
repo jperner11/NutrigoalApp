@@ -533,6 +533,7 @@ export default function NewDietPlanPage() {
                           return updated
                         })
                       }}
+                      aria-label="Meal name"
                       className="bg-transparent p-0 text-lg font-semibold text-[var(--fg)] outline-none"
                     />
                     <div className="flex gap-2 mt-0.5">
@@ -545,6 +546,7 @@ export default function NewDietPlanPage() {
                             return updated
                           })
                         }}
+                        aria-label="Meal type"
                         className="bg-transparent p-0 text-xs text-[var(--fg-3)] outline-none"
                       >
                         {MEAL_TYPES.map(mt => (
@@ -633,6 +635,7 @@ export default function NewDietPlanPage() {
                       type="number"
                       value={foodAmount}
                       onChange={(e) => setFoodAmount(parseInt(e.target.value) || 100)}
+                      aria-label="Amount in grams"
                       className="input-field w-20 text-center"
                       min={1}
                     />
