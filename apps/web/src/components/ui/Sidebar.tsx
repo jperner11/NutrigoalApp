@@ -39,6 +39,8 @@ interface SidebarProps {
   userRole: UserRole
   userName: string
   onSignOut: () => void
+  collapsed: boolean
+  onCollapsedChange: (collapsed: boolean) => void
 }
 
 const clientNavItems: {
@@ -76,9 +78,8 @@ const trainerNavItems: typeof clientNavItems = [
   { href: '/settings', label: 'Settings', icon: Settings, roles: ['nutritionist', 'personal_trainer'] },
 ]
 
-export default function Sidebar({ userRole, userName, onSignOut }: SidebarProps) {
+export default function Sidebar({ userRole, userName, onSignOut, collapsed, onCollapsedChange }: SidebarProps) {
   const pathname = usePathname()
-  const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
 
   // Close mobile menu on route change
@@ -170,7 +171,7 @@ export default function Sidebar({ userRole, userName, onSignOut }: SidebarProps)
 
         {/* Collapse toggle — desktop only */}
         <button
-          onClick={() => setCollapsed(!collapsed)}
+          onClick={() => onCollapsedChange(!collapsed)}
           className="hidden md:flex items-center justify-center p-2 rounded-xl text-[var(--muted-soft)] hover:bg-[rgba(245,241,234,0.06)] hover:text-white transition-all duration-200 w-full"
         >
           {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
