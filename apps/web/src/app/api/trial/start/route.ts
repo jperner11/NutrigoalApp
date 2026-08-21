@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getStripe, PRICE_IDS } from '@/lib/stripe'
@@ -29,10 +30,15 @@ export async function POST() {
   trialEndsAt.setDate(trialEndsAt.getDate() + TRIAL_DAYS)
 
   // Grant pro role + set trial expiry
-  await admin
+  const { error: grantError } = await admin
     .from('user_profiles')
     .update({ role: 'pro', trial_ends_at: trialEndsAt.toISOString() })
     .eq('id', user.id)
+
+  if (grantError) {
+    Sentry.captureException(grantError, { tags: { kind: 'api-route', route: 'trial/start' } })
+    return NextResponse.json({ message: 'Failed to start trial' }, { status: 500 })
+  }
 
   // Best-effort: create Stripe trial subscription
   try {
