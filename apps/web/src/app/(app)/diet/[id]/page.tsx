@@ -548,6 +548,7 @@ export default function DietPlanDetailPage() {
                 <h3 className="text-lg font-bold text-[var(--fg)]">Alternatives</h3>
                 <button
                   onClick={() => setAlternativesModal(null)}
+                  aria-label="Close"
                   className="rounded-lg p-1 text-[var(--fg-3)] transition-colors hover:bg-[var(--ink-2)]"
                 >
                   <X className="h-5 w-5" />
