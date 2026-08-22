@@ -22,12 +22,12 @@ export default function MoreScreen() {
     { icon: 'sparkles', label: 'AI Generate Plans', route: '/(tabs)/ai-generate', color: colors.brand500 },
     { icon: 'sparkles', label: 'AI Suggestions', route: '/(tabs)/ai', color: colors.brand400 },
     { icon: 'chatbubbles', label: 'My Trainer / Messages', route: '/(tabs)/my-pt', color: colors.brand400, roles: ['free', 'pro', 'personal_trainer_client', 'nutritionist_client'] },
-    { icon: 'people', label: 'Clients', route: '/(tabs)/clients', color: '#df9a2b', roles: ['personal_trainer', 'nutritionist'] },
+    { icon: 'people', label: 'Clients', route: '/(tabs)/clients', color: colors.warning, roles: ['personal_trainer', 'nutritionist'] },
     { icon: 'settings-sharp', label: 'Settings', route: '/(tabs)/settings', color: colors.textMuted },
   ]
 
   const TRAINER_MENU_ITEMS: MenuItem[] = [
-    { icon: 'people', label: 'Client Roster', route: '/(tabs)/clients', color: '#df9a2b' },
+    { icon: 'people', label: 'Client Roster', route: '/(tabs)/clients', color: colors.warning },
     { icon: 'sparkles', label: 'AI Suggestions', route: '/(tabs)/ai', color: colors.brand400 },
     { icon: 'settings-sharp', label: 'Settings', route: '/(tabs)/settings', color: colors.textMuted },
   ]
