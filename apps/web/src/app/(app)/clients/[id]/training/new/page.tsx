@@ -57,7 +57,11 @@ export default function NewClientTrainingPlanPage() {
     ]).then(([clientRes, exRes]) => {
       if (clientRes.error) { setLoadError('Failed to load client. Please refresh.'); setLoadingExercises(false); return }
       if (clientRes.data) setClient(clientRes.data as UserProfile)
-      if (exRes.data) setExercises(exRes.data as Exercise[])
+      if (exRes.error) {
+        toast.error('Failed to load the exercise library. Please refresh.')
+      } else if (exRes.data) {
+        setExercises(exRes.data as Exercise[])
+      }
       setLoadingExercises(false)
     }).catch(() => {
       setLoadError('Failed to load client. Please refresh.')
