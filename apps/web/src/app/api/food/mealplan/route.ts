@@ -1,8 +1,15 @@
 import { NextResponse } from 'next/server'
 import * as Sentry from '@sentry/nextjs'
 import OpenAI from 'openai'
+import { rateLimit, getClientIp } from '@/lib/rateLimit'
 
 export async function GET(request: Request) {
+  const ip = getClientIp(request)
+  const { success } = rateLimit(`food-mealplan:${ip}`, { limit: 5, windowMs: 60_000 })
+  if (!success) {
+    return NextResponse.json({ message: 'Too many requests. Please try again later.' }, { status: 429 })
+  }
+
   const { searchParams } = new URL(request.url)
   const targetCalories = parseInt(searchParams.get('targetCalories') ?? '2000')
   const targetProtein = parseInt(searchParams.get('targetProtein') ?? '150')
@@ -145,6 +152,12 @@ Return the JSON array only.`
 
 // POST: Regenerate a single meal
 export async function POST(request: Request) {
+  const ip = getClientIp(request)
+  const { success } = rateLimit(`food-mealplan-regen:${ip}`, { limit: 10, windowMs: 60_000 })
+  if (!success) {
+    return NextResponse.json({ message: 'Too many requests. Please try again later.' }, { status: 429 })
+  }
+
   const apiKey = process.env.OPENAI_API_KEY
   if (!apiKey) {
     return NextResponse.json({ message: 'AI service not configured' }, { status: 503 })
