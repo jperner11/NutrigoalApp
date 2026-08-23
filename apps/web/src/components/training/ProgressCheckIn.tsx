@@ -102,7 +102,7 @@ export default function ProgressCheckIn({ userId, onPlanRegenerate }: ProgressCh
   }
 
   const trendColor = (trend: string) => {
-    if (trend === 'improving') return 'text-[var(--ok-text)] bg-[rgba(26,163,122,0.12)] border-[rgba(26,163,122,0.34)]'
+    if (trend === 'improving') return 'text-[var(--ok-text)] bg-[var(--success-bg)] border-[rgba(26,163,122,0.34)]'
     if (trend === 'declining') return 'text-[var(--foreground)] bg-[var(--danger-bg)] border-[rgba(205,242,78,0.34)]'
     return 'text-[var(--warn-text)] bg-[rgba(196,121,28,0.12)] border-[rgba(196,121,28,0.34)]'
   }
@@ -192,7 +192,7 @@ export default function ProgressCheckIn({ userId, onPlanRegenerate }: ProgressCh
               <p className="text-lg font-bold text-[var(--foreground)]">{result.workoutsLogged}/{result.workoutsPlanned}</p>
               <p className="text-xs text-[var(--muted)]">Workouts</p>
             </div>
-            <div className="rounded-lg bg-[rgba(26,163,122,0.12)] p-3 text-center">
+            <div className="rounded-lg bg-[var(--success-bg)] p-3 text-center">
               <Target className="mx-auto mb-1 h-4 w-4 text-[var(--ok-text)]" />
               <p className="text-lg font-bold text-[var(--foreground)]">{consistency}%</p>
               <p className="text-xs text-[var(--muted)]">Consistency</p>
