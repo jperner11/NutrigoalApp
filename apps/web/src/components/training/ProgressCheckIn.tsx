@@ -123,7 +123,7 @@ export default function ProgressCheckIn({ userId, onPlanRegenerate }: ProgressCh
             <p className="text-sm font-semibold text-[var(--foreground)]">Progress Check-In Available</p>
             <p className="text-xs text-[var(--muted)]">
               {lastCheckInDate
-                ? `Last check-in: ${new Date(lastCheckInDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} — time to review your progress`
+                ? `Last check-in: ${new Date(lastCheckInDate + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} — time to review your progress`
                 : 'Analyse your workout data and get AI-powered insights'}
             </p>
           </div>
