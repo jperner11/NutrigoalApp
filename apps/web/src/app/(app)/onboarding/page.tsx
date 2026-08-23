@@ -1100,14 +1100,14 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-6">
             <StepHeader
-              icon={<User className="h-12 w-12 text-purple-600" />}
+              icon={<User className="h-12 w-12 text-[var(--acc-text)]" />}
               title={isManagedClient ? 'Your coach needs a quick intake' : "Let's Get to Know You"}
               subtitle={isManagedClient
                 ? 'These details give your coach the baseline for planning, progress review, and realistic expectations.'
                 : 'Your stats give us the baseline for calories, macros, hydration, and realistic rate of progress.'}
             />
-            <div className="flex items-center gap-2 bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-3 -mt-2">
-              <span className="text-indigo-600 text-sm font-medium">
+            <div className="flex items-center gap-2 bg-[var(--ink-3)] border border-[var(--line-2)] rounded-xl px-4 py-3 -mt-2">
+              <span className="text-[var(--acc-text)] text-sm font-medium">
                 {isManagedClient
                   ? 'This takes about 5–10 minutes and helps your coach understand your goals, constraints, and what kind of support you need.'
                   : 'This questionnaire takes about 5–10 minutes and helps us build plans tailored specifically to you.'}
@@ -1119,7 +1119,7 @@ export default function OnboardingPage() {
                 type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]"
                 placeholder="Your name"
               />
             </div>
@@ -1133,8 +1133,8 @@ export default function OnboardingPage() {
                     onClick={() => setGender(g)}
                     className={`py-3 px-4 rounded-xl border-2 font-semibold transition-all ${
                       gender === g
-                        ? 'border-purple-500 bg-purple-50 text-purple-700'
-                        : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                        ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
+                        : 'border-[var(--line-2)] text-[var(--fg-3)] hover:border-[var(--fg-3)]'
                     }`}
                   >
                     {g === 'male' ? 'Male' : 'Female'}
@@ -1146,22 +1146,22 @@ export default function OnboardingPage() {
               <div>
                 <Label>Age</Label>
                 <input type="number" value={age} onChange={(e) => setAge(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" placeholder="Years" />
+                  className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]" placeholder="Years" />
               </div>
               <div>
                 <Label>Height (cm)</Label>
                 <input type="number" value={height} onChange={(e) => setHeight(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" placeholder="175" />
+                  className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]" placeholder="175" />
               </div>
               <div>
                 <Label>Weight (kg)</Label>
                 <input type="number" value={weight} onChange={(e) => setWeight(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" placeholder="70" />
+                  className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]" placeholder="70" />
               </div>
               <div>
                 <Label>Body fat % (optional)</Label>
                 <input type="number" step="0.1" value={bodyFatPct} onChange={(e) => setBodyFatPct(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" placeholder="e.g. 18" />
+                  className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]" placeholder="e.g. 18" />
               </div>
             </div>
 
@@ -1177,9 +1177,9 @@ export default function OnboardingPage() {
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <Label>Goal weight (optional)</Label>
-                <p className="text-sm text-gray-500 mb-2">Leave this blank if you care more about how you want to look, feel, or perform than a specific number on the scale.</p>
+                <p className="text-sm text-[var(--fg-3)] mb-2">Leave this blank if you care more about how you want to look, feel, or perform than a specific number on the scale.</p>
                 <input type="number" value={targetWeight} onChange={(e) => setTargetWeight(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]"
                   placeholder="kg — or leave blank if you're not sure" />
               </div>
               <div>
@@ -1189,8 +1189,8 @@ export default function OnboardingPage() {
                     <button key={t.value} type="button" onClick={() => setGoalTimeline(t.value)}
                       className={`py-2.5 px-4 rounded-xl border-2 font-semibold text-sm transition-all ${
                         goalTimeline === t.value
-                          ? 'border-purple-500 bg-purple-50 text-purple-700'
-                          : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                          ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
+                          : 'border-[var(--line-2)] text-[var(--fg-3)] hover:border-[var(--fg-3)]'
                       }`}>
                       {t.label}
                     </button>
