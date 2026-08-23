@@ -190,8 +190,8 @@ export default function ClientDetailPage() {
       </div>
 
       <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <MetricCard label="Last meal log" value={overview.lastMealDate ? new Date(overview.lastMealDate).toLocaleDateString('en-GB') : 'No logs'} tone="muted" />
-        <MetricCard label="Last workout" value={overview.lastWorkoutDate ? new Date(overview.lastWorkoutDate).toLocaleDateString('en-GB') : 'No logs'} tone="accent" />
+        <MetricCard label="Last meal log" value={overview.lastMealDate ? new Date(overview.lastMealDate + 'T00:00:00').toLocaleDateString('en-GB') : 'No logs'} tone="muted" />
+        <MetricCard label="Last workout" value={overview.lastWorkoutDate ? new Date(overview.lastWorkoutDate + 'T00:00:00').toLocaleDateString('en-GB') : 'No logs'} tone="accent" />
         <MetricCard label="Latest weight" value={overview.latestWeight ? `${overview.latestWeight}kg` : 'No data'} tone="success" />
         <MetricCard label="Needs response" value={overview.pendingFeedbackCount + overview.unreadMessageCount} tone="warn" />
       </div>

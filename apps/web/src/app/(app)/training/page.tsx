@@ -53,7 +53,7 @@ function effortLabel(exercise: ExercisePreview) {
 
 function formatPlanDate(date: string | null) {
   if (!date) return 'No sessions yet'
-  return `Last ${new Date(date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`
+  return `Last ${new Date(date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`
 }
 
 function getRecentPr(workout?: WorkoutPreview) {

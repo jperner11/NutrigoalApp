@@ -386,7 +386,7 @@ export default function TrainingPlanDetailPage() {
                           {day.lastWorkout && (
                             <span className="flex items-center gap-1">
                               <Clock className="h-3.5 w-3.5" />
-                              Last: {new Date(day.lastWorkout).toLocaleDateString()}
+                              Last: {new Date(day.lastWorkout + 'T00:00:00').toLocaleDateString()}
                             </span>
                           )}
                         </div>
