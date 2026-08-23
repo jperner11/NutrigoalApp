@@ -156,6 +156,8 @@ export default function SupplementWidget({ userId }: SupplementWidgetProps) {
             <button
               key={sup.id}
               onClick={() => toggleLog(sup)}
+              aria-label={isTaken ? `Mark ${sup.name} as not taken today` : `Mark ${sup.name} as taken today`}
+              aria-pressed={isTaken}
               className="row w-full gap-2 rounded-lg px-2 py-1.5 text-left transition"
               style={{
                 background: isTaken ? 'var(--ink-3)' : 'transparent',
