@@ -200,7 +200,7 @@ Return ONLY valid JSON:
     }
 
     // Save check-in
-    await supabase.from('training_check_ins').insert({
+    const { error: checkInError } = await supabase.from('training_check_ins').insert({
       user_id: userId,
       training_plan_id: activePlan?.id ?? null,
       check_in_date: periodEnd,
@@ -212,6 +212,13 @@ Return ONLY valid JSON:
       ai_summary: aiAnalysis?.overall_summary ?? null,
       ai_recommendations: aiAnalysis != null ? JSON.stringify(aiAnalysis) : null,
     })
+
+    if (checkInError) {
+      Sentry.captureException(checkInError, {
+        tags: { kind: 'api-route', route: 'ai/training-check-in', op: 'save-check-in' },
+      })
+      return NextResponse.json({ message: 'Failed to save check-in' }, { status: 500 })
+    }
 
     return NextResponse.json({
       exerciseProgress,
