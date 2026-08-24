@@ -278,7 +278,7 @@ export default function NewClientDietPlanPage() {
           placeholder="e.g. Cutting Plan - Week 1" />
       </ListCard>
 
-      <div className="grid grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-2 gap-3 mb-6 lg:grid-cols-4">
         <MetricCard label="Calories" value={totalCals} footer={client.daily_calories ? `${Math.round((totalCals / client.daily_calories) * 100)}% of ${client.daily_calories}` : undefined} tone="accent" />
         <MetricCard label="Protein" value={totalProtein} unit="g" footer={client.daily_protein ? `${Math.round((totalProtein / client.daily_protein) * 100)}% of ${client.daily_protein}g` : undefined} tone="success" />
         <MetricCard label="Carbs" value={totalCarbs} unit="g" footer={client.daily_carbs ? `${Math.round((totalCarbs / client.daily_carbs) * 100)}% of ${client.daily_carbs}g` : undefined} tone="warn" />
