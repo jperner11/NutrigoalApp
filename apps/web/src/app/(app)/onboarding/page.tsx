@@ -697,7 +697,7 @@ export default function OnboardingPage() {
                     onClick={() => toggleArray(coachFormats, setCoachFormats, format)}
                     className={`px-4 py-3 rounded-xl border-2 font-semibold text-sm transition-all ${
                       coachFormats.includes(format)
-                        ? 'border-purple-500 bg-purple-50 text-purple-700'
+                        ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
                         : 'border-gray-200 text-gray-500 hover:border-gray-300'
                     }`}
                   >
@@ -905,7 +905,7 @@ export default function OnboardingPage() {
                     onClick={() => setCoachCheckInFrequency(value as typeof coachCheckInFrequency)}
                     className={`py-2.5 px-4 rounded-xl border-2 font-semibold text-sm transition-all ${
                       coachCheckInFrequency === value
-                        ? 'border-purple-500 bg-purple-50 text-purple-700'
+                        ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
                         : 'border-gray-200 text-gray-500 hover:border-gray-300'
                     }`}
                   >
@@ -1057,7 +1057,7 @@ export default function OnboardingPage() {
                       onClick={() => updateCoachQuestionAnswer(question.id, option)}
                       className={`py-3 px-4 rounded-xl border-2 font-semibold transition-all ${
                         coachQuestionAnswers[question.id] === option
-                          ? 'border-purple-500 bg-purple-50 text-purple-700'
+                          ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
                           : 'border-gray-200 text-gray-500 hover:border-gray-300'
                       }`}
                     >
@@ -1133,7 +1133,7 @@ export default function OnboardingPage() {
                     onClick={() => setGender(g)}
                     className={`py-3 px-4 rounded-xl border-2 font-semibold transition-all ${
                       gender === g
-                        ? 'border-purple-500 bg-purple-50 text-purple-700'
+                        ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
                         : 'border-gray-200 text-gray-500 hover:border-gray-300'
                     }`}
                   >
@@ -1189,7 +1189,7 @@ export default function OnboardingPage() {
                     <button key={t.value} type="button" onClick={() => setGoalTimeline(t.value)}
                       className={`py-2.5 px-4 rounded-xl border-2 font-semibold text-sm transition-all ${
                         goalTimeline === t.value
-                          ? 'border-purple-500 bg-purple-50 text-purple-700'
+                          ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
                           : 'border-gray-200 text-gray-500 hover:border-gray-300'
                       }`}>
                       {t.label}
@@ -1245,7 +1245,7 @@ export default function OnboardingPage() {
                     <button key={s.value} type="button" onClick={() => setSleepQuality(s.value)}
                       className={`flex-1 min-w-[90px] py-3 px-3 rounded-xl border-2 font-semibold text-sm transition-all ${
                         sleepQuality === s.value
-                          ? 'border-purple-500 bg-purple-50 text-purple-700'
+                          ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
                           : 'border-gray-200 text-gray-500 hover:border-gray-300'
                       }`}>
                       {s.label}
@@ -1261,7 +1261,7 @@ export default function OnboardingPage() {
                   <button key={s.value} type="button" onClick={() => setStressLevel(s.value)}
                     className={`flex-1 min-w-[100px] py-3 px-4 rounded-xl border-2 font-semibold text-sm transition-all ${
                       stressLevel === s.value
-                        ? 'border-purple-500 bg-purple-50 text-purple-700'
+                        ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
                         : 'border-gray-200 text-gray-500 hover:border-gray-300'
                     }`}>
                     {s.label}
@@ -1398,7 +1398,7 @@ export default function OnboardingPage() {
                   <button key={s.value} type="button" onClick={() => setSnackPreference(s.value)}
                     className={`flex-1 min-w-[100px] py-3 px-4 rounded-xl border-2 font-semibold text-sm transition-all ${
                       snackPreference === s.value
-                        ? 'border-purple-500 bg-purple-50 text-purple-700'
+                        ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
                         : 'border-gray-200 text-gray-500 hover:border-gray-300'
                     }`}>
                     {s.label}
@@ -1413,7 +1413,7 @@ export default function OnboardingPage() {
                   <button key={label} type="button" onClick={() => setLateNightSnacking(val)}
                     className={`py-3 px-4 rounded-xl border-2 font-semibold transition-all ${
                       lateNightSnacking === val
-                        ? 'border-purple-500 bg-purple-50 text-purple-700'
+                        ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
                         : 'border-gray-200 text-gray-500 hover:border-gray-300'
                     }`}>
                     {label}
@@ -1557,7 +1557,7 @@ export default function OnboardingPage() {
                   <button key={d.value} type="button" onClick={() => setMaxSessionMinutes(d.value)}
                     className={`py-2.5 px-5 rounded-xl border-2 font-semibold text-sm transition-all ${
                       maxSessionMinutes === d.value
-                        ? 'border-purple-500 bg-purple-50 text-purple-700'
+                        ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
                         : 'border-gray-200 text-gray-500 hover:border-gray-300'
                     }`}>
                     {d.label}
@@ -1604,7 +1604,7 @@ export default function OnboardingPage() {
                   <button key={String(opt.value)} type="button" onClick={() => setDoesCardio(opt.value)}
                     className={`flex-1 py-3 px-5 rounded-xl border-2 font-semibold text-sm transition-all ${
                       doesCardio === opt.value
-                        ? 'border-purple-500 bg-purple-50 text-purple-700'
+                        ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
                         : 'border-gray-200 text-gray-500 hover:border-gray-300'
                     }`}>
                     {opt.label}
@@ -1631,7 +1631,7 @@ export default function OnboardingPage() {
                         <button key={n} type="button" onClick={() => setCardioFrequency(n)}
                           className={`w-10 h-10 rounded-full border-2 font-bold text-sm transition-all ${
                             cardioFrequency === n
-                              ? 'border-purple-500 bg-purple-50 text-purple-700'
+                              ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
                               : 'border-gray-200 text-gray-500 hover:border-gray-300'
                           }`}>
                           {n}
@@ -1646,7 +1646,7 @@ export default function OnboardingPage() {
                         <button key={d} type="button" onClick={() => setCardioDuration(d)}
                           className={`py-2 px-4 rounded-xl border-2 font-semibold text-sm transition-all ${
                             cardioDuration === d
-                              ? 'border-purple-500 bg-purple-50 text-purple-700'
+                              ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
                               : 'border-gray-200 text-gray-500 hover:border-gray-300'
                           }`}>
                           {d}
@@ -1749,7 +1749,7 @@ export default function OnboardingPage() {
                   <button key={d} type="button" onClick={() => setWorkoutDays(d)}
                     className={`w-12 h-12 rounded-full border-2 font-bold text-lg transition-all ${
                       workoutDays === d
-                        ? 'border-purple-500 bg-purple-50 text-purple-700'
+                        ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
                         : 'border-gray-200 text-gray-500 hover:border-gray-300'
                     }`}>
                     {d}
@@ -1764,7 +1764,7 @@ export default function OnboardingPage() {
                   <button key={m} type="button" onClick={() => setMealsPerDay(m)}
                     className={`w-12 h-12 rounded-full border-2 font-bold text-lg transition-all ${
                       mealsPerDay === m
-                        ? 'border-purple-500 bg-purple-50 text-purple-700'
+                        ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
                         : 'border-gray-200 text-gray-500 hover:border-gray-300'
                     }`}>
                     {m}
