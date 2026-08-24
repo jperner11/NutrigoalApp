@@ -401,41 +401,45 @@ export default function GeneratePlansPage() {
       }
     }
 
-    for (const day of (data.days ?? [])) {
-      const { data: planDay, error: dayError } = await supabase
-        .from('training_plan_days')
-        .insert({
-          training_plan_id: plan.id,
-          day_number: day.day_number,
-          name: day.name,
-        })
-        .select()
-        .single()
-
-      if (dayError || !planDay) continue
-
-      const exerciseInserts = []
-      for (let idx = 0; idx < day.exercises.length; idx++) {
-        const ex = day.exercises[idx]
-        const exerciseId = ex.exercise_id ?? exerciseIdByName.get(ex.name.toLowerCase())
-
-        if (exerciseId) {
-          exerciseInserts.push({
-            plan_day_id: planDay.id,
-            exercise_id: exerciseId,
-            order_index: idx,
-            sets: ex.sets || 3,
-            reps: ex.reps || '8-12',
-            rest_seconds: ex.rest_seconds || 90,
-            notes: ex.notes || null,
+    // Each day's insert only depends on plan.id, not on prior days, so run
+    // them concurrently instead of serializing one round trip per day.
+    await Promise.all(
+      (data.days ?? []).map(async (day) => {
+        const { data: planDay, error: dayError } = await supabase
+          .from('training_plan_days')
+          .insert({
+            training_plan_id: plan.id,
+            day_number: day.day_number,
+            name: day.name,
           })
-        }
-      }
+          .select()
+          .single()
 
-      if (exerciseInserts.length > 0) {
-        await supabase.from('training_plan_exercises').insert(exerciseInserts)
-      }
-    }
+        if (dayError || !planDay) return
+
+        const exerciseInserts = []
+        for (let idx = 0; idx < day.exercises.length; idx++) {
+          const ex = day.exercises[idx]
+          const exerciseId = ex.exercise_id ?? exerciseIdByName.get(ex.name.toLowerCase())
+
+          if (exerciseId) {
+            exerciseInserts.push({
+              plan_day_id: planDay.id,
+              exercise_id: exerciseId,
+              order_index: idx,
+              sets: ex.sets || 3,
+              reps: ex.reps || '8-12',
+              rest_seconds: ex.rest_seconds || 90,
+              notes: ex.notes || null,
+            })
+          }
+        }
+
+        if (exerciseInserts.length > 0) {
+          await supabase.from('training_plan_exercises').insert(exerciseInserts)
+        }
+      })
+    )
   }
 
 interface CompanionContent {
