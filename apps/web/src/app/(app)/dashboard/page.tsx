@@ -24,6 +24,7 @@ import Link from 'next/link'
 import { toast } from 'react-hot-toast'
 import MealPlanTracker from '@/components/dashboard/MealPlanTracker'
 import { canAccess } from '@/lib/tierUtils'
+import { getLocalDateString } from '@/lib/date'
 import StreaksWidget from '@/components/dashboard/StreaksWidget'
 import TodayTrainingPreview from '@/components/dashboard/TodayTrainingPreview'
 import QuickWeightLog from '@/components/dashboard/QuickWeightLog'
@@ -72,7 +73,7 @@ export default function DashboardPage() {
   async function addWater(amount: number) {
     if (!profile) return
     const supabase = createClient()
-    const today = new Date().toISOString().split('T')[0]
+    const today = getLocalDateString()
 
     const { error } = await supabase.from('water_logs').insert({
       user_id: profile.id,
@@ -93,7 +94,7 @@ export default function DashboardPage() {
     if (!profile) return
 
     const supabase = createClient()
-    const today = new Date().toISOString().split('T')[0]
+    const today = getLocalDateString()
 
     async function loadTodayStats() {
       // Load meal, water, workout and cardio logs for today (independent queries)
