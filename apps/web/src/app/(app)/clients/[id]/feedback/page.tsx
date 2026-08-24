@@ -200,7 +200,7 @@ export default function ClientFeedbackPage() {
                   placeholder="Type your question..." />
               </div>
               {questions.length > 1 && (
-                <button onClick={() => removeQuestion(q.id)} className="mt-6 text-[var(--fg-4)] hover:text-[var(--danger-text)]">
+                <button onClick={() => removeQuestion(q.id)} aria-label="Remove question" className="mt-6 text-[var(--fg-4)] hover:text-[var(--danger-text)]">
                   <Trash2 className="h-4 w-4" />
                 </button>
               )}
