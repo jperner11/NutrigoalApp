@@ -336,7 +336,7 @@ function EditableMacros({ client, onUpdated }: { client: UserProfile; onUpdated:
             Edit
           </button>
         </div>
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <MacroPill label="Calories" value={client.daily_calories} unit="kcal" />
           <MacroPill label="Protein" value={client.daily_protein} unit="g" />
           <MacroPill label="Carbs" value={client.daily_carbs} unit="g" />
@@ -356,7 +356,7 @@ function EditableMacros({ client, onUpdated }: { client: UserProfile; onUpdated:
           </button>
         </div>
       </div>
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <div>
           <label htmlFor="client-macro-calories" className="app-mono-label mb-1 block">Calories</label>
           <input id="client-macro-calories" type="number" value={calories} onChange={e => setCalories(e.target.value)}
