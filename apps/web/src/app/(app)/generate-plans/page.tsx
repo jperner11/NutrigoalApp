@@ -366,6 +366,41 @@ export default function GeneratePlansPage() {
 
     if (planError || !plan) throw new Error('Failed to save training plan')
 
+    // Resolve exercise IDs — use server-provided ID or create client-side.
+    // Collect exercises missing an ID (deduped by name) up front so they can
+    // be created in a single bulk insert instead of one round trip per
+    // exercise per day.
+    const validBodyParts = new Set(['chest', 'back', 'shoulders', 'biceps', 'triceps', 'legs', 'core', 'full_body'])
+    const validEquipment = new Set(['barbell', 'dumbbell', 'machine', 'cable', 'bodyweight', 'band'])
+
+    const exerciseIdByName = new Map<string, string>()
+    const newExercises = new Map<string, { name: string; body_part: string; equipment: string; is_compound: boolean }>()
+    for (const day of (data.days ?? [])) {
+      for (let idx = 0; idx < day.exercises.length; idx++) {
+        const ex = day.exercises[idx]
+        if (ex.exercise_id) continue
+        const key = ex.name.toLowerCase()
+        if (newExercises.has(key)) continue
+        newExercises.set(key, {
+          name: ex.name,
+          body_part: validBodyParts.has(ex.body_part) ? ex.body_part : 'full_body',
+          equipment: validEquipment.has(ex.equipment) ? ex.equipment : 'bodyweight',
+          is_compound: idx < 3,
+        })
+      }
+    }
+
+    if (newExercises.size > 0) {
+      const { data: insertedExercises } = await supabase
+        .from('exercises')
+        .insert(Array.from(newExercises.values()))
+        .select('id, name')
+
+      for (const inserted of (insertedExercises ?? [])) {
+        exerciseIdByName.set(inserted.name.toLowerCase(), inserted.id)
+      }
+    }
+
     for (const day of (data.days ?? [])) {
       const { data: planDay, error: dayError } = await supabase
         .from('training_plan_days')
@@ -379,32 +414,10 @@ export default function GeneratePlansPage() {
 
       if (dayError || !planDay) continue
 
-      // Resolve exercise IDs — use server-provided ID or create client-side
-      const validBodyParts = new Set(['chest', 'back', 'shoulders', 'biceps', 'triceps', 'legs', 'core', 'full_body'])
-      const validEquipment = new Set(['barbell', 'dumbbell', 'machine', 'cable', 'bodyweight', 'band'])
-
       const exerciseInserts = []
       for (let idx = 0; idx < day.exercises.length; idx++) {
         const ex = day.exercises[idx]
-        let exerciseId = ex.exercise_id
-
-        if (!exerciseId) {
-          // Fallback: create exercise client-side
-          const bodyPart = validBodyParts.has(ex.body_part) ? ex.body_part : 'full_body'
-          const equip = validEquipment.has(ex.equipment) ? ex.equipment : 'bodyweight'
-          const { data: newEx } = await supabase
-            .from('exercises')
-            .insert({
-              name: ex.name,
-              body_part: bodyPart,
-              equipment: equip,
-              is_compound: idx < 3,
-            })
-            .select('id')
-            .single()
-
-          if (newEx) exerciseId = newEx.id
-        }
+        const exerciseId = ex.exercise_id ?? exerciseIdByName.get(ex.name.toLowerCase())
 
         if (exerciseId) {
           exerciseInserts.push({
