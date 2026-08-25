@@ -129,9 +129,9 @@ export default function GroceryPage() {
   const totalItems = groceryItems.length
   const checkedCount = checkedItems.size
 
-  function formatAmount(amount: number): string {
-    if (amount >= 1000) return `${(amount / 1000).toFixed(1)}kg`
-    return `${Math.round(amount)}`
+  function formatAmount(amount: number, unit: string): string {
+    if (unit === 'g' && amount >= 1000) return `${(amount / 1000).toFixed(1)}kg`
+    return `${Math.round(amount)}${unit}`
   }
 
   return (
@@ -222,7 +222,7 @@ export default function GroceryPage() {
                           {item.name}
                         </span>
                         <span className={`text-sm font-medium ${isChecked ? 'text-[var(--muted-soft)]' : 'text-[var(--muted)]'}`}>
-                          {formatAmount(item.totalAmount)}{item.unit}
+                          {formatAmount(item.totalAmount, item.unit)}
                         </span>
                       </button>
                     )

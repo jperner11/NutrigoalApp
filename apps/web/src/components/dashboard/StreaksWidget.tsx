@@ -93,7 +93,7 @@ export default function StreaksWidget({ userId }: StreaksWidgetProps) {
         <div className="row gap-2">
           <Flame
             className="h-4 w-4"
-            style={{ color: best >= 7 ? 'var(--acc)' : 'var(--fg-3)' }}
+            style={{ color: best >= 7 ? 'var(--acc-text)' : 'var(--fg-3)' }}
           />
           <div
             className="mono"
@@ -107,7 +107,7 @@ export default function StreaksWidget({ userId }: StreaksWidgetProps) {
           </div>
         </div>
         {best >= 7 ? (
-          <span className="chip" style={{ color: 'var(--acc)' }}>
+          <span className="chip" style={{ color: 'var(--acc-text)' }}>
             ● On fire
           </span>
         ) : null}

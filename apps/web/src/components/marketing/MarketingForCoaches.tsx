@@ -15,9 +15,9 @@ export default function MarketingForCoaches() {
           <div
             className="eyebrow mb-4"
             style={{
-              background: 'rgba(245,241,234,0.08)',
-              color: 'rgba(245,241,234,0.7)',
-              borderColor: 'rgba(245,241,234,0.12)',
+              background: 'var(--line)',
+              color: 'var(--fg-2)',
+              borderColor: 'var(--line-strong)',
             }}
           >
             {c.eyebrow}
@@ -25,10 +25,7 @@ export default function MarketingForCoaches() {
           <h2 className="h2" style={{ color: 'var(--on-strong)' }}>
             {c.titleMain}
             <br />
-            <span
-              className="italic-serif"
-              style={{ color: 'rgba(245,241,234,0.55)' }}
-            >
+            <span className="italic-serif" style={{ color: 'var(--fg-3)' }}>
               {c.titleAccent}
             </span>
           </h2>
@@ -37,7 +34,7 @@ export default function MarketingForCoaches() {
             style={{
               fontSize: 17,
               lineHeight: 1.6,
-              color: 'rgba(245,241,234,0.7)',
+              color: 'var(--fg-2)',
             }}
           >
             {c.body}
@@ -48,15 +45,12 @@ export default function MarketingForCoaches() {
               <div
                 key={b.title}
                 className="pb-4"
-                style={{ borderBottom: '1px solid rgba(245,241,234,0.1)' }}
+                style={{ borderBottom: '1px solid var(--line)' }}
               >
                 <div className="serif" style={{ fontSize: 22, lineHeight: 1.15 }}>
                   {b.title}
                 </div>
-                <div
-                  className="mt-1"
-                  style={{ fontSize: 14, color: 'rgba(245,241,234,0.6)' }}
-                >
+                <div className="mt-1" style={{ fontSize: 14, color: 'var(--fg-3)' }}>
                   {b.sub}
                 </div>
               </div>
@@ -79,7 +73,7 @@ export default function MarketingForCoaches() {
               className="btn"
               style={{
                 color: 'var(--on-strong)',
-                border: '1px solid rgba(245,241,234,0.2)',
+                border: '1px solid var(--line-strong)',
               }}
             >
               {c.ctas.how}
@@ -90,8 +84,8 @@ export default function MarketingForCoaches() {
         <div
           className="rounded-3xl p-7"
           style={{
-            background: 'rgba(245,241,234,0.04)',
-            border: '1px solid rgba(245,241,234,0.1)',
+            background: 'var(--ink-2)',
+            border: '1px solid var(--line-strong)',
           }}
         >
           <div className="row mb-5 justify-between">
@@ -100,7 +94,7 @@ export default function MarketingForCoaches() {
               style={{
                 fontSize: 10,
                 letterSpacing: '0.14em',
-                color: 'rgba(245,241,234,0.55)',
+                color: 'var(--fg-3)',
               }}
             >
               {c.preview.kicker}
@@ -110,7 +104,7 @@ export default function MarketingForCoaches() {
               style={{
                 background: 'rgba(26,163,122,0.15)',
                 borderColor: 'rgba(26,163,122,0.4)',
-                color: '#7ce5b8',
+                color: 'var(--ok-text)',
               }}
             >
               ● {c.preview.liveChip}
@@ -123,10 +117,7 @@ export default function MarketingForCoaches() {
               <div className="serif" style={{ fontSize: 28 }}>
                 {c.preview.coachName}
               </div>
-              <div
-                className="mono mt-1"
-                style={{ fontSize: 11, color: 'rgba(245,241,234,0.55)' }}
-              >
+              <div className="mono mt-1" style={{ fontSize: 11, color: 'var(--fg-3)' }}>
                 {c.preview.coachLine}
               </div>
               <div className="row mt-2.5 flex-wrap gap-1.5">
@@ -135,9 +126,9 @@ export default function MarketingForCoaches() {
                     key={t}
                     className="chip"
                     style={{
-                      background: 'rgba(245,241,234,0.06)',
-                      borderColor: 'rgba(245,241,234,0.1)',
-                      color: 'rgba(245,241,234,0.75)',
+                      background: 'var(--line)',
+                      borderColor: 'var(--line-strong)',
+                      color: 'var(--fg-2)',
                     }}
                   >
                     {t}
@@ -147,10 +138,7 @@ export default function MarketingForCoaches() {
             </div>
           </div>
 
-          <div
-            className="my-5 h-px w-full"
-            style={{ background: 'rgba(245,241,234,0.1)' }}
-          />
+          <div className="my-5 h-px w-full" style={{ background: 'var(--line)' }} />
 
           <div className="grid grid-cols-3 gap-3">
             {c.preview.stats.map((s) => (
@@ -159,7 +147,7 @@ export default function MarketingForCoaches() {
                   className="mono"
                   style={{
                     fontSize: 10,
-                    color: 'rgba(245,241,234,0.45)',
+                    color: 'var(--fg-4)',
                     letterSpacing: '0.1em',
                   }}
                 >
@@ -175,15 +163,15 @@ export default function MarketingForCoaches() {
           <div
             className="mt-5 rounded-xl p-3.5"
             style={{
-              background: 'rgba(245,241,234,0.05)',
-              border: '1px solid rgba(245,241,234,0.1)',
+              background: 'var(--ink-2)',
+              border: '1px solid var(--line-strong)',
             }}
           >
             <div
               className="mono"
               style={{
                 fontSize: 10,
-                color: 'rgba(245,241,234,0.6)',
+                color: 'var(--fg-3)',
                 letterSpacing: '0.12em',
               }}
             >
@@ -192,35 +180,35 @@ export default function MarketingForCoaches() {
             <div className="mt-1.5" style={{ fontSize: 13 }}>
               {c.preview.lead.message}
             </div>
-            <div className="row mt-3 gap-1.5">
-              <button
+            <div className="row mt-3 gap-1.5" aria-hidden="true">
+              <div
                 className="btn btn-accent"
                 style={{ padding: '6px 12px', fontSize: 11 }}
               >
                 Accept
-              </button>
-              <button
+              </div>
+              <div
                 className="btn"
                 style={{
                   padding: '6px 12px',
                   fontSize: 11,
                   color: 'var(--on-strong)',
-                  border: '1px solid rgba(245,241,234,0.2)',
+                  border: '1px solid var(--line-strong)',
                 }}
               >
                 Reply
-              </button>
-              <button
+              </div>
+              <div
                 className="btn"
                 style={{
                   padding: '6px 12px',
                   fontSize: 11,
                   color: 'var(--on-strong)',
-                  border: '1px solid rgba(245,241,234,0.2)',
+                  border: '1px solid var(--line-strong)',
                 }}
               >
                 Decline
-              </button>
+              </div>
             </div>
           </div>
         </div>

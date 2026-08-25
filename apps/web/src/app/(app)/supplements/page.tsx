@@ -49,23 +49,28 @@ export default function SupplementsPage() {
     if (!profile) return
     const supabase = createClient()
 
-    const [supRes, logRes] = await Promise.all([
-      supabase
-        .from('user_supplements')
-        .select('*')
-        .eq('user_id', profile.id)
-        .eq('is_active', true)
-        .order('created_at'),
-      supabase
-        .from('supplement_logs')
-        .select('*')
-        .eq('user_id', profile.id)
-        .eq('date', today),
-    ])
+    try {
+      const [supRes, logRes] = await Promise.all([
+        supabase
+          .from('user_supplements')
+          .select('*')
+          .eq('user_id', profile.id)
+          .eq('is_active', true)
+          .order('created_at'),
+        supabase
+          .from('supplement_logs')
+          .select('*')
+          .eq('user_id', profile.id)
+          .eq('date', today),
+      ])
 
-    setSupplements(supRes.data ?? [])
-    setTodayLogs(logRes.data ?? [])
-    setLoading(false)
+      setSupplements(supRes.data ?? [])
+      setTodayLogs(logRes.data ?? [])
+    } catch {
+      toast.error('Failed to load supplements')
+    } finally {
+      setLoading(false)
+    }
   }, [profile, today])
 
   useEffect(() => { load() }, [load])
@@ -204,7 +209,7 @@ export default function SupplementsPage() {
         meta={
           <div className="app-card-topline min-w-[160px]">
             <span>TODAY</span>
-            <span style={{ color: 'var(--acc)' }}>{takenCount}/{totalActive}</span>
+            <span style={{ color: 'var(--acc-text)' }}>{takenCount}/{totalActive}</span>
           </div>
         }
       />
@@ -217,7 +222,7 @@ export default function SupplementsPage() {
               <Pill className="h-5 w-5 text-[var(--ok)]" />
               <h3 className="text-sm font-semibold text-[var(--fg)]">Daily stack</h3>
             </div>
-            <span className="app-status-pill text-xs" style={{ color: 'var(--ok)' }}>
+            <span className="app-status-pill text-xs" style={{ color: 'var(--ok-text)' }}>
               {takenCount}/{totalActive}
             </span>
           </div>
@@ -360,8 +365,7 @@ export default function SupplementsPage() {
             return (
               <div
                 key={sup.id}
-                className="card-flat overflow-hidden transition hover:border-[var(--line-strong)]"
-                style={isTaken ? { borderColor: 'rgba(26, 163, 122, 0.42)', background: 'rgba(26, 163, 122, 0.08)' } : undefined}
+                className={`card-flat overflow-hidden transition ${isTaken ? 'border-[var(--ok)] bg-[var(--success-bg)]' : 'hover:border-[var(--line-strong)]'}`}
               >
                 <div className="flex items-center p-4">
                   <button

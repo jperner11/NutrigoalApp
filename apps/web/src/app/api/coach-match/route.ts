@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { scoreCoach } from '@/lib/coachScoring'
 import {
   normalizeCoachWizardAnswers,
@@ -89,8 +90,8 @@ export async function GET(request: Request) {
   }
 
   const coachIds = (data ?? []).map((profile) => profile.coach_id)
-  const { data: offers } = coachIds.length === 0
-    ? { data: [] as CoachOfferRow[] }
+  const { data: offers, error: offersError } = coachIds.length === 0
+    ? { data: [] as CoachOfferRow[], error: null }
     : await admin
       .from('coach_offers')
       .select('id, coach_id, title, description, price, billing_period, cta_label, is_active, sort_order')
@@ -98,6 +99,10 @@ export async function GET(request: Request) {
       .eq('is_active', true)
       .order('sort_order', { ascending: true })
       .order('created_at', { ascending: true })
+
+  if (offersError) {
+    Sentry.captureException(offersError, { tags: { kind: 'api-route', route: 'coach-match' } })
+  }
 
   const offersByCoachId = new Map<string, CoachMatchOffer[]>()
   for (const offer of (offers as CoachOfferRow[] | null) ?? []) {

@@ -56,41 +56,46 @@ export default function ClientDetailPage() {
     const trainerId = profile.id
     const supabase = createClient()
     async function load() {
-      const [clientRes, dietRes, trainingRes, mealLogRes, workoutLogRes, weightRes, feedbackRes, conversationRes, customResponseRes] = await Promise.all([
-        supabase.from('user_profiles').select('*').eq('id', id).single(),
-        supabase.from('diet_plans').select('*').eq('user_id', id).order('created_at', { ascending: false }),
-        supabase.from('training_plans').select('*').eq('user_id', id).order('created_at', { ascending: false }),
-        supabase.from('meal_logs').select('date').eq('user_id', id).order('date', { ascending: false }).limit(1),
-        supabase.from('workout_logs').select('date').eq('user_id', id).order('date', { ascending: false }).limit(1),
-        supabase.from('weight_logs').select('weight_kg, date').eq('user_id', id).order('date', { ascending: false }).limit(1),
-        supabase.from('feedback_requests').select('id', { count: 'exact', head: true }).eq('nutritionist_id', trainerId).eq('client_id', id).eq('status', 'pending'),
-        supabase.from('conversations').select('id').eq('nutritionist_id', trainerId).eq('client_id', id).maybeSingle(),
-        supabase.from('personal_trainer_custom_intake_responses').select('id, response_text, response_json, question:question_id(label)').eq('trainer_id', trainerId).eq('client_id', id),
-      ])
-      if (clientRes.data) setClient(clientRes.data as UserProfile)
-      if (dietRes.data) setDietPlans(dietRes.data as DietPlan[])
-      if (trainingRes.data) setTrainingPlans(trainingRes.data as TrainingPlan[])
-      setCustomResponses((customResponseRes.data as CustomIntakeResponseRow[] | null) ?? [])
+      try {
+        const [clientRes, dietRes, trainingRes, mealLogRes, workoutLogRes, weightRes, feedbackRes, conversationRes, customResponseRes] = await Promise.all([
+          supabase.from('user_profiles').select('*').eq('id', id).single(),
+          supabase.from('diet_plans').select('*').eq('user_id', id).order('created_at', { ascending: false }),
+          supabase.from('training_plans').select('*').eq('user_id', id).order('created_at', { ascending: false }),
+          supabase.from('meal_logs').select('date').eq('user_id', id).order('date', { ascending: false }).limit(1),
+          supabase.from('workout_logs').select('date').eq('user_id', id).order('date', { ascending: false }).limit(1),
+          supabase.from('weight_logs').select('weight_kg, date').eq('user_id', id).order('date', { ascending: false }).limit(1),
+          supabase.from('feedback_requests').select('id', { count: 'exact', head: true }).eq('nutritionist_id', trainerId).eq('client_id', id).eq('status', 'pending'),
+          supabase.from('conversations').select('id').eq('nutritionist_id', trainerId).eq('client_id', id).maybeSingle(),
+          supabase.from('personal_trainer_custom_intake_responses').select('id, response_text, response_json, question:question_id(label)').eq('trainer_id', trainerId).eq('client_id', id),
+        ])
+        if (clientRes.data) setClient(clientRes.data as UserProfile)
+        if (dietRes.data) setDietPlans(dietRes.data as DietPlan[])
+        if (trainingRes.data) setTrainingPlans(trainingRes.data as TrainingPlan[])
+        setCustomResponses((customResponseRes.data as CustomIntakeResponseRow[] | null) ?? [])
 
-      let unreadMessageCount = 0
-      if (conversationRes.data?.id) {
-        const { count } = await supabase
-          .from('messages')
-          .select('*', { count: 'exact', head: true })
-          .eq('conversation_id', conversationRes.data.id)
-          .neq('sender_id', trainerId)
-          .is('read_at', null)
-        unreadMessageCount = count ?? 0
+        let unreadMessageCount = 0
+        if (conversationRes.data?.id) {
+          const { count } = await supabase
+            .from('messages')
+            .select('*', { count: 'exact', head: true })
+            .eq('conversation_id', conversationRes.data.id)
+            .neq('sender_id', trainerId)
+            .is('read_at', null)
+          unreadMessageCount = count ?? 0
+        }
+
+        setOverview({
+          lastMealDate: mealLogRes.data?.[0]?.date ?? null,
+          lastWorkoutDate: workoutLogRes.data?.[0]?.date ?? null,
+          latestWeight: weightRes.data?.[0]?.weight_kg ?? null,
+          pendingFeedbackCount: feedbackRes.count ?? 0,
+          unreadMessageCount,
+        })
+      } catch {
+        toast.error('Failed to load client data')
+      } finally {
+        setLoading(false)
       }
-
-      setOverview({
-        lastMealDate: mealLogRes.data?.[0]?.date ?? null,
-        lastWorkoutDate: workoutLogRes.data?.[0]?.date ?? null,
-        latestWeight: weightRes.data?.[0]?.weight_kg ?? null,
-        pendingFeedbackCount: feedbackRes.count ?? 0,
-        unreadMessageCount,
-      })
-      setLoading(false)
     }
     load()
   }, [profile, id, router])
@@ -111,7 +116,7 @@ export default function ClientDetailPage() {
         accent={client.onboarding_completed ? 'ready.' : 'intake pending.'}
         subtitle={`${client.email} · ${client.gender}, ${client.age}y · ${client.weight_kg}kg · ${client.height_cm}cm${client.goal ? ` · ${client.goal}` : ''}`}
         meta={
-          <span className="app-status-pill" style={{ color: client.onboarding_completed ? 'var(--ok)' : 'var(--warn)' }}>
+          <span className="app-status-pill" style={{ color: client.onboarding_completed ? 'var(--ok-text)' : 'var(--warn-text)' }}>
             {client.onboarding_completed ? 'Intake complete' : 'Intake pending'}
           </span>
         }
@@ -185,8 +190,8 @@ export default function ClientDetailPage() {
       </div>
 
       <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <MetricCard label="Last meal log" value={overview.lastMealDate ? new Date(overview.lastMealDate).toLocaleDateString('en-GB') : 'No logs'} tone="muted" />
-        <MetricCard label="Last workout" value={overview.lastWorkoutDate ? new Date(overview.lastWorkoutDate).toLocaleDateString('en-GB') : 'No logs'} tone="accent" />
+        <MetricCard label="Last meal log" value={overview.lastMealDate ? new Date(overview.lastMealDate + 'T00:00:00').toLocaleDateString('en-GB') : 'No logs'} tone="muted" />
+        <MetricCard label="Last workout" value={overview.lastWorkoutDate ? new Date(overview.lastWorkoutDate + 'T00:00:00').toLocaleDateString('en-GB') : 'No logs'} tone="accent" />
         <MetricCard label="Latest weight" value={overview.latestWeight ? `${overview.latestWeight}kg` : 'No data'} tone="success" />
         <MetricCard label="Needs response" value={overview.pendingFeedbackCount + overview.unreadMessageCount} tone="warn" />
       </div>
@@ -331,7 +336,7 @@ function EditableMacros({ client, onUpdated }: { client: UserProfile; onUpdated:
             Edit
           </button>
         </div>
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <MacroPill label="Calories" value={client.daily_calories} unit="kcal" />
           <MacroPill label="Protein" value={client.daily_protein} unit="g" />
           <MacroPill label="Carbs" value={client.daily_carbs} unit="g" />
@@ -351,28 +356,28 @@ function EditableMacros({ client, onUpdated }: { client: UserProfile; onUpdated:
           </button>
         </div>
       </div>
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <div>
-          <label className="app-mono-label mb-1 block">Calories</label>
-          <input type="number" value={calories} onChange={e => setCalories(e.target.value)}
+          <label htmlFor="client-macro-calories" className="app-mono-label mb-1 block">Calories</label>
+          <input id="client-macro-calories" type="number" value={calories} onChange={e => setCalories(e.target.value)}
             className="input-field px-3 py-2 text-sm"
             placeholder="kcal" />
         </div>
         <div>
-          <label className="app-mono-label mb-1 block">Protein</label>
-          <input type="number" value={protein} onChange={e => setProtein(e.target.value)}
+          <label htmlFor="client-macro-protein" className="app-mono-label mb-1 block">Protein</label>
+          <input id="client-macro-protein" type="number" value={protein} onChange={e => setProtein(e.target.value)}
             className="input-field px-3 py-2 text-sm"
             placeholder="g" />
         </div>
         <div>
-          <label className="app-mono-label mb-1 block">Carbs</label>
-          <input type="number" value={carbs} onChange={e => setCarbs(e.target.value)}
+          <label htmlFor="client-macro-carbs" className="app-mono-label mb-1 block">Carbs</label>
+          <input id="client-macro-carbs" type="number" value={carbs} onChange={e => setCarbs(e.target.value)}
             className="input-field px-3 py-2 text-sm"
             placeholder="g" />
         </div>
         <div>
-          <label className="app-mono-label mb-1 block">Fat</label>
-          <input type="number" value={fat} onChange={e => setFat(e.target.value)}
+          <label htmlFor="client-macro-fat" className="app-mono-label mb-1 block">Fat</label>
+          <input id="client-macro-fat" type="number" value={fat} onChange={e => setFat(e.target.value)}
             className="input-field px-3 py-2 text-sm"
             placeholder="g" />
         </div>

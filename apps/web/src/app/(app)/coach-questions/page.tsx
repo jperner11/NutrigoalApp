@@ -9,6 +9,7 @@ import {
   Plus, Pencil, Trash2, Loader2, Check, X, ArrowUp, ArrowDown, ClipboardList,
 } from 'lucide-react'
 import { AppHeroPanel, AppSectionHeader, EmptyStateCard } from '@/components/ui/AppDesign'
+import { reportClientError } from '@/lib/apiClient'
 import type { PersonalTrainerCustomIntakeQuestion } from '@/lib/supabase/types'
 
 const QUESTION_TYPES: { value: PersonalTrainerCustomIntakeQuestion['type']; label: string }[] = [
@@ -47,15 +48,20 @@ export default function CoachQuestionsPage() {
   const [draft, setDraft] = useState<DraftQuestion | null>(null)
 
   const fetchQuestions = useCallback(async () => {
-    const res = await fetch('/api/personal-trainer/custom-intake/questions')
-    const json = await res.json()
-    if (!res.ok) {
-      toast.error(json.error || 'Failed to load questions')
+    try {
+      const res = await fetch('/api/personal-trainer/custom-intake/questions')
+      const json = await res.json()
+      if (!res.ok) {
+        toast.error(json.error || 'Failed to load questions')
+        return
+      }
+      setQuestions(json.questions ?? [])
+    } catch (err) {
+      reportClientError(err, { feature: 'coach-questions', action: 'load-questions' })
+      toast.error('Failed to load questions')
+    } finally {
       setLoading(false)
-      return
     }
-    setQuestions(json.questions ?? [])
-    setLoading(false)
   }, [])
 
   useEffect(() => {
@@ -129,28 +135,38 @@ export default function CoachQuestionsPage() {
 
   async function deleteQuestion(id: string) {
     if (!confirm('Delete this question? Existing client responses will also be removed.')) return
-    const res = await fetch(`/api/personal-trainer/custom-intake/questions/${id}`, { method: 'DELETE' })
-    const json = await res.json().catch(() => ({}))
-    if (!res.ok) {
-      toast.error(json.error || 'Failed to delete')
-      return
+    try {
+      const res = await fetch(`/api/personal-trainer/custom-intake/questions/${id}`, { method: 'DELETE' })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        toast.error(json.error || 'Failed to delete')
+        return
+      }
+      toast.success('Question deleted')
+      await fetchQuestions()
+    } catch (err) {
+      reportClientError(err, { feature: 'coach-questions', action: 'delete-question' })
+      toast.error('Failed to delete')
     }
-    toast.success('Question deleted')
-    await fetchQuestions()
   }
 
   async function toggleActive(q: PersonalTrainerCustomIntakeQuestion) {
-    const res = await fetch(`/api/personal-trainer/custom-intake/questions/${q.id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ is_active: !q.is_active }),
-    })
-    if (!res.ok) {
-      const json = await res.json().catch(() => ({}))
-      toast.error(json.error || 'Failed to update')
-      return
+    try {
+      const res = await fetch(`/api/personal-trainer/custom-intake/questions/${q.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_active: !q.is_active }),
+      })
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}))
+        toast.error(json.error || 'Failed to update')
+        return
+      }
+      await fetchQuestions()
+    } catch (err) {
+      reportClientError(err, { feature: 'coach-questions', action: 'toggle-question-active' })
+      toast.error('Failed to update')
     }
-    await fetchQuestions()
   }
 
   async function move(q: PersonalTrainerCustomIntakeQuestion, dir: -1 | 1) {
@@ -214,7 +230,7 @@ export default function CoachQuestionsPage() {
               <div key={q.id} className="card flex items-start justify-between gap-3 p-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <ClipboardList className="h-4 w-4 text-violet-500" />
+                    <ClipboardList className="h-4 w-4 text-[var(--acc-text)]" />
                     <span className="font-semibold text-[var(--fg)]">{q.label}</span>
                     <span className="app-status-pill text-xs">{QUESTION_TYPES.find((t) => t.value === q.type)?.label ?? q.type}</span>
                     {q.required && <span className="text-xs text-amber-500">required</span>}

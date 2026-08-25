@@ -8,7 +8,7 @@ import {
   Calendar, Dumbbell, Target,
 } from 'lucide-react'
 import type { ExerciseProgress } from '@treno/shared'
-import { apiFetch } from '@/lib/apiClient'
+import { apiFetch, reportClientError } from '@/lib/apiClient'
 
 interface CheckInResult {
   exerciseProgress: ExerciseProgress[]
@@ -41,32 +41,36 @@ export default function ProgressCheckIn({ userId, onPlanRegenerate }: ProgressCh
   const checkEligibility = useCallback(async () => {
     const supabase = createClient()
 
-    const { data: lastCheckIn } = await supabase
-      .from('training_check_ins')
-      .select('check_in_date')
-      .eq('user_id', userId)
-      .order('check_in_date', { ascending: false })
-      .limit(1)
-      .single()
+    try {
+      const { data: lastCheckIn } = await supabase
+        .from('training_check_ins')
+        .select('check_in_date')
+        .eq('user_id', userId)
+        .order('check_in_date', { ascending: false })
+        .limit(1)
+        .single()
 
-    if (lastCheckIn) {
-      setLastCheckInDate(lastCheckIn.check_in_date)
-      const lastDate = new Date(lastCheckIn.check_in_date)
-      const daysSince = Math.floor((Date.now() - lastDate.getTime()) / (1000 * 60 * 60 * 24))
-      if (daysSince < 14) {
-        setChecking(false)
-        return
+      if (lastCheckIn) {
+        setLastCheckInDate(lastCheckIn.check_in_date)
+        const lastDate = new Date(lastCheckIn.check_in_date)
+        const daysSince = Math.floor((Date.now() - lastDate.getTime()) / (1000 * 60 * 60 * 24))
+        if (daysSince < 14) {
+          return
+        }
       }
+
+      // Check if user has any workout logs
+      const { count } = await supabase
+        .from('workout_logs')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', userId)
+
+      setEligible((count ?? 0) > 0)
+    } catch (err) {
+      reportClientError(err, { feature: 'training', action: 'check-in-eligibility', extra: { userId } })
+    } finally {
+      setChecking(false)
     }
-
-    // Check if user has any workout logs
-    const { count } = await supabase
-      .from('workout_logs')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', userId)
-
-    setEligible((count ?? 0) > 0)
-    setChecking(false)
   }, [userId])
 
   useEffect(() => {
@@ -98,7 +102,7 @@ export default function ProgressCheckIn({ userId, onPlanRegenerate }: ProgressCh
   }
 
   const trendColor = (trend: string) => {
-    if (trend === 'improving') return 'text-[var(--ok-text)] bg-[rgba(26,163,122,0.12)] border-[rgba(26,163,122,0.34)]'
+    if (trend === 'improving') return 'text-[var(--ok-text)] bg-[var(--success-bg)] border-[rgba(26,163,122,0.34)]'
     if (trend === 'declining') return 'text-[var(--foreground)] bg-[var(--danger-bg)] border-[rgba(205,242,78,0.34)]'
     return 'text-[var(--warn-text)] bg-[rgba(196,121,28,0.12)] border-[rgba(196,121,28,0.34)]'
   }
@@ -119,7 +123,7 @@ export default function ProgressCheckIn({ userId, onPlanRegenerate }: ProgressCh
             <p className="text-sm font-semibold text-[var(--foreground)]">Progress Check-In Available</p>
             <p className="text-xs text-[var(--muted)]">
               {lastCheckInDate
-                ? `Last check-in: ${new Date(lastCheckInDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} — time to review your progress`
+                ? `Last check-in: ${new Date(lastCheckInDate + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} — time to review your progress`
                 : 'Analyse your workout data and get AI-powered insights'}
             </p>
           </div>
@@ -188,7 +192,7 @@ export default function ProgressCheckIn({ userId, onPlanRegenerate }: ProgressCh
               <p className="text-lg font-bold text-[var(--foreground)]">{result.workoutsLogged}/{result.workoutsPlanned}</p>
               <p className="text-xs text-[var(--muted)]">Workouts</p>
             </div>
-            <div className="rounded-lg bg-[rgba(26,163,122,0.12)] p-3 text-center">
+            <div className="rounded-lg bg-[var(--success-bg)] p-3 text-center">
               <Target className="mx-auto mb-1 h-4 w-4 text-[var(--ok-text)]" />
               <p className="text-lg font-bold text-[var(--foreground)]">{consistency}%</p>
               <p className="text-xs text-[var(--muted)]">Consistency</p>

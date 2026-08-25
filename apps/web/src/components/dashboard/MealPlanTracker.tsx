@@ -9,6 +9,7 @@ import type { DietPlan, DietPlanMeal, FoodItem } from '@/lib/supabase/types'
 import { isFeatureLocked } from '@/lib/tierUtils'
 import type { UserRole } from '@/lib/supabase/types'
 import { reportClientError } from '@/lib/apiClient'
+import { getMondayIndexedDay } from '@/lib/date'
 
 interface MealMeta {
   label?: string
@@ -56,8 +57,7 @@ export default function MealPlanTracker({ userId, userRole = 'free', onMacrosUpd
   const [selectedMealId, setSelectedMealId] = useState<string | null>(null)
 
   const today = new Date().toISOString().split('T')[0]
-  // Convert JS day (0=Sun) to our format (0=Mon): (jsDay + 6) % 7
-  const dayOfWeek = (new Date().getDay() + 6) % 7
+  const dayOfWeek = getMondayIndexedDay()
   const isFreeUser = isFeatureLocked(userRole, 'full_meals') && (activePlan?.is_ai_generated !== false)
 
   useEffect(() => {
@@ -144,6 +144,7 @@ export default function MealPlanTracker({ userId, userRole = 'free', onMacrosUpd
   async function toggleMeal(meal: DietPlanMeal) {
     const supabase = createClient()
     const isCurrentlyLogged = loggedMealIds.has(meal.id)
+    const newLogged = new Set(loggedMealIds)
 
     if (isCurrentlyLogged) {
       // Uncheck: delete the meal log
@@ -159,7 +160,6 @@ export default function MealPlanTracker({ userId, userRole = 'free', onMacrosUpd
         return
       }
 
-      const newLogged = new Set(loggedMealIds)
       newLogged.delete(meal.id)
       setLoggedMealIds(newLogged)
       toast.success(`${meal.meal_name} unmarked`)
@@ -182,7 +182,6 @@ export default function MealPlanTracker({ userId, userRole = 'free', onMacrosUpd
         return
       }
 
-      const newLogged = new Set(loggedMealIds)
       newLogged.add(meal.id)
       setLoggedMealIds(newLogged)
       toast.success(`${meal.meal_name} logged!`)
@@ -191,16 +190,9 @@ export default function MealPlanTracker({ userId, userRole = 'free', onMacrosUpd
     // Recalculate macros
     const allMeals = meals
     let totalCal = 0, totalPro = 0, totalCarbs = 0, totalFat = 0
-    const updatedLogged = new Set(loggedMealIds)
-
-    if (isCurrentlyLogged) {
-      updatedLogged.delete(meal.id)
-    } else {
-      updatedLogged.add(meal.id)
-    }
 
     allMeals.forEach(m => {
-      if (updatedLogged.has(m.id)) {
+      if (newLogged.has(m.id)) {
         totalCal += m.total_calories
         totalPro += m.total_protein
         totalCarbs += m.total_carbs
@@ -367,7 +359,7 @@ export default function MealPlanTracker({ userId, userRole = 'free', onMacrosUpd
                       style={{
                         borderColor: isEaten ? 'var(--acc)' : 'var(--line-2)',
                         background: isEaten ? 'var(--acc)' : 'var(--ink-2)',
-                        color: isEaten ? 'var(--ink-1)' : 'var(--fg-3)',
+                        color: isEaten ? '#0a0a0a' : 'var(--fg-3)',
                       }}
                       aria-label={isEaten ? `Unmark ${meal.meal_name}` : `Mark ${meal.meal_name} eaten`}
                     >

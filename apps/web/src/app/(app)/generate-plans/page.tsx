@@ -366,63 +366,80 @@ export default function GeneratePlansPage() {
 
     if (planError || !plan) throw new Error('Failed to save training plan')
 
+    // Resolve exercise IDs — use server-provided ID or create client-side.
+    // Collect exercises missing an ID (deduped by name) up front so they can
+    // be created in a single bulk insert instead of one round trip per
+    // exercise per day.
+    const validBodyParts = new Set(['chest', 'back', 'shoulders', 'biceps', 'triceps', 'legs', 'core', 'full_body'])
+    const validEquipment = new Set(['barbell', 'dumbbell', 'machine', 'cable', 'bodyweight', 'band'])
+
+    const exerciseIdByName = new Map<string, string>()
+    const newExercises = new Map<string, { name: string; body_part: string; equipment: string; is_compound: boolean }>()
     for (const day of (data.days ?? [])) {
-      const { data: planDay, error: dayError } = await supabase
-        .from('training_plan_days')
-        .insert({
-          training_plan_id: plan.id,
-          day_number: day.day_number,
-          name: day.name,
-        })
-        .select()
-        .single()
-
-      if (dayError || !planDay) continue
-
-      // Resolve exercise IDs — use server-provided ID or create client-side
-      const validBodyParts = new Set(['chest', 'back', 'shoulders', 'biceps', 'triceps', 'legs', 'core', 'full_body'])
-      const validEquipment = new Set(['barbell', 'dumbbell', 'machine', 'cable', 'bodyweight', 'band'])
-
-      const exerciseInserts = []
       for (let idx = 0; idx < day.exercises.length; idx++) {
         const ex = day.exercises[idx]
-        let exerciseId = ex.exercise_id
-
-        if (!exerciseId) {
-          // Fallback: create exercise client-side
-          const bodyPart = validBodyParts.has(ex.body_part) ? ex.body_part : 'full_body'
-          const equip = validEquipment.has(ex.equipment) ? ex.equipment : 'bodyweight'
-          const { data: newEx } = await supabase
-            .from('exercises')
-            .insert({
-              name: ex.name,
-              body_part: bodyPart,
-              equipment: equip,
-              is_compound: idx < 3,
-            })
-            .select('id')
-            .single()
-
-          if (newEx) exerciseId = newEx.id
-        }
-
-        if (exerciseId) {
-          exerciseInserts.push({
-            plan_day_id: planDay.id,
-            exercise_id: exerciseId,
-            order_index: idx,
-            sets: ex.sets || 3,
-            reps: ex.reps || '8-12',
-            rest_seconds: ex.rest_seconds || 90,
-            notes: ex.notes || null,
-          })
-        }
-      }
-
-      if (exerciseInserts.length > 0) {
-        await supabase.from('training_plan_exercises').insert(exerciseInserts)
+        if (ex.exercise_id) continue
+        const key = ex.name.toLowerCase()
+        if (newExercises.has(key)) continue
+        newExercises.set(key, {
+          name: ex.name,
+          body_part: validBodyParts.has(ex.body_part) ? ex.body_part : 'full_body',
+          equipment: validEquipment.has(ex.equipment) ? ex.equipment : 'bodyweight',
+          is_compound: idx < 3,
+        })
       }
     }
+
+    if (newExercises.size > 0) {
+      const { data: insertedExercises } = await supabase
+        .from('exercises')
+        .insert(Array.from(newExercises.values()))
+        .select('id, name')
+
+      for (const inserted of (insertedExercises ?? [])) {
+        exerciseIdByName.set(inserted.name.toLowerCase(), inserted.id)
+      }
+    }
+
+    // Each day's insert only depends on plan.id, not on prior days, so run
+    // them concurrently instead of serializing one round trip per day.
+    await Promise.all(
+      (data.days ?? []).map(async (day) => {
+        const { data: planDay, error: dayError } = await supabase
+          .from('training_plan_days')
+          .insert({
+            training_plan_id: plan.id,
+            day_number: day.day_number,
+            name: day.name,
+          })
+          .select()
+          .single()
+
+        if (dayError || !planDay) return
+
+        const exerciseInserts = []
+        for (let idx = 0; idx < day.exercises.length; idx++) {
+          const ex = day.exercises[idx]
+          const exerciseId = ex.exercise_id ?? exerciseIdByName.get(ex.name.toLowerCase())
+
+          if (exerciseId) {
+            exerciseInserts.push({
+              plan_day_id: planDay.id,
+              exercise_id: exerciseId,
+              order_index: idx,
+              sets: ex.sets || 3,
+              reps: ex.reps || '8-12',
+              rest_seconds: ex.rest_seconds || 90,
+              notes: ex.notes || null,
+            })
+          }
+        }
+
+        if (exerciseInserts.length > 0) {
+          await supabase.from('training_plan_exercises').insert(exerciseInserts)
+        }
+      })
+    )
   }
 
 interface CompanionContent {
@@ -593,14 +610,14 @@ interface SavedSupplementRecommendation {
       <div className="max-w-md w-full mx-auto text-center">
         {/* Header */}
         <div className="mb-10">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 mb-4 shadow-lg shadow-purple-500/25">
-            <Sparkles className="h-8 w-8 text-white" />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-[var(--brand-500)] to-[var(--brand-400)] mb-4 shadow-lg shadow-[var(--brand-200)]">
+            <Sparkles className="h-8 w-8 text-[#0a0a0a]" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-[var(--foreground)]">
             {allDone ? 'Your plans are ready!' : hasError ? 'Almost there...' : 'Creating your personalized plans'}
           </h1>
           {!allDone && (
-            <p className="text-gray-600 mt-2">
+            <p className="text-[var(--muted)] mt-2">
               Using your profile to build the perfect training and nutrition plans.
             </p>
           )}
@@ -614,19 +631,19 @@ interface SavedSupplementRecommendation {
                 key={i}
                 className={`flex items-center gap-4 px-5 py-4 rounded-xl border transition-all duration-300 ${
                   step.status === 'done'
-                    ? 'bg-green-50 border-green-200'
+                    ? 'bg-[var(--success-bg)] border-[var(--ok)]'
                     : step.status === 'error'
-                    ? 'bg-red-50 border-red-200'
+                    ? 'bg-[var(--danger-bg)] border-[var(--danger)]'
                     : step.status === 'loading'
-                    ? 'bg-purple-50 border-purple-200'
-                    : 'bg-gray-50 border-gray-200'
+                    ? 'bg-[var(--acc-soft)] border-[var(--acc)]'
+                    : 'bg-[var(--ink-2)] border-[var(--line)]'
                 }`}
               >
                 <div className={`flex-shrink-0 ${
-                  step.status === 'done' ? 'text-green-600'
-                    : step.status === 'error' ? 'text-red-500'
-                    : step.status === 'loading' ? 'text-purple-600'
-                    : 'text-gray-400'
+                  step.status === 'done' ? 'text-[var(--ok-text)]'
+                    : step.status === 'error' ? 'text-[var(--danger-text)]'
+                    : step.status === 'loading' ? 'text-[var(--acc-text)]'
+                    : 'text-[var(--fg-4)]'
                 }`}>
                   {step.status === 'loading' ? (
                     <Loader2 className="h-5 w-5 animate-spin" />
@@ -640,10 +657,10 @@ interface SavedSupplementRecommendation {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className={`text-sm font-medium ${
-                    step.status === 'done' ? 'text-green-800'
-                      : step.status === 'error' ? 'text-red-800'
-                      : step.status === 'loading' ? 'text-purple-800'
-                      : 'text-gray-500'
+                    step.status === 'done' ? 'text-[var(--ok-text)]'
+                      : step.status === 'error' ? 'text-[var(--danger-text)]'
+                      : step.status === 'loading' ? 'text-[var(--acc-text)]'
+                      : 'text-[var(--fg-3)]'
                   }`}>
                     {step.status === 'done'
                       ? step.label.replace('Generating', 'Generated').replace('Saving', 'Saved')
@@ -652,13 +669,13 @@ interface SavedSupplementRecommendation {
                       : step.label}
                   </p>
                   {step.error && (
-                    <p className="text-xs text-red-600 mt-0.5">{step.error}</p>
+                    <p className="text-xs text-[var(--danger-text)] mt-0.5">{step.error}</p>
                   )}
                 </div>
                 {step.status === 'loading' && (
-                  <div className="w-16 h-1.5 bg-purple-200 rounded-full overflow-hidden">
+                  <div className="w-16 h-1.5 bg-[var(--line)] rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-purple-600 rounded-full transition-all duration-500"
+                      className="h-full bg-[var(--acc)] rounded-full transition-all duration-500"
                       style={{ width: i === 1 && mealDayProgress > 0 ? `${Math.round((mealDayProgress / 7) * 100)}%` : '60%' }}
                     />
                   </div>
@@ -671,46 +688,43 @@ interface SavedSupplementRecommendation {
         {/* Success overview — show where everything was saved */}
         {allDone && (
           <div className="space-y-3 text-left">
-            <p className="text-sm text-gray-500 mb-4 text-center">Here&apos;s where to find everything:</p>
+            <p className="text-sm text-[var(--fg-3)] mb-4 text-center">Here&apos;s where to find everything:</p>
 
             {savedMealPlan && (
-              <Link href="/diet" className="flex items-center gap-4 px-5 py-4 rounded-xl border border-green-200 bg-green-50 hover:bg-green-100 transition-colors group">
-                <Utensils className="h-5 w-5 text-green-600 flex-shrink-0" />
+              <Link href="/diet" className="flex items-center gap-4 px-5 py-4 rounded-xl border border-[var(--ok)] bg-[var(--success-bg)] hover:border-[var(--acc)] transition-colors group">
+                <Utensils className="h-5 w-5 text-[var(--ok-text)] flex-shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-green-800">7-Day Meal Plan</p>
-                  <p className="text-xs text-green-600">View your meals, macros, and coaching insights</p>
+                  <p className="text-sm font-semibold text-[var(--ok-text)]">7-Day Meal Plan</p>
+                  <p className="text-xs text-[var(--fg-2)]">View your meals, macros, and coaching insights</p>
                 </div>
-                <ArrowRight className="h-4 w-4 text-green-400 group-hover:translate-x-0.5 transition-transform" />
+                <ArrowRight className="h-4 w-4 text-[var(--ok-text)] group-hover:translate-x-0.5 transition-transform" />
               </Link>
             )}
 
             {savedTraining && (
-              <Link href="/training" className="flex items-center gap-4 px-5 py-4 rounded-xl border border-purple-200 bg-purple-50 hover:bg-purple-100 transition-colors group">
-                <Dumbbell className="h-5 w-5 text-purple-600 flex-shrink-0" />
+              <Link href="/training" className="flex items-center gap-4 px-5 py-4 rounded-xl border border-[var(--acc)] bg-[var(--acc-soft)] hover:border-[var(--acc)] transition-colors group">
+                <Dumbbell className="h-5 w-5 text-[var(--acc-text)] flex-shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-purple-800">Training Plan</p>
-                  <p className="text-xs text-purple-600">Your personalised workout programme</p>
+                  <p className="text-sm font-semibold text-[var(--acc-text)]">Training Plan</p>
+                  <p className="text-xs text-[var(--fg-2)]">Your personalised workout programme</p>
                 </div>
-                <ArrowRight className="h-4 w-4 text-purple-400 group-hover:translate-x-0.5 transition-transform" />
+                <ArrowRight className="h-4 w-4 text-[var(--acc-text)] group-hover:translate-x-0.5 transition-transform" />
               </Link>
             )}
 
             {savedSupplements && (
-              <Link href="/supplements" className="flex items-center gap-4 px-5 py-4 rounded-xl border border-amber-200 bg-amber-50 hover:bg-amber-100 transition-colors group">
-                <Pill className="h-5 w-5 text-amber-600 flex-shrink-0" />
+              <Link href="/supplements" className="flex items-center gap-4 px-5 py-4 rounded-xl border border-[rgba(196,121,28,0.34)] bg-[rgba(196,121,28,0.14)] hover:border-[var(--warn)] transition-colors group">
+                <Pill className="h-5 w-5 text-[var(--warn-text)] flex-shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-amber-800">Supplement Recommendations</p>
-                  <p className="text-xs text-amber-600">Evidence-based suggestions added to your Supplements tab</p>
+                  <p className="text-sm font-semibold text-[var(--warn-text)]">Supplement Recommendations</p>
+                  <p className="text-xs text-[var(--fg-2)]">Evidence-based suggestions added to your Supplements tab</p>
                 </div>
-                <ArrowRight className="h-4 w-4 text-amber-400 group-hover:translate-x-0.5 transition-transform" />
+                <ArrowRight className="h-4 w-4 text-[var(--warn-text)] group-hover:translate-x-0.5 transition-transform" />
               </Link>
             )}
 
             <div className="pt-4">
-              <Link
-                href="/dashboard"
-                className="block w-full text-center px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
-              >
+              <Link href="/dashboard" className="btn btn-accent w-full justify-center">
                 Go to Dashboard
               </Link>
             </div>
@@ -721,7 +735,7 @@ interface SavedSupplementRecommendation {
         {hasError && !allDone && (
           <button
             onClick={() => router.push('/dashboard')}
-            className="mt-8 px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-medium hover:shadow-lg transition-all"
+            className="btn btn-accent mt-8"
           >
             Go to Dashboard
           </button>

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { reportClientError } from '@/lib/apiClient'
 import { Scale, Plus } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import Link from 'next/link'
@@ -29,24 +30,29 @@ export default function QuickWeightLog({ userId, currentWeight, onWeightLogged }
     const supabase = createClient()
     const today = new Date().toISOString().split('T')[0]
 
-    const { error } = await supabase
-      .from('weight_logs')
-      .upsert(
-        { user_id: userId, date: today, weight_kg: val },
-        { onConflict: 'user_id,date' }
-      )
+    try {
+      const { error } = await supabase
+        .from('weight_logs')
+        .upsert(
+          { user_id: userId, date: today, weight_kg: val },
+          { onConflict: 'user_id,date' }
+        )
 
-    if (error) {
+      if (error) {
+        toast.error('Failed to log weight')
+        return
+      }
+
+      toast.success(`Weight logged: ${val} kg`)
+      onWeightLogged(val)
+      setWeight('')
+      setJustLogged(true)
+    } catch (err) {
+      reportClientError(err, { feature: 'dashboard', action: 'quick-weight-log' })
       toast.error('Failed to log weight')
+    } finally {
       setSaving(false)
-      return
     }
-
-    toast.success(`Weight logged: ${val} kg`)
-    onWeightLogged(val)
-    setWeight('')
-    setJustLogged(true)
-    setSaving(false)
   }
 
   return (

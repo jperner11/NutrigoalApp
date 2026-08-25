@@ -85,6 +85,8 @@ export default function CoachReviews({
           setTitle(json.myReview.title ?? '')
           setBody(json.myReview.body ?? '')
         }
+      } else {
+        toast.error(json.error || 'Failed to load reviews.')
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Failed to load reviews.')

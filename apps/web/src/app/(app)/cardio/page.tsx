@@ -48,27 +48,35 @@ export default function CardioPage() {
     const supabase = createClient()
 
     async function load() {
-      const [{ data: types }, { data: sessionsData }] = await Promise.all([
-        supabase.from('cardio_types').select('*').order('name'),
-        supabase
-          .from('cardio_sessions')
-          .select('*, cardio_types(*)')
-          .eq('user_id', profile!.id)
-          .order('date', { ascending: false })
-          .limit(20),
-      ])
+      try {
+        const [{ data: types, error: typesError }, { data: sessionsData, error: sessionsError }] = await Promise.all([
+          supabase.from('cardio_types').select('*').order('name'),
+          supabase
+            .from('cardio_sessions')
+            .select('*, cardio_types(*)')
+            .eq('user_id', profile!.id)
+            .order('date', { ascending: false })
+            .limit(20),
+        ])
 
-      setCardioTypes(types ?? [])
-      if (types?.length) {
-        setFormData(prev => ({ ...prev, cardio_type_id: types[0].id }))
+        if (typesError) throw typesError
+        if (sessionsError) throw sessionsError
+
+        setCardioTypes(types ?? [])
+        if (types?.length) {
+          setFormData(prev => ({ ...prev, cardio_type_id: types[0].id }))
+        }
+
+        const mapped = (sessionsData ?? []).map((s) => ({
+          ...s,
+          cardio_type: s.cardio_types as unknown as CardioType,
+        }))
+        setSessions(mapped)
+      } catch {
+        toast.error('Failed to load cardio data')
+      } finally {
+        setLoading(false)
       }
-
-      const mapped = (sessionsData ?? []).map((s) => ({
-        ...s,
-        cardio_type: s.cardio_types as unknown as CardioType,
-      }))
-      setSessions(mapped)
-      setLoading(false)
     }
 
     load()
@@ -113,19 +121,25 @@ export default function CardioPage() {
 
     toast.success(`Logged ${formData.duration_minutes} min of ${selectedType.name} — ${caloriesBurned} cal burned.`)
 
-    const { data } = await supabase
-      .from('cardio_sessions')
-      .select('*, cardio_types(*)')
-      .eq('user_id', profile.id)
-      .order('date', { ascending: false })
-      .limit(20)
+    try {
+      const { data, error: refetchError } = await supabase
+        .from('cardio_sessions')
+        .select('*, cardio_types(*)')
+        .eq('user_id', profile.id)
+        .order('date', { ascending: false })
+        .limit(20)
 
-    setSessions(
-      (data ?? []).map((s) => ({
-        ...s,
-        cardio_type: s.cardio_types as unknown as CardioType,
-      }))
-    )
+      if (refetchError) throw refetchError
+
+      setSessions(
+        (data ?? []).map((s) => ({
+          ...s,
+          cardio_type: s.cardio_types as unknown as CardioType,
+        }))
+      )
+    } catch {
+      toast.error('Session logged, but the list failed to refresh — reload to see it.')
+    }
 
     setFormData(prev => ({
       ...prev,
@@ -157,7 +171,7 @@ export default function CardioPage() {
         <div className="card p-10 text-center">
           <div
             className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl"
-            style={{ background: 'var(--ink-3)', color: 'var(--acc)' }}
+            style={{ background: 'var(--ink-3)', color: 'var(--acc-text)' }}
           >
             <Lock className="h-6 w-6" />
           </div>
@@ -272,7 +286,7 @@ export default function CardioPage() {
                           className="mono"
                           style={{
                             fontSize: 9,
-                            color: 'var(--acc)',
+                            color: 'var(--acc-text)',
                             letterSpacing: '0.1em',
                           }}
                         >

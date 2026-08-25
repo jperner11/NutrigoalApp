@@ -24,32 +24,24 @@ export async function POST(request: Request) {
     // Session-scoped client: RLS limits reads/writes to the user's own rows
     const supabase = await createClient()
 
-    const { data: profile } = await supabase
-      .from('user_profiles')
-      .select('*')
-      .eq('id', userId)
-      .single()
+    // Independent reads (all keyed only on userId) fetched in parallel
+    const [{ data: profile }, { data: activePlan }, { data: lastCheckIn }] = await Promise.all([
+      supabase.from('user_profiles').select('*').eq('id', userId).single(),
+      // Get active training plan
+      supabase.from('training_plans').select('*').eq('user_id', userId).eq('is_active', true).single(),
+      // Determine period: since last check-in or 14 days
+      supabase
+        .from('training_check_ins')
+        .select('check_in_date')
+        .eq('user_id', userId)
+        .order('check_in_date', { ascending: false })
+        .limit(1)
+        .single(),
+    ])
 
     if (!profile) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 })
     }
-
-    // Get active training plan
-    const { data: activePlan } = await supabase
-      .from('training_plans')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('is_active', true)
-      .single()
-
-    // Determine period: since last check-in or 14 days
-    const { data: lastCheckIn } = await supabase
-      .from('training_check_ins')
-      .select('check_in_date')
-      .eq('user_id', userId)
-      .order('check_in_date', { ascending: false })
-      .limit(1)
-      .single()
 
     const now = new Date()
     const periodEnd = now.toISOString().split('T')[0]
@@ -201,10 +193,14 @@ Return ONLY valid JSON:
         response: (aiAnalysis.overall_summary ?? '').substring(0, 500),
         tokens_used: tokensUsed,
       })
+    } else {
+      Sentry.captureException(new Error(`OpenAI request failed: ${openaiResponse.status}`), {
+        tags: { kind: 'api-route', route: 'ai/training-check-in', op: 'openai' },
+      })
     }
 
     // Save check-in
-    await supabase.from('training_check_ins').insert({
+    const { error: checkInError } = await supabase.from('training_check_ins').insert({
       user_id: userId,
       training_plan_id: activePlan?.id ?? null,
       check_in_date: periodEnd,
@@ -216,6 +212,13 @@ Return ONLY valid JSON:
       ai_summary: aiAnalysis?.overall_summary ?? null,
       ai_recommendations: aiAnalysis != null ? JSON.stringify(aiAnalysis) : null,
     })
+
+    if (checkInError) {
+      Sentry.captureException(checkInError, {
+        tags: { kind: 'api-route', route: 'ai/training-check-in', op: 'save-check-in' },
+      })
+      return NextResponse.json({ message: 'Failed to save check-in' }, { status: 500 })
+    }
 
     return NextResponse.json({
       exerciseProgress,

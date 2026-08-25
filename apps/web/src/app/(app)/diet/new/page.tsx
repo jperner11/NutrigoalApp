@@ -533,6 +533,7 @@ export default function NewDietPlanPage() {
                           return updated
                         })
                       }}
+                      aria-label="Meal name"
                       className="bg-transparent p-0 text-lg font-semibold text-[var(--fg)] outline-none"
                     />
                     <div className="flex gap-2 mt-0.5">
@@ -545,6 +546,7 @@ export default function NewDietPlanPage() {
                             return updated
                           })
                         }}
+                        aria-label="Meal type"
                         className="bg-transparent p-0 text-xs text-[var(--fg-3)] outline-none"
                       >
                         {MEAL_TYPES.map(mt => (
@@ -600,8 +602,8 @@ export default function NewDietPlanPage() {
                         <p className="text-sm font-medium text-[var(--fg)]">{food.amount} {food.unit} {food.name}</p>
                       </div>
                       <div className="col-span-2 text-right text-sm text-[var(--fg-2)]">{food.calories}</div>
-                      <div className="col-span-1 text-right text-sm text-[var(--ok)]">{food.protein}g</div>
-                      <div className="col-span-1 text-right text-sm text-[var(--warn)]">{food.carbs}g</div>
+                      <div className="col-span-1 text-right text-sm text-[var(--ok-text)]">{food.protein}g</div>
+                      <div className="col-span-1 text-right text-sm text-[var(--warn-text)]">{food.carbs}g</div>
                       <div className="col-span-1 text-right text-sm text-[var(--brand-400)]">{food.fat}g</div>
                       <div className="col-span-2 text-right">
                         <button
@@ -633,6 +635,7 @@ export default function NewDietPlanPage() {
                       type="number"
                       value={foodAmount}
                       onChange={(e) => setFoodAmount(parseInt(e.target.value) || 100)}
+                      aria-label="Amount in grams"
                       className="input-field w-20 text-center"
                       min={1}
                     />

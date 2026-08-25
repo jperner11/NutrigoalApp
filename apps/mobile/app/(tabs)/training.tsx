@@ -5,6 +5,7 @@ import {
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
+import * as Sentry from '@sentry/react-native'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
 import {
@@ -64,8 +65,21 @@ export default function TrainingScreen() {
     if (data) setPlans(data as TrainingPlan[])
   }
 
-  useEffect(() => { fetchPlans() }, [user])
-  const onRefresh = async () => { setRefreshing(true); await fetchPlans(); setRefreshing(false) }
+  useEffect(() => {
+    fetchPlans().catch((err) => {
+      Sentry.captureException(err, { tags: { kind: 'training-load', screen: 'training-list' } })
+    })
+  }, [user])
+  const onRefresh = async () => {
+    setRefreshing(true)
+    try {
+      await fetchPlans()
+    } catch (err) {
+      Sentry.captureException(err, { tags: { kind: 'training-refresh', screen: 'training-list' } })
+    } finally {
+      setRefreshing(false)
+    }
+  }
 
   if (screen === 'create' && !managedClient) return <CreatePlan user={user} profile={profile} onDone={() => { setScreen('list'); fetchPlans() }} onCancel={() => setScreen('list')} />
   if (screen === 'detail' && selectedPlanId) return <PlanDetail planId={selectedPlanId} user={user} onBack={() => { setScreen('list'); fetchPlans() }} onStartSession={(dayId: string) => { setSessionDayId(dayId); setScreen('session') }} />
@@ -593,7 +607,7 @@ function WorkoutSession({ dayId, user, profile, onDone }: any) {
               keyboardType="numeric"
               editable={!set.completed}
               placeholder={set.suggestedWeight ? `${set.suggestedWeight}` : '0'}
-              placeholderTextColor="#c4b5fd"
+              placeholderTextColor={colors.textSubtle}
             />
             <TextInput
               style={[s.setInput]}
@@ -602,7 +616,7 @@ function WorkoutSession({ dayId, user, profile, onDone }: any) {
               keyboardType="numeric"
               editable={!set.completed}
               placeholder={currentEx.reps.split('-').pop() || '12'}
-              placeholderTextColor="#c4b5fd"
+              placeholderTextColor={colors.textSubtle}
             />
             <TouchableOpacity style={[s.checkBtn, set.completed && s.checkBtnDone]} onPress={() => toggleComplete(si)}>
               <Ionicons name={set.completed ? 'checkmark-circle' : 'ellipse-outline'} size={28} color={set.completed ? colors.brand500 : colors.textSubtle} />

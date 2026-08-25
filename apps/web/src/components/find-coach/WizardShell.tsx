@@ -26,13 +26,13 @@ export default function WizardShell({
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(245,241,234,0.12),transparent_34%),radial-gradient(circle_at_88%_18%,rgba(205,242,78,0.24),transparent_22%)]" />
           <div className="relative flex h-full flex-col justify-between gap-10">
             <div>
-              <div className="inline-flex rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-sky-100/90">
+              <div className="inline-flex rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/90">
                 {stepLabel}
               </div>
               <h1 className="mt-6 max-w-md font-display text-4xl font-bold leading-[0.98] sm:text-5xl">
                 {title}
               </h1>
-              <p className="mt-5 max-w-md text-base leading-7 text-sky-50/82 sm:text-lg">
+              <p className="mt-5 max-w-md text-base leading-7 text-white/82 sm:text-lg">
                 {description}
               </p>
             </div>

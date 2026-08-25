@@ -40,22 +40,38 @@ export default function PhotosPage() {
   const [uploading, setUploading] = useState(false)
   const [lightbox, setLightbox] = useState<ProgressPhoto | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const lightboxCloseRef = useRef<HTMLButtonElement>(null)
 
   const loadPhotos = useCallback(async () => {
     if (!profile) return
     const supabase = createClient()
-    const { data } = await supabase
-      .from('progress_photos')
-      .select('*')
-      .eq('user_id', profile.id)
-      .order('date', { ascending: false })
-      .limit(50)
 
-    setPhotos(data ?? [])
-    setLoading(false)
+    try {
+      const { data, error } = await supabase
+        .from('progress_photos')
+        .select('*')
+        .eq('user_id', profile.id)
+        .order('date', { ascending: false })
+        .limit(50)
+
+      if (error) throw error
+      setPhotos(data ?? [])
+    } catch {
+      toast.error('Failed to load photos')
+    } finally {
+      setLoading(false)
+    }
   }, [profile])
 
   useEffect(() => { loadPhotos() }, [loadPhotos])
+
+  // Revoke the blob URL whenever it changes or the component unmounts, so
+  // reselecting a photo repeatedly doesn't leak memory.
+  useEffect(() => {
+    return () => {
+      if (preview) URL.revokeObjectURL(preview)
+    }
+  }, [preview])
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -66,6 +82,11 @@ export default function PhotosPage() {
     }
     setSelectedFile(file)
     setPreview(URL.createObjectURL(file))
+  }
+
+  function clearPreview() {
+    setSelectedFile(null)
+    setPreview(null)
   }
 
   async function handleUpload() {
@@ -101,8 +122,7 @@ export default function PhotosPage() {
     } else {
       toast.success('Photo uploaded.')
       setShowForm(false)
-      setSelectedFile(null)
-      setPreview(null)
+      clearPreview()
       setFormNotes('')
       loadPhotos()
     }
@@ -142,6 +162,21 @@ export default function PhotosPage() {
   function prevPhoto() {
     if (lightboxIndex > 0) setLightbox(photos[lightboxIndex - 1])
   }
+
+  useEffect(() => {
+    if (!lightbox) return
+    lightboxCloseRef.current?.focus()
+
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') setLightbox(null)
+      if (e.key === 'ArrowLeft') prevPhoto()
+      if (e.key === 'ArrowRight') nextPhoto()
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lightbox])
 
   if (loading) {
     return (
@@ -257,10 +292,7 @@ export default function PhotosPage() {
                   style={{ border: '1px solid var(--line-2)' }}
                 />
                 <button
-                  onClick={() => {
-                    setSelectedFile(null)
-                    setPreview(null)
-                  }}
+                  onClick={clearPreview}
                   className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full"
                   style={{
                     background: 'rgba(19, 16, 18, 0.72)',
@@ -339,8 +371,7 @@ export default function PhotosPage() {
             <button
               onClick={() => {
                 setShowForm(false)
-                setSelectedFile(null)
-                setPreview(null)
+                clearPreview()
               }}
               className="btn btn-ghost"
             >
@@ -394,7 +425,7 @@ export default function PhotosPage() {
                       className="object-cover transition-transform duration-300 group-hover:scale-105"
                       sizes="(max-width: 768px) 50vw, 280px"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[rgba(13,27,42,0.55)] via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[rgba(19,16,18,0.55)] via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
                     <span
                       className="chip absolute bottom-2 left-2"
                       style={{
@@ -449,8 +480,12 @@ export default function PhotosPage() {
           className="fixed inset-0 z-50 flex items-center justify-center"
           style={{ background: 'rgba(19, 16, 18, 0.92)', backdropFilter: 'blur(6px)' }}
           onClick={() => setLightbox(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${lightbox.pose} photo from ${lightbox.date}`}
         >
           <button
+            ref={lightboxCloseRef}
             onClick={() => setLightbox(null)}
             className="absolute right-4 top-4 p-2 transition"
             style={{ color: 'rgba(245, 241, 234, 0.7)' }}

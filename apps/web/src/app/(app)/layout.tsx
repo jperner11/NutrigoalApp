@@ -44,6 +44,7 @@ function TrialBanner({ trialEndsAt }: { trialEndsAt: string }) {
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { profile, loading, signOut } = useUser()
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   if (loading) {
     return (
@@ -67,8 +68,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         userRole={profile?.role ?? 'free'}
         userName={profile?.full_name ?? profile?.email ?? 'User'}
         onSignOut={signOut}
+        collapsed={sidebarCollapsed}
+        onCollapsedChange={setSidebarCollapsed}
       />
-      <div className="md:ml-64">
+      <div className={sidebarCollapsed ? 'md:ml-16' : 'md:ml-64'}>
         {showTrial && <TrialBanner trialEndsAt={profile!.trial_ends_at!} />}
         <main className="min-h-screen pt-16 md:pt-0">
           <div className="app-workspace">

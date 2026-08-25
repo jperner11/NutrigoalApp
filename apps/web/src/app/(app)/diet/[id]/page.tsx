@@ -23,6 +23,7 @@ import {
 } from 'lucide-react'
 import type { DietPlan, DietPlanMeal } from '@/lib/supabase/types'
 import { isFeatureLocked, canAccess } from '@/lib/tierUtils'
+import { reportClientError } from '@/lib/apiClient'
 import PlanChat from '@/components/diet/PlanChat'
 import UpgradeModal from '@/components/ui/UpgradeModal'
 import WeekDayTabs from '@/components/diet/WeekDayTabs'
@@ -115,28 +116,35 @@ export default function DietPlanDetailPage() {
     if (!profile || !params.id) return
     const supabase = createClient()
 
-    const { data: planData, error: planError } = await supabase
-      .from('diet_plans')
-      .select('*')
-      .eq('id', params.id)
-      .single()
+    try {
+      const { data: planData, error: planError } = await supabase
+        .from('diet_plans')
+        .select('*')
+        .eq('id', params.id)
+        .single()
 
-    if (planError || !planData) {
-      toast.error('Diet plan not found')
+      if (planError || !planData) {
+        toast.error('Diet plan not found')
+        router.push('/diet')
+        return
+      }
+
+      setPlan(planData)
+
+      const { data: mealsData } = await supabase
+        .from('diet_plan_meals')
+        .select('*')
+        .eq('diet_plan_id', params.id)
+
+      setMeals(mealsData ?? [])
+      setExpandedMeals(new Set((mealsData ?? []).map(m => m.id)))
+    } catch (err) {
+      reportClientError(err, { feature: 'diet', action: 'diet-plan-detail-load' })
+      toast.error('Failed to load diet plan')
       router.push('/diet')
-      return
+    } finally {
+      setLoading(false)
     }
-
-    setPlan(planData)
-
-    const { data: mealsData } = await supabase
-      .from('diet_plan_meals')
-      .select('*')
-      .eq('diet_plan_id', params.id)
-
-    setMeals(mealsData ?? [])
-    setExpandedMeals(new Set((mealsData ?? []).map(m => m.id)))
-    setLoading(false)
   }, [profile, params.id, router])
 
   useEffect(() => {
@@ -540,6 +548,7 @@ export default function DietPlanDetailPage() {
                 <h3 className="text-lg font-bold text-[var(--fg)]">Alternatives</h3>
                 <button
                   onClick={() => setAlternativesModal(null)}
+                  aria-label="Close"
                   className="rounded-lg p-1 text-[var(--fg-3)] transition-colors hover:bg-[var(--ink-2)]"
                 >
                   <X className="h-5 w-5" />

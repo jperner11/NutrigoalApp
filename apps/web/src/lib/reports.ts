@@ -93,13 +93,15 @@ export async function generateWeeklyReport(
   const totalPro = mealLogs?.reduce((s, l) => s + (l.total_protein || 0), 0) ?? 0
   const totalCarbs = mealLogs?.reduce((s, l) => s + (l.total_carbs || 0), 0) ?? 0
   const totalFat = mealLogs?.reduce((s, l) => s + (l.total_fat || 0), 0) ?? 0
-  const daysWithMeals = mealDays.size || 1
+  const mealDayCount = mealDays.size
+  const daysWithMeals = mealDayCount || 1 // divisor only, guards against divide-by-zero below
 
   const waterByDay = new Map<string, number>()
   waterLogs?.forEach(l => {
     waterByDay.set(l.date, (waterByDay.get(l.date) ?? 0) + l.amount_ml)
   })
-  const daysWithWater = waterByDay.size || 1
+  const waterDayCount = waterByDay.size
+  const daysWithWater = waterDayCount || 1 // divisor only, guards against divide-by-zero below
   const totalWater = Array.from(waterByDay.values()).reduce((s, v) => s + v, 0)
 
   const targetCal = targets.calories ?? 2000
@@ -126,7 +128,7 @@ export async function generateWeeklyReport(
     targetCalories: targetCal,
     targetProtein: targetPro,
     mealsLogged: mealLogs?.length ?? 0,
-    daysWithMeals,
+    daysWithMeals: mealDayCount,
     calorieAdherence: Math.round(calorieAdherence),
     workoutsCompleted: workoutLogs?.length ?? 0,
     totalWorkoutMinutes: workoutLogs?.reduce((s, l) => s + (l.duration_minutes || 0), 0) ?? 0,
@@ -138,6 +140,6 @@ export async function generateWeeklyReport(
     avgWaterMl: Math.round(avgWater),
     targetWaterMl: targetWater,
     waterAdherence: Math.round(waterAdherence),
-    daysWithWater,
+    daysWithWater: waterDayCount,
   }
 }
