@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, RefreshControl } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
+import * as Sentry from '@sentry/react-native'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
 import { WATER_QUICK_ADD } from '@treno/shared'
@@ -44,9 +45,22 @@ export default function WaterScreen() {
     if (data) setLogs(data)
   }
 
-  useEffect(() => { fetchLogs() }, [user])
+  useEffect(() => {
+    fetchLogs().catch((err) => {
+      Sentry.captureException(err, { tags: { kind: 'water-load', screen: 'water' } })
+    })
+  }, [user])
 
-  const onRefresh = async () => { setRefreshing(true); await fetchLogs(); setRefreshing(false) }
+  const onRefresh = async () => {
+    setRefreshing(true)
+    try {
+      await fetchLogs()
+    } catch (err) {
+      Sentry.captureException(err, { tags: { kind: 'water-refresh', screen: 'water' } })
+    } finally {
+      setRefreshing(false)
+    }
+  }
 
   const addWater = async (amount: number) => {
     if (!user) return
