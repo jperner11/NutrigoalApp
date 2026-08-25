@@ -145,7 +145,7 @@ function CheckInCard({ request }: { request: FeedbackRequest & { client?: UserPr
           </div>
           <div className="flex items-center gap-2">
             <span className={`flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-full ${
-              request.status === 'completed' ? 'bg-[var(--success-bg)] text-[var(--ok-text)]' : 'bg-[rgba(196,121,28,0.14)] text-[var(--warn-text)]'
+              request.status === 'completed' ? 'bg-[var(--success-bg)] text-[var(--ok-text)]' : 'bg-[var(--warn-bg)] text-[var(--warn-text)]'
             }`}>
               {request.status === 'completed' ? <CheckCircle className="h-3 w-3" /> : <Clock className="h-3 w-3" />}
               {request.status === 'completed' ? 'Done' : 'Pending'}
@@ -603,7 +603,7 @@ function ClientCheckInsPage({ profile }: { profile: UserProfile }) {
                           {req.questions.length} question{req.questions.length === 1 ? '' : 's'} · Sent {new Date(req.created_at).toLocaleDateString()}
                         </p>
                       </div>
-                      <span className="flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-full bg-[rgba(196,121,28,0.14)] text-[var(--warn-text)]">
+                      <span className="flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-full bg-[var(--warn-bg)] text-[var(--warn-text)]">
                         <Clock className="h-3 w-3" />
                         Pending
                       </span>
