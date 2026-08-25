@@ -141,26 +141,38 @@ export default function NewClientTrainingPlanPage() {
 
       if (error || !plan) { toast.error(error?.message || 'Failed'); setSaving(false); return }
 
-      for (let i = 0; i < days.length; i++) {
-        const { data: day, error: dayError } = await supabase.from('training_plan_days').insert({
-          training_plan_id: plan.id, day_number: i + 1, name: days[i].name,
-        }).select().single()
-        if (dayError || !day) {
-          toast.error(`Failed to create day "${days[i].name}"`)
-          setSaving(false)
-          return
-        }
+      // Insert days and their exercises in parallel (each day only depends on plan.id)
+      const dayResults = await Promise.all(
+        days.map(async (day, i) => {
+          const { data: insertedDay, error: dayError } = await supabase.from('training_plan_days').insert({
+            training_plan_id: plan.id, day_number: i + 1, name: day.name,
+          }).select().single()
+          if (dayError || !insertedDay) {
+            return { ok: false, name: day.name, stage: 'day' as const }
+          }
 
-        const rows = days[i].exercises.map((e, idx) => ({
-          plan_day_id: day.id, exercise_id: e.exercise_id, order_index: idx,
-          sets: e.sets, reps: e.reps, rest_seconds: e.rest_seconds,
-        }))
-        const { error: exError } = await supabase.from('training_plan_exercises').insert(rows)
-        if (exError) {
-          toast.error(`Failed to save exercises for "${days[i].name}"`)
-          setSaving(false)
-          return
-        }
+          const rows = day.exercises.map((e, idx) => ({
+            plan_day_id: insertedDay.id, exercise_id: e.exercise_id, order_index: idx,
+            sets: e.sets, reps: e.reps, rest_seconds: e.rest_seconds,
+          }))
+          const { error: exError } = await supabase.from('training_plan_exercises').insert(rows)
+          if (exError) {
+            return { ok: false, name: day.name, stage: 'exercises' as const }
+          }
+
+          return { ok: true, name: day.name, stage: null }
+        })
+      )
+
+      const failed = dayResults.find((r) => !r.ok)
+      if (failed) {
+        toast.error(
+          failed.stage === 'day'
+            ? `Failed to create day "${failed.name}"`
+            : `Failed to save exercises for "${failed.name}"`
+        )
+        setSaving(false)
+        return
       }
 
       toast.success(`Training plan created for ${client?.full_name}`)
