@@ -526,7 +526,7 @@ export default function WorkoutSessionPage() {
                 inputMode="decimal"
                 value={set.weight_kg || ''}
                 onChange={e => updateSet(i, 'weight_kg', parseFloat(e.target.value) || 0)}
-                className={`w-full text-center text-sm font-medium border rounded-lg py-2.5 px-2 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-colors ${
+                className={`w-full text-center text-sm font-medium border rounded-lg py-2.5 px-2 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors ${
                   set.completed
                     ? 'bg-green-50 border-green-200 text-green-800'
                     : 'bg-white border-gray-200 text-gray-900'
@@ -545,7 +545,7 @@ export default function WorkoutSessionPage() {
                 inputMode="numeric"
                 value={set.reps || ''}
                 onChange={e => updateSet(i, 'reps', parseInt(e.target.value) || 0)}
-                className={`w-full text-center text-sm font-medium border rounded-lg py-2.5 px-2 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-colors ${
+                className={`w-full text-center text-sm font-medium border rounded-lg py-2.5 px-2 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors ${
                   set.completed
                     ? 'bg-green-50 border-green-200 text-green-800'
                     : 'bg-white border-gray-200 text-gray-900'
