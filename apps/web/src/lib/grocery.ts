@@ -63,7 +63,8 @@ const CATEGORY_MAP: Record<string, string> = {
   'vegetable oil': 'Oils & Fats', 'sesame oil': 'Oils & Fats',
 
   // Condiments & Sauces
-  'peanut butter': 'Condiments', 'almond butter': 'Condiments', 'honey': 'Condiments',
+  'peanut butter': 'Condiments', 'almond butter': 'Condiments',
+  'cashew butter': 'Condiments', 'sunflower seed butter': 'Condiments', 'honey': 'Condiments',
   'maple syrup': 'Condiments', 'soy sauce': 'Condiments', 'hot sauce': 'Condiments',
   'mustard': 'Condiments', 'ketchup': 'Condiments', 'mayo': 'Condiments',
   'mayonnaise': 'Condiments', 'salsa': 'Condiments', 'vinegar': 'Condiments',
