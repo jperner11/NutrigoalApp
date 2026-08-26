@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
+import { getLocalDateString } from '@/lib/date'
 import { toast } from 'react-hot-toast'
 import { reportClientError } from '@/lib/apiClient'
 import Link from 'next/link'
@@ -81,7 +82,7 @@ export default function ProgressPage() {
   const [formWeight, setFormWeight] = useState('')
   const [formBodyFat, setFormBodyFat] = useState('')
   const [formNotes, setFormNotes] = useState('')
-  const [formDate, setFormDate] = useState(new Date().toISOString().split('T')[0])
+  const [formDate, setFormDate] = useState(getLocalDateString())
   const [saving, setSaving] = useState(false)
 
   // Edit state

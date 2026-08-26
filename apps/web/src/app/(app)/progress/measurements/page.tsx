@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
+import { getLocalDateString } from '@/lib/date'
 import { toast } from 'react-hot-toast'
 import { Plus, Ruler, TrendingDown, TrendingUp, Minus } from 'lucide-react'
 import Link from 'next/link'
@@ -64,7 +65,7 @@ export default function MeasurementsPage() {
   const [measurements, setMeasurements] = useState<BodyMeasurement[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
-  const [formDate, setFormDate] = useState(new Date().toISOString().split('T')[0])
+  const [formDate, setFormDate] = useState(getLocalDateString())
   const [formValues, setFormValues] = useState<Record<string, string>>({})
   const [formNotes, setFormNotes] = useState('')
   const [saving, setSaving] = useState(false)

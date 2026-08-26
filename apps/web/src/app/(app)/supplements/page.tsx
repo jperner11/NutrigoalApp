@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
+import { getLocalDateString } from '@/lib/date'
 import { toast } from 'react-hot-toast'
 import {
   Pill,
@@ -43,7 +44,7 @@ export default function SupplementsPage() {
     notes: '',
   })
 
-  const today = new Date().toISOString().split('T')[0]
+  const today = getLocalDateString()
 
   const load = useCallback(async () => {
     if (!profile) return

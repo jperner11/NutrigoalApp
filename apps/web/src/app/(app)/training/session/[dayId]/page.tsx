@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter, useParams } from 'next/navigation'
 import toast from 'react-hot-toast'
 import { calculateSuggestion, parseRepRange } from '@/lib/training'
+import { getLocalDateString } from '@/lib/date'
 import {
   ArrowLeft,
   Check,
@@ -306,7 +307,7 @@ export default function WorkoutSessionPage() {
       }))
 
       const durationMinutes = Math.round(elapsedSeconds / 60)
-      const today = new Date().toISOString().split('T')[0]
+      const today = getLocalDateString()
 
       const { error } = await supabase.from('workout_logs').insert({
         user_id: profile.id,

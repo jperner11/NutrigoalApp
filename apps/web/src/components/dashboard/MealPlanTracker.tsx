@@ -9,7 +9,7 @@ import type { DietPlan, DietPlanMeal, FoodItem } from '@/lib/supabase/types'
 import { isFeatureLocked } from '@/lib/tierUtils'
 import type { UserRole } from '@/lib/supabase/types'
 import { reportClientError } from '@/lib/apiClient'
-import { getMondayIndexedDay } from '@/lib/date'
+import { getMondayIndexedDay, getLocalDateString } from '@/lib/date'
 
 interface MealMeta {
   label?: string
@@ -56,7 +56,7 @@ export default function MealPlanTracker({ userId, userRole = 'free', onMacrosUpd
   const [expandedMeal, setExpandedMeal] = useState<string | null>(null)
   const [selectedMealId, setSelectedMealId] = useState<string | null>(null)
 
-  const today = new Date().toISOString().split('T')[0]
+  const today = getLocalDateString()
   const dayOfWeek = getMondayIndexedDay()
   const isFreeUser = isFeatureLocked(userRole, 'full_meals') && (activePlan?.is_ai_generated !== false)
 

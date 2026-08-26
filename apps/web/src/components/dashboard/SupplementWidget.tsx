@@ -7,6 +7,7 @@ import { toast } from 'react-hot-toast'
 import Link from 'next/link'
 import type { UserSupplement, SupplementLog } from '@/lib/supabase/types'
 import { reportClientError } from '@/lib/apiClient'
+import { getLocalDateString } from '@/lib/date'
 
 interface SupplementWidgetProps {
   userId: string
@@ -17,7 +18,7 @@ export default function SupplementWidget({ userId }: SupplementWidgetProps) {
   const [todayLogs, setTodayLogs] = useState<SupplementLog[]>([])
   const [loading, setLoading] = useState(true)
 
-  const today = new Date().toISOString().split('T')[0]
+  const today = getLocalDateString()
 
   useEffect(() => {
     async function load() {

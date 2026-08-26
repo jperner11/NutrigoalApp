@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
 import { calculateCardioCalories } from '@/lib/cardio'
+import { getLocalDateString } from '@/lib/date'
 import { HeartPulse, Lock } from 'lucide-react'
 import Link from 'next/link'
 import { isFeatureLocked } from '@/lib/tierUtils'
@@ -40,7 +41,7 @@ export default function CardioPage() {
     cardio_type_id: '',
     duration_minutes: 30,
     avg_bpm: '' as string | number,
-    date: new Date().toISOString().split('T')[0],
+    date: getLocalDateString(),
   })
 
   useEffect(() => {
@@ -144,7 +145,7 @@ export default function CardioPage() {
     setFormData(prev => ({
       ...prev,
       avg_bpm: '',
-      date: new Date().toISOString().split('T')[0],
+      date: getLocalDateString(),
     }))
     setSubmitting(false)
   }
