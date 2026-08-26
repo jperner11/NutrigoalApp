@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { reportClientError } from '@/lib/apiClient'
+import { getLocalDateString } from '@/lib/date'
 import { Scale, Plus } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import Link from 'next/link'
@@ -28,7 +29,7 @@ export default function QuickWeightLog({ userId, currentWeight, onWeightLogged }
 
     setSaving(true)
     const supabase = createClient()
-    const today = new Date().toISOString().split('T')[0]
+    const today = getLocalDateString()
 
     try {
       const { error } = await supabase

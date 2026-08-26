@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Dumbbell, Play, CheckCircle2 } from 'lucide-react'
 import Link from 'next/link'
 import { reportClientError } from '@/lib/apiClient'
-import { getMondayIndexedDay } from '@/lib/date'
+import { getMondayIndexedDay, getLocalDateString } from '@/lib/date'
 
 interface TodayTrainingPreviewProps {
   userId: string
@@ -70,7 +70,7 @@ export default function TodayTrainingPreview({ userId }: TodayTrainingPreviewPro
 
         // Check if today's workout is already completed, and get exercises for
         // this day — these two reads are independent, so run them in parallel.
-        const today = new Date().toISOString().split('T')[0]
+        const today = getLocalDateString()
         const [{ count: completedCount }, { data: planExercises }] = await Promise.all([
           supabase
             .from('workout_logs')

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
+import { getLocalDateString } from '@/lib/date'
 import { toast } from 'react-hot-toast'
 import { Plus, Camera, Trash2, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
@@ -32,7 +33,7 @@ export default function PhotosPage() {
   const [photos, setPhotos] = useState<ProgressPhoto[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
-  const [formDate, setFormDate] = useState(new Date().toISOString().split('T')[0])
+  const [formDate, setFormDate] = useState(getLocalDateString())
   const [formPose, setFormPose] = useState<PhotoPose>('front')
   const [formNotes, setFormNotes] = useState('')
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
