@@ -83,7 +83,7 @@ export default function InviteClientPage() {
             type="text"
             value={clientFirstName}
             onChange={(e) => setClientFirstName(e.target.value)}
-            className="w-full px-4 py-3 border border-[var(--line-strong)] rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="w-full px-4 py-3 border border-[var(--line-strong)] rounded-lg focus:ring-2 focus:ring-[var(--acc)] focus:border-transparent"
             placeholder="Optional"
           />
         </div>
@@ -98,7 +98,7 @@ export default function InviteClientPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-[var(--line-strong)] rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-[var(--line-strong)] rounded-lg focus:ring-2 focus:ring-[var(--acc)] focus:border-transparent"
               placeholder="client@example.com"
               required
             />
@@ -140,7 +140,7 @@ export default function InviteClientPage() {
           </div>
           <Link
             href="/clients"
-            className="inline-block mt-4 text-sm text-purple-600 hover:text-purple-700"
+            className="inline-block mt-4 text-sm text-[var(--muted-soft)] hover:text-[var(--muted)]"
           >
             ← Back to Clients
           </Link>
