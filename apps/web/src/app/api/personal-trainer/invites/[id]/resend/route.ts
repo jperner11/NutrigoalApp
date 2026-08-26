@@ -67,6 +67,7 @@ export async function POST(
       .update({
         delivery_method: 'invite',
         last_sent_at: new Date().toISOString(),
+        expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
       })
       .eq('id', invite.id)
   } catch (error) {
