@@ -608,7 +608,8 @@ export default function NewDietPlanPage() {
                       <div className="col-span-2 text-right">
                         <button
                           onClick={() => removeFoodFromMeal(mealIndex, foodIndex)}
-                          className="p-1 text-[var(--fg-4)] opacity-0 transition-colors hover:text-[var(--brand-400)] group-hover:opacity-100"
+                          aria-label={`Remove ${food.name}`}
+                          className="p-1 text-[var(--fg-4)] opacity-0 transition-colors hover:text-[var(--brand-400)] group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
