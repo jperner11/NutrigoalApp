@@ -146,7 +146,7 @@ export default function ClientDetailPage() {
               <AnamnesisRow icon={<Activity className="h-4 w-4 text-[var(--brand-400)]" />} label="Experience" value={client.training_experience} />
             )}
             {client.equipment_access && (
-              <AnamnesisRow icon={<Weight className="h-4 w-4 text-indigo-500" />} label="Equipment" value={client.equipment_access.replace(/_/g, ' ')} />
+              <AnamnesisRow icon={<Weight className="h-4 w-4 text-cyan-500" />} label="Equipment" value={client.equipment_access.replace(/_/g, ' ')} />
             )}
           </div>
         )}
@@ -157,7 +157,7 @@ export default function ClientDetailPage() {
             {client.desired_outcome && <AnamnesisRow icon={<Target className="h-4 w-4 text-blue-500" />} label="Desired outcome" value={client.desired_outcome} />}
             {client.past_dieting_challenges && <AnamnesisRow icon={<AlertTriangle className="h-4 w-4 text-amber-500" />} label="Past challenges" value={client.past_dieting_challenges} />}
             {client.weekly_derailers && <AnamnesisRow icon={<ClipboardList className="h-4 w-4 text-[var(--acc)]" />} label="Derailers" value={client.weekly_derailers} />}
-            {client.equipment_access && <AnamnesisRow icon={<Weight className="h-4 w-4 text-indigo-500" />} label="Equipment" value={client.equipment_access.replace(/_/g, ' ')} />}
+            {client.equipment_access && <AnamnesisRow icon={<Weight className="h-4 w-4 text-cyan-500" />} label="Equipment" value={client.equipment_access.replace(/_/g, ' ')} />}
             {client.workout_days_per_week && <AnamnesisRow icon={<Dumbbell className="h-4 w-4 text-[var(--brand-400)]" />} label="Training availability" value={`${client.workout_days_per_week} days / week`} />}
             {client.max_session_minutes && <AnamnesisRow icon={<Activity className="h-4 w-4 text-emerald-500" />} label="Session length" value={`${client.max_session_minutes} min`} />}
             {client.plan_preference && <AnamnesisRow icon={<ClipboardList className="h-4 w-4 text-[var(--acc)]" />} label="Plan style" value={client.plan_preference.replace(/_/g, ' ')} />}
