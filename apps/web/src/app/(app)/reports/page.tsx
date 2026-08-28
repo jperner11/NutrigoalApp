@@ -8,6 +8,7 @@ import { generateWeeklyReport } from '@/lib/reports'
 import type { WeeklyReport } from '@/lib/reports'
 import { isTrainerRole } from '@treno/shared'
 import { toast } from 'react-hot-toast'
+import { getLocalDateString } from '@/lib/date'
 
 function getWeekRange(offset: number): { start: string; end: string; label: string } {
   const now = new Date()
@@ -18,14 +19,13 @@ function getWeekRange(offset: number): { start: string; end: string; label: stri
   const sunday = new Date(monday)
   sunday.setDate(monday.getDate() + 6)
 
-  const fmt = (d: Date) => d.toISOString().split('T')[0]
   const label = offset === 0
     ? 'This Week'
     : offset === -1
     ? 'Last Week'
     : `${monday.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${sunday.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
 
-  return { start: fmt(monday), end: fmt(sunday), label }
+  return { start: getLocalDateString(monday), end: getLocalDateString(sunday), label }
 }
 
 function StatCard({ label, value, subtitle, icon: Icon }: {

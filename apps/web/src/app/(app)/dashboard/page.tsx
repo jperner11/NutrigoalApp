@@ -149,10 +149,10 @@ export default function DashboardPage() {
         // Weekly progress stats
         const weekStart = new Date()
         weekStart.setDate(weekStart.getDate() - weekStart.getDay()) // Sunday
-        const weekStartStr = weekStart.toISOString().split('T')[0]
+        const weekStartStr = getLocalDateString(weekStart)
 
         // Avg daily calorie goal % over past 7 days
-        const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0]
+        const sevenDaysAgo = getLocalDateString(new Date(Date.now() - 7 * 86400000))
 
         // Weekly stats and latest weight data are all independent of each other
         const [
