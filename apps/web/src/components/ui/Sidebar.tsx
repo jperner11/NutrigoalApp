@@ -125,6 +125,7 @@ export default function Sidebar({ userRole, userName, onSignOut, collapsed, onCo
                   : 'text-[var(--muted)] hover:bg-[rgba(245,241,234,0.06)] hover:text-white'
               }`}
               title={collapsed && !mobileOpen ? item.label : undefined}
+              aria-label={collapsed && !mobileOpen ? item.label : undefined}
             >
               <Icon className={`h-5 w-5 flex-shrink-0 transition-transform duration-200 ${
                 isActive ? 'text-[var(--brand-400)]' : 'text-[var(--muted-soft)] group-hover:text-white group-hover:scale-110'
@@ -155,6 +156,7 @@ export default function Sidebar({ userRole, userName, onSignOut, collapsed, onCo
           href="/feedback"
           className="flex items-center space-x-3 px-3 py-2 rounded-xl text-sm text-[var(--muted-soft)] hover:bg-[rgba(245,241,234,0.06)] hover:text-white transition-all duration-200 w-full"
           title={collapsed && !mobileOpen ? 'Send feedback' : undefined}
+          aria-label={collapsed && !mobileOpen ? 'Send feedback' : undefined}
         >
           <MessageSquarePlus className="h-5 w-5 flex-shrink-0" />
           {(!collapsed || mobileOpen) && <span>Send feedback</span>}
@@ -164,6 +166,7 @@ export default function Sidebar({ userRole, userName, onSignOut, collapsed, onCo
           onClick={onSignOut}
           className="flex items-center space-x-3 px-3 py-2 rounded-xl text-sm text-[var(--muted-soft)] hover:bg-[rgba(245,241,234,0.06)] hover:text-white transition-all duration-200 w-full"
           title={collapsed && !mobileOpen ? 'Sign Out' : undefined}
+          aria-label={collapsed && !mobileOpen ? 'Sign Out' : undefined}
         >
           <LogOut className="h-5 w-5 flex-shrink-0" />
           {(!collapsed || mobileOpen) && <span>Sign Out</span>}
