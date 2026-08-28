@@ -661,12 +661,12 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-6">
             <StepHeader
-              icon={<User className="h-12 w-12 text-purple-600" />}
+              icon={<User className="h-12 w-12 text-[var(--acc-text)]" />}
               title="Set up your coaching profile"
               subtitle="This tells Treno who you coach, how you work, and how to frame client intake around your process."
             />
-            <div className="flex items-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 -mt-2">
-              <span className="text-sm font-medium text-indigo-600">Clients will see this reflected in their coach-led intake and dashboard journey.</span>
+            <div className="flex items-center gap-2 rounded-xl border border-[var(--line-2)] bg-[var(--ink-3)] px-4 py-3 -mt-2">
+              <span className="text-sm font-medium text-[var(--acc-text)]">Clients will see this reflected in their coach-led intake and dashboard journey.</span>
             </div>
             <div>
               <Label>Display name</Label>
@@ -674,13 +674,13 @@ export default function OnboardingPage() {
                 type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]"
                 placeholder="Your name"
               />
             </div>
             <div>
               <Label>Primary specialties</Label>
-              <p className="text-sm text-gray-500 mb-3">Pick the outcomes you want to be known for.</p>
+              <p className="text-sm text-[var(--fg-3)] mb-3">Pick the outcomes you want to be known for.</p>
               <ChipGrid
                 items={COACH_SPECIALTY_OPTIONS.map((item) => ({ value: item, label: item }))}
                 selected={coachSpecialties}
@@ -698,7 +698,7 @@ export default function OnboardingPage() {
                     className={`px-4 py-3 rounded-xl border-2 font-semibold text-sm transition-all ${
                       coachFormats.includes(format)
                         ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
-                        : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                        : 'border-[var(--line-2)] text-[var(--fg-3)] hover:border-[var(--fg-3)]'
                     }`}
                   >
                     {format}
