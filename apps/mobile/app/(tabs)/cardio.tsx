@@ -73,7 +73,7 @@ export default function CardioScreen() {
       setCardioTypes(typesRes.data as CardioType[])
       if (!selectedTypeId && typesRes.data.length > 0) setSelectedTypeId(typesRes.data[0].id)
     }
-    if (sessionsRes.data) setSessions(sessionsRes.data as any)
+    if (sessionsRes.data) setSessions(sessionsRes.data as (CardioSession & { cardio_types?: CardioType })[])
   }
 
   useEffect(() => { fetchData() }, [user])
@@ -147,7 +147,7 @@ export default function CardioScreen() {
                   <Ionicons name="heart" size={20} color={colors.accent} />
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.cardTitle}>{(s as any).cardio_types?.name || 'Cardio'}</Text>
+                  <Text style={styles.cardTitle}>{s.cardio_types?.name || 'Cardio'}</Text>
                   <Text style={styles.cardDate}>{new Date(s.date).toLocaleDateString()}</Text>
                 </View>
                 <View style={{ alignItems: 'flex-end' }}>
