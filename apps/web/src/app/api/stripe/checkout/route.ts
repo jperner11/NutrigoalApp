@@ -12,7 +12,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Not authenticated' }, { status: 401 })
   }
 
-  const { plan } = await request.json()
+  const body = await request.json().catch(() => null)
+  const plan = body?.plan
 
   if (typeof plan !== 'string' || !Object.prototype.hasOwnProperty.call(PRICE_IDS, plan)) {
     return NextResponse.json({ message: 'Invalid plan' }, { status: 400 })
