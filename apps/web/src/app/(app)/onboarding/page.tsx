@@ -1206,7 +1206,7 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-6">
             <StepHeader
-              icon={<Briefcase className="h-12 w-12 text-indigo-500" />}
+              icon={<Briefcase className="h-12 w-12 text-[var(--acc-text)]" />}
               title="Your Lifestyle"
               subtitle="This helps us set calorie targets based on your real life, not a generic online calculator."
             />
@@ -1221,7 +1221,7 @@ export default function OnboardingPage() {
             </div>
             <div>
               <Label>Overall activity level (job + exercise combined)</Label>
-              <p className="text-sm text-gray-500 mb-2">Based on your job type AND how often you exercise</p>
+              <p className="text-sm text-[var(--fg-3)] mb-2">Based on your job type AND how often you exercise</p>
               <div className="space-y-2">
                 {ACTIVITY_LEVELS.map((level) => (
                   <OptionCard key={level.value} title={level.label} description={level.description}
@@ -1235,7 +1235,7 @@ export default function OnboardingPage() {
                 <Label>Hours of sleep per night</Label>
                 <input type="number" step="0.5" min="3" max="12" value={sleepHours}
                   onChange={(e) => setSleepHours(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]"
                   placeholder="7" />
               </div>
               <div>
@@ -1246,7 +1246,7 @@ export default function OnboardingPage() {
                       className={`flex-1 min-w-[90px] py-3 px-3 rounded-xl border-2 font-semibold text-sm transition-all ${
                         sleepQuality === s.value
                           ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
-                          : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                          : 'border-[var(--line-2)] text-[var(--fg-3)] hover:border-[var(--fg-3)]'
                       }`}>
                       {s.label}
                     </button>
@@ -1262,7 +1262,7 @@ export default function OnboardingPage() {
                     className={`flex-1 min-w-[100px] py-3 px-4 rounded-xl border-2 font-semibold text-sm transition-all ${
                       stressLevel === s.value
                         ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
-                        : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                        : 'border-[var(--line-2)] text-[var(--fg-3)] hover:border-[var(--fg-3)]'
                     }`}>
                     {s.label}
                   </button>
@@ -1280,7 +1280,7 @@ export default function OnboardingPage() {
               {alcoholFrequency !== 'none' && (
                 <input type="text" value={alcoholDetails}
                   onChange={(e) => setAlcoholDetails(e.target.value)}
-                  className="w-full mt-3 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="w-full mt-3 px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]"
                   placeholder="e.g. 2-3 beers on weekends, glass of wine with dinner" />
               )}
             </div>
