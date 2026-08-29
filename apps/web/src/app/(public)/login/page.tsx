@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 import { sanitizeNextPath } from '@/lib/authRedirect'
@@ -155,7 +155,7 @@ export default function LoginPage() {
             style={{ padding: '14px 18px', fontSize: 15 }}
           >
             {isLoading ? (
-              <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
             ) : (
               <span>Enter dashboard →</span>
             )}
