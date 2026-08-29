@@ -294,6 +294,7 @@ export default function PhotosPage() {
                 />
                 <button
                   onClick={clearPreview}
+                  aria-label="Remove selected photo"
                   className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full"
                   style={{
                     background: 'rgba(19, 16, 18, 0.72)',
