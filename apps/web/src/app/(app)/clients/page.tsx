@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'react-hot-toast'
 import { isTrainerRole } from '@treno/shared'
 import { AppHeroPanel, AppSectionHeader, EmptyStateCard, MetricCard } from '@/components/ui/AppDesign'
-import { apiFetch, ApiError } from '@/lib/apiClient'
+import { apiFetch, ApiError, reportClientError } from '@/lib/apiClient'
 import { getAppOrigin, getShareableInviteUrl } from '@/lib/personalTrainerInvites'
 
 interface ActiveClientRow {
@@ -25,6 +25,19 @@ interface ActiveClientRow {
     email: string
     onboarding_completed: boolean
   } | null
+}
+
+interface ActiveClientRowQuery {
+  id: string
+  status: string
+  invited_email: string | null
+  created_at: string
+  client: Array<{
+    id: string
+    full_name: string | null
+    email: string
+    onboarding_completed: boolean
+  }> | null
 }
 
 interface PendingInviteRow {
@@ -77,7 +90,10 @@ export default function ClientsPage() {
         if (clientsError) throw clientsError
         if (invitesError) throw invitesError
 
-        const activeRows = (clientRows as unknown as ActiveClientRow[]) ?? []
+        const activeRows: ActiveClientRow[] = ((clientRows as ActiveClientRowQuery[] | null) ?? []).map((row) => ({
+          ...row,
+          client: row.client?.[0] ?? null,
+        }))
         const clientIds = activeRows.map((row) => row.client?.id).filter(Boolean) as string[]
 
         let activeDietSet = new Set<string>()
@@ -104,7 +120,8 @@ export default function ClientsPage() {
           }))
         )
         setPendingInvites((inviteRows as PendingInviteRow[]) ?? [])
-      } catch {
+      } catch (err) {
+        reportClientError(err, { feature: 'clients', action: 'load-clients' })
         toast.error('Failed to load clients')
       } finally {
         setLoading(false)
