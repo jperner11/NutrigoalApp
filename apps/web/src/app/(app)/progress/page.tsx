@@ -593,6 +593,7 @@ export default function ProgressPage() {
                         onClick={() => handleEditSave(log)}
                         className="btn btn-ghost"
                         style={{ padding: 6, color: 'var(--ok)' }}
+                        aria-label="Save"
                       >
                         <Check className="h-4 w-4" />
                       </button>
@@ -600,6 +601,7 @@ export default function ProgressPage() {
                         onClick={() => setEditingId(null)}
                         className="btn btn-ghost"
                         style={{ padding: 6 }}
+                        aria-label="Cancel"
                       >
                         <X className="h-4 w-4" />
                       </button>
@@ -645,6 +647,7 @@ export default function ProgressPage() {
                         }}
                         className="btn btn-ghost"
                         style={{ padding: 6 }}
+                        aria-label="Edit entry"
                       >
                         <Pencil className="h-3.5 w-3.5" />
                       </button>
@@ -652,6 +655,7 @@ export default function ProgressPage() {
                         onClick={() => handleDelete(log.id)}
                         className="btn btn-ghost"
                         style={{ padding: 6, color: 'var(--warn)' }}
+                        aria-label="Delete entry"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
