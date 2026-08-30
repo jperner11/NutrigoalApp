@@ -233,7 +233,7 @@ export default function CoachQuestionsPage() {
                     <ClipboardList className="h-4 w-4 text-[var(--acc-text)]" />
                     <span className="font-semibold text-[var(--fg)]">{q.label}</span>
                     <span className="app-status-pill text-xs">{QUESTION_TYPES.find((t) => t.value === q.type)?.label ?? q.type}</span>
-                    {q.required && <span className="text-xs text-amber-500">required</span>}
+                    {q.required && <span className="text-xs text-[var(--warn-text)]">required</span>}
                     {!q.is_active && <span className="text-xs text-[var(--fg-4)]">inactive</span>}
                   </div>
                   {q.help_text && <p className="mt-1 text-xs text-[var(--fg-3)]">{q.help_text}</p>}
