@@ -724,14 +724,14 @@ export default function OnboardingPage() {
                   <img
                     src={avatarPreview}
                     alt="Profile"
-                    className="h-24 w-24 rounded-full object-cover border-4 border-purple-100"
+                    className="h-24 w-24 rounded-full object-cover border-4 border-[var(--line-2)]"
                   />
                 ) : (
-                  <div className="h-24 w-24 rounded-full bg-gray-100 flex items-center justify-center border-4 border-purple-100">
-                    <Camera className="h-8 w-8 text-gray-400" />
+                  <div className="h-24 w-24 rounded-full bg-[var(--ink-2)] flex items-center justify-center border-4 border-[var(--line-2)]">
+                    <Camera className="h-8 w-8 text-[var(--fg-3)]" />
                   </div>
                 )}
-                <label className="absolute -bottom-1 -right-1 cursor-pointer rounded-full bg-purple-600 p-2 text-white shadow-lg hover:bg-purple-700 transition-colors">
+                <label className="absolute -bottom-1 -right-1 cursor-pointer rounded-full btn-accent p-2 shadow-lg transition-colors">
                   <Camera className="h-4 w-4" />
                   <input
                     type="file"
@@ -750,21 +750,21 @@ export default function OnboardingPage() {
                   />
                 </label>
               </div>
-              <p className="text-sm text-gray-500">Upload a profile picture (optional, max 5MB)</p>
+              <p className="text-sm text-[var(--fg-3)]">Upload a profile picture (optional, max 5MB)</p>
             </div>
 
             <div>
               <Label>Headline *</Label>
-              <p className="text-sm text-gray-500 mb-2">One line that explains what you do.</p>
+              <p className="text-sm text-[var(--fg-3)] mb-2">One line that explains what you do.</p>
               <input
                 type="text"
                 value={profileHeadline}
                 onChange={(e) => setProfileHeadline(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]"
                 placeholder="e.g. Online fat loss and strength coach for busy professionals"
                 maxLength={120}
               />
-              <p className="text-xs text-gray-400 mt-1">{profileHeadline.length}/120</p>
+              <p className="text-xs text-[var(--fg-3)] mt-1">{profileHeadline.length}/120</p>
             </div>
 
             <div>
@@ -772,39 +772,39 @@ export default function OnboardingPage() {
               <textarea
                 value={profileBio}
                 onChange={(e) => setProfileBio(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
+                className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)] resize-none"
                 rows={4}
                 placeholder="Tell potential clients about your experience and approach..."
                 maxLength={500}
               />
-              <p className="text-xs text-gray-400 mt-1">{profileBio.length}/500</p>
+              <p className="text-xs text-[var(--fg-3)] mt-1">{profileBio.length}/500</p>
             </div>
 
             <div>
               <Label>Price range (optional)</Label>
-              <p className="text-sm text-gray-500 mb-2">Give clients an idea of your rates. You can add exact offers later in Settings.</p>
+              <p className="text-sm text-[var(--fg-3)] mb-2">Give clients an idea of your rates. You can add exact offers later in Settings.</p>
               <div className="grid grid-cols-[1fr_auto_1fr_auto] gap-3 items-center">
                 <input
                   type="number"
                   value={profilePriceFrom}
                   onChange={(e) => setProfilePriceFrom(e.target.value)}
-                  className="px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]"
                   placeholder="From"
                   min={0}
                 />
-                <span className="text-gray-400">–</span>
+                <span className="text-[var(--fg-3)]">–</span>
                 <input
                   type="number"
                   value={profilePriceTo}
                   onChange={(e) => setProfilePriceTo(e.target.value)}
-                  className="px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]"
                   placeholder="To"
                   min={0}
                 />
                 <select
                   value={profileCurrency}
                   onChange={(e) => setProfileCurrency(e.target.value)}
-                  className="px-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="px-3 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]"
                 >
                   {COACH_MARKETPLACE_CURRENCIES.map((c) => (
                     <option key={c} value={c}>{c}</option>
@@ -813,8 +813,8 @@ export default function OnboardingPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3">
-              <span className="text-sm font-medium text-green-700">Your profile will be published to the coach directory when you finish setup.</span>
+            <div className="flex items-center gap-2 rounded-xl border border-[var(--ok)] bg-[var(--success-bg)] px-4 py-3">
+              <span className="text-sm font-medium text-[var(--ok-text)]">Your profile will be published to the coach directory when you finish setup.</span>
             </div>
           </div>
         )
