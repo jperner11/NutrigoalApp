@@ -131,13 +131,13 @@ export default function ClientDetailPage() {
         {(client.injuries?.length > 0 || client.medical_conditions?.length > 0 || client.dietary_restrictions?.length > 0 || client.food_dislikes?.length > 0) && (
           <div className="mt-6 space-y-2 border-t border-[var(--line)] pt-4">
             {client.injuries?.length > 0 && (
-              <AnamnesisRow icon={<AlertTriangle className="h-4 w-4 text-red-500" />} label="Injuries" value={client.injuries.join(', ')} />
+              <AnamnesisRow icon={<AlertTriangle className="h-4 w-4 text-[var(--danger-text)]" />} label="Injuries" value={client.injuries.join(', ')} />
             )}
             {client.medical_conditions?.length > 0 && (
               <AnamnesisRow icon={<Stethoscope className="h-4 w-4 text-[var(--warn)]" />} label="Conditions" value={client.medical_conditions.join(', ')} />
             )}
             {client.dietary_restrictions?.length > 0 && (
-              <AnamnesisRow icon={<Leaf className="h-4 w-4 text-green-500" />} label="Diet Restrictions" value={client.dietary_restrictions.join(', ')} />
+              <AnamnesisRow icon={<Leaf className="h-4 w-4 text-[var(--ok)]" />} label="Diet Restrictions" value={client.dietary_restrictions.join(', ')} />
             )}
             {client.food_dislikes?.length > 0 && (
               <AnamnesisRow icon={<ThumbsDown className="h-4 w-4 text-[var(--fg-3)]" />} label="Dislikes" value={client.food_dislikes.join(', ')} />
@@ -146,7 +146,7 @@ export default function ClientDetailPage() {
               <AnamnesisRow icon={<Activity className="h-4 w-4 text-[var(--brand-400)]" />} label="Experience" value={client.training_experience} />
             )}
             {client.equipment_access && (
-              <AnamnesisRow icon={<Weight className="h-4 w-4 text-cyan-500" />} label="Equipment" value={client.equipment_access.replace(/_/g, ' ')} />
+              <AnamnesisRow icon={<Weight className="h-4 w-4 text-[var(--brand-400)]" />} label="Equipment" value={client.equipment_access.replace(/_/g, ' ')} />
             )}
           </div>
         )}
@@ -154,14 +154,14 @@ export default function ClientDetailPage() {
         <div className="mt-6 border-t border-[var(--line)] pt-4">
           <h2 className="app-mono-label mb-3">Coach intake summary</h2>
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-            {client.desired_outcome && <AnamnesisRow icon={<Target className="h-4 w-4 text-blue-500" />} label="Desired outcome" value={client.desired_outcome} />}
-            {client.past_dieting_challenges && <AnamnesisRow icon={<AlertTriangle className="h-4 w-4 text-amber-500" />} label="Past challenges" value={client.past_dieting_challenges} />}
+            {client.desired_outcome && <AnamnesisRow icon={<Target className="h-4 w-4 text-[var(--acc)]" />} label="Desired outcome" value={client.desired_outcome} />}
+            {client.past_dieting_challenges && <AnamnesisRow icon={<AlertTriangle className="h-4 w-4 text-[var(--warn)]" />} label="Past challenges" value={client.past_dieting_challenges} />}
             {client.weekly_derailers && <AnamnesisRow icon={<ClipboardList className="h-4 w-4 text-[var(--acc)]" />} label="Derailers" value={client.weekly_derailers} />}
-            {client.equipment_access && <AnamnesisRow icon={<Weight className="h-4 w-4 text-cyan-500" />} label="Equipment" value={client.equipment_access.replace(/_/g, ' ')} />}
+            {client.equipment_access && <AnamnesisRow icon={<Weight className="h-4 w-4 text-[var(--brand-400)]" />} label="Equipment" value={client.equipment_access.replace(/_/g, ' ')} />}
             {client.workout_days_per_week && <AnamnesisRow icon={<Dumbbell className="h-4 w-4 text-[var(--brand-400)]" />} label="Training availability" value={`${client.workout_days_per_week} days / week`} />}
-            {client.max_session_minutes && <AnamnesisRow icon={<Activity className="h-4 w-4 text-emerald-500" />} label="Session length" value={`${client.max_session_minutes} min`} />}
+            {client.max_session_minutes && <AnamnesisRow icon={<Activity className="h-4 w-4 text-[var(--brand-400)]" />} label="Session length" value={`${client.max_session_minutes} min`} />}
             {client.plan_preference && <AnamnesisRow icon={<ClipboardList className="h-4 w-4 text-[var(--acc)]" />} label="Plan style" value={client.plan_preference.replace(/_/g, ' ')} />}
-            {client.sleep_quality && <AnamnesisRow icon={<Stethoscope className="h-4 w-4 text-slate-500" />} label="Recovery context" value={`${client.sleep_quality}${client.stress_level ? ` · stress ${client.stress_level}` : ''}`} />}
+            {client.sleep_quality && <AnamnesisRow icon={<Stethoscope className="h-4 w-4 text-[var(--fg-3)]" />} label="Recovery context" value={`${client.sleep_quality}${client.stress_level ? ` · stress ${client.stress_level}` : ''}`} />}
           </div>
         </div>
 
@@ -232,7 +232,7 @@ export default function ClientDetailPage() {
             {dietPlans.map(plan => (
               <div key={plan.id} className="card p-4 flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <Utensils className="h-5 w-5 text-green-500" />
+                  <Utensils className="h-5 w-5 text-[var(--ok)]" />
                   <div>
                     <p className="font-semibold text-[var(--fg)]">{plan.name}</p>
                     <p className="text-xs text-[var(--fg-3)]">
