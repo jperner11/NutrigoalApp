@@ -414,7 +414,7 @@ export default function NewDietPlanPage() {
       {canAccess(profile.role, 'ai_suggestions') ? (
       <ListCard className="mb-8" eyebrow="AI GENERATOR" tone="accent">
         <div className="flex items-center gap-2 mb-4">
-          <Sparkles className="h-5 w-5 text-[var(--brand-400)]" />
+          <Sparkles className="h-5 w-5 text-[var(--acc-text)]" />
           <h3 className="font-semibold text-[var(--fg)]">Auto-generate plan</h3>
         </div>
         <p className="mb-4 text-sm text-[var(--fg-2)]">
@@ -446,7 +446,7 @@ export default function NewDietPlanPage() {
               onClick={() => setIncludeSnack(!includeSnack)}
               className={`chip flex items-center gap-2 text-sm font-medium transition-colors ${
                 includeSnack
-                  ? 'border-[var(--brand-400)] bg-[var(--brand-100)] text-[var(--brand-400)]'
+                  ? 'border-[var(--brand-400)] bg-[var(--brand-100)] text-[var(--acc-text)]'
                   : ''
               }`}
             >
@@ -494,7 +494,7 @@ export default function NewDietPlanPage() {
         </p>
         <Link
           href="/pricing"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--brand-400)]"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--acc-text)] hover:underline"
         >
           Upgrade to Pro
         </Link>
@@ -520,7 +520,7 @@ export default function NewDietPlanPage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="rounded-lg bg-[var(--brand-100)] p-2">
-                    <Utensils className="h-4 w-4 text-[var(--brand-400)]" />
+                    <Utensils className="h-4 w-4 text-[var(--acc-text)]" />
                   </div>
                   <div>
                     <input
@@ -604,12 +604,12 @@ export default function NewDietPlanPage() {
                       <div className="col-span-2 text-right text-sm text-[var(--fg-2)]">{food.calories}</div>
                       <div className="col-span-1 text-right text-sm text-[var(--ok-text)]">{food.protein}g</div>
                       <div className="col-span-1 text-right text-sm text-[var(--warn-text)]">{food.carbs}g</div>
-                      <div className="col-span-1 text-right text-sm text-[var(--brand-400)]">{food.fat}g</div>
+                      <div className="col-span-1 text-right text-sm text-[var(--acc-text)]">{food.fat}g</div>
                       <div className="col-span-2 text-right">
                         <button
                           onClick={() => removeFoodFromMeal(mealIndex, foodIndex)}
                           aria-label={`Remove ${food.name}`}
-                          className="p-1 text-[var(--fg-4)] opacity-0 transition-colors hover:text-[var(--brand-400)] group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100"
+                          className="p-1 text-[var(--fg-4)] opacity-0 transition-colors hover:text-[var(--acc-text)] group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
@@ -660,9 +660,9 @@ export default function NewDietPlanPage() {
                           className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[var(--fg)] transition-colors hover:bg-[var(--ink-2)] disabled:opacity-50"
                         >
                           {loadingNutrition ? (
-                            <Loader2 className="h-3 w-3 animate-spin text-[var(--brand-400)]" />
+                            <Loader2 className="h-3 w-3 animate-spin text-[var(--acc-text)]" />
                           ) : (
-                            <Plus className="h-3 w-3 text-[var(--brand-400)]" />
+                            <Plus className="h-3 w-3 text-[var(--acc-text)]" />
                           )}
                           <span>{result.name}</span>
                           {result.calories_per_100g !== undefined && (
@@ -690,7 +690,7 @@ export default function NewDietPlanPage() {
               ) : (
                 <button
                   onClick={() => setSelectedMealIndex(mealIndex)}
-                  className="flex items-center gap-1 text-sm font-medium text-[var(--brand-400)] hover:text-[var(--brand-500)]"
+                  className="flex items-center gap-1 text-sm font-medium text-[var(--acc-text)] hover:underline"
                 >
                   <Plus className="h-3 w-3" />
                   Add Food
@@ -711,7 +711,7 @@ export default function NewDietPlanPage() {
       {/* Add Meal Button */}
       <button
         onClick={addMeal}
-        className="mb-8 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-[var(--line-strong)] py-3 text-[var(--fg-2)] transition-colors hover:border-[var(--brand-400)] hover:text-[var(--brand-400)]"
+        className="mb-8 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-[var(--line-strong)] py-3 text-[var(--fg-2)] transition-colors hover:border-[var(--brand-400)] hover:text-[var(--acc-text)]"
       >
         <Plus className="h-4 w-4" />
         Add Meal
