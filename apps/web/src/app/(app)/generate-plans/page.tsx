@@ -9,7 +9,7 @@ import { Sparkles, Dumbbell, Utensils, CheckCircle2, AlertCircle, Loader2, Pill,
 import { toast } from 'react-hot-toast'
 import { checkRegenEligibility, getRegenCooldownDays } from '@/lib/tierUtils'
 import { isManagedClientRole } from '@treno/shared'
-import { apiFetch } from '@/lib/apiClient'
+import { apiFetch, reportClientError } from '@/lib/apiClient'
 
 type StepStatus = 'pending' | 'loading' | 'done' | 'error'
 
@@ -57,7 +57,11 @@ export default function GeneratePlansPage() {
     }
     startedRef.current = true
 
-    generateAll()
+    generateAll().catch((err) => {
+      reportClientError(err, { feature: 'generate-plans', action: 'generate-all' })
+      toast.error('Something went wrong generating your plans. Please try again.')
+      setTimeout(() => router.push('/dashboard'), 2000)
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile])
 
