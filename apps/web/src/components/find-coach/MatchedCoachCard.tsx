@@ -4,8 +4,8 @@ import { formatCoachPriceRange } from '@/lib/coachMarketplace'
 import { type MatchedCoachResult } from '@/lib/findCoach'
 
 function getBadgeClasses(score: number) {
-  if (score > 75) return 'bg-[rgba(26,163,122,0.14)] text-emerald-300 border-[rgba(26,163,122,0.35)]'
-  if (score > 50) return 'bg-[rgba(196,121,28,0.14)] text-amber-300 border-[rgba(196,121,28,0.35)]'
+  if (score > 75) return 'bg-[rgba(26,163,122,0.14)] text-[var(--ok-text)] border-[rgba(26,163,122,0.35)]'
+  if (score > 50) return 'bg-[rgba(196,121,28,0.14)] text-[var(--warn-text)] border-[rgba(196,121,28,0.35)]'
   return 'bg-[var(--ink-2)] text-[var(--muted)] border-[var(--line)]'
 }
 
