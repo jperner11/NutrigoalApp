@@ -50,7 +50,12 @@ function CoachCheckInsPage({ profile }: { profile: UserProfile }) {
         supabase.from('feedback_requests').select('*, client:client_id(id, full_name, email)').eq('nutritionist_id', profile.id).order('created_at', { ascending: false }).limit(50),
       ])
       if (tRes.data) setTemplates(tRes.data as FeedbackTemplate[])
-      if (rRes.data) setRequests(rRes.data as (FeedbackRequest & { client?: UserProfile })[])
+      if (rRes.data) {
+        // feedback_requests has two FKs to user_profiles (nutritionist_id, client_id), so
+        // PostgREST returns the embedded client relation as an array, not a single object.
+        const rows = rRes.data as (FeedbackRequest & { client: UserProfile[] | UserProfile | null })[]
+        setRequests(rows.map(r => ({ ...r, client: Array.isArray(r.client) ? (r.client[0] ?? undefined) : (r.client ?? undefined) })))
+      }
     } catch (err) {
       reportClientError(err, { feature: 'check-ins', action: 'coach-load-all' })
     } finally {
