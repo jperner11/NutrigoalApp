@@ -567,6 +567,7 @@ function ClientCheckInsPage({ profile }: { profile: UserProfile }) {
 
   const pending = requests.filter(r => r.status === 'pending')
   const completed = requests.filter(r => r.status === 'completed')
+  const activeRequest = activeId ? requests.find(r => r.id === activeId) : undefined
 
   if (loading) return <div className="text-[var(--muted-soft)]">Loading check-ins...</div>
 
@@ -574,9 +575,9 @@ function ClientCheckInsPage({ profile }: { profile: UserProfile }) {
     <div className="max-w-3xl mx-auto">
       <h1 className="text-2xl font-bold text-[var(--foreground)] mb-6">Check-ins</h1>
 
-      {activeId ? (
+      {activeRequest ? (
         <ActiveCheckIn
-          request={requests.find(r => r.id === activeId)!}
+          request={activeRequest}
           answers={answers}
           setAnswers={setAnswers}
           onPhotoUpload={handlePhotoUpload}
