@@ -822,7 +822,7 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-6">
             <StepHeader
-              icon={<Users className="h-12 w-12 text-indigo-500" />}
+              icon={<Users className="h-12 w-12 text-[var(--acc-text)]" />}
               title="Who do you work best with?"
               subtitle="We'll use this to shape the trainer dashboard and the way client intake is framed after an invite is accepted."
             />
@@ -831,7 +831,7 @@ export default function OnboardingPage() {
               <textarea
                 value={coachIdealClient}
                 onChange={(e) => setCoachIdealClient(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
+                className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)] resize-none"
                 rows={4}
                 placeholder="e.g. busy professionals who want fat loss, strength, and simple nutrition they can sustain"
               />
