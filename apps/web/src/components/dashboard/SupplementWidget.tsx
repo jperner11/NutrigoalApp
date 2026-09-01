@@ -7,6 +7,7 @@ import { toast } from 'react-hot-toast'
 import Link from 'next/link'
 import type { UserSupplement, SupplementLog } from '@/lib/supabase/types'
 import { reportClientError } from '@/lib/apiClient'
+import { getLocalDateString } from '@/lib/date'
 
 interface SupplementWidgetProps {
   userId: string
@@ -17,7 +18,7 @@ export default function SupplementWidget({ userId }: SupplementWidgetProps) {
   const [todayLogs, setTodayLogs] = useState<SupplementLog[]>([])
   const [loading, setLoading] = useState(true)
 
-  const today = new Date().toISOString().split('T')[0]
+  const today = getLocalDateString()
 
   useEffect(() => {
     async function load() {
@@ -156,6 +157,8 @@ export default function SupplementWidget({ userId }: SupplementWidgetProps) {
             <button
               key={sup.id}
               onClick={() => toggleLog(sup)}
+              aria-label={isTaken ? `Mark ${sup.name} as not taken today` : `Mark ${sup.name} as taken today`}
+              aria-pressed={isTaken}
               className="row w-full gap-2 rounded-lg px-2 py-1.5 text-left transition"
               style={{
                 background: isTaken ? 'var(--ink-3)' : 'transparent',

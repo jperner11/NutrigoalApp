@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
+import { getLocalDateString } from '@/lib/date'
 import { toast } from 'react-hot-toast'
 import { Plus, Ruler, TrendingDown, TrendingUp, Minus } from 'lucide-react'
 import Link from 'next/link'
@@ -47,7 +48,7 @@ function DiffBadge({ current, previous }: { current: number | null; previous: nu
       </span>
     )
   }
-  const tone = diff > 0 ? 'var(--acc)' : 'var(--ok)'
+  const tone = diff > 0 ? 'var(--acc-text)' : 'var(--ok-text)'
   return (
     <span
       className="row mono gap-1"
@@ -64,7 +65,7 @@ export default function MeasurementsPage() {
   const [measurements, setMeasurements] = useState<BodyMeasurement[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
-  const [formDate, setFormDate] = useState(new Date().toISOString().split('T')[0])
+  const [formDate, setFormDate] = useState(getLocalDateString())
   const [formValues, setFormValues] = useState<Record<string, string>>({})
   const [formNotes, setFormNotes] = useState('')
   const [saving, setSaving] = useState(false)
@@ -72,19 +73,22 @@ export default function MeasurementsPage() {
   const loadMeasurements = useCallback(async () => {
     if (!profile) return
     const supabase = createClient()
-    const { data, error } = await supabase
-      .from('body_measurements')
-      .select('*')
-      .eq('user_id', profile.id)
-      .order('date', { ascending: false })
-      .limit(20)
 
-    if (error) {
-      toast.error('Failed to load measurements')
-    } else {
+    try {
+      const { data, error } = await supabase
+        .from('body_measurements')
+        .select('*')
+        .eq('user_id', profile.id)
+        .order('date', { ascending: false })
+        .limit(20)
+
+      if (error) throw error
       setMeasurements(data ?? [])
+    } catch {
+      toast.error('Failed to load measurements')
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }, [profile])
 
   useEffect(() => { loadMeasurements() }, [loadMeasurements])

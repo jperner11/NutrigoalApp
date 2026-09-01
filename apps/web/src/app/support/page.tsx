@@ -24,7 +24,7 @@ export default function SupportPage() {
         <h2 className="font-display text-3xl font-bold text-[var(--foreground)]">{supportCopy.contact.title}</h2>
         <p className="mt-4 text-sm leading-7 text-[var(--muted)]">
           {supportCopy.contact.bodyBefore}
-          <a className="font-semibold text-[var(--brand-700)]" href={`mailto:${supportCopy.contact.email}`}>{supportCopy.contact.email}</a>
+          <a className="font-semibold text-[var(--acc-text)]" href={`mailto:${supportCopy.contact.email}`}>{supportCopy.contact.email}</a>
           {supportCopy.contact.bodyAfter}
         </p>
         <div className="mt-6 flex flex-wrap gap-3">

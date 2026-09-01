@@ -57,9 +57,16 @@ export default function NewClientTrainingPlanPage() {
     ]).then(([clientRes, exRes]) => {
       if (clientRes.error) { setLoadError('Failed to load client. Please refresh.'); setLoadingExercises(false); return }
       if (clientRes.data) setClient(clientRes.data as UserProfile)
-      if (exRes.data) setExercises(exRes.data as Exercise[])
+      if (exRes.error) {
+        toast.error('Failed to load the exercise library. Please refresh.')
+      } else if (exRes.data) {
+        setExercises(exRes.data as Exercise[])
+      }
       setLoadingExercises(false)
-    }).catch(() => setLoadingExercises(false))
+    }).catch(() => {
+      setLoadError('Failed to load client. Please refresh.')
+      setLoadingExercises(false)
+    })
   }, [profile, id, router])
 
   const filteredExercises = useMemo(() => {
@@ -124,30 +131,56 @@ export default function NewClientTrainingPlanPage() {
     setSaving(true)
     const supabase = createClient()
 
-    await supabase.from('training_plans').update({ is_active: false }).eq('user_id', id).eq('is_active', true)
+    try {
+      await supabase.from('training_plans').update({ is_active: false }).eq('user_id', id).eq('is_active', true)
 
-    const { data: plan, error } = await supabase.from('training_plans').insert({
-      user_id: id, created_by: profile!.id, name: planName,
-      description: description.trim() || null, days_per_week: days.length, is_active: true,
-    }).select().single()
-
-    if (error || !plan) { toast.error(error?.message || 'Failed'); setSaving(false); return }
-
-    for (let i = 0; i < days.length; i++) {
-      const { data: day } = await supabase.from('training_plan_days').insert({
-        training_plan_id: plan.id, day_number: i + 1, name: days[i].name,
+      const { data: plan, error } = await supabase.from('training_plans').insert({
+        user_id: id, created_by: profile!.id, name: planName,
+        description: description.trim() || null, days_per_week: days.length, is_active: true,
       }).select().single()
-      if (!day) continue
 
-      const rows = days[i].exercises.map((e, idx) => ({
-        plan_day_id: day.id, exercise_id: e.exercise_id, order_index: idx,
-        sets: e.sets, reps: e.reps, rest_seconds: e.rest_seconds,
-      }))
-      await supabase.from('training_plan_exercises').insert(rows)
+      if (error || !plan) { toast.error(error?.message || 'Failed'); setSaving(false); return }
+
+      // Insert days and their exercises in parallel (each day only depends on plan.id)
+      const dayResults = await Promise.all(
+        days.map(async (day, i) => {
+          const { data: insertedDay, error: dayError } = await supabase.from('training_plan_days').insert({
+            training_plan_id: plan.id, day_number: i + 1, name: day.name,
+          }).select().single()
+          if (dayError || !insertedDay) {
+            return { ok: false, name: day.name, stage: 'day' as const }
+          }
+
+          const rows = day.exercises.map((e, idx) => ({
+            plan_day_id: insertedDay.id, exercise_id: e.exercise_id, order_index: idx,
+            sets: e.sets, reps: e.reps, rest_seconds: e.rest_seconds,
+          }))
+          const { error: exError } = await supabase.from('training_plan_exercises').insert(rows)
+          if (exError) {
+            return { ok: false, name: day.name, stage: 'exercises' as const }
+          }
+
+          return { ok: true, name: day.name, stage: null }
+        })
+      )
+
+      const failed = dayResults.find((r) => !r.ok)
+      if (failed) {
+        toast.error(
+          failed.stage === 'day'
+            ? `Failed to create day "${failed.name}"`
+            : `Failed to save exercises for "${failed.name}"`
+        )
+        setSaving(false)
+        return
+      }
+
+      toast.success(`Training plan created for ${client?.full_name}`)
+      router.push(`/clients/${id}`)
+    } catch {
+      toast.error('An unexpected error occurred')
+      setSaving(false)
     }
-
-    toast.success(`Training plan created for ${client?.full_name}`)
-    router.push(`/clients/${id}`)
   }
 
   return (

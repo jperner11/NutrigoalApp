@@ -24,6 +24,7 @@
   --focus: rgba(205, 242, 78, 0.45);
   --success-bg: rgba(26, 163, 122, 0.12);
   --danger-bg: rgba(220, 38, 38, 0.14);
+  --warn-bg: rgba(196, 121, 28, 0.14);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -50,6 +51,7 @@
     --focus: rgba(205, 242, 78, 0.32);
     --success-bg: rgba(26, 163, 122, 0.12);
     --danger-bg: rgba(220, 38, 38, 0.14);
+    --warn-bg: rgba(196, 121, 28, 0.14);
   }
 }
 
@@ -621,6 +623,17 @@ main {
   background: var(--panel);
   color: var(--foreground);
   border: 1px solid var(--line-strong);
+}
+
+.btn.btn-danger {
+  background: var(--danger-bg);
+  color: var(--danger-text);
+  border: 1px solid var(--danger);
+}
+
+.btn.btn-danger:hover {
+  background: var(--danger);
+  color: #fff;
 }
 
 .btn-ghost {
@@ -1196,6 +1209,10 @@ input[type="checkbox"] {
   background-color: rgba(205, 242, 78, 0.20) !important;
 }
 
+/* Text color uses the readable *-text tokens, not the raw hue tokens —
+   var(--acc) is ~1.3:1 on light panels (see --acc-text definition above),
+   far below WCAG AA for text. The raw tokens stay reserved for
+   backgrounds/borders/icons-on-dark, where that contrast math doesn't apply. */
 .text-purple-300,
 .text-purple-400,
 .text-purple-500,
@@ -1218,7 +1235,7 @@ input[type="checkbox"] {
 .text-red-700,
 .text-red-800,
 .text-orange-500 {
-  color: var(--acc) !important;
+  color: var(--acc-text) !important;
 }
 
 .text-green-400,
@@ -1229,7 +1246,7 @@ input[type="checkbox"] {
 .text-emerald-500,
 .text-emerald-600,
 .text-emerald-700 {
-  color: var(--ok) !important;
+  color: var(--ok-text) !important;
 }
 
 .text-amber-400,
@@ -1240,7 +1257,7 @@ input[type="checkbox"] {
 .text-yellow-500,
 .text-yellow-600,
 .text-yellow-700 {
-  color: var(--warn) !important;
+  color: var(--warn-text) !important;
 }
 
 .border-purple-100,
@@ -1290,7 +1307,7 @@ input[type="checkbox"] {
 .hover\:text-red-500:hover,
 .hover\:text-red-600:hover,
 .hover\:text-red-700:hover {
-  color: var(--acc) !important;
+  color: var(--acc-text) !important;
 }
 
 .hover\:text-green-500:hover,
@@ -1298,14 +1315,14 @@ input[type="checkbox"] {
 .hover\:text-green-700:hover,
 .hover\:text-emerald-500:hover,
 .hover\:text-emerald-600:hover {
-  color: var(--ok) !important;
+  color: var(--ok-text) !important;
 }
 
 .hover\:text-amber-500:hover,
 .hover\:text-amber-600:hover,
 .hover\:text-yellow-500:hover,
 .hover\:text-yellow-600:hover {
-  color: var(--warn) !important;
+  color: var(--warn-text) !important;
 }
 
 .hover\:border-purple-300:hover,

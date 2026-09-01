@@ -24,40 +24,43 @@ export async function GET(request: Request) {
     return NextResponse.json({ message: error?.message ?? 'Failed to load schedules' }, { status: 500 })
   }
 
-  let created = 0
+  const results = await Promise.all(
+    schedules.map(async (schedule) => {
+      if (shouldSkip(schedule, now)) return false
 
-  for (const schedule of schedules) {
-    if (shouldSkip(schedule, now)) continue
+      const template = schedule.template as { id: string; name: string; questions: unknown[] } | null
+      if (!template) return false
 
-    const template = schedule.template as { id: string; name: string; questions: unknown[] } | null
-    if (!template) continue
+      const { error: insertError } = await supabase.from('feedback_requests').insert({
+        nutritionist_id: schedule.trainer_id,
+        client_id: schedule.client_id,
+        title: template.name,
+        questions: template.questions,
+        template_id: template.id,
+        schedule_id: schedule.id,
+        status: 'pending',
+      })
 
-    const { error: insertError } = await supabase.from('feedback_requests').insert({
-      nutritionist_id: schedule.trainer_id,
-      client_id: schedule.client_id,
-      title: template.name,
-      questions: template.questions,
-      template_id: template.id,
-      schedule_id: schedule.id,
-      status: 'pending',
-    })
+      if (insertError) {
+        Sentry.captureException(insertError, { tags: { kind: 'cron', route: 'check-ins', scheduleId: schedule.id } })
+        return false
+      }
 
-    if (insertError) {
-      Sentry.captureException(insertError, { tags: { kind: 'cron', route: 'check-ins', scheduleId: schedule.id } })
-      continue
-    }
+      const { error: updateError } = await supabase
+        .from('feedback_schedules')
+        .update({ last_triggered_at: now.toISOString() })
+        .eq('id', schedule.id)
 
-    const { error: updateError } = await supabase
-      .from('feedback_schedules')
-      .update({ last_triggered_at: now.toISOString() })
-      .eq('id', schedule.id)
+      if (updateError) {
+        Sentry.captureException(updateError, { tags: { kind: 'cron', route: 'check-ins', scheduleId: schedule.id } })
+        return false
+      }
 
-    if (updateError) {
-      Sentry.captureException(updateError, { tags: { kind: 'cron', route: 'check-ins', scheduleId: schedule.id } })
-      continue
-    }
-    created++
-  }
+      return true
+    }),
+  )
+
+  const created = results.filter(Boolean).length
 
   return NextResponse.json({ created, checked: schedules.length })
 }

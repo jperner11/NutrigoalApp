@@ -8,15 +8,13 @@ import MarketingNav from '@/components/marketing/MarketingNav'
 import PublicFooter from '@/components/marketing/PublicFooter'
 import { PRICING } from '@/lib/constants'
 import { apiFetch, ApiError } from '@/lib/apiClient'
+import { formatPrice } from '@/lib/format'
 import {
   CHECKOUT_INTENT_STORAGE_KEY,
   type CheckoutIntentPlan,
   getCheckoutSignupHref,
   parseCheckoutIntent,
 } from '@/lib/checkoutIntent'
-
-const formatPrice = (price: number) =>
-  price === 0 ? '$0' : `$${price.toFixed(price % 1 === 0 ? 0 : 2)}`
 
 const tiers = [
   {
@@ -188,7 +186,7 @@ export default function PricingPage() {
                   <span className="serif" style={{ fontSize: 48, lineHeight: 1 }}>
                     {formatPrice(t.plan.price)}
                   </span>
-                  <span style={{ fontSize: 12, color: 'var(--fg-3)' }}>
+                  <span style={{ fontSize: 12, color: 'var(--fg-2)' }}>
                     {t.period}
                   </span>
                 </div>
@@ -261,7 +259,7 @@ export default function PricingPage() {
               </span>
               <span
                 className="ml-2"
-                style={{ fontSize: 12, color: 'var(--fg-3)' }}
+                style={{ fontSize: 12, color: 'var(--fg-2)' }}
               >
                 per month · up to {coachPlan.baseClients} clients
               </span>

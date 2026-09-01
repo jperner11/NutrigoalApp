@@ -23,6 +23,7 @@ import {
 } from 'lucide-react'
 import type { DietPlan, DietPlanMeal } from '@/lib/supabase/types'
 import { isFeatureLocked, canAccess } from '@/lib/tierUtils'
+import { reportClientError } from '@/lib/apiClient'
 import PlanChat from '@/components/diet/PlanChat'
 import UpgradeModal from '@/components/ui/UpgradeModal'
 import WeekDayTabs from '@/components/diet/WeekDayTabs'
@@ -115,28 +116,35 @@ export default function DietPlanDetailPage() {
     if (!profile || !params.id) return
     const supabase = createClient()
 
-    const { data: planData, error: planError } = await supabase
-      .from('diet_plans')
-      .select('*')
-      .eq('id', params.id)
-      .single()
+    try {
+      const { data: planData, error: planError } = await supabase
+        .from('diet_plans')
+        .select('*')
+        .eq('id', params.id)
+        .single()
 
-    if (planError || !planData) {
-      toast.error('Diet plan not found')
+      if (planError || !planData) {
+        toast.error('Diet plan not found')
+        router.push('/diet')
+        return
+      }
+
+      setPlan(planData)
+
+      const { data: mealsData } = await supabase
+        .from('diet_plan_meals')
+        .select('*')
+        .eq('diet_plan_id', params.id)
+
+      setMeals(mealsData ?? [])
+      setExpandedMeals(new Set((mealsData ?? []).map(m => m.id)))
+    } catch (err) {
+      reportClientError(err, { feature: 'diet', action: 'diet-plan-detail-load' })
+      toast.error('Failed to load diet plan')
       router.push('/diet')
-      return
+    } finally {
+      setLoading(false)
     }
-
-    setPlan(planData)
-
-    const { data: mealsData } = await supabase
-      .from('diet_plan_meals')
-      .select('*')
-      .eq('diet_plan_id', params.id)
-
-    setMeals(mealsData ?? [])
-    setExpandedMeals(new Set((mealsData ?? []).map(m => m.id)))
-    setLoading(false)
   }, [profile, params.id, router])
 
   useEffect(() => {
@@ -327,7 +335,7 @@ export default function DietPlanDetailPage() {
       {profile?.daily_water_ml && (
         <ListCard className="mb-6" eyebrow="WATER GOAL">
           <div className="flex items-center gap-3">
-            <Droplets className="h-5 w-5 text-[var(--brand-400)]" />
+            <Droplets className="h-5 w-5 text-[var(--acc-text)]" />
             <div>
               <span className="text-sm font-medium text-[var(--fg)]">Hydration target</span>
               <span className="ml-2 text-sm text-[var(--fg-3)]">{(profile.daily_water_ml / 1000).toFixed(1)}L / day</span>
@@ -391,7 +399,7 @@ export default function DietPlanDetailPage() {
                   {isLocked ? (
                     <button
                       onClick={() => setShowUpgradeModal(true)}
-                      className="mt-3 flex items-center gap-1.5 text-sm font-medium text-[var(--brand-400)] transition-colors hover:text-[var(--brand-500)]"
+                      className="mt-3 flex items-center gap-1.5 text-sm font-medium text-[var(--acc-text)] transition-colors hover:underline"
                     >
                       <Lock className="h-3.5 w-3.5" />
                       <span>Upgrade to see this meal</span>
@@ -399,7 +407,7 @@ export default function DietPlanDetailPage() {
                   ) : (
                     <button
                       onClick={() => toggleMeal(meal.id)}
-                      className="mt-3 flex items-center gap-1 text-sm font-medium text-[var(--brand-400)] transition-colors hover:text-[var(--brand-500)]"
+                      className="mt-3 flex items-center gap-1 text-sm font-medium text-[var(--acc-text)] transition-colors hover:underline"
                     >
                       {isExpanded ? (
                         <>
@@ -439,7 +447,7 @@ export default function DietPlanDetailPage() {
                           {items.map((food, idx) => (
                             <div key={idx} className="flex items-center gap-3 py-2.5">
                               <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-[var(--brand-100)]">
-                                <Check className="h-4 w-4 text-[var(--brand-400)]" />
+                                <Check className="h-4 w-4 text-[var(--acc-text)]" />
                               </div>
 
                               <div className="flex-1 min-w-0">
@@ -498,11 +506,11 @@ export default function DietPlanDetailPage() {
                     className="flex w-full items-center gap-3 rounded-xl border border-[var(--line)] bg-[var(--ink-2)] p-3 text-left transition-all hover:border-[var(--brand-400)]"
                   >
                     <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[var(--brand-100)]">
-                      <Utensils className="h-4 w-4 text-[var(--brand-400)]" />
+                      <Utensils className="h-4 w-4 text-[var(--acc-text)]" />
                     </div>
                     <div className="flex-1 min-w-0">
                       {meta.label && (
-                        <p className="text-xs font-semibold text-[var(--brand-400)]">{meta.label}</p>
+                        <p className="text-xs font-semibold text-[var(--acc-text)]">{meta.label}</p>
                       )}
                       <p className="font-medium text-[var(--fg)]">{meal.meal_name}</p>
                       <p className="text-xs text-[var(--fg-3)]">
@@ -540,6 +548,7 @@ export default function DietPlanDetailPage() {
                 <h3 className="text-lg font-bold text-[var(--fg)]">Alternatives</h3>
                 <button
                   onClick={() => setAlternativesModal(null)}
+                  aria-label="Close"
                   className="rounded-lg p-1 text-[var(--fg-3)] transition-colors hover:bg-[var(--ink-2)]"
                 >
                   <X className="h-5 w-5" />

@@ -20,6 +20,7 @@ No test framework is configured.
 ## Source Files
 
 - **`types.ts`** — All database/domain interfaces and union-type aliases. Mirrors Supabase table shapes. Covers: user profiles, diet/training plans, workout/meal/supplement/cardio logs, coach features (leads, offers, public profiles, invites), feedback/check-in system, progress photos/measurements, messaging, subscriptions, tier gating.
+- **`types/supplementPlans.ts`, `types/anamnesis.ts`, `types/cardioPlans.ts`** — Feature-scoped type modules re-exported from `index.ts` (coach-prescribed supplement plans, custom intake/anamnesis inputs, coach-prescribed cardio programmes).
 - **`constants.ts`** — Pricing tiers (`PRICING`), anamnesis/onboarding option arrays (training experience, equipment, dietary restrictions, supplements, etc.), training defaults (weight increments, rest, reps), cardio MET values, body parts, equipment types, meal types, water quick-add amounts.
 - **`nutrition.ts`** — Mifflin-St Jeor BMR → TDEE → goal-adjusted calories → macro split (protein/carbs/fat) → water intake. Entry point: `calculateNutritionTargets(metrics)`.
 - **`training.ts`** — Progressive overload: `parseRepRange("8-12")` and `calculateSuggestion(lastSets, targetReps, isCompound)` — suggests weight increase when all sets hit rep max.

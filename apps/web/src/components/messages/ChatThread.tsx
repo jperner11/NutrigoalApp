@@ -114,42 +114,47 @@ export function ChatThread({
     setSending(true)
     const supabase = createClient()
 
-    const { data, error } = await supabase
-      .from('messages')
-      .insert({
-        conversation_id: conversationId,
-        sender_id: currentUserId,
-        content: trimmed,
-      })
-      .select()
-      .single()
+    try {
+      const { data, error } = await supabase
+        .from('messages')
+        .insert({
+          conversation_id: conversationId,
+          sender_id: currentUserId,
+          content: trimmed,
+        })
+        .select()
+        .single()
 
-    if (!error && data) {
-      const inserted = data as Message
-      setMessages((prev) =>
-        prev.some((m) => m.id === inserted.id) ? prev : [...prev, inserted]
-      )
-      setText('')
-      setTimeout(scrollToBottom, 50)
-      supabase
-        .from('conversations')
-        .update({ last_message_at: new Date().toISOString() })
-        .eq('id', conversationId)
-        .then(
-          ({ error: touchError }) => {
-            if (touchError) {
-              Sentry.captureException(touchError, { tags: { kind: 'component', component: 'ChatThread', op: 'touchConversation' } })
-            }
-          },
-          (err) => {
-            Sentry.captureException(err, { tags: { kind: 'component', component: 'ChatThread', op: 'touchConversation' } })
-          }
+      if (!error && data) {
+        const inserted = data as Message
+        setMessages((prev) =>
+          prev.some((m) => m.id === inserted.id) ? prev : [...prev, inserted]
         )
-    } else {
+        setText('')
+        setTimeout(scrollToBottom, 50)
+        supabase
+          .from('conversations')
+          .update({ last_message_at: new Date().toISOString() })
+          .eq('id', conversationId)
+          .then(
+            ({ error: touchError }) => {
+              if (touchError) {
+                Sentry.captureException(touchError, { tags: { kind: 'component', component: 'ChatThread', op: 'touchConversation' } })
+              }
+            },
+            (err) => {
+              Sentry.captureException(err, { tags: { kind: 'component', component: 'ChatThread', op: 'touchConversation' } })
+            }
+          )
+      } else {
+        toast.error('Failed to send message. Please try again.')
+      }
+    } catch (err) {
+      Sentry.captureException(err, { tags: { kind: 'component', component: 'ChatThread', op: 'handleSend' } })
       toast.error('Failed to send message. Please try again.')
+    } finally {
+      setSending(false)
     }
-
-    setSending(false)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

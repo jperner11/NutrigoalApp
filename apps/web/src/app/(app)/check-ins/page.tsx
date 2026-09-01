@@ -18,7 +18,7 @@ import { reportClientError } from '@/lib/apiClient'
 export default function CheckInsPage() {
   const { profile } = useUser()
 
-  if (!profile) return <div className="text-gray-500">Loading...</div>
+  if (!profile) return <div className="text-[var(--muted-soft)]">Loading...</div>
 
   if (isTrainerRole(profile.role)) {
     return <CoachCheckInsPage profile={profile} />
@@ -50,7 +50,12 @@ function CoachCheckInsPage({ profile }: { profile: UserProfile }) {
         supabase.from('feedback_requests').select('*, client:client_id(id, full_name, email)').eq('nutritionist_id', profile.id).order('created_at', { ascending: false }).limit(50),
       ])
       if (tRes.data) setTemplates(tRes.data as FeedbackTemplate[])
-      if (rRes.data) setRequests(rRes.data as (FeedbackRequest & { client?: UserProfile })[])
+      if (rRes.data) {
+        // feedback_requests has two FKs to user_profiles (nutritionist_id, client_id), so
+        // PostgREST returns the embedded client relation as an array, not a single object.
+        const rows = rRes.data as (FeedbackRequest & { client: UserProfile[] | UserProfile | null })[]
+        setRequests(rows.map(r => ({ ...r, client: Array.isArray(r.client) ? (r.client[0] ?? undefined) : (r.client ?? undefined) })))
+      }
     } catch (err) {
       reportClientError(err, { feature: 'check-ins', action: 'coach-load-all' })
     } finally {
@@ -58,20 +63,20 @@ function CoachCheckInsPage({ profile }: { profile: UserProfile }) {
     }
   }
 
-  if (loading) return <div className="text-gray-500">Loading check-ins...</div>
+  if (loading) return <div className="text-[var(--muted-soft)]">Loading check-ins...</div>
 
   return (
     <div className="max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Check-ins</h1>
+      <h1 className="text-2xl font-bold text-[var(--foreground)] mb-6">Check-ins</h1>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-6">
+      <div className="flex gap-1 bg-[var(--ink-2)] rounded-xl p-1 mb-6">
         <button onClick={() => setTab('overview')}
-          className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all ${tab === 'overview' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
+          className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all ${tab === 'overview' ? 'bg-[var(--panel-strong)] text-[var(--foreground)] shadow-sm' : 'text-[var(--muted-soft)] hover:text-[var(--muted)]'}`}>
           Overview
         </button>
         <button onClick={() => setTab('templates')}
-          className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all ${tab === 'templates' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
+          className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all ${tab === 'templates' ? 'bg-[var(--panel-strong)] text-[var(--foreground)] shadow-sm' : 'text-[var(--muted-soft)] hover:text-[var(--muted)]'}`}>
           Templates ({templates.length})
         </button>
       </div>
@@ -93,7 +98,7 @@ function CoachOverview({ requests }: { requests: (FeedbackRequest & { client?: U
     <div>
       {pending.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-amber-600 mb-3">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-[var(--warn-text)] mb-3">
             Awaiting response ({pending.length})
           </h2>
           <div className="space-y-3">
@@ -106,15 +111,15 @@ function CoachOverview({ requests }: { requests: (FeedbackRequest & { client?: U
 
       {pending.length === 0 && completed.length === 0 && (
         <div className="card p-12 text-center">
-          <CheckCircle className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-          <h3 className="font-semibold text-gray-900 mb-1">No check-ins yet</h3>
-          <p className="text-sm text-gray-500">Create a template, then schedule it for your clients.</p>
+          <CheckCircle className="h-12 w-12 text-[var(--muted-soft)] mx-auto mb-3" />
+          <h3 className="font-semibold text-[var(--foreground)] mb-1">No check-ins yet</h3>
+          <p className="text-sm text-[var(--muted-soft)]">Create a template, then schedule it for your clients.</p>
         </div>
       )}
 
       {completed.length > 0 && (
         <div>
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-green-600 mb-3">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-[var(--ok-text)] mb-3">
             Completed ({completed.length})
           </h2>
           <div className="space-y-3">
@@ -137,44 +142,45 @@ function CheckInCard({ request }: { request: FeedbackRequest & { client?: UserPr
       <button onClick={() => setExpanded(!expanded)} className="w-full text-left">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-semibold text-gray-900">{request.title}</h3>
-            <p className="text-xs text-gray-500 mt-1">
+            <h3 className="font-semibold text-[var(--foreground)]">{request.title}</h3>
+            <p className="text-xs text-[var(--muted-soft)] mt-1">
               {clientName} · {new Date(request.created_at).toLocaleDateString()}
               {request.responded_at && ` · Responded ${new Date(request.responded_at).toLocaleDateString()}`}
             </p>
           </div>
           <div className="flex items-center gap-2">
             <span className={`flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-full ${
-              request.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
+              request.status === 'completed' ? 'bg-[var(--success-bg)] text-[var(--ok-text)]' : 'bg-[var(--warn-bg)] text-[var(--warn-text)]'
             }`}>
               {request.status === 'completed' ? <CheckCircle className="h-3 w-3" /> : <Clock className="h-3 w-3" />}
               {request.status === 'completed' ? 'Done' : 'Pending'}
             </span>
             {request.status === 'completed' && (
-              expanded ? <ChevronDown className="h-4 w-4 text-gray-400" /> : <ChevronRight className="h-4 w-4 text-gray-400" />
+              expanded ? <ChevronDown className="h-4 w-4 text-[var(--muted-soft)]" /> : <ChevronRight className="h-4 w-4 text-[var(--muted-soft)]" />
             )}
           </div>
         </div>
       </button>
 
       {expanded && request.status === 'completed' && request.responses && (
-        <div className="border-t border-gray-100 mt-3 pt-3 space-y-3">
+        <div className="border-t border-[var(--line)] mt-3 pt-3 space-y-3">
           {request.questions.map((q: FeedbackQuestion, i: number) => {
             const resp = (request.responses as FeedbackResponse[])?.[i]
             return (
               <div key={q.id}>
-                <p className="text-xs font-medium text-gray-500">{q.question}</p>
+                <p className="text-xs font-medium text-[var(--muted-soft)]">{q.question}</p>
                 {q.type === 'photo' && Array.isArray(resp?.answer) ? (
                   <div className="flex flex-wrap gap-2 mt-1">
                     {(resp.answer as string[]).map((url, j) => (
-                      <img key={j} src={url} alt={`Photo ${j + 1}`} className="h-20 w-20 rounded-lg object-cover border border-gray-200" />
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img key={j} src={url} alt={`Photo ${j + 1}`} className="h-20 w-20 rounded-lg object-cover border border-[var(--line)]" />
                     ))}
-                    {(resp.answer as string[]).length === 0 && <span className="text-sm text-gray-400">No photos</span>}
+                    {(resp.answer as string[]).length === 0 && <span className="text-sm text-[var(--muted-soft)]">No photos</span>}
                   </div>
                 ) : q.type === 'rating' || q.type === 'rating_10' ? (
-                  <p className="text-sm text-gray-900 mt-0.5 font-semibold">{resp?.answer ?? '—'} / {q.type === 'rating' ? 5 : 10}</p>
+                  <p className="text-sm text-[var(--foreground)] mt-0.5 font-semibold">{resp?.answer ?? '—'} / {q.type === 'rating' ? 5 : 10}</p>
                 ) : (
-                  <p className="text-sm text-gray-900 mt-0.5">{String(resp?.answer ?? '—')}</p>
+                  <p className="text-sm text-[var(--foreground)] mt-0.5">{String(resp?.answer ?? '—')}</p>
                 )}
               </div>
             )
@@ -208,7 +214,7 @@ function TemplateManager({ templates, trainerId, onRefresh }: {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <p className="text-sm text-gray-500">Reusable question sets for scheduled check-ins.</p>
+        <p className="text-sm text-[var(--muted-soft)]">Reusable question sets for scheduled check-ins.</p>
         <button onClick={() => { setCreating(true); setEditing(null) }}
           className="btn btn-accent">
           <Plus className="h-4 w-4" />
@@ -227,8 +233,8 @@ function TemplateManager({ templates, trainerId, onRefresh }: {
 
       {templates.length === 0 && !creating ? (
         <div className="card p-12 text-center">
-          <h3 className="font-semibold text-gray-900 mb-1">No templates yet</h3>
-          <p className="text-sm text-gray-500">Create your first template to start scheduling recurring check-ins.</p>
+          <h3 className="font-semibold text-[var(--foreground)] mb-1">No templates yet</h3>
+          <p className="text-sm text-[var(--muted-soft)]">Create your first template to start scheduling recurring check-ins.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -237,12 +243,12 @@ function TemplateManager({ templates, trainerId, onRefresh }: {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-gray-900">{t.name}</h3>
+                    <h3 className="font-semibold text-[var(--foreground)]">{t.name}</h3>
                     {t.is_default && (
-                      <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">Default</span>
+                      <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-[var(--acc-soft)] text-[var(--acc-text)]">Default</span>
                     )}
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-[var(--muted-soft)] mt-1">
                     {t.questions.length} question{t.questions.length === 1 ? '' : 's'}
                     {' · '}
                     {(t.questions as FeedbackQuestion[]).map(q => {
@@ -254,22 +260,23 @@ function TemplateManager({ templates, trainerId, onRefresh }: {
                 <div className="flex items-center gap-2">
                   <button onClick={() => { setEditing(t); setCreating(false) }}
                     aria-label={`Edit ${t.name}`}
-                    className="p-2 text-gray-400 hover:text-purple-600 rounded-lg hover:bg-purple-50">
+                    className="p-2 text-[var(--muted-soft)] hover:bg-[var(--ink-3)] hover:text-[var(--fg-2)] rounded-lg">
                     <Pencil className="h-4 w-4" />
                   </button>
                   <button onClick={async () => {
                     const supabase = createClient()
                     const newQuestions = (t.questions as FeedbackQuestion[]).map(q => ({ ...q, id: String(Date.now()) + Math.random().toString(36).slice(2, 6) }))
-                    await supabase.from('feedback_templates').insert({
+                    const { error } = await supabase.from('feedback_templates').insert({
                       trainer_id: trainerId,
                       name: `${t.name} (copy)`,
                       questions: newQuestions,
                     })
+                    if (error) { toast.error(error.message); return }
                     toast.success('Template duplicated')
                     onRefresh()
                   }}
                     aria-label={`Duplicate ${t.name}`}
-                    className="p-2 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50">
+                    className="p-2 text-[var(--muted-soft)] hover:bg-[var(--ink-3)] hover:text-[var(--fg-2)] rounded-lg">
                     <Copy className="h-4 w-4" />
                   </button>
                 </div>
@@ -364,52 +371,52 @@ function TemplateForm({ template, trainerId, onSaved, onCancel }: {
 
   return (
     <div className="card p-6 mb-6 ring-2 ring-[var(--brand-200)]">
-      <h2 className="text-lg font-bold text-gray-900 mb-4">
+      <h2 className="text-lg font-bold text-[var(--foreground)] mb-4">
         {template ? 'Edit Template' : 'New Template'}
       </h2>
 
       <div className="mb-4">
-        <label htmlFor="template-name" className="block text-sm font-medium text-gray-700 mb-1">Template Name</label>
+        <label htmlFor="template-name" className="block text-sm font-medium text-[var(--muted)] mb-1">Template Name</label>
         <input id="template-name" type="text" value={name} onChange={e => setName(e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          className="input-field"
           placeholder="e.g. Weekly Check-in" />
       </div>
 
       <div className="flex items-center gap-3 mb-4">
-        <button type="button" onClick={() => setIsDefault(!isDefault)} aria-pressed={isDefault} className="flex items-center gap-2 text-sm text-gray-600">
-          {isDefault ? <ToggleRight className="h-5 w-5 text-purple-600" /> : <ToggleLeft className="h-5 w-5 text-gray-400" />}
+        <button type="button" onClick={() => setIsDefault(!isDefault)} aria-pressed={isDefault} className="flex items-center gap-2 text-sm text-[var(--muted)]">
+          {isDefault ? <ToggleRight className="h-5 w-5 text-[var(--acc-text)]" /> : <ToggleLeft className="h-5 w-5 text-[var(--muted-soft)]" />}
           Default template
         </button>
-        <span className="text-xs text-gray-400">Used when scheduling new clients</span>
+        <span className="text-xs text-[var(--muted-soft)]">Used when scheduling new clients</span>
       </div>
 
-      <label className="block text-sm font-medium text-gray-700 mb-2">Questions</label>
+      <label className="block text-sm font-medium text-[var(--muted)] mb-2">Questions</label>
       <div className="space-y-3 mb-4">
         {questions.map((q, idx) => (
-          <div key={q.id} className="flex items-start gap-2 bg-gray-50 rounded-xl p-3">
+          <div key={q.id} className="flex items-start gap-2 bg-[var(--panel)] rounded-xl p-3">
             <div className="flex flex-col gap-1 mt-1">
               <button onClick={() => moveQuestion(idx, -1)} disabled={idx === 0}
                 aria-label="Move question up"
-                className="text-gray-400 hover:text-gray-600 disabled:opacity-30 text-xs">▲</button>
+                className="text-[var(--muted-soft)] hover:text-[var(--muted)] disabled:opacity-30 text-xs">▲</button>
               <button onClick={() => moveQuestion(idx, 1)} disabled={idx === questions.length - 1}
                 aria-label="Move question down"
-                className="text-gray-400 hover:text-gray-600 disabled:opacity-30 text-xs">▼</button>
+                className="text-[var(--muted-soft)] hover:text-[var(--muted)] disabled:opacity-30 text-xs">▼</button>
             </div>
             <div className="flex-1">
               <select value={q.type} onChange={e => updateQuestion(q.id, 'type', e.target.value)}
                 aria-label={`Question ${idx + 1} type`}
-                className="text-xs font-medium text-purple-700 bg-purple-50 border border-purple-200 rounded-lg px-2 py-1 mb-2">
+                className="text-xs font-medium text-[var(--acc-text)] bg-[var(--acc-soft)] border border-[var(--line-strong)] rounded-lg px-2 py-1 mb-2">
                 {QUESTION_TYPES.map(qt => (
                   <option key={qt.value} value={qt.value}>{qt.label}</option>
                 ))}
               </select>
               <input type="text" value={q.question} onChange={e => updateQuestion(q.id, 'question', e.target.value)}
                 aria-label={`Question ${idx + 1} text`}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg"
+                className="w-full px-3 py-2 text-sm border border-[var(--line-strong)] rounded-lg"
                 placeholder="Type your question..." />
             </div>
             {questions.length > 1 && (
-              <button onClick={() => removeQuestion(q.id)} aria-label="Remove question" className="mt-6 text-gray-400 hover:text-[var(--danger-text)]">
+              <button onClick={() => removeQuestion(q.id)} aria-label="Remove question" className="mt-6 text-[var(--muted-soft)] hover:text-[var(--danger-text)]">
                 <Trash2 className="h-4 w-4" />
               </button>
             )}
@@ -420,15 +427,15 @@ function TemplateForm({ template, trainerId, onSaved, onCancel }: {
       <div className="flex flex-wrap gap-2 mb-6">
         {QUESTION_TYPES.map(qt => (
           <button key={qt.value} onClick={() => addQuestion(qt.value)}
-            className="text-xs font-medium px-3 py-1.5 border border-gray-200 rounded-lg text-purple-600 hover:bg-purple-50">
+            className="text-xs font-medium px-3 py-1.5 border border-[var(--line-strong)] rounded-lg text-[var(--acc-text)] hover:bg-[var(--acc-soft)]">
             + {qt.label}
           </button>
         ))}
       </div>
 
-      <div className="flex gap-3 border-t border-gray-100 pt-4">
+      <div className="flex gap-3 border-t border-[var(--line)] pt-4">
         <button onClick={onCancel}
-          className="px-6 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50">
+          className="px-6 py-2 border border-[var(--line-strong)] rounded-lg text-sm font-medium text-[var(--muted)] hover:bg-[var(--panel)]">
           Cancel
         </button>
         {template && (
@@ -565,16 +572,17 @@ function ClientCheckInsPage({ profile }: { profile: UserProfile }) {
 
   const pending = requests.filter(r => r.status === 'pending')
   const completed = requests.filter(r => r.status === 'completed')
+  const activeRequest = activeId ? requests.find(r => r.id === activeId) : undefined
 
-  if (loading) return <div className="text-gray-500">Loading check-ins...</div>
+  if (loading) return <div className="text-[var(--muted-soft)]">Loading check-ins...</div>
 
   return (
     <div className="max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Check-ins</h1>
+      <h1 className="text-2xl font-bold text-[var(--foreground)] mb-6">Check-ins</h1>
 
-      {activeId ? (
+      {activeRequest ? (
         <ActiveCheckIn
-          request={requests.find(r => r.id === activeId)!}
+          request={activeRequest}
           answers={answers}
           setAnswers={setAnswers}
           onPhotoUpload={handlePhotoUpload}
@@ -587,7 +595,7 @@ function ClientCheckInsPage({ profile }: { profile: UserProfile }) {
         <>
           {pending.length > 0 && (
             <div className="mb-8">
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-amber-600 mb-3">
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-[var(--warn-text)] mb-3">
                 Waiting for your response ({pending.length})
               </h2>
               <div className="space-y-3">
@@ -596,12 +604,12 @@ function ClientCheckInsPage({ profile }: { profile: UserProfile }) {
                     className="w-full text-left card p-5 hover:shadow-md transition-shadow">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="font-semibold text-gray-900">{req.title}</h3>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <h3 className="font-semibold text-[var(--foreground)]">{req.title}</h3>
+                        <p className="text-xs text-[var(--muted-soft)] mt-1">
                           {req.questions.length} question{req.questions.length === 1 ? '' : 's'} · Sent {new Date(req.created_at).toLocaleDateString()}
                         </p>
                       </div>
-                      <span className="flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-full bg-amber-100 text-amber-700">
+                      <span className="flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-full bg-[var(--warn-bg)] text-[var(--warn-text)]">
                         <Clock className="h-3 w-3" />
                         Pending
                       </span>
@@ -614,15 +622,15 @@ function ClientCheckInsPage({ profile }: { profile: UserProfile }) {
 
           {pending.length === 0 && completed.length === 0 && (
             <div className="card p-12 text-center">
-              <CheckCircle className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-              <h3 className="font-semibold text-gray-900 mb-1">No check-ins yet</h3>
-              <p className="text-sm text-gray-500">Your coach will send check-ins here for you to complete.</p>
+              <CheckCircle className="h-12 w-12 text-[var(--muted-soft)] mx-auto mb-3" />
+              <h3 className="font-semibold text-[var(--foreground)] mb-1">No check-ins yet</h3>
+              <p className="text-sm text-[var(--muted-soft)]">Your coach will send check-ins here for you to complete.</p>
             </div>
           )}
 
           {completed.length > 0 && (
             <div>
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-green-600 mb-3">
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-[var(--ok-text)] mb-3">
                 Completed ({completed.length})
               </h2>
               <div className="space-y-3">
@@ -631,12 +639,12 @@ function ClientCheckInsPage({ profile }: { profile: UserProfile }) {
                     className="w-full text-left card p-5 hover:shadow-md transition-shadow">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="font-semibold text-gray-900">{req.title}</h3>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <h3 className="font-semibold text-[var(--foreground)]">{req.title}</h3>
+                        <p className="text-xs text-[var(--muted-soft)] mt-1">
                           Responded {req.responded_at ? new Date(req.responded_at).toLocaleDateString() : ''}
                         </p>
                       </div>
-                      <span className="flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-full bg-green-100 text-green-700">
+                      <span className="flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-full bg-[var(--success-bg)] text-[var(--ok-text)]">
                         <CheckCircle className="h-3 w-3" />
                         Done
                       </span>
@@ -672,25 +680,25 @@ function ActiveCheckIn({
 
   return (
     <div>
-      <button onClick={onCancel} className="text-sm text-gray-500 hover:text-gray-700 mb-4">
+      <button onClick={onCancel} className="text-sm text-[var(--muted-soft)] hover:text-[var(--muted)] mb-4">
         ← Back to check-ins
       </button>
       <div className="card p-6 md:p-8">
-        <h2 className="text-xl font-bold text-gray-900 mb-1">{request.title}</h2>
-        <p className="text-sm text-gray-500 mb-6">
+        <h2 className="text-xl font-bold text-[var(--foreground)] mb-1">{request.title}</h2>
+        <p className="text-sm text-[var(--muted-soft)] mb-6">
           {isCompleted ? 'Submitted' : 'From your coach'} · {new Date(request.created_at).toLocaleDateString()}
         </p>
 
         <div className="space-y-6">
           {request.questions.map((q: FeedbackQuestion) => (
-            <div key={q.id} className="rounded-xl border border-gray-200 p-5">
-              <label className="block text-sm font-semibold text-gray-700 mb-3">{q.question}</label>
+            <div key={q.id} className="rounded-xl border border-[var(--line)] p-5">
+              <label className="block text-sm font-semibold text-[var(--muted)] mb-3">{q.question}</label>
 
               {q.type === 'text' && (
                 <textarea
                   value={String(answers[q.id] ?? '')}
                   onChange={e => setAnswers(prev => ({ ...prev, [q.id]: e.target.value }))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                  className="input-field resize-none"
                   rows={3}
                   placeholder="Your answer..."
                   disabled={isCompleted}
@@ -704,8 +712,8 @@ function ActiveCheckIn({
                       disabled={isCompleted}
                       className={`h-12 w-12 rounded-xl border-2 font-bold transition-all ${
                         answers[q.id] === n
-                          ? 'border-purple-500 bg-purple-50 text-purple-700'
-                          : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                          ? 'border-[var(--acc)] bg-[var(--acc-soft)] text-[var(--acc-text)]'
+                          : 'border-[var(--line)] text-[var(--muted-soft)] hover:border-[var(--line-strong)]'
                       }`}>
                       {n}
                     </button>
@@ -720,8 +728,8 @@ function ActiveCheckIn({
                       disabled={isCompleted}
                       className={`h-10 w-10 rounded-lg border-2 text-sm font-bold transition-all ${
                         answers[q.id] === n
-                          ? 'border-purple-500 bg-purple-50 text-purple-700'
-                          : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                          ? 'border-[var(--acc)] bg-[var(--acc-soft)] text-[var(--acc-text)]'
+                          : 'border-[var(--line)] text-[var(--muted-soft)] hover:border-[var(--line-strong)]'
                       }`}>
                       {n}
                     </button>
@@ -736,8 +744,8 @@ function ActiveCheckIn({
                       disabled={isCompleted}
                       className={`py-3 rounded-xl border-2 font-semibold transition-all ${
                         answers[q.id] === opt
-                          ? 'border-purple-500 bg-purple-50 text-purple-700'
-                          : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                          ? 'border-[var(--acc)] bg-[var(--acc-soft)] text-[var(--acc-text)]'
+                          : 'border-[var(--line)] text-[var(--muted-soft)] hover:border-[var(--line-strong)]'
                       }`}>
                       {opt}
                     </button>
@@ -749,12 +757,13 @@ function ActiveCheckIn({
                 <div>
                   <div className="flex flex-wrap gap-3 mb-3">
                     {((answers[q.id] as string[]) ?? []).map((url, i) => (
+                      // eslint-disable-next-line @next/next/no-img-element
                       <img key={i} src={url} alt={`Photo ${i + 1}`}
-                        className="h-24 w-24 rounded-xl object-cover border border-gray-200" />
+                        className="h-24 w-24 rounded-xl object-cover border border-[var(--line)]" />
                     ))}
                   </div>
                   {!isCompleted && (
-                    <label className="inline-flex items-center gap-2 cursor-pointer px-4 py-2.5 rounded-xl border-2 border-dashed border-gray-300 text-sm font-medium text-gray-600 hover:border-purple-400 hover:text-purple-600 transition-colors">
+                    <label className="inline-flex items-center gap-2 cursor-pointer px-4 py-2.5 rounded-xl border-2 border-dashed border-[var(--line-strong)] text-sm font-medium text-[var(--muted)] hover:border-[var(--acc)] hover:text-[var(--acc-text)] transition-colors">
                       {uploadingPhoto === q.id ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
@@ -772,9 +781,9 @@ function ActiveCheckIn({
         </div>
 
         {!isCompleted && (
-          <div className="flex gap-3 mt-8 pt-6 border-t border-gray-100">
+          <div className="flex gap-3 mt-8 pt-6 border-t border-[var(--line)]">
             <button onClick={onCancel}
-              className="px-6 py-3 border border-gray-300 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50">
+              className="px-6 py-3 border border-[var(--line-strong)] rounded-xl text-sm font-medium text-[var(--muted)] hover:bg-[var(--panel)]">
               Save for later
             </button>
             <button onClick={onSubmit} disabled={submitting}

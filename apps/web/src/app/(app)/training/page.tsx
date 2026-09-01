@@ -13,6 +13,7 @@ import {
   Zap,
 } from 'lucide-react'
 import Link from 'next/link'
+import { toast } from 'react-hot-toast'
 import type { Exercise, TrainingPlan, TrainingPlanDay, TrainingPlanExercise } from '@/lib/supabase/types'
 import ProgressCheckIn from '@/components/training/ProgressCheckIn'
 import {
@@ -52,7 +53,7 @@ function effortLabel(exercise: ExercisePreview) {
 
 function formatPlanDate(date: string | null) {
   if (!date) return 'No sessions yet'
-  return `Last ${new Date(date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`
+  return `Last ${new Date(date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`
 }
 
 function getRecentPr(workout?: WorkoutPreview) {
@@ -81,81 +82,93 @@ export default function TrainingPage() {
     const supabase = createClient()
 
     async function loadPlans() {
-      const { data: rawPlans } = await supabase
-        .from('training_plans')
-        .select('*')
-        .eq('user_id', profile!.id)
-        .order('created_at', { ascending: false })
+      try {
+        const { data: rawPlans, error: plansError } = await supabase
+          .from('training_plans')
+          .select('*')
+          .eq('user_id', profile!.id)
+          .order('created_at', { ascending: false })
 
-      if (!rawPlans || rawPlans.length === 0) {
-        setPlans([])
-        setLoading(false)
-        return
-      }
+        if (plansError) throw plansError
 
-      const planIds = rawPlans.map((plan) => plan.id)
-
-      const { data: allDays } = await supabase
-        .from('training_plan_days')
-        .select('*')
-        .in('training_plan_id', planIds)
-        .order('day_number')
-
-      const dayIds = (allDays ?? []).map((day) => day.id)
-
-      const { data: allExercises } = dayIds.length
-        ? await supabase
-            .from('training_plan_exercises')
-            .select('*, exercises(*)')
-            .in('plan_day_id', dayIds)
-            .order('order_index')
-        : { data: [] as ExercisePreview[] }
-
-      const { data: lastLog } = await supabase
-        .from('workout_logs')
-        .select('date, plan_day_id')
-        .eq('user_id', profile!.id)
-        .not('plan_day_id', 'is', null)
-        .order('date', { ascending: false })
-        .limit(1)
-
-      const daysByPlan = new Map<string, TrainingPlanDay[]>()
-      for (const day of allDays ?? []) {
-        const list = daysByPlan.get(day.training_plan_id) ?? []
-        list.push(day)
-        daysByPlan.set(day.training_plan_id, list)
-      }
-
-      const exercisesByDay = new Map<string, ExercisePreview[]>()
-      for (const exercise of (allExercises ?? []) as ExercisePreview[]) {
-        const list = exercisesByDay.get(exercise.plan_day_id) ?? []
-        list.push(exercise)
-        exercisesByDay.set(exercise.plan_day_id, list)
-      }
-
-      const lastLogEntry = lastLog?.[0]
-      const lastWorkoutDayId = lastLogEntry?.plan_day_id ?? null
-      const lastWorkoutPlanId = lastWorkoutDayId
-        ? allDays?.find((day) => day.id === lastWorkoutDayId)?.training_plan_id ?? null
-        : null
-
-      const enriched = rawPlans.map((plan) => {
-        const days = daysByPlan.get(plan.id) ?? []
-        const workouts = days.map((day) => ({
-          ...day,
-          exercises: exercisesByDay.get(day.id) ?? [],
-        }))
-
-        return {
-          ...plan,
-          dayCount: days.length,
-          lastWorkout: lastWorkoutPlanId === plan.id ? lastLogEntry!.date : null,
-          workouts,
+        if (!rawPlans || rawPlans.length === 0) {
+          setPlans([])
+          return
         }
-      })
 
-      setPlans(enriched)
-      setLoading(false)
+        const planIds = rawPlans.map((plan) => plan.id)
+
+        const { data: allDays, error: daysError } = await supabase
+          .from('training_plan_days')
+          .select('*')
+          .in('training_plan_id', planIds)
+          .order('day_number')
+
+        if (daysError) throw daysError
+
+        const dayIds = (allDays ?? []).map((day) => day.id)
+
+        const { data: allExercises, error: exercisesError } = dayIds.length
+          ? await supabase
+              .from('training_plan_exercises')
+              .select('*, exercises(*)')
+              .in('plan_day_id', dayIds)
+              .order('order_index')
+          : { data: [] as ExercisePreview[], error: null }
+
+        if (exercisesError) throw exercisesError
+
+        const { data: lastLog, error: lastLogError } = await supabase
+          .from('workout_logs')
+          .select('date, plan_day_id')
+          .eq('user_id', profile!.id)
+          .not('plan_day_id', 'is', null)
+          .order('date', { ascending: false })
+          .limit(1)
+
+        if (lastLogError) throw lastLogError
+
+        const daysByPlan = new Map<string, TrainingPlanDay[]>()
+        for (const day of allDays ?? []) {
+          const list = daysByPlan.get(day.training_plan_id) ?? []
+          list.push(day)
+          daysByPlan.set(day.training_plan_id, list)
+        }
+
+        const exercisesByDay = new Map<string, ExercisePreview[]>()
+        for (const exercise of (allExercises ?? []) as ExercisePreview[]) {
+          const list = exercisesByDay.get(exercise.plan_day_id) ?? []
+          list.push(exercise)
+          exercisesByDay.set(exercise.plan_day_id, list)
+        }
+
+        const lastLogEntry = lastLog?.[0]
+        const lastWorkoutDayId = lastLogEntry?.plan_day_id ?? null
+        const lastWorkoutPlanId = lastWorkoutDayId
+          ? allDays?.find((day) => day.id === lastWorkoutDayId)?.training_plan_id ?? null
+          : null
+
+        const enriched = rawPlans.map((plan) => {
+          const days = daysByPlan.get(plan.id) ?? []
+          const workouts = days.map((day) => ({
+            ...day,
+            exercises: exercisesByDay.get(day.id) ?? [],
+          }))
+
+          return {
+            ...plan,
+            dayCount: days.length,
+            lastWorkout: lastWorkoutPlanId === plan.id ? lastLogEntry!.date : null,
+            workouts,
+          }
+        })
+
+        setPlans(enriched)
+      } catch {
+        toast.error('Failed to load training plans')
+      } finally {
+        setLoading(false)
+      }
     }
 
     loadPlans()

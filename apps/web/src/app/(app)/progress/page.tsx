@@ -3,7 +3,9 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
+import { getLocalDateString } from '@/lib/date'
 import { toast } from 'react-hot-toast'
+import { reportClientError } from '@/lib/apiClient'
 import Link from 'next/link'
 import {
   TrendingUp,
@@ -80,7 +82,7 @@ export default function ProgressPage() {
   const [formWeight, setFormWeight] = useState('')
   const [formBodyFat, setFormBodyFat] = useState('')
   const [formNotes, setFormNotes] = useState('')
-  const [formDate, setFormDate] = useState(new Date().toISOString().split('T')[0])
+  const [formDate, setFormDate] = useState(getLocalDateString())
   const [saving, setSaving] = useState(false)
 
   // Edit state
@@ -91,18 +93,21 @@ export default function ProgressPage() {
   const loadLogs = useCallback(async () => {
     if (!profile) return
     const supabase = createClient()
-    const { data, error } = await supabase
-      .from('weight_logs')
-      .select('*')
-      .eq('user_id', profile.id)
-      .order('date', { ascending: true })
 
-    if (error) {
+    try {
+      const { data, error } = await supabase
+        .from('weight_logs')
+        .select('*')
+        .eq('user_id', profile.id)
+        .order('date', { ascending: true })
+
+      if (error) throw error
+      setLogs(data ?? [])
+    } catch {
       toast.error('Failed to load weight logs')
-      return
+    } finally {
+      setLoading(false)
     }
-    setLogs(data ?? [])
-    setLoading(false)
   }, [profile])
 
   useEffect(() => { loadLogs() }, [loadLogs])
@@ -112,58 +117,73 @@ export default function ProgressPage() {
     setSaving(true)
     const supabase = createClient()
 
-    const { error } = await supabase.from('weight_logs').upsert({
-      user_id: profile.id,
-      date: formDate,
-      weight_kg: parseFloat(formWeight),
-      body_fat_pct: formBodyFat ? parseFloat(formBodyFat) : null,
-      notes: formNotes || null,
-    }, { onConflict: 'user_id,date' })
+    try {
+      const { error } = await supabase.from('weight_logs').upsert({
+        user_id: profile.id,
+        date: formDate,
+        weight_kg: parseFloat(formWeight),
+        body_fat_pct: formBodyFat ? parseFloat(formBodyFat) : null,
+        notes: formNotes || null,
+      }, { onConflict: 'user_id,date' })
 
-    if (error) {
+      if (error) {
+        toast.error('Failed to save weight log')
+        return
+      }
+
+      await supabase.from('user_profiles').update({ weight_kg: parseFloat(formWeight) }).eq('id', profile.id)
+
+      toast.success('Weight logged.')
+      setShowForm(false)
+      setFormWeight('')
+      setFormBodyFat('')
+      setFormNotes('')
+      loadLogs()
+    } catch (err) {
+      reportClientError(err, { feature: 'progress', action: 'save-weight-log' })
       toast.error('Failed to save weight log')
+    } finally {
       setSaving(false)
-      return
     }
-
-    await supabase.from('user_profiles').update({ weight_kg: parseFloat(formWeight) }).eq('id', profile.id)
-
-    toast.success('Weight logged.')
-    setShowForm(false)
-    setFormWeight('')
-    setFormBodyFat('')
-    setFormNotes('')
-    setSaving(false)
-    loadLogs()
   }
 
   async function handleDelete(id: string) {
     if (!window.confirm('Delete this weight entry? This action cannot be undone.')) return
     const supabase = createClient()
-    const { error } = await supabase.from('weight_logs').delete().eq('id', id)
-    if (error) {
+    try {
+      const { error } = await supabase.from('weight_logs').delete().eq('id', id)
+      if (error) {
+        toast.error('Failed to delete entry')
+        return
+      }
+      toast.success('Entry deleted')
+      loadLogs()
+    } catch (err) {
+      reportClientError(err, { feature: 'progress', action: 'delete-weight-log' })
       toast.error('Failed to delete entry')
-      return
     }
-    toast.success('Entry deleted')
-    loadLogs()
   }
 
   async function handleEditSave(log: WeightLog) {
     if (!editWeight) return
     const supabase = createClient()
-    const { error } = await supabase.from('weight_logs').update({
-      weight_kg: parseFloat(editWeight),
-      body_fat_pct: editBodyFat ? parseFloat(editBodyFat) : null,
-    }).eq('id', log.id)
+    try {
+      const { error } = await supabase.from('weight_logs').update({
+        weight_kg: parseFloat(editWeight),
+        body_fat_pct: editBodyFat ? parseFloat(editBodyFat) : null,
+      }).eq('id', log.id)
 
-    if (error) {
+      if (error) {
+        toast.error('Failed to update')
+        return
+      }
+      setEditingId(null)
+      toast.success('Updated')
+      loadLogs()
+    } catch (err) {
+      reportClientError(err, { feature: 'progress', action: 'update-weight-log' })
       toast.error('Failed to update')
-      return
     }
-    setEditingId(null)
-    toast.success('Updated')
-    loadLogs()
   }
 
   // Filter logs by range
@@ -573,6 +593,7 @@ export default function ProgressPage() {
                         onClick={() => handleEditSave(log)}
                         className="btn btn-ghost"
                         style={{ padding: 6, color: 'var(--ok)' }}
+                        aria-label="Save"
                       >
                         <Check className="h-4 w-4" />
                       </button>
@@ -580,6 +601,7 @@ export default function ProgressPage() {
                         onClick={() => setEditingId(null)}
                         className="btn btn-ghost"
                         style={{ padding: 6 }}
+                        aria-label="Cancel"
                       >
                         <X className="h-4 w-4" />
                       </button>
@@ -625,6 +647,7 @@ export default function ProgressPage() {
                         }}
                         className="btn btn-ghost"
                         style={{ padding: 6 }}
+                        aria-label="Edit entry"
                       >
                         <Pencil className="h-3.5 w-3.5" />
                       </button>
@@ -632,6 +655,7 @@ export default function ProgressPage() {
                         onClick={() => handleDelete(log.id)}
                         className="btn btn-ghost"
                         style={{ padding: 6, color: 'var(--warn)' }}
+                        aria-label="Delete entry"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>

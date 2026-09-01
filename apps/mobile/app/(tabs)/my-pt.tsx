@@ -198,6 +198,7 @@ function ChatScreen({ conversationId, user, ptName, onBack }: {
     // Mark as read
     supabase.from('messages').update({ read_at: new Date().toISOString() })
       .eq('conversation_id', conversationId).neq('sender_id', user.id).is('read_at', null)
+      .then(() => {})
 
     // Realtime
     const channel = supabase

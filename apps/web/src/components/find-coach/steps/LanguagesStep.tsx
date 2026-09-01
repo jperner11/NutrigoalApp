@@ -39,7 +39,7 @@ export default function LanguagesStep({
       <button
         type="button"
         onClick={() => setShowAll((value) => !value)}
-        className="mt-5 text-sm font-semibold text-[var(--brand-700)] underline-offset-4 hover:underline"
+        className="mt-5 text-sm font-semibold text-[var(--acc-text)] underline-offset-4 hover:underline"
       >
         {showAll ? 'Show fewer languages' : 'Show all'}
       </button>

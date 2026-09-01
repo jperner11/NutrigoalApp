@@ -192,6 +192,14 @@ export default function OnboardingPage() {
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [avatarPreview, setAvatarPreview] = useState<string | null>(profile?.avatar_url ?? null)
 
+  // Revoke the blob URL whenever it changes or the component unmounts, so
+  // reselecting a photo repeatedly doesn't leak memory. profile.avatar_url
+  // is a real remote URL, not a blob one, so revoking it is a harmless no-op.
+  useEffect(() => {
+    return () => {
+      if (avatarPreview?.startsWith('blob:')) URL.revokeObjectURL(avatarPreview)
+    }
+  }, [avatarPreview])
 
   useEffect(() => {
     if (!profile || !isTrainer) return
@@ -653,12 +661,12 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-6">
             <StepHeader
-              icon={<User className="h-12 w-12 text-purple-600" />}
+              icon={<User className="h-12 w-12 text-[var(--acc-text)]" />}
               title="Set up your coaching profile"
               subtitle="This tells Treno who you coach, how you work, and how to frame client intake around your process."
             />
-            <div className="flex items-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 -mt-2">
-              <span className="text-sm font-medium text-indigo-600">Clients will see this reflected in their coach-led intake and dashboard journey.</span>
+            <div className="flex items-center gap-2 rounded-xl border border-[var(--line-2)] bg-[var(--ink-3)] px-4 py-3 -mt-2">
+              <span className="text-sm font-medium text-[var(--acc-text)]">Clients will see this reflected in their coach-led intake and dashboard journey.</span>
             </div>
             <div>
               <Label>Display name</Label>
@@ -666,13 +674,13 @@ export default function OnboardingPage() {
                 type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]"
                 placeholder="Your name"
               />
             </div>
             <div>
               <Label>Primary specialties</Label>
-              <p className="text-sm text-gray-500 mb-3">Pick the outcomes you want to be known for.</p>
+              <p className="text-sm text-[var(--fg-3)] mb-3">Pick the outcomes you want to be known for.</p>
               <ChipGrid
                 items={COACH_SPECIALTY_OPTIONS.map((item) => ({ value: item, label: item }))}
                 selected={coachSpecialties}
@@ -689,8 +697,8 @@ export default function OnboardingPage() {
                     onClick={() => toggleArray(coachFormats, setCoachFormats, format)}
                     className={`px-4 py-3 rounded-xl border-2 font-semibold text-sm transition-all ${
                       coachFormats.includes(format)
-                        ? 'border-purple-500 bg-purple-50 text-purple-700'
-                        : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                        ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
+                        : 'border-[var(--line-2)] text-[var(--fg-3)] hover:border-[var(--fg-3)]'
                     }`}
                   >
                     {format}
@@ -712,17 +720,18 @@ export default function OnboardingPage() {
             <div className="flex flex-col items-center gap-4">
               <div className="relative">
                 {avatarPreview ? (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={avatarPreview}
                     alt="Profile"
-                    className="h-24 w-24 rounded-full object-cover border-4 border-purple-100"
+                    className="h-24 w-24 rounded-full object-cover border-4 border-[var(--line-2)]"
                   />
                 ) : (
-                  <div className="h-24 w-24 rounded-full bg-gray-100 flex items-center justify-center border-4 border-purple-100">
-                    <Camera className="h-8 w-8 text-gray-400" />
+                  <div className="h-24 w-24 rounded-full bg-[var(--ink-2)] flex items-center justify-center border-4 border-[var(--line-2)]">
+                    <Camera className="h-8 w-8 text-[var(--fg-3)]" />
                   </div>
                 )}
-                <label className="absolute -bottom-1 -right-1 cursor-pointer rounded-full bg-purple-600 p-2 text-white shadow-lg hover:bg-purple-700 transition-colors">
+                <label className="absolute -bottom-1 -right-1 cursor-pointer rounded-full btn-accent p-2 shadow-lg transition-colors">
                   <Camera className="h-4 w-4" />
                   <input
                     type="file"
@@ -741,21 +750,21 @@ export default function OnboardingPage() {
                   />
                 </label>
               </div>
-              <p className="text-sm text-gray-500">Upload a profile picture (optional, max 5MB)</p>
+              <p className="text-sm text-[var(--fg-3)]">Upload a profile picture (optional, max 5MB)</p>
             </div>
 
             <div>
               <Label>Headline *</Label>
-              <p className="text-sm text-gray-500 mb-2">One line that explains what you do.</p>
+              <p className="text-sm text-[var(--fg-3)] mb-2">One line that explains what you do.</p>
               <input
                 type="text"
                 value={profileHeadline}
                 onChange={(e) => setProfileHeadline(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]"
                 placeholder="e.g. Online fat loss and strength coach for busy professionals"
                 maxLength={120}
               />
-              <p className="text-xs text-gray-400 mt-1">{profileHeadline.length}/120</p>
+              <p className="text-xs text-[var(--fg-3)] mt-1">{profileHeadline.length}/120</p>
             </div>
 
             <div>
@@ -763,39 +772,39 @@ export default function OnboardingPage() {
               <textarea
                 value={profileBio}
                 onChange={(e) => setProfileBio(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
+                className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)] resize-none"
                 rows={4}
                 placeholder="Tell potential clients about your experience and approach..."
                 maxLength={500}
               />
-              <p className="text-xs text-gray-400 mt-1">{profileBio.length}/500</p>
+              <p className="text-xs text-[var(--fg-3)] mt-1">{profileBio.length}/500</p>
             </div>
 
             <div>
               <Label>Price range (optional)</Label>
-              <p className="text-sm text-gray-500 mb-2">Give clients an idea of your rates. You can add exact offers later in Settings.</p>
+              <p className="text-sm text-[var(--fg-3)] mb-2">Give clients an idea of your rates. You can add exact offers later in Settings.</p>
               <div className="grid grid-cols-[1fr_auto_1fr_auto] gap-3 items-center">
                 <input
                   type="number"
                   value={profilePriceFrom}
                   onChange={(e) => setProfilePriceFrom(e.target.value)}
-                  className="px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]"
                   placeholder="From"
                   min={0}
                 />
-                <span className="text-gray-400">–</span>
+                <span className="text-[var(--fg-3)]">–</span>
                 <input
                   type="number"
                   value={profilePriceTo}
                   onChange={(e) => setProfilePriceTo(e.target.value)}
-                  className="px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]"
                   placeholder="To"
                   min={0}
                 />
                 <select
                   value={profileCurrency}
                   onChange={(e) => setProfileCurrency(e.target.value)}
-                  className="px-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="px-3 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]"
                 >
                   {COACH_MARKETPLACE_CURRENCIES.map((c) => (
                     <option key={c} value={c}>{c}</option>
@@ -804,8 +813,8 @@ export default function OnboardingPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3">
-              <span className="text-sm font-medium text-green-700">Your profile will be published to the coach directory when you finish setup.</span>
+            <div className="flex items-center gap-2 rounded-xl border border-[var(--ok)] bg-[var(--success-bg)] px-4 py-3">
+              <span className="text-sm font-medium text-[var(--ok-text)]">Your profile will be published to the coach directory when you finish setup.</span>
             </div>
           </div>
         )
@@ -813,7 +822,7 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-6">
             <StepHeader
-              icon={<Users className="h-12 w-12 text-indigo-500" />}
+              icon={<Users className="h-12 w-12 text-[var(--acc-text)]" />}
               title="Who do you work best with?"
               subtitle="We'll use this to shape the trainer dashboard and the way client intake is framed after an invite is accepted."
             />
@@ -822,7 +831,7 @@ export default function OnboardingPage() {
               <textarea
                 value={coachIdealClient}
                 onChange={(e) => setCoachIdealClient(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
+                className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)] resize-none"
                 rows={4}
                 placeholder="e.g. busy professionals who want fat loss, strength, and simple nutrition they can sustain"
               />
@@ -896,7 +905,7 @@ export default function OnboardingPage() {
                     onClick={() => setCoachCheckInFrequency(value as typeof coachCheckInFrequency)}
                     className={`py-2.5 px-4 rounded-xl border-2 font-semibold text-sm transition-all ${
                       coachCheckInFrequency === value
-                        ? 'border-purple-500 bg-purple-50 text-purple-700'
+                        ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
                         : 'border-gray-200 text-gray-500 hover:border-gray-300'
                     }`}
                   >
@@ -919,7 +928,7 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-6">
             <StepHeader
-              icon={<ClipboardList className="h-12 w-12 text-purple-600" />}
+              icon={<ClipboardList className="h-12 w-12 text-[var(--acc-text)]" />}
               title="Your custom client intake"
               subtitle="Add questions your clients must answer after the base onboarding. Check what we already collect first so you don't duplicate it."
             />
@@ -962,7 +971,7 @@ export default function OnboardingPage() {
             </div>
 
             <div className="bg-[var(--panel-strong)] rounded-2xl p-6 border border-[var(--line)]">
-              <h3 className="text-sm font-bold text-purple-700 uppercase tracking-wider mb-4">Setup summary</h3>
+              <h3 className="text-sm font-bold text-[var(--acc-text)] uppercase tracking-wider mb-4">Setup summary</h3>
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <ReviewRow label="Display name" value={fullName || 'Not set'} />
                 <ReviewRow label="Headline" value={profileHeadline || 'Not set'} />
@@ -978,9 +987,9 @@ export default function OnboardingPage() {
               </div>
             </div>
 
-            <div className="flex gap-3 bg-purple-50 border border-purple-200 rounded-2xl p-5">
-              <Sparkles className="h-5 w-5 text-purple-600 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-purple-800 leading-relaxed">
+            <div className="flex gap-3 bg-[var(--ink-3)] border border-[var(--line-2)] rounded-2xl p-5">
+              <Sparkles className="h-5 w-5 text-[var(--acc-text)] flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-[var(--muted)] leading-relaxed">
                 Clients will be guided through a coach-led intake after they accept your invite, and your dashboard will flag who is still pending versus ready for review.
               </p>
             </div>
@@ -988,7 +997,7 @@ export default function OnboardingPage() {
             <button
               onClick={handleTrainerFinish}
               disabled={saving}
-              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-4 rounded-xl text-base font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+              className="btn-accent w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl text-base font-semibold disabled:opacity-50"
             >
               <span>{saving ? 'Saving...' : 'Finish coach setup'}</span>
               <ArrowRight className="h-5 w-5" />
@@ -1048,7 +1057,7 @@ export default function OnboardingPage() {
                       onClick={() => updateCoachQuestionAnswer(question.id, option)}
                       className={`py-3 px-4 rounded-xl border-2 font-semibold transition-all ${
                         coachQuestionAnswers[question.id] === option
-                          ? 'border-purple-500 bg-purple-50 text-purple-700'
+                          ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
                           : 'border-gray-200 text-gray-500 hover:border-gray-300'
                       }`}
                     >
@@ -1124,7 +1133,7 @@ export default function OnboardingPage() {
                     onClick={() => setGender(g)}
                     className={`py-3 px-4 rounded-xl border-2 font-semibold transition-all ${
                       gender === g
-                        ? 'border-purple-500 bg-purple-50 text-purple-700'
+                        ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
                         : 'border-gray-200 text-gray-500 hover:border-gray-300'
                     }`}
                   >
@@ -1180,7 +1189,7 @@ export default function OnboardingPage() {
                     <button key={t.value} type="button" onClick={() => setGoalTimeline(t.value)}
                       className={`py-2.5 px-4 rounded-xl border-2 font-semibold text-sm transition-all ${
                         goalTimeline === t.value
-                          ? 'border-purple-500 bg-purple-50 text-purple-700'
+                          ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
                           : 'border-gray-200 text-gray-500 hover:border-gray-300'
                       }`}>
                       {t.label}
@@ -1197,7 +1206,7 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-6">
             <StepHeader
-              icon={<Briefcase className="h-12 w-12 text-indigo-500" />}
+              icon={<Briefcase className="h-12 w-12 text-[var(--acc-text)]" />}
               title="Your Lifestyle"
               subtitle="This helps us set calorie targets based on your real life, not a generic online calculator."
             />
@@ -1212,7 +1221,7 @@ export default function OnboardingPage() {
             </div>
             <div>
               <Label>Overall activity level (job + exercise combined)</Label>
-              <p className="text-sm text-gray-500 mb-2">Based on your job type AND how often you exercise</p>
+              <p className="text-sm text-[var(--fg-3)] mb-2">Based on your job type AND how often you exercise</p>
               <div className="space-y-2">
                 {ACTIVITY_LEVELS.map((level) => (
                   <OptionCard key={level.value} title={level.label} description={level.description}
@@ -1226,7 +1235,7 @@ export default function OnboardingPage() {
                 <Label>Hours of sleep per night</Label>
                 <input type="number" step="0.5" min="3" max="12" value={sleepHours}
                   onChange={(e) => setSleepHours(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]"
                   placeholder="7" />
               </div>
               <div>
@@ -1236,8 +1245,8 @@ export default function OnboardingPage() {
                     <button key={s.value} type="button" onClick={() => setSleepQuality(s.value)}
                       className={`flex-1 min-w-[90px] py-3 px-3 rounded-xl border-2 font-semibold text-sm transition-all ${
                         sleepQuality === s.value
-                          ? 'border-purple-500 bg-purple-50 text-purple-700'
-                          : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                          ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
+                          : 'border-[var(--line-2)] text-[var(--fg-3)] hover:border-[var(--fg-3)]'
                       }`}>
                       {s.label}
                     </button>
@@ -1252,8 +1261,8 @@ export default function OnboardingPage() {
                   <button key={s.value} type="button" onClick={() => setStressLevel(s.value)}
                     className={`flex-1 min-w-[100px] py-3 px-4 rounded-xl border-2 font-semibold text-sm transition-all ${
                       stressLevel === s.value
-                        ? 'border-purple-500 bg-purple-50 text-purple-700'
-                        : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                        ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
+                        : 'border-[var(--line-2)] text-[var(--fg-3)] hover:border-[var(--fg-3)]'
                     }`}>
                     {s.label}
                   </button>
@@ -1271,7 +1280,7 @@ export default function OnboardingPage() {
               {alcoholFrequency !== 'none' && (
                 <input type="text" value={alcoholDetails}
                   onChange={(e) => setAlcoholDetails(e.target.value)}
-                  className="w-full mt-3 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="w-full mt-3 px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]"
                   placeholder="e.g. 2-3 beers on weekends, glass of wine with dinner" />
               )}
             </div>
@@ -1389,7 +1398,7 @@ export default function OnboardingPage() {
                   <button key={s.value} type="button" onClick={() => setSnackPreference(s.value)}
                     className={`flex-1 min-w-[100px] py-3 px-4 rounded-xl border-2 font-semibold text-sm transition-all ${
                       snackPreference === s.value
-                        ? 'border-purple-500 bg-purple-50 text-purple-700'
+                        ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
                         : 'border-gray-200 text-gray-500 hover:border-gray-300'
                     }`}>
                     {s.label}
@@ -1404,7 +1413,7 @@ export default function OnboardingPage() {
                   <button key={label} type="button" onClick={() => setLateNightSnacking(val)}
                     className={`py-3 px-4 rounded-xl border-2 font-semibold transition-all ${
                       lateNightSnacking === val
-                        ? 'border-purple-500 bg-purple-50 text-purple-700'
+                        ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
                         : 'border-gray-200 text-gray-500 hover:border-gray-300'
                     }`}>
                     {label}
@@ -1548,7 +1557,7 @@ export default function OnboardingPage() {
                   <button key={d.value} type="button" onClick={() => setMaxSessionMinutes(d.value)}
                     className={`py-2.5 px-5 rounded-xl border-2 font-semibold text-sm transition-all ${
                       maxSessionMinutes === d.value
-                        ? 'border-purple-500 bg-purple-50 text-purple-700'
+                        ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
                         : 'border-gray-200 text-gray-500 hover:border-gray-300'
                     }`}>
                     {d.label}
@@ -1595,7 +1604,7 @@ export default function OnboardingPage() {
                   <button key={String(opt.value)} type="button" onClick={() => setDoesCardio(opt.value)}
                     className={`flex-1 py-3 px-5 rounded-xl border-2 font-semibold text-sm transition-all ${
                       doesCardio === opt.value
-                        ? 'border-purple-500 bg-purple-50 text-purple-700'
+                        ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
                         : 'border-gray-200 text-gray-500 hover:border-gray-300'
                     }`}>
                     {opt.label}
@@ -1622,7 +1631,7 @@ export default function OnboardingPage() {
                         <button key={n} type="button" onClick={() => setCardioFrequency(n)}
                           className={`w-10 h-10 rounded-full border-2 font-bold text-sm transition-all ${
                             cardioFrequency === n
-                              ? 'border-purple-500 bg-purple-50 text-purple-700'
+                              ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
                               : 'border-gray-200 text-gray-500 hover:border-gray-300'
                           }`}>
                           {n}
@@ -1637,7 +1646,7 @@ export default function OnboardingPage() {
                         <button key={d} type="button" onClick={() => setCardioDuration(d)}
                           className={`py-2 px-4 rounded-xl border-2 font-semibold text-sm transition-all ${
                             cardioDuration === d
-                              ? 'border-purple-500 bg-purple-50 text-purple-700'
+                              ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
                               : 'border-gray-200 text-gray-500 hover:border-gray-300'
                           }`}>
                           {d}
@@ -1740,7 +1749,7 @@ export default function OnboardingPage() {
                   <button key={d} type="button" onClick={() => setWorkoutDays(d)}
                     className={`w-12 h-12 rounded-full border-2 font-bold text-lg transition-all ${
                       workoutDays === d
-                        ? 'border-purple-500 bg-purple-50 text-purple-700'
+                        ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
                         : 'border-gray-200 text-gray-500 hover:border-gray-300'
                     }`}>
                     {d}
@@ -1755,7 +1764,7 @@ export default function OnboardingPage() {
                   <button key={m} type="button" onClick={() => setMealsPerDay(m)}
                     className={`w-12 h-12 rounded-full border-2 font-bold text-lg transition-all ${
                       mealsPerDay === m
-                        ? 'border-purple-500 bg-purple-50 text-purple-700'
+                        ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
                         : 'border-gray-200 text-gray-500 hover:border-gray-300'
                     }`}>
                     {m}
@@ -1799,7 +1808,7 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-6">
             <StepHeader
-              icon={<Calculator className="h-12 w-12 text-purple-600" />}
+              icon={<Calculator className="h-12 w-12 text-[var(--acc-text)]" />}
               title="Your Profile Summary"
               subtitle={isManagedClient
                 ? 'Review the intake your coach will use to assess your case and build your plan.'
@@ -1809,11 +1818,11 @@ export default function OnboardingPage() {
             {targets && (
               <>
                 {/* Nutrition Targets */}
-                <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl p-6 border border-purple-100">
-                  <h3 className="text-sm font-bold text-purple-700 uppercase tracking-wider mb-4">Daily Nutrition Targets</h3>
+                <div className="bg-[var(--ink-3)] rounded-2xl p-6 border border-[var(--line-2)]">
+                  <h3 className="text-sm font-bold text-[var(--acc-text)] uppercase tracking-wider mb-4">Daily Nutrition Targets</h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div className="bg-[var(--panel-strong)]/80 rounded-xl p-4 text-center">
-                      <div className="text-2xl font-bold text-purple-700">{targets.calories}</div>
+                      <div className="text-2xl font-bold text-[var(--acc-text)]">{targets.calories}</div>
                       <div className="text-xs text-[var(--muted-soft)] mt-1">kcal / day</div>
                     </div>
                     <div className="bg-[var(--panel-strong)]/80 rounded-xl p-4 text-center">
@@ -1837,7 +1846,7 @@ export default function OnboardingPage() {
 
                 {/* Key Details */}
                 <div className="bg-[var(--panel-strong)] rounded-2xl p-6 border border-[var(--line)]">
-                  <h3 className="text-sm font-bold text-purple-700 uppercase tracking-wider mb-4">Your Profile</h3>
+                  <h3 className="text-sm font-bold text-[var(--acc-text)] uppercase tracking-wider mb-4">Your Profile</h3>
                   <div className="grid grid-cols-2 gap-3">
                     <ReviewRow label="Goal" value={FITNESS_GOALS.find(g => g.value === goal)?.label ?? goal} />
                     {targetWeight && <ReviewRow label="Target weight" value={`${targetWeight} kg`} />}
@@ -1882,7 +1891,7 @@ export default function OnboardingPage() {
 
                 {/* Schedule */}
                 <div className="bg-[var(--panel-strong)] rounded-2xl p-6 border border-[var(--line)]">
-                  <h3 className="text-sm font-bold text-purple-700 uppercase tracking-wider mb-4">Schedule</h3>
+                  <h3 className="text-sm font-bold text-[var(--acc-text)] uppercase tracking-wider mb-4">Schedule</h3>
                   <div className="grid grid-cols-2 gap-3">
                     <ReviewRow label="Wake up" value={fmt12(wakeTime)} />
                     <ReviewRow label="Bedtime" value={fmt12(sleepTime)} />
@@ -1897,7 +1906,7 @@ export default function OnboardingPage() {
 
                 {isManagedClient && coachCustomQuestions.length > 0 && (
                   <div className="bg-[var(--panel-strong)] rounded-2xl p-6 border border-[var(--line)]">
-                    <h3 className="text-sm font-bold text-purple-700 uppercase tracking-wider mb-4">Coach questions</h3>
+                    <h3 className="text-sm font-bold text-[var(--acc-text)] uppercase tracking-wider mb-4">Coach questions</h3>
                     <div className="grid grid-cols-1 gap-3">
                       {coachCustomQuestions.map((question) => {
                         const answer = coachQuestionAnswers[question.id]
@@ -1909,9 +1918,9 @@ export default function OnboardingPage() {
                 )}
 
                 {/* AI Note */}
-                <div className="flex gap-3 bg-purple-50 border border-purple-200 rounded-2xl p-5">
-                  <Sparkles className="h-5 w-5 text-purple-600 flex-shrink-0 mt-0.5" />
-                  <p className="text-sm text-purple-800 leading-relaxed">
+                <div className="flex gap-3 bg-[var(--ink-3)] border border-[var(--line-2)] rounded-2xl p-5">
+                  <Sparkles className="h-5 w-5 text-[var(--acc-text)] flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-[var(--muted)] leading-relaxed">
                     {isManagedClient
                       ? 'Your coach will see this intake in their dashboard, including your goals, restrictions, schedule, and main obstacles, so they can review your case and decide the right next step.'
                       : "Your personal AI coach will use everything you've told us to create a meal plan and training structure that actually fit your life: favourite meals, snack habits, training level, schedule, recovery, and pace of progress. No bland template plans unless that's what you asked for."}
@@ -1924,7 +1933,7 @@ export default function OnboardingPage() {
                     <button
                       onClick={() => handleFinish('ai-generate')}
                       disabled={saving}
-                      className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-4 rounded-xl text-base font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+                      className="btn-accent flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-xl text-base font-semibold disabled:opacity-50"
                     >
                       <Sparkles className="h-5 w-5" />
                       <span>{saving ? 'Saving...' : 'Generate AI Plans'}</span>
@@ -1935,7 +1944,7 @@ export default function OnboardingPage() {
                     disabled={saving}
                     className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-xl text-base font-semibold transition-all disabled:opacity-50 ${
                       isManagedClient
-                        ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:shadow-lg'
+                        ? 'btn-accent'
                         : 'border-2 border-[var(--line)] text-[var(--foreground)] hover:bg-[var(--background-elevated)]'
                     }`}
                   >
@@ -1971,7 +1980,7 @@ export default function OnboardingPage() {
 
       <div
         className="eyebrow mb-4"
-        style={{ color: 'var(--acc)' }}
+        style={{ color: 'var(--acc-text)' }}
       >
         {isTrainer ? 'YOUR COACHING PROFILE' : "LET'S MEET YOU"} · {String(step + 1).padStart(2, '0')} / {String(steps.length).padStart(2, '0')}
       </div>
@@ -2022,14 +2031,14 @@ function StepHeader({ icon, title, subtitle }: { icon: React.ReactNode; title: s
   return (
     <div className="text-center mb-2">
       <div className="flex justify-center mb-4">{icon}</div>
-      <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{title}</h2>
-      <p className="text-gray-600">{subtitle}</p>
+      <h2 className="text-2xl md:text-3xl font-bold text-[var(--foreground)] mb-2">{title}</h2>
+      <p className="text-[var(--muted)]">{subtitle}</p>
     </div>
   )
 }
 
 function Label({ children }: { children: React.ReactNode }) {
-  return <label className="block text-sm font-semibold text-gray-700 mb-2">{children}</label>
+  return <label className="block text-sm font-semibold text-[var(--muted)] mb-2">{children}</label>
 }
 
 function OptionCard({
@@ -2049,14 +2058,14 @@ function OptionCard({
           onClick()
         }
       }}
-      className={`p-4 border-2 rounded-xl cursor-pointer transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 ${
+      className={`p-4 border-2 rounded-xl cursor-pointer transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--acc)] focus-visible:ring-offset-2 ${
         selected
-          ? 'border-purple-500 bg-purple-50'
-          : 'border-gray-200 hover:border-gray-300'
+          ? 'border-[var(--acc)] bg-[var(--ink-3)]'
+          : 'border-[var(--line)] hover:border-[var(--line-2)]'
       }`}
     >
-      <h3 className={`font-semibold ${selected ? 'text-purple-700' : 'text-gray-900'}`}>{title}</h3>
-      <p className="text-sm text-gray-600 mt-0.5">{description}</p>
+      <h3 className={`font-semibold ${selected ? 'text-[var(--acc-text)]' : 'text-[var(--foreground)]'}`}>{title}</h3>
+      <p className="text-sm text-[var(--muted)] mt-0.5">{description}</p>
     </div>
   )
 }
@@ -2075,8 +2084,8 @@ function ChipGrid({
           onClick={() => onToggle(item.value)}
           className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
             selected.includes(item.value)
-              ? 'bg-purple-600 text-white shadow-sm'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              ? 'bg-[var(--acc)] text-[#0a0a0a] shadow-sm'
+              : 'bg-[var(--ink-2)] text-[var(--muted)] hover:bg-[var(--line-2)]'
           }`}
         >
           {item.label}

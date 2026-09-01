@@ -56,41 +56,46 @@ export default function ClientDetailPage() {
     const trainerId = profile.id
     const supabase = createClient()
     async function load() {
-      const [clientRes, dietRes, trainingRes, mealLogRes, workoutLogRes, weightRes, feedbackRes, conversationRes, customResponseRes] = await Promise.all([
-        supabase.from('user_profiles').select('*').eq('id', id).single(),
-        supabase.from('diet_plans').select('*').eq('user_id', id).order('created_at', { ascending: false }),
-        supabase.from('training_plans').select('*').eq('user_id', id).order('created_at', { ascending: false }),
-        supabase.from('meal_logs').select('date').eq('user_id', id).order('date', { ascending: false }).limit(1),
-        supabase.from('workout_logs').select('date').eq('user_id', id).order('date', { ascending: false }).limit(1),
-        supabase.from('weight_logs').select('weight_kg, date').eq('user_id', id).order('date', { ascending: false }).limit(1),
-        supabase.from('feedback_requests').select('id', { count: 'exact', head: true }).eq('nutritionist_id', trainerId).eq('client_id', id).eq('status', 'pending'),
-        supabase.from('conversations').select('id').eq('nutritionist_id', trainerId).eq('client_id', id).maybeSingle(),
-        supabase.from('personal_trainer_custom_intake_responses').select('id, response_text, response_json, question:question_id(label)').eq('trainer_id', trainerId).eq('client_id', id),
-      ])
-      if (clientRes.data) setClient(clientRes.data as UserProfile)
-      if (dietRes.data) setDietPlans(dietRes.data as DietPlan[])
-      if (trainingRes.data) setTrainingPlans(trainingRes.data as TrainingPlan[])
-      setCustomResponses((customResponseRes.data as CustomIntakeResponseRow[] | null) ?? [])
+      try {
+        const [clientRes, dietRes, trainingRes, mealLogRes, workoutLogRes, weightRes, feedbackRes, conversationRes, customResponseRes] = await Promise.all([
+          supabase.from('user_profiles').select('*').eq('id', id).single(),
+          supabase.from('diet_plans').select('*').eq('user_id', id).order('created_at', { ascending: false }),
+          supabase.from('training_plans').select('*').eq('user_id', id).order('created_at', { ascending: false }),
+          supabase.from('meal_logs').select('date').eq('user_id', id).order('date', { ascending: false }).limit(1),
+          supabase.from('workout_logs').select('date').eq('user_id', id).order('date', { ascending: false }).limit(1),
+          supabase.from('weight_logs').select('weight_kg, date').eq('user_id', id).order('date', { ascending: false }).limit(1),
+          supabase.from('feedback_requests').select('id', { count: 'exact', head: true }).eq('nutritionist_id', trainerId).eq('client_id', id).eq('status', 'pending'),
+          supabase.from('conversations').select('id').eq('nutritionist_id', trainerId).eq('client_id', id).maybeSingle(),
+          supabase.from('personal_trainer_custom_intake_responses').select('id, response_text, response_json, question:question_id(label)').eq('trainer_id', trainerId).eq('client_id', id),
+        ])
+        if (clientRes.data) setClient(clientRes.data as UserProfile)
+        if (dietRes.data) setDietPlans(dietRes.data as DietPlan[])
+        if (trainingRes.data) setTrainingPlans(trainingRes.data as TrainingPlan[])
+        setCustomResponses((customResponseRes.data as CustomIntakeResponseRow[] | null) ?? [])
 
-      let unreadMessageCount = 0
-      if (conversationRes.data?.id) {
-        const { count } = await supabase
-          .from('messages')
-          .select('*', { count: 'exact', head: true })
-          .eq('conversation_id', conversationRes.data.id)
-          .neq('sender_id', trainerId)
-          .is('read_at', null)
-        unreadMessageCount = count ?? 0
+        let unreadMessageCount = 0
+        if (conversationRes.data?.id) {
+          const { count } = await supabase
+            .from('messages')
+            .select('*', { count: 'exact', head: true })
+            .eq('conversation_id', conversationRes.data.id)
+            .neq('sender_id', trainerId)
+            .is('read_at', null)
+          unreadMessageCount = count ?? 0
+        }
+
+        setOverview({
+          lastMealDate: mealLogRes.data?.[0]?.date ?? null,
+          lastWorkoutDate: workoutLogRes.data?.[0]?.date ?? null,
+          latestWeight: weightRes.data?.[0]?.weight_kg ?? null,
+          pendingFeedbackCount: feedbackRes.count ?? 0,
+          unreadMessageCount,
+        })
+      } catch {
+        toast.error('Failed to load client data')
+      } finally {
+        setLoading(false)
       }
-
-      setOverview({
-        lastMealDate: mealLogRes.data?.[0]?.date ?? null,
-        lastWorkoutDate: workoutLogRes.data?.[0]?.date ?? null,
-        latestWeight: weightRes.data?.[0]?.weight_kg ?? null,
-        pendingFeedbackCount: feedbackRes.count ?? 0,
-        unreadMessageCount,
-      })
-      setLoading(false)
     }
     load()
   }, [profile, id, router])
@@ -111,7 +116,7 @@ export default function ClientDetailPage() {
         accent={client.onboarding_completed ? 'ready.' : 'intake pending.'}
         subtitle={`${client.email} · ${client.gender}, ${client.age}y · ${client.weight_kg}kg · ${client.height_cm}cm${client.goal ? ` · ${client.goal}` : ''}`}
         meta={
-          <span className="app-status-pill" style={{ color: client.onboarding_completed ? 'var(--ok)' : 'var(--warn)' }}>
+          <span className="app-status-pill" style={{ color: client.onboarding_completed ? 'var(--ok-text)' : 'var(--warn-text)' }}>
             {client.onboarding_completed ? 'Intake complete' : 'Intake pending'}
           </span>
         }
@@ -126,13 +131,13 @@ export default function ClientDetailPage() {
         {(client.injuries?.length > 0 || client.medical_conditions?.length > 0 || client.dietary_restrictions?.length > 0 || client.food_dislikes?.length > 0) && (
           <div className="mt-6 space-y-2 border-t border-[var(--line)] pt-4">
             {client.injuries?.length > 0 && (
-              <AnamnesisRow icon={<AlertTriangle className="h-4 w-4 text-red-500" />} label="Injuries" value={client.injuries.join(', ')} />
+              <AnamnesisRow icon={<AlertTriangle className="h-4 w-4 text-[var(--danger-text)]" />} label="Injuries" value={client.injuries.join(', ')} />
             )}
             {client.medical_conditions?.length > 0 && (
               <AnamnesisRow icon={<Stethoscope className="h-4 w-4 text-[var(--warn)]" />} label="Conditions" value={client.medical_conditions.join(', ')} />
             )}
             {client.dietary_restrictions?.length > 0 && (
-              <AnamnesisRow icon={<Leaf className="h-4 w-4 text-green-500" />} label="Diet Restrictions" value={client.dietary_restrictions.join(', ')} />
+              <AnamnesisRow icon={<Leaf className="h-4 w-4 text-[var(--ok)]" />} label="Diet Restrictions" value={client.dietary_restrictions.join(', ')} />
             )}
             {client.food_dislikes?.length > 0 && (
               <AnamnesisRow icon={<ThumbsDown className="h-4 w-4 text-[var(--fg-3)]" />} label="Dislikes" value={client.food_dislikes.join(', ')} />
@@ -141,7 +146,7 @@ export default function ClientDetailPage() {
               <AnamnesisRow icon={<Activity className="h-4 w-4 text-[var(--brand-400)]" />} label="Experience" value={client.training_experience} />
             )}
             {client.equipment_access && (
-              <AnamnesisRow icon={<Weight className="h-4 w-4 text-indigo-500" />} label="Equipment" value={client.equipment_access.replace(/_/g, ' ')} />
+              <AnamnesisRow icon={<Weight className="h-4 w-4 text-[var(--brand-400)]" />} label="Equipment" value={client.equipment_access.replace(/_/g, ' ')} />
             )}
           </div>
         )}
@@ -149,14 +154,14 @@ export default function ClientDetailPage() {
         <div className="mt-6 border-t border-[var(--line)] pt-4">
           <h2 className="app-mono-label mb-3">Coach intake summary</h2>
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-            {client.desired_outcome && <AnamnesisRow icon={<Target className="h-4 w-4 text-blue-500" />} label="Desired outcome" value={client.desired_outcome} />}
-            {client.past_dieting_challenges && <AnamnesisRow icon={<AlertTriangle className="h-4 w-4 text-amber-500" />} label="Past challenges" value={client.past_dieting_challenges} />}
+            {client.desired_outcome && <AnamnesisRow icon={<Target className="h-4 w-4 text-[var(--acc)]" />} label="Desired outcome" value={client.desired_outcome} />}
+            {client.past_dieting_challenges && <AnamnesisRow icon={<AlertTriangle className="h-4 w-4 text-[var(--warn)]" />} label="Past challenges" value={client.past_dieting_challenges} />}
             {client.weekly_derailers && <AnamnesisRow icon={<ClipboardList className="h-4 w-4 text-[var(--acc)]" />} label="Derailers" value={client.weekly_derailers} />}
-            {client.equipment_access && <AnamnesisRow icon={<Weight className="h-4 w-4 text-indigo-500" />} label="Equipment" value={client.equipment_access.replace(/_/g, ' ')} />}
+            {client.equipment_access && <AnamnesisRow icon={<Weight className="h-4 w-4 text-[var(--brand-400)]" />} label="Equipment" value={client.equipment_access.replace(/_/g, ' ')} />}
             {client.workout_days_per_week && <AnamnesisRow icon={<Dumbbell className="h-4 w-4 text-[var(--brand-400)]" />} label="Training availability" value={`${client.workout_days_per_week} days / week`} />}
-            {client.max_session_minutes && <AnamnesisRow icon={<Activity className="h-4 w-4 text-emerald-500" />} label="Session length" value={`${client.max_session_minutes} min`} />}
+            {client.max_session_minutes && <AnamnesisRow icon={<Activity className="h-4 w-4 text-[var(--brand-400)]" />} label="Session length" value={`${client.max_session_minutes} min`} />}
             {client.plan_preference && <AnamnesisRow icon={<ClipboardList className="h-4 w-4 text-[var(--acc)]" />} label="Plan style" value={client.plan_preference.replace(/_/g, ' ')} />}
-            {client.sleep_quality && <AnamnesisRow icon={<Stethoscope className="h-4 w-4 text-slate-500" />} label="Recovery context" value={`${client.sleep_quality}${client.stress_level ? ` · stress ${client.stress_level}` : ''}`} />}
+            {client.sleep_quality && <AnamnesisRow icon={<Stethoscope className="h-4 w-4 text-[var(--fg-3)]" />} label="Recovery context" value={`${client.sleep_quality}${client.stress_level ? ` · stress ${client.stress_level}` : ''}`} />}
           </div>
         </div>
 
@@ -185,8 +190,8 @@ export default function ClientDetailPage() {
       </div>
 
       <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <MetricCard label="Last meal log" value={overview.lastMealDate ? new Date(overview.lastMealDate).toLocaleDateString('en-GB') : 'No logs'} tone="muted" />
-        <MetricCard label="Last workout" value={overview.lastWorkoutDate ? new Date(overview.lastWorkoutDate).toLocaleDateString('en-GB') : 'No logs'} tone="accent" />
+        <MetricCard label="Last meal log" value={overview.lastMealDate ? new Date(overview.lastMealDate + 'T00:00:00').toLocaleDateString('en-GB') : 'No logs'} tone="muted" />
+        <MetricCard label="Last workout" value={overview.lastWorkoutDate ? new Date(overview.lastWorkoutDate + 'T00:00:00').toLocaleDateString('en-GB') : 'No logs'} tone="accent" />
         <MetricCard label="Latest weight" value={overview.latestWeight ? `${overview.latestWeight}kg` : 'No data'} tone="success" />
         <MetricCard label="Needs response" value={overview.pendingFeedbackCount + overview.unreadMessageCount} tone="warn" />
       </div>
@@ -227,7 +232,7 @@ export default function ClientDetailPage() {
             {dietPlans.map(plan => (
               <div key={plan.id} className="card p-4 flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <Utensils className="h-5 w-5 text-green-500" />
+                  <Utensils className="h-5 w-5 text-[var(--ok)]" />
                   <div>
                     <p className="font-semibold text-[var(--fg)]">{plan.name}</p>
                     <p className="text-xs text-[var(--fg-3)]">
@@ -331,7 +336,7 @@ function EditableMacros({ client, onUpdated }: { client: UserProfile; onUpdated:
             Edit
           </button>
         </div>
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <MacroPill label="Calories" value={client.daily_calories} unit="kcal" />
           <MacroPill label="Protein" value={client.daily_protein} unit="g" />
           <MacroPill label="Carbs" value={client.daily_carbs} unit="g" />
@@ -351,28 +356,28 @@ function EditableMacros({ client, onUpdated }: { client: UserProfile; onUpdated:
           </button>
         </div>
       </div>
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <div>
-          <label className="app-mono-label mb-1 block">Calories</label>
-          <input type="number" value={calories} onChange={e => setCalories(e.target.value)}
+          <label htmlFor="client-macro-calories" className="app-mono-label mb-1 block">Calories</label>
+          <input id="client-macro-calories" type="number" value={calories} onChange={e => setCalories(e.target.value)}
             className="input-field px-3 py-2 text-sm"
             placeholder="kcal" />
         </div>
         <div>
-          <label className="app-mono-label mb-1 block">Protein</label>
-          <input type="number" value={protein} onChange={e => setProtein(e.target.value)}
+          <label htmlFor="client-macro-protein" className="app-mono-label mb-1 block">Protein</label>
+          <input id="client-macro-protein" type="number" value={protein} onChange={e => setProtein(e.target.value)}
             className="input-field px-3 py-2 text-sm"
             placeholder="g" />
         </div>
         <div>
-          <label className="app-mono-label mb-1 block">Carbs</label>
-          <input type="number" value={carbs} onChange={e => setCarbs(e.target.value)}
+          <label htmlFor="client-macro-carbs" className="app-mono-label mb-1 block">Carbs</label>
+          <input id="client-macro-carbs" type="number" value={carbs} onChange={e => setCarbs(e.target.value)}
             className="input-field px-3 py-2 text-sm"
             placeholder="g" />
         </div>
         <div>
-          <label className="app-mono-label mb-1 block">Fat</label>
-          <input type="number" value={fat} onChange={e => setFat(e.target.value)}
+          <label htmlFor="client-macro-fat" className="app-mono-label mb-1 block">Fat</label>
+          <input id="client-macro-fat" type="number" value={fat} onChange={e => setFat(e.target.value)}
             className="input-field px-3 py-2 text-sm"
             placeholder="g" />
         </div>

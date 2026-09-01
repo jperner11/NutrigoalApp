@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
+import { getLocalDateString } from '@/lib/date'
 import { Droplets, Plus, Minus } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { WATER_QUICK_ADD } from '@/lib/constants'
@@ -13,7 +14,7 @@ export default function WaterPage() {
   const [todayTotal, setTodayTotal] = useState(0)
   const [customAmount, setCustomAmount] = useState(250)
   const [loading, setLoading] = useState(true)
-  const today = new Date().toISOString().split('T')[0]
+  const today = getLocalDateString()
 
   const target = profile?.daily_water_ml ?? 2500
   const progress = Math.min((todayTotal / target) * 100, 100)
@@ -22,14 +23,20 @@ export default function WaterPage() {
   const loadToday = useCallback(async () => {
     if (!profile) return
     const supabase = createClient()
-    const { data } = await supabase
-      .from('water_logs')
-      .select('amount_ml')
-      .eq('user_id', profile.id)
-      .eq('date', today)
 
-    setTodayTotal(data?.reduce((sum, log) => sum + log.amount_ml, 0) ?? 0)
-    setLoading(false)
+    try {
+      const { data } = await supabase
+        .from('water_logs')
+        .select('amount_ml')
+        .eq('user_id', profile.id)
+        .eq('date', today)
+
+      setTodayTotal(data?.reduce((sum, log) => sum + log.amount_ml, 0) ?? 0)
+    } catch {
+      toast.error('Failed to load water intake')
+    } finally {
+      setLoading(false)
+    }
   }, [profile, today])
 
   useEffect(() => {

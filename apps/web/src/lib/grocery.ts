@@ -63,7 +63,8 @@ const CATEGORY_MAP: Record<string, string> = {
   'vegetable oil': 'Oils & Fats', 'sesame oil': 'Oils & Fats',
 
   // Condiments & Sauces
-  'peanut butter': 'Condiments', 'almond butter': 'Condiments', 'honey': 'Condiments',
+  'peanut butter': 'Condiments', 'almond butter': 'Condiments',
+  'cashew butter': 'Condiments', 'sunflower seed butter': 'Condiments', 'honey': 'Condiments',
   'maple syrup': 'Condiments', 'soy sauce': 'Condiments', 'hot sauce': 'Condiments',
   'mustard': 'Condiments', 'ketchup': 'Condiments', 'mayo': 'Condiments',
   'mayonnaise': 'Condiments', 'salsa': 'Condiments', 'vinegar': 'Condiments',
@@ -83,6 +84,12 @@ const CATEGORY_ORDER = [
   'Nuts & Seeds', 'Legumes', 'Oils & Fats', 'Condiments', 'Beverages', 'Other',
 ]
 
+// Longest key first so a specific match (e.g. "peanut butter") wins over a
+// shorter substring match (e.g. "butter") regardless of CATEGORY_MAP order.
+const CATEGORY_ENTRIES_BY_KEY_LENGTH = Object.entries(CATEGORY_MAP).sort(
+  ([a], [b]) => b.length - a.length
+)
+
 function categorizeIngredient(name: string): string {
   const lower = name.toLowerCase().trim()
 
@@ -90,7 +97,7 @@ function categorizeIngredient(name: string): string {
   if (CATEGORY_MAP[lower]) return CATEGORY_MAP[lower]
 
   // Partial match
-  for (const [key, category] of Object.entries(CATEGORY_MAP)) {
+  for (const [key, category] of CATEGORY_ENTRIES_BY_KEY_LENGTH) {
     if (lower.includes(key) || key.includes(lower)) return category
   }
 

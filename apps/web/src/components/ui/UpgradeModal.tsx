@@ -124,7 +124,7 @@ export default function UpgradeModal({ isOpen, onClose, feature }: UpgradeModalP
           </div>
           <div
             className="mono mb-2"
-            style={{ fontSize: 10, color: 'var(--acc)', letterSpacing: '0.16em' }}
+            style={{ fontSize: 10, color: 'var(--acc-text)', letterSpacing: '0.16em' }}
           >
             ✦ UPGRADE TO UNLOCK
           </div>
@@ -180,7 +180,7 @@ export default function UpgradeModal({ isOpen, onClose, feature }: UpgradeModalP
                       className="row gap-2"
                       style={{ fontSize: 12, color: 'var(--fg-2)', lineHeight: 1.5 }}
                     >
-                      <span style={{ color: 'var(--acc)', flexShrink: 0 }}>✓</span>
+                      <span style={{ color: 'var(--acc-text)', flexShrink: 0 }}>✓</span>
                       <span>{f}</span>
                     </li>
                   ))}
