@@ -197,7 +197,7 @@ export function ChatThread({
           )}
           {loadError && (
             <div className="card-2 mx-auto mt-8 max-w-[520px] p-6 text-center">
-              <p className="text-sm leading-6" style={{ color: 'var(--error, #c0392b)' }}>
+              <p className="text-sm leading-6" style={{ color: 'var(--danger-text)' }}>
                 {loadError}
               </p>
             </div>
