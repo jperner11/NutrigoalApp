@@ -263,7 +263,7 @@ function ClientDetail({ client, user, onBack, onMessages, onFeedback, onCreateDi
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!client.client_id) return
+    if (!client.client_id) { setLoading(false); return }
     Promise.all([
       supabase.from('diet_plans').select('*').eq('user_id', client.client_id).order('created_at', { ascending: false }),
       supabase.from('training_plans').select('*').eq('user_id', client.client_id).order('created_at', { ascending: false }),
@@ -271,7 +271,7 @@ function ClientDetail({ client, user, onBack, onMessages, onFeedback, onCreateDi
       if (dietRes.data) setDietPlans(dietRes.data as DietPlan[])
       if (trainingRes.data) setTrainingPlans(trainingRes.data as TrainingPlan[])
       setLoading(false)
-    })
+    }).catch(() => setLoading(false))
   }, [client.client_id])
 
   return (
