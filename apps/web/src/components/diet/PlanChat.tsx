@@ -91,10 +91,15 @@ export default function PlanChat({ planId, meals, targets, userProfile, dayOfWee
     const supabase = createClient()
 
     // Delete existing meals for this day only (or all if no day specified)
-    if (dayOfWeek !== null && dayOfWeek !== undefined) {
-      await supabase.from('diet_plan_meals').delete().eq('diet_plan_id', planId).eq('day_of_week', dayOfWeek)
-    } else {
-      await supabase.from('diet_plan_meals').delete().eq('diet_plan_id', planId)
+    const deleteQuery = supabase.from('diet_plan_meals').delete().eq('diet_plan_id', planId)
+    const { error: deleteError } =
+      dayOfWeek !== null && dayOfWeek !== undefined
+        ? await deleteQuery.eq('day_of_week', dayOfWeek)
+        : await deleteQuery
+
+    if (deleteError) {
+      toast.error('Failed to save modified meals')
+      return
     }
 
     const inserts = updatedMeals.map(meal => {
