@@ -405,6 +405,7 @@ export default function WorkoutSessionPage() {
           </div>
           <button
             onClick={() => setShowOverloadBanner(false)}
+            aria-label="Dismiss"
             className="text-amber-400 hover:text-amber-600 text-lg leading-none ml-2 flex-shrink-0"
           >
             &times;
