@@ -729,7 +729,7 @@ const makeStyles = (c: BrandColors) => StyleSheet.create({
   sessionExMeta: { fontSize: 14, color: c.textMuted, textAlign: 'center', marginTop: 4, marginBottom: 16 },
   suggestionCard: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: c.brand100, borderRadius: 14, borderWidth: 1, borderColor: c.accentLine, padding: 12, marginBottom: 16 },
   suggestionText: { fontSize: 13, color: c.foregroundSoft, flex: 1 },
-  overloadBanner: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: c.warningBg, borderRadius: 14, borderWidth: 1, borderColor: '#f3d27a', padding: 12, marginBottom: 14 },
+  overloadBanner: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: c.warningBg, borderRadius: 14, borderWidth: 1, borderColor: c.warning, padding: 12, marginBottom: 14 },
   overloadBannerText: { fontSize: 13, color: c.foregroundSoft, fontWeight: '600', flex: 1 },
   lastSessionCard: { backgroundColor: c.panel, borderRadius: 14, borderWidth: 1, borderColor: c.line, padding: 12, marginBottom: 12 },
   lastSessionLabel: { fontSize: 12, fontWeight: '700', color: c.textMuted, textTransform: 'uppercase', letterSpacing: 0.4 },
