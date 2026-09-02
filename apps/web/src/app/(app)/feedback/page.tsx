@@ -86,7 +86,10 @@ export default function FeedbackPage() {
             className="btn-primary flex items-center justify-center gap-2 rounded-2xl px-6 py-3 text-base font-semibold disabled:opacity-50"
           >
             {isSending ? (
-              <div className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              <>
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" aria-hidden="true" />
+                <span className="sr-only">Sending feedback…</span>
+              </>
             ) : (
               <>
                 <Send className="h-4 w-4" />
