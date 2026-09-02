@@ -32,8 +32,13 @@ export default function ClientMessagesPage() {
       .eq('id', id)
       .single()
       .then(
-        ({ data }) => {
-          if (!cancelled && data) setClient(data as UserProfile)
+        ({ data, error }) => {
+          if (cancelled) return
+          if (data) {
+            setClient(data as UserProfile)
+          } else if (error) {
+            Sentry.captureException(error, { tags: { kind: 'page', page: 'clients/[id]/messages', op: 'loadClient' } })
+          }
         },
         (err) => {
           Sentry.captureException(err, { tags: { kind: 'page', page: 'clients/[id]/messages', op: 'loadClient' } })
