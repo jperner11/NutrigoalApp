@@ -360,13 +360,14 @@ export default function TrainingPlanDetailPage() {
                 >
                   <div className="flex items-center space-x-4">
                     <div className="relative flex-shrink-0">
-                      <div className={`w-12 h-12 rounded-full flex items-center justify-center shadow-sm ${
-                        isLocked ? 'bg-[var(--line-strong)]' : 'bg-gradient-to-br from-[var(--brand-500)] to-[var(--brand-800)]'
-                      }`}>
+                      <div
+                        className="w-12 h-12 rounded-full flex items-center justify-center shadow-sm"
+                        style={{ background: isLocked ? 'var(--line-strong)' : 'var(--acc)' }}
+                      >
                         {isLocked ? (
-                          <Lock className="h-5 w-5 text-white" />
+                          <Lock className="h-5 w-5" style={{ color: 'var(--muted-soft)' }} />
                         ) : (
-                          <span className="text-white font-bold text-lg">{day.day_number}</span>
+                          <span className="font-bold text-lg" style={{ color: 'var(--acc-text)' }}>{day.day_number}</span>
                         )}
                       </div>
                     </div>
@@ -487,8 +488,8 @@ export default function TrainingPlanDetailPage() {
                   onClick={() => handleSelectFreeDay(day.id)}
                   className="w-full flex items-center gap-3 p-3 rounded-xl border border-[var(--line)] hover:border-[var(--brand-400)] hover:bg-[var(--acc-soft)] transition-all text-left"
                 >
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--brand-500)] to-[var(--brand-800)] flex items-center justify-center flex-shrink-0">
-                    <span className="text-white font-bold">{day.day_number}</span>
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'var(--acc)' }}>
+                    <span className="font-bold" style={{ color: 'var(--acc-text)' }}>{day.day_number}</span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-[var(--foreground)]">{day.name}</p>
