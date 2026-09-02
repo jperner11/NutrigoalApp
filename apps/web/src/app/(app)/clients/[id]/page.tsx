@@ -68,6 +68,9 @@ export default function ClientDetailPage() {
           supabase.from('conversations').select('id').eq('nutritionist_id', trainerId).eq('client_id', id).maybeSingle(),
           supabase.from('personal_trainer_custom_intake_responses').select('id, response_text, response_json, question:question_id(label)').eq('trainer_id', trainerId).eq('client_id', id),
         ])
+        if (clientRes.error) throw clientRes.error
+        if (dietRes.error) throw dietRes.error
+        if (trainingRes.error) throw trainingRes.error
         if (clientRes.data) setClient(clientRes.data as UserProfile)
         if (dietRes.data) setDietPlans(dietRes.data as DietPlan[])
         if (trainingRes.data) setTrainingPlans(trainingRes.data as TrainingPlan[])
