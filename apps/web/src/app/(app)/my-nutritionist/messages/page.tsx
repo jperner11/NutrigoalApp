@@ -41,8 +41,13 @@ export default function MyNutritionistMessagesPage() {
       .eq('id', trainerId)
       .single()
       .then(
-        ({ data }) => {
-          if (!cancelled && data) setTrainer(data as TrainerInfo)
+        ({ data, error }) => {
+          if (cancelled) return
+          if (data) {
+            setTrainer(data as TrainerInfo)
+          } else if (error) {
+            Sentry.captureException(error, { tags: { kind: 'page', page: 'my-nutritionist/messages', op: 'loadTrainer' } })
+          }
         },
         (err) => {
           Sentry.captureException(err, { tags: { kind: 'page', page: 'my-nutritionist/messages', op: 'loadTrainer' } })
