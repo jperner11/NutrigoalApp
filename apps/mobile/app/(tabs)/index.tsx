@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import * as Sentry from '@sentry/react-native'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
+import { getLocalDateString } from '../../src/lib/date'
 import { WATER_QUICK_ADD, isManagedClientRole, isTrainerRole } from '@treno/shared'
 import { BrandLogo } from '../../src/components/BrandLogo'
 import { useBrandColors, useThemedStyles, brandShadow, type BrandColors } from '../../src/theme/brand'
@@ -61,7 +62,7 @@ function ClientHome({ userId }: { userId: string | null }) {
   const [hasDietPlan, setHasDietPlan] = useState(false)
   const [hasTrainingPlan, setHasTrainingPlan] = useState(false)
 
-  const today = useMemo(() => new Date().toISOString().split('T')[0], [])
+  const today = useMemo(() => getLocalDateString(), [])
   const managedClient = isManagedClientRole(profile?.role)
 
   const fetchDashboardData = async () => {

@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
+import { getLocalDateString } from '../../src/lib/date'
 import {
   MEAL_TYPES, COMMON_SUPPLEMENTS, SUPPLEMENT_FREQUENCIES, SUPPLEMENT_TIMES,
 } from '@treno/shared'
@@ -54,7 +55,7 @@ export default function DietScreen() {
   const [todayLogs, setTodayLogs] = useState<string[]>([]) // supplement_ids taken today
   const [refreshing, setRefreshing] = useState(false)
 
-  const today = new Date().toISOString().split('T')[0]
+  const today = getLocalDateString()
 
   const fetchPlans = async () => {
     if (!user) return
@@ -179,7 +180,7 @@ function DietPlanDetail({ planId, user, onBack }: { planId: string; user: { id: 
   const [expandedMeal, setExpandedMeal] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
-  const today = new Date().toISOString().split('T')[0]
+  const today = getLocalDateString()
   const dayOfWeek = (new Date().getDay() + 6) % 7
 
   const loadPlan = async () => {
@@ -756,7 +757,7 @@ function LogMeal({ user, onDone, onCancel }: any) {
   const handleSave = async () => {
     if (foods.length === 0) { Alert.alert('Error', 'Add at least one food'); return }
     setSaving(true)
-    const today = new Date().toISOString().split('T')[0]
+    const today = getLocalDateString()
     await supabase.from('meal_logs').insert({
       user_id: user.id, date: today, meal_type: mealType, foods,
       total_calories: foods.reduce((s, f) => s + f.calories, 0),
