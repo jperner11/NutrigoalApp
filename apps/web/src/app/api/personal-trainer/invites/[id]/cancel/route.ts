@@ -24,7 +24,12 @@ export async function POST(
     .eq('id', user.id)
     .single()
 
-  await ensureTrainerAccess(user.id, profile?.role)
+  try {
+    await ensureTrainerAccess(user.id, profile?.role)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Forbidden'
+    return NextResponse.json({ error: message }, { status: 403 })
+  }
 
   const { data: invite, error } = await admin
     .from('personal_trainer_invites')
