@@ -267,7 +267,7 @@ export default function ProgressCheckIn({ userId, onPlanRegenerate }: ProgressCh
           <div className="px-5 pb-5">
             <button
               onClick={onPlanRegenerate}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[var(--brand-500)] to-[var(--brand-400)] px-5 py-3 text-sm font-semibold text-white transition-all hover:shadow-lg"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[var(--brand-500)] to-[var(--brand-400)] px-5 py-3 text-sm font-semibold text-[#0a0a0a] transition-all hover:shadow-lg"
             >
               <RefreshCw className="h-4 w-4" />
               <span>Generate Updated Training Plan</span>
