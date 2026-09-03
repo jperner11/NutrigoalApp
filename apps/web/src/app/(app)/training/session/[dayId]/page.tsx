@@ -345,7 +345,7 @@ export default function WorkoutSessionPage() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
-          <Dumbbell className="h-10 w-10 text-purple-500 animate-pulse mx-auto mb-3" />
+          <Dumbbell className="h-10 w-10 text-[var(--acc-text)] animate-pulse mx-auto mb-3" />
           <p className="text-gray-500">Loading workout...</p>
         </div>
       </div>
@@ -360,7 +360,7 @@ export default function WorkoutSessionPage() {
         <p className="text-gray-500 mb-6">This training day has no exercises configured.</p>
         <button
           onClick={() => router.back()}
-          className="inline-flex items-center gap-2 text-purple-600 font-medium hover:text-purple-700"
+          className="inline-flex items-center gap-2 text-[var(--acc-text)] font-medium hover:opacity-80"
         >
           <ArrowLeft className="h-4 w-4" />
           Go Back
@@ -396,17 +396,17 @@ export default function WorkoutSessionPage() {
 
       {/* Progressive Overload Banner */}
       {showOverloadBanner && (
-        <div className="bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-xl p-3 mb-4 flex items-center justify-between">
+        <div className="bg-[rgba(196,121,28,0.12)] border border-[rgba(196,121,28,0.34)] rounded-xl p-3 mb-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-amber-500 flex-shrink-0" />
-            <p className="text-sm text-amber-800">
+            <Sparkles className="h-4 w-4 text-[var(--warn-text)] flex-shrink-0" />
+            <p className="text-sm text-[var(--warn-text)]">
               Progressive overload applied — weights adjusted based on your last session
             </p>
           </div>
           <button
             onClick={() => setShowOverloadBanner(false)}
             aria-label="Dismiss"
-            className="text-amber-400 hover:text-amber-600 text-lg leading-none ml-2 flex-shrink-0"
+            className="text-[var(--warn-text)] hover:opacity-70 text-lg leading-none ml-2 flex-shrink-0"
           >
             &times;
           </button>
@@ -420,7 +420,7 @@ export default function WorkoutSessionPage() {
           <span className="text-sm font-medium text-gray-500">
             Exercise {currentExerciseIndex + 1} of {exercises.length}
           </span>
-          <div className="flex items-center gap-1.5 text-sm font-mono text-purple-600 bg-purple-50 px-3 py-1 rounded-full">
+          <div className="flex items-center gap-1.5 text-sm font-mono text-[var(--acc-text)] bg-[var(--acc-soft)] px-3 py-1 rounded-full">
             <Timer className="h-3.5 w-3.5" />
             {formatTime(elapsedSeconds)}
           </div>
@@ -429,7 +429,7 @@ export default function WorkoutSessionPage() {
         {/* Progress Bar */}
         <div className="h-1.5 bg-gray-100 rounded-full mb-4 overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full transition-all duration-500"
+            className="h-full bg-gradient-to-r from-[var(--brand-500)] to-[var(--brand-400)] rounded-full transition-all duration-500"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
@@ -439,10 +439,10 @@ export default function WorkoutSessionPage() {
 
         {/* Badges */}
         <div className="flex items-center gap-2">
-          <span className="text-xs font-medium bg-purple-100 text-purple-700 px-2.5 py-1 rounded-full">
+          <span className="text-xs font-medium bg-[var(--acc-soft)] text-[var(--acc-text)] px-2.5 py-1 rounded-full">
             {formatBodyPart(exercise.body_part)}
           </span>
-          <span className="text-xs font-medium bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded-full">
+          <span className="text-xs font-medium bg-[var(--acc-soft)] text-[var(--acc-text)] px-2.5 py-1 rounded-full">
             {formatEquipment(exercise.equipment)}
           </span>
           {exercise.isCompound && (
@@ -512,7 +512,7 @@ export default function WorkoutSessionPage() {
               restTimerSeconds === 0 &&
               completedSetsCount === i &&
               !set.completed
-                ? 'bg-purple-50/40'
+                ? 'bg-[var(--acc-soft)]'
                 : ''
             }`}
           >
@@ -536,7 +536,7 @@ export default function WorkoutSessionPage() {
                 disabled={set.completed}
               />
               {set.suggestedWeight !== null && set.weight_kg === set.suggestedWeight && (
-                <Sparkles className="absolute right-1.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-amber-500" />
+                <Sparkles className="absolute right-1.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--warn-text)]" />
               )}
             </div>
 
@@ -580,7 +580,7 @@ export default function WorkoutSessionPage() {
         {/* Add Set Row */}
         <button
           onClick={addSet}
-          className="w-full flex items-center justify-center gap-1.5 py-3 text-sm font-medium text-purple-600 hover:bg-purple-50 transition-colors"
+          className="w-full flex items-center justify-center gap-1.5 py-3 text-sm font-medium text-[var(--acc-text)] hover:bg-[var(--acc-soft)] transition-colors"
         >
           <Plus className="h-4 w-4" />
           Add Set
@@ -590,7 +590,7 @@ export default function WorkoutSessionPage() {
       {/* Suggestion Reason (if any) */}
       {exercise.sets[0]?.suggestedReason && (
         <div className="flex items-start gap-2 px-1 mb-4">
-          <Sparkles className="h-3.5 w-3.5 text-amber-500 mt-0.5 flex-shrink-0" />
+          <Sparkles className="h-3.5 w-3.5 text-[var(--warn-text)] mt-0.5 flex-shrink-0" />
           <p className="text-xs text-gray-500">{exercise.sets[0].suggestedReason}</p>
         </div>
       )}
