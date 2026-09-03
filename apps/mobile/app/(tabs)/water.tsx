@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons'
 import * as Sentry from '@sentry/react-native'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
+import { getLocalDateString } from '../../src/lib/date'
 import { WATER_QUICK_ADD } from '@treno/shared'
 import { useBrandColors, useThemedStyles, brandShadow } from '../../src/theme/brand'
 
@@ -32,7 +33,7 @@ export default function WaterScreen() {
   const { user, profile } = useAuth()
   const [logs, setLogs] = useState<{ id: string; amount_ml: number; logged_at: string }[]>([])
   const [refreshing, setRefreshing] = useState(false)
-  const today = new Date().toISOString().split('T')[0]
+  const today = getLocalDateString()
 
   const fetchLogs = async () => {
     if (!user) return

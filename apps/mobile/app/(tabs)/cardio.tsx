@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
+import { getLocalDateString } from '../../src/lib/date'
 import { calculateCardioCalories } from '@treno/shared'
 import type { CardioSession, CardioType } from '@treno/shared'
 import { useBrandColors, useThemedStyles, brandShadow } from '../../src/theme/brand'
@@ -61,7 +62,7 @@ export default function CardioScreen() {
   const [selectedTypeId, setSelectedTypeId] = useState('')
   const [duration, setDuration] = useState('30')
   const [bpm, setBpm] = useState('')
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0])
+  const [date, setDate] = useState(getLocalDateString())
 
   const fetchData = async () => {
     if (!user) return

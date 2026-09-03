@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons'
 import * as Sentry from '@sentry/react-native'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
+import { getLocalDateString } from '../../src/lib/date'
 import {
   BODY_PARTS, EQUIPMENT_TYPES, DEFAULT_REST_SECONDS, DEFAULT_SETS, DEFAULT_REPS,
   calculateSuggestion, parseRepRange,
@@ -524,7 +525,7 @@ function WorkoutSession({ dayId, user, profile, onDone }: any) {
     await supabase.from('workout_logs').insert({
       user_id: user.id,
       plan_day_id: dayId,
-      date: new Date().toISOString().split('T')[0],
+      date: getLocalDateString(),
       duration_minutes: durationMin,
       exercises: exerciseLogs,
     })
