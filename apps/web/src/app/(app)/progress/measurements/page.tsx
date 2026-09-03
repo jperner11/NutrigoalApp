@@ -48,7 +48,7 @@ function DiffBadge({ current, previous }: { current: number | null; previous: nu
       </span>
     )
   }
-  const tone = diff > 0 ? 'var(--acc-text)' : 'var(--ok-text)'
+  const tone = diff > 0 ? 'var(--warn-text)' : 'var(--ok-text)'
   return (
     <span
       className="row mono gap-1"
