@@ -450,24 +450,29 @@ function MessagesScreen({ client, user, onBack }: { client: ClientWithProfile; u
   }, [user])
 
   useEffect(() => {
+    let cancelled = false
+    let channel: ReturnType<typeof supabase.channel> | null = null
+
     getOrCreateConversation().then(id => {
-      if (id) {
-        setConversationId(id)
-        fetchMessages(id)
+      if (cancelled || !id) return
+      setConversationId(id)
+      fetchMessages(id)
 
-        // Subscribe to new messages
-        const channel = supabase
-          .channel(`messages:${id}`)
-          .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${id}` },
-            (payload) => {
-              setMessages(prev => [...prev, payload.new as Message])
-            }
-          )
-          .subscribe()
+      // Subscribe to new messages
+      channel = supabase
+        .channel(`messages:${id}`)
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${id}` },
+          (payload) => {
+            setMessages(prev => [...prev, payload.new as Message])
+          }
+        )
+        .subscribe()
+    }).catch(() => {})
 
-        return () => { supabase.removeChannel(channel) }
-      }
-    })
+    return () => {
+      cancelled = true
+      if (channel) supabase.removeChannel(channel)
+    }
   }, [])
 
   const handleSend = async () => {
