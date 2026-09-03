@@ -180,7 +180,8 @@ export default function GeneratePlansPage() {
           is_active: true,
         }))
 
-        await supabase.from('user_supplements').insert(supplementRows)
+        const { error: supplementsError } = await supabase.from('user_supplements').insert(supplementRows)
+        if (supplementsError) throw new Error('Failed to save supplements')
         setSavedSupplements(true)
       }
 
