@@ -396,10 +396,15 @@ export default function GeneratePlansPage() {
     }
 
     if (newExercises.size > 0) {
-      const { data: insertedExercises } = await supabase
+      const { data: insertedExercises, error: exercisesError } = await supabase
         .from('exercises')
         .insert(Array.from(newExercises.values()))
         .select('id, name')
+
+      if (exercisesError) {
+        reportClientError(exercisesError, { feature: 'generate-plans', action: 'save-training-exercises' })
+        throw new Error('Failed to save training plan')
+      }
 
       for (const inserted of (insertedExercises ?? [])) {
         exerciseIdByName.set(inserted.name.toLowerCase(), inserted.id)
@@ -408,7 +413,7 @@ export default function GeneratePlansPage() {
 
     // Each day's insert only depends on plan.id, not on prior days, so run
     // them concurrently instead of serializing one round trip per day.
-    await Promise.all(
+    const dayResults = await Promise.all(
       (data.days ?? []).map(async (day) => {
         const { data: planDay, error: dayError } = await supabase
           .from('training_plan_days')
@@ -420,7 +425,7 @@ export default function GeneratePlansPage() {
           .select()
           .single()
 
-        if (dayError || !planDay) return
+        if (dayError || !planDay) return { error: dayError }
 
         const exerciseInserts = []
         for (let idx = 0; idx < day.exercises.length; idx++) {
@@ -441,10 +446,21 @@ export default function GeneratePlansPage() {
         }
 
         if (exerciseInserts.length > 0) {
-          await supabase.from('training_plan_exercises').insert(exerciseInserts)
+          const { error: insertError } = await supabase.from('training_plan_exercises').insert(exerciseInserts)
+          if (insertError) return { error: insertError }
         }
+
+        return { error: null }
       })
     )
+
+    const failedDays = dayResults.filter((result) => result.error)
+    if (failedDays.length > 0) {
+      failedDays.forEach((result) =>
+        reportClientError(result.error, { feature: 'generate-plans', action: 'save-training-day' }),
+      )
+      throw new Error('Failed to save training plan')
+    }
   }
 
 interface CompanionContent {
