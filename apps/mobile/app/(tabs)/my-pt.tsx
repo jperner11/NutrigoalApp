@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
+import type { User } from '@supabase/supabase-js'
 import type { Message, FeedbackRequest, FeedbackQuestion } from '@treno/shared'
 import { useBrandColors, useThemedStyles, brandShadow, type BrandColors } from '../../src/theme/brand'
 
@@ -89,7 +90,7 @@ export default function MyPTScreen() {
 
   useEffect(() => { loadData() }, [loadData])
 
-  if (screen === 'messages' && conversationId) {
+  if (screen === 'messages' && conversationId && user) {
     return <ChatScreen conversationId={conversationId} user={user} ptName={ptName || 'PT'}
       onBack={() => { setScreen('home'); loadData() }} />
   }
@@ -97,7 +98,7 @@ export default function MyPTScreen() {
     return <FeedbackListScreen requests={feedbackRequests} onBack={() => setScreen('home')}
       onSelect={(fb) => { setSelectedFeedback(fb); setScreen('feedback-respond') }} />
   }
-  if (screen === 'feedback-respond' && selectedFeedback) {
+  if (screen === 'feedback-respond' && selectedFeedback && user) {
     return <FeedbackRespondScreen feedback={selectedFeedback} user={user}
       onBack={() => { setScreen('feedback-list'); loadData() }} />
   }
@@ -180,7 +181,7 @@ export default function MyPTScreen() {
 
 // ─── Chat Screen ─────────────────────────────────────────
 function ChatScreen({ conversationId, user, ptName, onBack }: {
-  conversationId: string; user: any; ptName: string; onBack: () => void
+  conversationId: string; user: User; ptName: string; onBack: () => void
 }) {
   const colors = useBrandColors()
   const s = useThemedStyles(makeStyles)
@@ -302,7 +303,7 @@ function FeedbackListScreen({ requests, onBack, onSelect }: {
 
 // ─── Feedback Respond ────────────────────────────────────
 function FeedbackRespondScreen({ feedback, user, onBack }: {
-  feedback: FeedbackRequest; user: any; onBack: () => void
+  feedback: FeedbackRequest; user: User; onBack: () => void
 }) {
   const colors = useBrandColors()
   const s = useThemedStyles(makeStyles)
