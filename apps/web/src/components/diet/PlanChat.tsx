@@ -147,6 +147,7 @@ export default function PlanChat({ planId, meals, targets, userProfile, dayOfWee
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
+          aria-label="Modify plan with AI"
           className="fixed bottom-6 right-6 p-4 rounded-full shadow-lg hover:shadow-xl transition-all z-40 group"
           style={{
             background: 'linear-gradient(135deg, var(--brand-500), var(--brand-400))',
@@ -154,7 +155,7 @@ export default function PlanChat({ planId, meals, targets, userProfile, dayOfWee
             border: '1px solid var(--brand-200)',
           }}
         >
-          <MessageSquare className="h-6 w-6" />
+          <MessageSquare className="h-6 w-6" aria-hidden="true" />
           <span
             className="absolute -top-10 right-0 text-xs px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap"
             style={{ background: 'var(--panel-strong)', color: 'var(--fg)', border: '1px solid var(--line)' }}
