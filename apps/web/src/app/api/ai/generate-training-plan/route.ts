@@ -302,10 +302,16 @@ PROGRAMMING RULES:
     }
 
     if (newExercises.size > 0) {
-      const { data: insertedExercises } = await adminSupabase
+      const { data: insertedExercises, error: insertExercisesError } = await adminSupabase
         .from('exercises')
         .insert(Array.from(newExercises.values()))
         .select('id, name')
+
+      if (insertExercisesError) {
+        Sentry.captureException(insertExercisesError, {
+          tags: { kind: 'api-route', route: 'ai/generate-training-plan' },
+        })
+      }
 
       for (const inserted of (insertedExercises ?? [])) {
         exerciseMap.set(inserted.name.toLowerCase(), inserted.id)
