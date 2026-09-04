@@ -346,7 +346,7 @@ export default function WorkoutSessionPage() {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
           <Dumbbell className="h-10 w-10 text-[var(--acc-text)] animate-pulse mx-auto mb-3" />
-          <p className="text-gray-500">Loading workout...</p>
+          <p className="text-[var(--muted-soft)]">Loading workout...</p>
         </div>
       </div>
     )
@@ -355,9 +355,9 @@ export default function WorkoutSessionPage() {
   if (exercises.length === 0) {
     return (
       <div className="text-center py-20">
-        <Dumbbell className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-        <h2 className="text-lg font-semibold text-gray-900 mb-2">No exercises found</h2>
-        <p className="text-gray-500 mb-6">This training day has no exercises configured.</p>
+        <Dumbbell className="h-12 w-12 text-[var(--muted-soft)] mx-auto mb-4" />
+        <h2 className="text-lg font-semibold text-[var(--foreground)] mb-2">No exercises found</h2>
+        <p className="text-[var(--muted-soft)] mb-6">This training day has no exercises configured.</p>
         <button
           onClick={() => router.back()}
           className="inline-flex items-center gap-2 text-[var(--acc-text)] font-medium hover:opacity-80"
@@ -388,7 +388,7 @@ export default function WorkoutSessionPage() {
       {/* Back Button */}
       <button
         onClick={() => router.back()}
-        className="flex items-center gap-1.5 text-gray-500 hover:text-gray-700 mb-4 text-sm"
+        className="flex items-center gap-1.5 text-[var(--muted-soft)] hover:text-[var(--muted)] mb-4 text-sm"
       >
         <ArrowLeft className="h-4 w-4" />
         Exit Workout
@@ -414,10 +414,10 @@ export default function WorkoutSessionPage() {
       )}
 
       {/* Top Bar */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5 mb-4">
+      <div className="bg-[var(--panel-strong)] rounded-2xl shadow-sm border border-[var(--line-strong)] p-5 mb-4">
         {/* Exercise Progress + Timer */}
         <div className="flex items-center justify-between mb-3">
-          <span className="text-sm font-medium text-gray-500">
+          <span className="text-sm font-medium text-[var(--muted-soft)]">
             Exercise {currentExerciseIndex + 1} of {exercises.length}
           </span>
           <div className="flex items-center gap-1.5 text-sm font-mono text-[var(--acc-text)] bg-[var(--acc-soft)] px-3 py-1 rounded-full">
@@ -427,7 +427,7 @@ export default function WorkoutSessionPage() {
         </div>
 
         {/* Progress Bar */}
-        <div className="h-1.5 bg-gray-100 rounded-full mb-4 overflow-hidden">
+        <div className="h-1.5 bg-[var(--line)] rounded-full mb-4 overflow-hidden">
           <div
             className="h-full bg-gradient-to-r from-[var(--brand-500)] to-[var(--brand-400)] rounded-full transition-all duration-500"
             style={{ width: `${progressPercent}%` }}
@@ -435,7 +435,7 @@ export default function WorkoutSessionPage() {
         </div>
 
         {/* Exercise Name */}
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">{exercise.exercise_name}</h1>
+        <h1 className="text-2xl font-bold text-[var(--foreground)] mb-2">{exercise.exercise_name}</h1>
 
         {/* Badges */}
         <div className="flex items-center gap-2">
@@ -446,7 +446,7 @@ export default function WorkoutSessionPage() {
             {formatEquipment(exercise.equipment)}
           </span>
           {exercise.isCompound && (
-            <span className="text-xs font-medium bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full">
+            <span className="text-xs font-medium bg-[var(--line)] text-[var(--muted)] px-2.5 py-1 rounded-full">
               Compound
             </span>
           )}
@@ -455,7 +455,7 @@ export default function WorkoutSessionPage() {
 
       {/* Rest Timer Overlay */}
       {restTimerActive && restTimerSeconds > 0 && (
-        <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-5 mb-4 text-[#0a0a0a]">
+        <div className="bg-gradient-to-r from-[var(--brand-500)] to-[var(--brand-400)] rounded-2xl p-5 mb-4 text-[#0a0a0a]">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <Timer className="h-5 w-5" />
@@ -490,13 +490,13 @@ export default function WorkoutSessionPage() {
       )}
 
       {/* Set Tracking Table */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden mb-4">
+      <div className="bg-[var(--panel-strong)] rounded-2xl shadow-sm border border-[var(--line-strong)] overflow-hidden mb-4">
         {/* Header */}
-        <div className="grid grid-cols-[48px_1fr_1fr_56px] gap-2 px-4 py-3 bg-gray-50 border-b border-gray-100">
-          <span className="text-xs font-semibold text-gray-500 uppercase text-center">Set</span>
-          <span className="text-xs font-semibold text-gray-500 uppercase text-center">Kg</span>
-          <span className="text-xs font-semibold text-gray-500 uppercase text-center">Reps</span>
-          <span className="text-xs font-semibold text-gray-500 uppercase text-center">
+        <div className="grid grid-cols-[48px_1fr_1fr_56px] gap-2 px-4 py-3 bg-[var(--panel)] border-b border-[var(--line)]">
+          <span className="text-xs font-semibold text-[var(--muted-soft)] uppercase text-center">Set</span>
+          <span className="text-xs font-semibold text-[var(--muted-soft)] uppercase text-center">Kg</span>
+          <span className="text-xs font-semibold text-[var(--muted-soft)] uppercase text-center">Reps</span>
+          <span className="text-xs font-semibold text-[var(--muted-soft)] uppercase text-center">
             <Check className="h-3.5 w-3.5 mx-auto" />
           </span>
         </div>
@@ -505,8 +505,8 @@ export default function WorkoutSessionPage() {
         {exercise.sets.map((set, i) => (
           <div
             key={set.set_number}
-            className={`grid grid-cols-[48px_1fr_1fr_56px] gap-2 px-4 py-3 items-center border-b border-gray-50 transition-colors ${
-              set.completed ? 'bg-green-50/60' : ''
+            className={`grid grid-cols-[48px_1fr_1fr_56px] gap-2 px-4 py-3 items-center border-b border-[var(--line)] transition-colors ${
+              set.completed ? 'bg-[var(--success-bg)]' : ''
             } ${
               !restTimerActive &&
               restTimerSeconds === 0 &&
@@ -518,7 +518,7 @@ export default function WorkoutSessionPage() {
           >
             {/* Set Number */}
             <div className="text-center">
-              <span className="text-sm font-bold text-gray-700">{set.set_number}</span>
+              <span className="text-sm font-bold text-[var(--foreground)]">{set.set_number}</span>
             </div>
 
             {/* Weight Input */}
@@ -528,10 +528,10 @@ export default function WorkoutSessionPage() {
                 inputMode="decimal"
                 value={set.weight_kg || ''}
                 onChange={e => updateSet(i, 'weight_kg', parseFloat(e.target.value) || 0)}
-                className={`w-full text-center text-sm font-medium border rounded-lg py-2.5 px-2 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors ${
+                className={`w-full text-center text-sm font-medium border rounded-lg py-2.5 px-2 focus:outline-none focus:ring-2 focus:ring-[var(--acc)] focus:border-transparent transition-colors ${
                   set.completed
-                    ? 'bg-green-50 border-green-200 text-green-800'
-                    : 'bg-white border-gray-200 text-gray-900'
+                    ? 'bg-[var(--success-bg)] border-[var(--ok)] text-[var(--ok-text)]'
+                    : 'bg-[var(--panel-strong)] border-[var(--line-strong)] text-[var(--foreground)]'
                 }`}
                 disabled={set.completed}
               />
@@ -547,15 +547,15 @@ export default function WorkoutSessionPage() {
                 inputMode="numeric"
                 value={set.reps || ''}
                 onChange={e => updateSet(i, 'reps', parseInt(e.target.value) || 0)}
-                className={`w-full text-center text-sm font-medium border rounded-lg py-2.5 px-2 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors ${
+                className={`w-full text-center text-sm font-medium border rounded-lg py-2.5 px-2 focus:outline-none focus:ring-2 focus:ring-[var(--acc)] focus:border-transparent transition-colors ${
                   set.completed
-                    ? 'bg-green-50 border-green-200 text-green-800'
-                    : 'bg-white border-gray-200 text-gray-900'
+                    ? 'bg-[var(--success-bg)] border-[var(--ok)] text-[var(--ok-text)]'
+                    : 'bg-[var(--panel-strong)] border-[var(--line-strong)] text-[var(--foreground)]'
                 }`}
                 disabled={set.completed}
               />
               {!set.completed && (
-                <p className="text-[10px] text-gray-400 text-center mt-0.5">
+                <p className="text-[10px] text-[var(--muted-soft)] text-center mt-0.5">
                   Target: {exercise.targetReps}
                 </p>
               )}
@@ -567,8 +567,8 @@ export default function WorkoutSessionPage() {
                 onClick={() => toggleSetComplete(i)}
                 className={`h-11 w-11 rounded-xl flex items-center justify-center transition-all active:scale-95 ${
                   set.completed
-                    ? 'bg-green-500 text-white shadow-sm shadow-green-200'
-                    : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
+                    ? 'bg-[var(--ok)] text-white shadow-sm'
+                    : 'bg-[var(--line)] text-[var(--muted-soft)] hover:bg-[var(--line-strong)]'
                 }`}
               >
                 <Check className="h-5 w-5" strokeWidth={set.completed ? 3 : 2} />
@@ -591,12 +591,12 @@ export default function WorkoutSessionPage() {
       {exercise.sets[0]?.suggestedReason && (
         <div className="flex items-start gap-2 px-1 mb-4">
           <Sparkles className="h-3.5 w-3.5 text-[var(--warn-text)] mt-0.5 flex-shrink-0" />
-          <p className="text-xs text-gray-500">{exercise.sets[0].suggestedReason}</p>
+          <p className="text-xs text-[var(--muted-soft)]">{exercise.sets[0].suggestedReason}</p>
         </div>
       )}
 
       {/* Navigation Buttons */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-gray-200 px-4 py-4 z-50">
+      <div className="fixed bottom-0 left-0 right-0 bg-[var(--panel-strong)]/80 backdrop-blur-lg border-t border-[var(--line-strong)] px-4 py-4 z-50">
         <div className="max-w-lg mx-auto flex items-center gap-3">
           {/* Previous Button */}
           <button
@@ -604,8 +604,8 @@ export default function WorkoutSessionPage() {
             disabled={currentExerciseIndex === 0}
             className={`flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
               currentExerciseIndex === 0
-                ? 'text-gray-300 bg-gray-50 cursor-not-allowed'
-                : 'text-gray-700 bg-gray-100 hover:bg-gray-200 active:scale-[0.98]'
+                ? 'text-[var(--muted-soft)] bg-[var(--panel)] cursor-not-allowed'
+                : 'text-[var(--foreground)] bg-[var(--line)] hover:bg-[var(--line-strong)] active:scale-[0.98]'
             }`}
           >
             <ChevronLeft className="h-4 w-4" />
@@ -617,7 +617,7 @@ export default function WorkoutSessionPage() {
             <button
               onClick={finishWorkout}
               disabled={saving}
-              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold text-[#0a0a0a] bg-gradient-to-r from-purple-600 to-indigo-600 hover:shadow-lg hover:shadow-purple-200 active:scale-[0.98] transition-all disabled:opacity-50"
+              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold text-[#0a0a0a] bg-gradient-to-r from-[var(--brand-500)] to-[var(--brand-400)] hover:shadow-lg hover:shadow-[var(--brand-100)] active:scale-[0.98] transition-all disabled:opacity-50"
             >
               {saving ? (
                 <>
@@ -636,8 +636,8 @@ export default function WorkoutSessionPage() {
               onClick={() => goToExercise(currentExerciseIndex + 1)}
               className={`flex-1 flex items-center justify-center gap-1.5 py-3 rounded-xl text-sm font-semibold transition-all active:scale-[0.98] ${
                 allSetsCompleted
-                  ? 'text-[#0a0a0a] bg-gradient-to-r from-purple-600 to-indigo-600 hover:shadow-lg hover:shadow-purple-200'
-                  : 'text-gray-700 bg-gray-100 hover:bg-gray-200'
+                  ? 'text-[#0a0a0a] bg-gradient-to-r from-[var(--brand-500)] to-[var(--brand-400)] hover:shadow-lg hover:shadow-[var(--brand-100)]'
+                  : 'text-[var(--foreground)] bg-[var(--line)] hover:bg-[var(--line-strong)]'
               }`}
             >
               Next Exercise
@@ -649,7 +649,7 @@ export default function WorkoutSessionPage() {
 
       {/* Day Name Subtitle */}
       {dayName && (
-        <p className="text-center text-xs text-gray-400 mt-2">{dayName}</p>
+        <p className="text-center text-xs text-[var(--muted-soft)] mt-2">{dayName}</p>
       )}
     </div>
   )
