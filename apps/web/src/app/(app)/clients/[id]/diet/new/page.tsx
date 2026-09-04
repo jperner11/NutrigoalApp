@@ -372,7 +372,7 @@ export default function NewClientDietPlanPage() {
                 <div className="space-y-3 rounded-lg border border-[var(--line)] bg-[var(--ink-2)] p-4">
                   <input type="text" value={customFood.name} onChange={e => setCustomFood(p => ({ ...p, name: e.target.value }))}
                     className="input-field w-full px-3 py-2 text-sm" placeholder="Food name" />
-                  <div className="grid grid-cols-4 gap-2">
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                     <div>
                       <label className="app-mono-label mb-1 block">Cal/100g</label>
                       <input type="number" value={customFood.calories_per_100g} onChange={e => setCustomFood(p => ({ ...p, calories_per_100g: e.target.value }))}
