@@ -169,7 +169,7 @@ export default function ClientsScreen() {
       <View style={st.header}>
         <Text style={st.title}>Clients</Text>
         <TouchableOpacity style={st.addBtn} onPress={() => setShowInvite(true)}>
-          <Ionicons name="person-add" size={20} color="#fff" />
+          <Ionicons name="person-add" size={20} color={colors.onAccent} />
         </TouchableOpacity>
       </View>
 
@@ -239,7 +239,7 @@ export default function ClientsScreen() {
               keyboardType="email-address" autoCapitalize="none" autoCorrect={false} />
             <Text style={st.hint}>We&apos;ll send a secure invite email. They only appear as active after they accept.</Text>
             <TouchableOpacity style={[st.primaryBtn, inviting && { opacity: 0.6 }]} onPress={handleInvite} disabled={inviting || !inviteEmail.trim()}>
-              {inviting ? <ActivityIndicator color="#fff" /> : <Text style={st.primaryBtnText}>Send Invite</Text>}
+              {inviting ? <ActivityIndicator color={colors.onAccent} /> : <Text style={st.primaryBtnText}>Send Invite</Text>}
             </TouchableOpacity>
           </View>
         </SafeAreaView>
@@ -504,8 +504,8 @@ function MessagesScreen({ client, user, onBack }: { client: ClientWithProfile; u
           const isMe = item.sender_id === user?.id
           return (
             <View style={[st.msgBubble, isMe ? st.msgMe : st.msgThem]}>
-              <Text style={[st.msgText, isMe && { color: '#fff' }]}>{item.content}</Text>
-              <Text style={[st.msgTime, isMe && { color: 'rgba(255,255,255,0.7)' }]}>
+              <Text style={[st.msgText, isMe && { color: colors.onAccent }]}>{item.content}</Text>
+              <Text style={[st.msgTime, isMe && { color: 'rgba(10, 10, 10, 0.7)' }]}>
                 {new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </Text>
             </View>
@@ -523,7 +523,7 @@ function MessagesScreen({ client, user, onBack }: { client: ClientWithProfile; u
           multiline
         />
         <TouchableOpacity style={st.sendBtn} onPress={handleSend} disabled={sending || !text.trim()}>
-          <Ionicons name="send" size={20} color="#fff" />
+          <Ionicons name="send" size={20} color={colors.onAccent} />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -676,7 +676,7 @@ function FeedbackScreen({ client, user, onBack }: { client: ClientWithProfile; u
                 <Text style={st.cancelBtnText}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[st.primaryBtn, saving && { opacity: 0.6 }]} onPress={handleSend} disabled={saving}>
-                {saving ? <ActivityIndicator color="#fff" /> : <Text style={st.primaryBtnText}>Send to Client</Text>}
+                {saving ? <ActivityIndicator color={colors.onAccent} /> : <Text style={st.primaryBtnText}>Send to Client</Text>}
               </TouchableOpacity>
             </View>
           </View>
@@ -838,7 +838,7 @@ function CreateClientDietPlan({ client, user, onDone, onCancel }: {
         </TouchableOpacity>
 
         <TouchableOpacity style={[st.primaryBtn, saving && { opacity: 0.6 }]} onPress={handleSave} disabled={saving}>
-          {saving ? <ActivityIndicator color="#fff" /> : <Text style={st.primaryBtnText}>Create Plan</Text>}
+          {saving ? <ActivityIndicator color={colors.onAccent} /> : <Text style={st.primaryBtnText}>Create Plan</Text>}
         </TouchableOpacity>
       </ScrollView>
 
@@ -855,7 +855,7 @@ function CreateClientDietPlan({ client, user, onDone, onCancel }: {
               <TextInput style={[st.input, { flex: 1 }]} value={searchQuery} onChangeText={setSearchQuery}
                 placeholder="e.g. chicken breast, rice..." placeholderTextColor={colors.textSubtle} returnKeyType="search" onSubmitEditing={searchFood} />
               <TouchableOpacity style={st.searchBtn} onPress={searchFood}>
-                {searching ? <ActivityIndicator color="#fff" size="small" /> : <Ionicons name="search" size={20} color="#fff" />}
+                {searching ? <ActivityIndicator color={colors.onAccent} size="small" /> : <Ionicons name="search" size={20} color={colors.onAccent} />}
               </TouchableOpacity>
             </View>
           </View>
@@ -1032,7 +1032,7 @@ function CreateClientTrainingPlan({ client, user, onDone, onCancel }: {
         </TouchableOpacity>
 
         <TouchableOpacity style={[st.primaryBtn, saving && { opacity: 0.6 }]} onPress={handleSave} disabled={saving}>
-          {saving ? <ActivityIndicator color="#fff" /> : <Text style={st.primaryBtnText}>Create Plan</Text>}
+          {saving ? <ActivityIndicator color={colors.onAccent} /> : <Text style={st.primaryBtnText}>Create Plan</Text>}
         </TouchableOpacity>
       </ScrollView>
 
@@ -1103,7 +1103,7 @@ const makeStyles = (c: BrandColors) => StyleSheet.create({
   hint: { fontSize: 12, color: c.textSubtle, marginTop: 8 },
   input: { backgroundColor: c.panel, borderWidth: 1, borderColor: c.lineStrong, borderRadius: 16, paddingHorizontal: 16, paddingVertical: 14, fontSize: 16, color: c.foreground },
   primaryBtn: { flex: 2, backgroundColor: c.brand500, borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginTop: 20 },
-  primaryBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  primaryBtnText: { color: c.onAccent, fontSize: 16, fontWeight: '700' },
   cancelBtn: { flex: 1, borderWidth: 1, borderColor: c.lineStrong, borderRadius: 16, paddingVertical: 14, alignItems: 'center', backgroundColor: c.panelMuted },
   cancelBtnText: { fontSize: 15, fontWeight: '600', color: c.textMuted },
   // Detail screen
@@ -1209,7 +1209,7 @@ const makeStyles = (c: BrandColors) => StyleSheet.create({
   filterChip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, backgroundColor: c.panelMuted },
   filterChipActive: { backgroundColor: c.brand500 },
   filterChipText: { fontSize: 13, fontWeight: '500', color: c.textMuted },
-  filterChipTextActive: { color: '#fff' },
+  filterChipTextActive: { color: c.onAccent },
   pickItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: c.line },
   pickName: { fontSize: 15, fontWeight: '600', color: c.foregroundSoft },
   pickMeta: { fontSize: 12, color: c.textSubtle, marginTop: 2 },
