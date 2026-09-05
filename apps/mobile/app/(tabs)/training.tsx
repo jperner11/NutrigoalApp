@@ -157,7 +157,10 @@ function CreatePlan({ user, profile, onDone, onCancel }: any) {
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    supabase.from('exercises').select('*').then(({ data }) => { if (data) setAllExercises(data as Exercise[]) })
+    supabase.from('exercises').select('*').then(({ data, error }) => {
+      if (data) setAllExercises(data as Exercise[])
+      else if (error) Alert.alert('Error', 'Could not load exercises')
+    })
   }, [])
 
   const filteredExercises = allExercises.filter(e => {
