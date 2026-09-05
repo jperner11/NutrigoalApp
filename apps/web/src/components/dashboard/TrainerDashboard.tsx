@@ -13,6 +13,7 @@ import {
   UserPlus,
   Users,
 } from 'lucide-react'
+import { toast } from 'react-hot-toast'
 import AppPageHeader from '@/components/ui/AppPageHeader'
 import { reportClientError } from '@/lib/apiClient'
 
@@ -210,6 +211,7 @@ export default function TrainerDashboard({ trainerId, trainerName }: TrainerDash
         })
       } catch (err) {
         reportClientError(err, { feature: 'dashboard', action: 'trainer-dashboard-load' })
+        toast.error('Failed to load dashboard. Please refresh the page.')
       } finally {
         setLoading(false)
       }
