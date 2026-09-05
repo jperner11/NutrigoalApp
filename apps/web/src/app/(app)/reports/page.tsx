@@ -39,7 +39,7 @@ function StatCard({ label, value, subtitle, icon: Icon }: {
       <div className="flex items-center gap-3 mb-2">
         <div
           className="w-9 h-9 rounded-lg flex items-center justify-center"
-          style={{ background: 'var(--ink-3)', color: 'var(--acc)' }}
+          style={{ background: 'var(--ink-3)', color: 'var(--acc-text)' }}
         >
           <Icon className="h-4.5 w-4.5" />
         </div>
