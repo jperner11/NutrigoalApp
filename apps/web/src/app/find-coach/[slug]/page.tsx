@@ -125,7 +125,7 @@ export default async function CoachProfilePage({
 
       <div className="grid gap-14 lg:grid-cols-[1.3fr_1fr]">
         <div>
-          <div className="grid gap-6" style={{ gridTemplateColumns: '180px 1fr' }}>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-[180px_1fr]">
             <CoachAvatar avatarUrl={profile.coach?.avatar_url} name={name} height={210} seed={1} />
             <div>
               <div
