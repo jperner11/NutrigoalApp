@@ -868,7 +868,7 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-6">
             <StepHeader
-              icon={<ClipboardList className="h-12 w-12 text-amber-500" />}
+              icon={<ClipboardList className="h-12 w-12 text-[var(--acc-text)]" />}
               title="How do you run accountability?"
               subtitle="These answers shape what the app highlights to you once client responses start coming in."
             />
@@ -906,7 +906,7 @@ export default function OnboardingPage() {
                     className={`py-2.5 px-4 rounded-xl border-2 font-semibold text-sm transition-all ${
                       coachCheckInFrequency === value
                         ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
-                        : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                        : 'border-[var(--line-2)] text-[var(--fg-3)] hover:border-[var(--fg-3)]'
                     }`}
                   >
                     {label}
