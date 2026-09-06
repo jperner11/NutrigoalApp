@@ -84,19 +84,19 @@ export async function PUT(request: Request) {
     return NextResponse.json({ message: 'Food ID required' }, { status: 400 })
   }
 
+  const updates: Record<string, unknown> = { updated_at: new Date().toISOString() }
+  if ('name' in body) updates.name = name?.trim()
+  if ('brand' in body) updates.brand = brand?.trim() || null
+  if ('calories_per_100g' in body) updates.calories_per_100g = Number(calories_per_100g) || 0
+  if ('protein_per_100g' in body) updates.protein_per_100g = Number(protein_per_100g) || 0
+  if ('carbs_per_100g' in body) updates.carbs_per_100g = Number(carbs_per_100g) || 0
+  if ('fat_per_100g' in body) updates.fat_per_100g = Number(fat_per_100g) || 0
+  if ('default_amount' in body) updates.default_amount = Number(default_amount) || 100
+  if ('default_unit' in body) updates.default_unit = default_unit || 'g'
+
   const { data, error } = await supabase
     .from('foods')
-    .update({
-      name: name?.trim(),
-      brand: brand?.trim() || null,
-      calories_per_100g: Number(calories_per_100g) || 0,
-      protein_per_100g: Number(protein_per_100g) || 0,
-      carbs_per_100g: Number(carbs_per_100g) || 0,
-      fat_per_100g: Number(fat_per_100g) || 0,
-      default_amount: Number(default_amount) || 100,
-      default_unit: default_unit || 'g',
-      updated_at: new Date().toISOString(),
-    })
+    .update(updates)
     .eq('id', id)
     .eq('created_by', user.id)
     .select()
