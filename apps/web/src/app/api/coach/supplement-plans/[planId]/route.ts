@@ -25,11 +25,12 @@ export async function GET(_req: Request, ctx: { params: Promise<{ planId: string
     const { planId } = await ctx.params
     const admin = createAdminClient()
     const plan = await loadOwnedPlan(admin, userId, planId)
-    const { data: items } = await admin
+    const { data: items, error: itemsError } = await admin
       .from('supplement_plan_items')
       .select('*')
       .eq('plan_id', planId)
       .order('sort_order', { ascending: true })
+    if (itemsError) throw new ApiError(itemsError.message, 400)
     return NextResponse.json({ plan: { ...plan, items: items ?? [] } })
   } catch (error) {
     return errorResponse(error)
