@@ -85,7 +85,12 @@ export async function PUT(request: Request) {
   }
 
   const updates: Record<string, unknown> = { updated_at: new Date().toISOString() }
-  if ('name' in body) updates.name = name?.trim()
+  if ('name' in body) {
+    if (typeof name !== 'string' || name.trim().length < 2) {
+      return NextResponse.json({ message: 'Name must be at least 2 characters' }, { status: 400 })
+    }
+    updates.name = name.trim()
+  }
   if ('brand' in body) updates.brand = brand?.trim() || null
   if ('calories_per_100g' in body) updates.calories_per_100g = Number(calories_per_100g) || 0
   if ('protein_per_100g' in body) updates.protein_per_100g = Number(protein_per_100g) || 0
