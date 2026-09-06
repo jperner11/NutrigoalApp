@@ -172,7 +172,7 @@ export default function LoginScreen() {
             </View>
             <Text style={styles.title}>Built for focused nutrition and training plans.</Text>
             <Text style={styles.subtitle}>
-              Pick up your programme, track today, and keep the clinic view with you on mobile.
+              Pick up your programme, track today, and keep your plan with you on mobile.
             </Text>
           </View>
 
