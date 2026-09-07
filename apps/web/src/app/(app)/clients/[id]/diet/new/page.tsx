@@ -241,7 +241,13 @@ export default function NewClientDietPlanPage() {
       total_carbs: m.foods.reduce((s, f) => s + f.carbs, 0),
       total_fat: m.foods.reduce((s, f) => s + f.fat, 0),
     }))
-    await supabase.from('diet_plan_meals').insert(mealRows)
+    const { error: mealsError } = await supabase.from('diet_plan_meals').insert(mealRows)
+
+    if (mealsError) {
+      toast.error('Failed to save meals')
+      setSaving(false)
+      return
+    }
 
     toast.success(`Diet plan created for ${client?.full_name}`)
     router.push(`/clients/${id}`)
