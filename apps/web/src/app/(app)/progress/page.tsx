@@ -131,7 +131,14 @@ export default function ProgressPage() {
         return
       }
 
-      await supabase.from('user_profiles').update({ weight_kg: parseFloat(formWeight) }).eq('id', profile.id)
+      const { error: profileError } = await supabase
+        .from('user_profiles')
+        .update({ weight_kg: parseFloat(formWeight) })
+        .eq('id', profile.id)
+
+      if (profileError) {
+        reportClientError(profileError, { feature: 'progress', action: 'sync-profile-weight' })
+      }
 
       toast.success('Weight logged.')
       setShowForm(false)
