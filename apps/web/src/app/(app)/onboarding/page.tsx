@@ -1014,17 +1014,17 @@ export default function OnboardingPage() {
       return (
         <div className="space-y-6">
           <StepHeader
-            icon={<ClipboardList className="h-12 w-12 text-indigo-500" />}
+            icon={<ClipboardList className="h-12 w-12 text-[var(--acc-text)]" />}
             title="Coach-specific questions"
             subtitle="These extra answers go straight into your coach&apos;s dashboard so they can tailor your next step more precisely."
           />
 
           {coachCustomQuestions.map((question) => (
-            <div key={question.id} className="rounded-2xl border border-gray-200 bg-white p-5">
+            <div key={question.id} className="rounded-2xl border border-[var(--line)] bg-[var(--background-elevated)] p-5">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <Label>{question.label}{question.required ? ' *' : ''}</Label>
-                  {question.help_text && <p className="mb-3 text-sm text-gray-500">{question.help_text}</p>}
+                  {question.help_text && <p className="mb-3 text-sm text-[var(--fg-3)]">{question.help_text}</p>}
                 </div>
               </div>
 
@@ -1033,7 +1033,7 @@ export default function OnboardingPage() {
                   type="text"
                   value={Array.isArray(coachQuestionAnswers[question.id]) ? '' : String(coachQuestionAnswers[question.id] ?? '')}
                   onChange={(e) => updateCoachQuestionAnswer(question.id, e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]"
                   placeholder="Type your answer"
                 />
               )}
@@ -1042,7 +1042,7 @@ export default function OnboardingPage() {
                 <textarea
                   value={Array.isArray(coachQuestionAnswers[question.id]) ? '' : String(coachQuestionAnswers[question.id] ?? '')}
                   onChange={(e) => updateCoachQuestionAnswer(question.id, e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
+                  className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)] resize-none"
                   rows={4}
                   placeholder="Type your answer"
                 />
@@ -1058,7 +1058,7 @@ export default function OnboardingPage() {
                       className={`py-3 px-4 rounded-xl border-2 font-semibold transition-all ${
                         coachQuestionAnswers[question.id] === option
                           ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
-                          : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                          : 'border-[var(--line-2)] text-[var(--fg-3)] hover:border-[var(--fg-3)]'
                       }`}
                     >
                       {option}
