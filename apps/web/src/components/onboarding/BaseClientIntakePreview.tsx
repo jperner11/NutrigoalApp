@@ -85,7 +85,7 @@ export function BaseClientIntakePreview({
 
   return (
     <div
-      className={`rounded-2xl border border-indigo-200 bg-indigo-50/60 ${className}`}
+      className={`rounded-2xl border border-[var(--acc)] bg-[var(--acc-soft)] ${className}`}
     >
       <button
         type="button"
@@ -94,21 +94,21 @@ export function BaseClientIntakePreview({
         aria-controls="base-intake-categories"
         className="w-full flex items-start gap-3 px-5 py-4 text-left"
       >
-        <Info className="h-5 w-5 text-indigo-600 flex-shrink-0 mt-0.5" />
+        <Info className="h-5 w-5 text-[var(--acc-text)] flex-shrink-0 mt-0.5" />
         <div className="flex-1">
-          <p className="text-sm font-semibold text-indigo-900">
+          <p className="text-sm font-semibold text-[var(--fg)]">
             We already ask your clients these questions
           </p>
-          <p className="text-xs text-indigo-700 mt-0.5">
+          <p className="text-xs text-[var(--fg-3)] mt-0.5">
             {open
               ? 'Hide the full list.'
               : 'Expand to see what the base intake already covers so you don\u2019t duplicate it.'}
           </p>
         </div>
         {open ? (
-          <ChevronDown className="h-5 w-5 text-indigo-600 flex-shrink-0 mt-0.5" />
+          <ChevronDown className="h-5 w-5 text-[var(--acc-text)] flex-shrink-0 mt-0.5" />
         ) : (
-          <ChevronRight className="h-5 w-5 text-indigo-600 flex-shrink-0 mt-0.5" />
+          <ChevronRight className="h-5 w-5 text-[var(--acc-text)] flex-shrink-0 mt-0.5" />
         )}
       </button>
 
@@ -118,16 +118,13 @@ export function BaseClientIntakePreview({
           className="px-5 pb-5 grid grid-cols-1 md:grid-cols-2 gap-4"
         >
           {BASE_INTAKE_CATEGORIES.map((cat) => (
-            <div
-              key={cat.title}
-              className="bg-white/80 rounded-xl border border-indigo-100 p-4"
-            >
-              <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-700 mb-2">
+            <div key={cat.title} className="card-2 p-4">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--fg-3)] mb-2">
                 {cat.title}
               </h4>
               <ul className="space-y-1">
                 {cat.items.map((item) => (
-                  <li key={item} className="text-xs text-gray-700 leading-snug">
+                  <li key={item} className="text-xs text-[var(--fg-2)] leading-snug">
                     • {item}
                   </li>
                 ))}
