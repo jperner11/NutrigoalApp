@@ -55,6 +55,7 @@ export default function ClientDetailPage() {
 
     const trainerId = profile.id
     const supabase = createClient()
+    let cancelled = false
     async function load() {
       try {
         const [clientRes, dietRes, trainingRes, mealLogRes, workoutLogRes, weightRes, feedbackRes, conversationRes, customResponseRes] = await Promise.all([
@@ -71,6 +72,7 @@ export default function ClientDetailPage() {
         if (clientRes.error) throw clientRes.error
         if (dietRes.error) throw dietRes.error
         if (trainingRes.error) throw trainingRes.error
+        if (cancelled) return
         if (clientRes.data) setClient(clientRes.data as UserProfile)
         if (dietRes.data) setDietPlans(dietRes.data as DietPlan[])
         if (trainingRes.data) setTrainingPlans(trainingRes.data as TrainingPlan[])
@@ -87,6 +89,7 @@ export default function ClientDetailPage() {
           unreadMessageCount = count ?? 0
         }
 
+        if (cancelled) return
         setOverview({
           lastMealDate: mealLogRes.data?.[0]?.date ?? null,
           lastWorkoutDate: workoutLogRes.data?.[0]?.date ?? null,
@@ -95,12 +98,15 @@ export default function ClientDetailPage() {
           unreadMessageCount,
         })
       } catch {
-        toast.error('Failed to load client data')
+        if (!cancelled) toast.error('Failed to load client data')
       } finally {
-        setLoading(false)
+        if (!cancelled) setLoading(false)
       }
     }
     load()
+    return () => {
+      cancelled = true
+    }
   }, [profile, id, router])
 
   if (loading) return <div className="text-[var(--fg-3)]">Loading client...</div>
