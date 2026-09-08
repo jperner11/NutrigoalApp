@@ -5,6 +5,7 @@ import {
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
+import * as Sentry from '@sentry/react-native'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
 import { getLocalDateString } from '../../src/lib/date'
@@ -77,9 +78,22 @@ export default function CardioScreen() {
     if (sessionsRes.data) setSessions(sessionsRes.data as (CardioSession & { cardio_types?: CardioType })[])
   }
 
-  useEffect(() => { fetchData() }, [user])
+  useEffect(() => {
+    fetchData().catch((err) => {
+      Sentry.captureException(err, { tags: { kind: 'cardio-load', screen: 'cardio' } })
+    })
+  }, [user])
 
-  const onRefresh = async () => { setRefreshing(true); await fetchData(); setRefreshing(false) }
+  const onRefresh = async () => {
+    setRefreshing(true)
+    try {
+      await fetchData()
+    } catch (err) {
+      Sentry.captureException(err, { tags: { kind: 'cardio-refresh', screen: 'cardio' } })
+    } finally {
+      setRefreshing(false)
+    }
+  }
 
   const handleSave = async () => {
     if (!user || !profile) return
