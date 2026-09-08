@@ -712,7 +712,7 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-6">
             <StepHeader
-              icon={<Globe className="h-12 w-12 text-sky-500" />}
+              icon={<Globe className="h-12 w-12 text-[var(--acc-text)]" />}
               title="Set up your public profile"
               subtitle="This is what potential clients see in the coach directory. You can update it anytime from Settings."
             />
@@ -937,7 +937,7 @@ export default function OnboardingPage() {
               value={trainerDraftQuestions}
               onChange={setTrainerDraftQuestions}
             />
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-[var(--fg-3)]">
               You can edit these anytime from <span className="font-semibold">Settings → Coach Intake</span>.
             </p>
           </div>
@@ -946,7 +946,7 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-6">
             <StepHeader
-              icon={<MessageSquare className="h-12 w-12 text-indigo-500" />}
+              icon={<MessageSquare className="h-12 w-12 text-[var(--acc-text)]" />}
               title="What happens after intake?"
               subtitle="Choose the default next step once a client accepts your invite and finishes their questionnaire."
             />
@@ -1100,14 +1100,14 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-6">
             <StepHeader
-              icon={<User className="h-12 w-12 text-purple-600" />}
+              icon={<User className="h-12 w-12 text-[var(--acc-text)]" />}
               title={isManagedClient ? 'Your coach needs a quick intake' : "Let's Get to Know You"}
               subtitle={isManagedClient
                 ? 'These details give your coach the baseline for planning, progress review, and realistic expectations.'
                 : 'Your stats give us the baseline for calories, macros, hydration, and realistic rate of progress.'}
             />
-            <div className="flex items-center gap-2 bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-3 -mt-2">
-              <span className="text-indigo-600 text-sm font-medium">
+            <div className="flex items-center gap-2 bg-[var(--acc-soft)] border border-[var(--acc)] rounded-xl px-4 py-3 -mt-2">
+              <span className="text-sm font-medium text-[var(--acc-text)]">
                 {isManagedClient
                   ? 'This takes about 5–10 minutes and helps your coach understand your goals, constraints, and what kind of support you need.'
                   : 'This questionnaire takes about 5–10 minutes and helps us build plans tailored specifically to you.'}
@@ -1119,7 +1119,7 @@ export default function OnboardingPage() {
                 type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]"
                 placeholder="Your name"
               />
             </div>
@@ -1134,7 +1134,7 @@ export default function OnboardingPage() {
                     className={`py-3 px-4 rounded-xl border-2 font-semibold transition-all ${
                       gender === g
                         ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
-                        : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                        : 'border-[var(--line-2)] text-[var(--fg-3)] hover:border-[var(--fg-3)]'
                     }`}
                   >
                     {g === 'male' ? 'Male' : 'Female'}
@@ -1146,22 +1146,22 @@ export default function OnboardingPage() {
               <div>
                 <Label>Age</Label>
                 <input type="number" value={age} onChange={(e) => setAge(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" placeholder="Years" />
+                  className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]" placeholder="Years" />
               </div>
               <div>
                 <Label>Height (cm)</Label>
                 <input type="number" value={height} onChange={(e) => setHeight(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" placeholder="175" />
+                  className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]" placeholder="175" />
               </div>
               <div>
                 <Label>Weight (kg)</Label>
                 <input type="number" value={weight} onChange={(e) => setWeight(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" placeholder="70" />
+                  className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]" placeholder="70" />
               </div>
               <div>
                 <Label>Body fat % (optional)</Label>
                 <input type="number" step="0.1" value={bodyFatPct} onChange={(e) => setBodyFatPct(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" placeholder="e.g. 18" />
+                  className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]" placeholder="e.g. 18" />
               </div>
             </div>
 
@@ -1177,9 +1177,9 @@ export default function OnboardingPage() {
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <Label>Goal weight (optional)</Label>
-                <p className="text-sm text-gray-500 mb-2">Leave this blank if you care more about how you want to look, feel, or perform than a specific number on the scale.</p>
+                <p className="text-sm text-[var(--fg-3)] mb-2">Leave this blank if you care more about how you want to look, feel, or perform than a specific number on the scale.</p>
                 <input type="number" value={targetWeight} onChange={(e) => setTargetWeight(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]"
                   placeholder="kg — or leave blank if you're not sure" />
               </div>
               <div>
@@ -1190,7 +1190,7 @@ export default function OnboardingPage() {
                       className={`py-2.5 px-4 rounded-xl border-2 font-semibold text-sm transition-all ${
                         goalTimeline === t.value
                           ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
-                          : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                          : 'border-[var(--line-2)] text-[var(--fg-3)] hover:border-[var(--fg-3)]'
                       }`}>
                       {t.label}
                     </button>
@@ -1292,21 +1292,21 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-6">
             <StepHeader
-              icon={<Utensils className="h-12 w-12 text-orange-500" />}
+              icon={<Utensils className="h-12 w-12 text-[var(--acc-text)]" />}
               title="Your Food Preferences"
               subtitle="Tell us what you genuinely enjoy eating so the plan feels like it was built by a real nutritionist, not a template."
             />
             <div>
               <Label>Top 5 favourite meals or dishes (any cuisine)</Label>
-              <p className="text-sm text-gray-500 mb-2">Think meals, not just ingredients &mdash; e.g. &quot;chicken stir-fry&quot;, &quot;pasta carbonara&quot;, &quot;salmon with rice&quot;</p>
+              <p className="text-sm text-[var(--fg-3)] mb-2">Think meals, not just ingredients &mdash; e.g. &quot;chicken stir-fry&quot;, &quot;pasta carbonara&quot;, &quot;salmon with rice&quot;</p>
               <textarea value={favouriteFoods} onChange={(e) => setFavouriteFoods(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
+                className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)] resize-none"
                 rows={3} placeholder="e.g. chicken stir-fry, spaghetti bolognese, salmon with rice, tacos, Greek salad" />
             </div>
             <div>
               <Label>Foods you absolutely hate and would never eat</Label>
               <textarea value={foodDislikes} onChange={(e) => setFoodDislikes(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
+                className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)] resize-none"
                 rows={2} placeholder="e.g. tofu, liver, sardines, coconut" />
               <div className="flex flex-wrap gap-1.5 mt-2">
                 {COMMON_FOOD_DISLIKES.map(f => (
@@ -1316,7 +1316,7 @@ export default function OnboardingPage() {
                       if (items.some(i => i.toLowerCase() === f.toLowerCase())) return prev
                       return prev ? `${prev}, ${f}` : f
                     })}
-                    className="text-xs px-2.5 py-1 bg-gray-100 text-gray-600 rounded-full hover:bg-red-100 hover:text-red-700 transition-colors">
+                    className="text-xs px-2.5 py-1 bg-[var(--ink-2)] text-[var(--fg-2)] rounded-full hover:bg-[var(--danger-bg)] hover:text-[var(--danger-text)] transition-colors">
                     + {f}
                   </button>
                 ))}
@@ -1330,7 +1330,7 @@ export default function OnboardingPage() {
                 onToggle={(val) => toggleArray(dietaryRestrictions, setDietaryRestrictions, val)}
               />
               <input type="text" value={allergies} onChange={(e) => setAllergies(e.target.value)}
-                className="w-full mt-3 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full mt-3 px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]"
                 placeholder="Any specific allergies? e.g. peanuts, shellfish, gluten" />
             </div>
             <div className="grid md:grid-cols-2 gap-4">
@@ -1356,12 +1356,12 @@ export default function OnboardingPage() {
             <div>
               <Label>How adventurous are you with food? (1 = stick to what I know, 10 = try anything)</Label>
               <div className="flex items-center gap-4 mt-2">
-                <span className="text-sm text-gray-500">1</span>
+                <span className="text-sm text-[var(--fg-3)]">1</span>
                 <input type="range" min={1} max={10} value={foodAdventurousness}
                   onChange={(e) => setFoodAdventurousness(parseInt(e.target.value))}
-                  className="flex-1 accent-purple-600" />
-                <span className="text-sm text-gray-500">10</span>
-                <span className="text-lg font-bold text-purple-600 w-8 text-center">{foodAdventurousness}</span>
+                  className="flex-1 accent-[var(--acc)]" />
+                <span className="text-sm text-[var(--fg-3)]">10</span>
+                <span className="text-lg font-bold text-[var(--acc-text)] w-8 text-center">{foodAdventurousness}</span>
               </div>
             </div>
           </div>
@@ -1372,14 +1372,14 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-6">
             <StepHeader
-              icon={<Cookie className="h-12 w-12 text-amber-500" />}
+              icon={<Cookie className="h-12 w-12 text-[var(--acc-text)]" />}
               title="Your Snack Habits"
               subtitle="No judgment here. Understanding your snack pattern helps us build smarter swaps and a more realistic cut."
             />
             <div>
               <Label>What snacks do you currently reach for?</Label>
               <textarea value={currentSnacks} onChange={(e) => setCurrentSnacks(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
+                className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)] resize-none"
                 rows={3} placeholder="e.g. crisps, chocolate, biscuits, protein bars, fruit, yogurt, nuts" />
             </div>
             <div>
@@ -1399,7 +1399,7 @@ export default function OnboardingPage() {
                     className={`flex-1 min-w-[100px] py-3 px-4 rounded-xl border-2 font-semibold text-sm transition-all ${
                       snackPreference === s.value
                         ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
-                        : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                        : 'border-[var(--line-2)] text-[var(--fg-3)] hover:border-[var(--fg-3)]'
                     }`}>
                     {s.label}
                   </button>
@@ -1414,7 +1414,7 @@ export default function OnboardingPage() {
                     className={`py-3 px-4 rounded-xl border-2 font-semibold transition-all ${
                       lateNightSnacking === val
                         ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
-                        : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                        : 'border-[var(--line-2)] text-[var(--fg-3)] hover:border-[var(--fg-3)]'
                     }`}>
                     {label}
                   </button>
@@ -1451,7 +1451,7 @@ export default function OnboardingPage() {
             <div>
               <Label>What usually throws you off track?</Label>
               <textarea value={weeklyDerailers} onChange={(e) => setWeeklyDerailers(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
+                className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)] resize-none"
                 rows={3} placeholder="e.g. stressful work days, social drinks, skipping meals then overeating later" />
             </div>
           </div>
@@ -1462,25 +1462,25 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-6">
             <StepHeader
-              icon={<Heart className="h-12 w-12 text-red-500" />}
+              icon={<Heart className="h-12 w-12 text-[var(--acc-text)]" />}
               title="Health & Medical"
               subtitle="This helps us avoid exercises, nutrition choices, or recovery recommendations that could cause problems."
             />
             <div>
               <Label>Any injuries or physical limitations?</Label>
-              <p className="text-sm text-gray-500 mb-3">Select all that apply (or skip)</p>
+              <p className="text-sm text-[var(--fg-3)] mb-3">Select all that apply (or skip)</p>
               <ChipGrid
                 items={COMMON_INJURIES.map(i => ({ value: i, label: i }))}
                 selected={injuries}
                 onToggle={(val) => toggleArray(injuries, setInjuries, val)}
               />
               <input type="text" value={customInjury} onChange={(e) => setCustomInjury(e.target.value)}
-                className="w-full mt-3 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full mt-3 px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]"
                 placeholder="Other injury (optional)" />
             </div>
             <div>
               <Label>Medical conditions?</Label>
-              <p className="text-sm text-gray-500 mb-3">Select any that apply</p>
+              <p className="text-sm text-[var(--fg-3)] mb-3">Select any that apply</p>
               <ChipGrid
                 items={COMMON_CONDITIONS.map(c => ({ value: c, label: c }))}
                 selected={conditions}
@@ -1490,7 +1490,7 @@ export default function OnboardingPage() {
             <div>
               <Label>Current medications (optional)</Label>
               <input type="text" value={medications} onChange={(e) => setMedications(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]"
                 placeholder="e.g. Metformin, Levothyroxine" />
             </div>
           </div>
@@ -1501,7 +1501,7 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-6">
             <StepHeader
-              icon={<Dumbbell className="h-12 w-12 text-purple-600" />}
+              icon={<Dumbbell className="h-12 w-12 text-[var(--acc-text)]" />}
               title="Training Background"
               subtitle="This shapes your workout plan: exercise selection, volume, progression, and how hard we push."
             />
@@ -1518,7 +1518,7 @@ export default function OnboardingPage() {
               <div>
                 <Label>How many years have you been training?</Label>
                 <input type="number" step="0.5" min="0" value={yearsTraining} onChange={(e) => setYearsTraining(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]"
                   placeholder="e.g. 3" />
               </div>
             )}
@@ -1533,7 +1533,7 @@ export default function OnboardingPage() {
             </div>
             <div>
               <Label>Preferred training style</Label>
-              <p className="text-sm text-gray-500 mb-3">Select one or more</p>
+              <p className="text-sm text-[var(--fg-3)] mb-3">Select one or more</p>
               <ChipGrid
                 items={TRAINING_STYLES.map(s => ({ value: s.value, label: s.label }))}
                 selected={trainingStyles}
@@ -1542,7 +1542,7 @@ export default function OnboardingPage() {
             </div>
             <div>
               <Label>Secondary goal</Label>
-              <p className="text-sm text-gray-500 mb-2">Anything else you&apos;d like your plan to address?</p>
+              <p className="text-sm text-[var(--fg-3)] mb-2">Anything else you&apos;d like your plan to address?</p>
               <div className="space-y-2">
                 {SECONDARY_TRAINING_GOALS.map((g) => (
                   <OptionCard key={g.value} title={g.label} description={g.description}
@@ -1558,7 +1558,7 @@ export default function OnboardingPage() {
                     className={`py-2.5 px-5 rounded-xl border-2 font-semibold text-sm transition-all ${
                       maxSessionMinutes === d.value
                         ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
-                        : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                        : 'border-[var(--line-2)] text-[var(--fg-3)] hover:border-[var(--fg-3)]'
                     }`}>
                     {d.label}
                   </button>
@@ -1568,30 +1568,30 @@ export default function OnboardingPage() {
             {experience !== 'never' && (
               <div>
                 <Label>Estimated 1-rep maxes (optional — helps us dial in intensity)</Label>
-                <p className="text-sm text-gray-500 mb-3">Leave blank if you&apos;re not sure — we&apos;ll use conservative estimates</p>
+                <p className="text-sm text-[var(--fg-3)] mb-3">Leave blank if you&apos;re not sure — we&apos;ll use conservative estimates</p>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-xs text-gray-500 mb-1 block">Squat (kg)</label>
+                    <label className="text-xs text-[var(--fg-3)] mb-1 block">Squat (kg)</label>
                     <input type="number" value={squat1rm} onChange={(e) => setSquat1rm(e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]"
                       placeholder="e.g. 100" />
                   </div>
                   <div>
-                    <label className="text-xs text-gray-500 mb-1 block">Bench Press (kg)</label>
+                    <label className="text-xs text-[var(--fg-3)] mb-1 block">Bench Press (kg)</label>
                     <input type="number" value={bench1rm} onChange={(e) => setBench1rm(e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]"
                       placeholder="e.g. 80" />
                   </div>
                   <div>
-                    <label className="text-xs text-gray-500 mb-1 block">Deadlift (kg)</label>
+                    <label className="text-xs text-[var(--fg-3)] mb-1 block">Deadlift (kg)</label>
                     <input type="number" value={deadlift1rm} onChange={(e) => setDeadlift1rm(e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]"
                       placeholder="e.g. 120" />
                   </div>
                   <div>
-                    <label className="text-xs text-gray-500 mb-1 block">Overhead Press (kg)</label>
+                    <label className="text-xs text-[var(--fg-3)] mb-1 block">Overhead Press (kg)</label>
                     <input type="number" value={ohp1rm} onChange={(e) => setOhp1rm(e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]"
                       placeholder="e.g. 50" />
                   </div>
                 </div>
@@ -1605,7 +1605,7 @@ export default function OnboardingPage() {
                     className={`flex-1 py-3 px-5 rounded-xl border-2 font-semibold text-sm transition-all ${
                       doesCardio === opt.value
                         ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
-                        : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                        : 'border-[var(--line-2)] text-[var(--fg-3)] hover:border-[var(--fg-3)]'
                     }`}>
                     {opt.label}
                   </button>
@@ -1616,7 +1616,7 @@ export default function OnboardingPage() {
               <>
                 <div>
                   <Label>Preferred cardio types</Label>
-                  <p className="text-sm text-gray-500 mb-3">Select all that apply</p>
+                  <p className="text-sm text-[var(--fg-3)] mb-3">Select all that apply</p>
                   <ChipGrid
                     items={CARDIO_TYPES.map(c => ({ value: c.name, label: c.name }))}
                     selected={cardioTypesPreferred}
@@ -1632,7 +1632,7 @@ export default function OnboardingPage() {
                           className={`w-10 h-10 rounded-full border-2 font-bold text-sm transition-all ${
                             cardioFrequency === n
                               ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
-                              : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                              : 'border-[var(--line-2)] text-[var(--fg-3)] hover:border-[var(--fg-3)]'
                           }`}>
                           {n}
                         </button>
@@ -1647,7 +1647,7 @@ export default function OnboardingPage() {
                           className={`py-2 px-4 rounded-xl border-2 font-semibold text-sm transition-all ${
                             cardioDuration === d
                               ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
-                              : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                              : 'border-[var(--line-2)] text-[var(--fg-3)] hover:border-[var(--fg-3)]'
                           }`}>
                           {d}
                         </button>
@@ -1665,7 +1665,7 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-6">
             <StepHeader
-              icon={<Sparkles className="h-12 w-12 text-indigo-500" />}
+              icon={<Sparkles className="h-12 w-12 text-[var(--acc-text)]" />}
               title={isManagedClient ? 'What success looks like for you' : 'Your Goals'}
               subtitle={isManagedClient
                 ? 'Your coach will use this to understand your motivation, expectations, and what usually gets in the way.'
@@ -1673,7 +1673,7 @@ export default function OnboardingPage() {
             />
             <div>
               <Label>What motivates you?</Label>
-              <p className="text-sm text-gray-500 mb-3">Select all that apply so your coaching and check-ins feel more personal.</p>
+              <p className="text-sm text-[var(--fg-3)] mb-3">Select all that apply so your coaching and check-ins feel more personal.</p>
               <ChipGrid
                 items={MOTIVATIONS.map(m => ({ value: m, label: m }))}
                 selected={motivation}
@@ -1682,15 +1682,15 @@ export default function OnboardingPage() {
             </div>
             <div>
               <Label>What do you want to look, feel, or perform like?</Label>
-              <p className="text-sm text-gray-500 mb-2">This gives the AI a more human target than just calories and bodyweight.</p>
+              <p className="text-sm text-[var(--fg-3)] mb-2">This gives the AI a more human target than just calories and bodyweight.</p>
               <textarea value={desiredOutcome} onChange={(e) => setDesiredOutcome(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
+                className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)] resize-none"
                 rows={3} placeholder="e.g. feel leaner and more confident, perform better in the gym, have steadier energy through the day" />
             </div>
             <div>
               <Label>What has made past plans hard to stick to?</Label>
               <textarea value={pastDietingChallenges} onChange={(e) => setPastDietingChallenges(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
+                className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)] resize-none"
                 rows={3} placeholder="e.g. plans were too rigid, meals took too long, weekends always derailed me" />
             </div>
           </div>
@@ -1701,21 +1701,21 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-6">
             <StepHeader
-              icon={<Calendar className="h-12 w-12 text-indigo-500" />}
+              icon={<Calendar className="h-12 w-12 text-[var(--acc-text)]" />}
               title="Your Schedule"
               subtitle="We&apos;ll time your meals around your training and working day so the plan is easy to stick to."
             />
             <div>
               <Label>What time do you wake up?</Label>
               <select value={wakeTime} onChange={(e) => setWakeTime(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 font-semibold text-sm text-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all bg-white">
+                className="w-full px-4 py-3 rounded-xl border-2 border-[var(--line-2)] font-semibold text-sm text-[var(--foreground)] outline-none transition focus:border-[var(--acc)] bg-transparent">
                 {TIME_OPTIONS.map((t) => (<option key={t} value={t}>{fmt12(t)}</option>))}
               </select>
             </div>
             <div>
               <Label>Preferred workout time</Label>
               <select value={workoutTime} onChange={(e) => setWorkoutTime(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 font-semibold text-sm text-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all bg-white">
+                className="w-full px-4 py-3 rounded-xl border-2 border-[var(--line-2)] font-semibold text-sm text-[var(--foreground)] outline-none transition focus:border-[var(--acc)] bg-transparent">
                 {TIME_OPTIONS.map((t) => (<option key={t} value={t}>{fmt12(t)}</option>))}
               </select>
             </div>
@@ -1723,14 +1723,14 @@ export default function OnboardingPage() {
               <div>
                 <Label>Work start time</Label>
                 <select value={workStartTime} onChange={(e) => setWorkStartTime(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 font-semibold text-sm text-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all bg-white">
+                  className="w-full px-4 py-3 rounded-xl border-2 border-[var(--line-2)] font-semibold text-sm text-[var(--foreground)] outline-none transition focus:border-[var(--acc)] bg-transparent">
                   {TIME_OPTIONS.map((t) => (<option key={t} value={t}>{fmt12(t)}</option>))}
                 </select>
               </div>
               <div>
                 <Label>Work end time</Label>
                 <select value={workEndTime} onChange={(e) => setWorkEndTime(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 font-semibold text-sm text-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all bg-white">
+                  className="w-full px-4 py-3 rounded-xl border-2 border-[var(--line-2)] font-semibold text-sm text-[var(--foreground)] outline-none transition focus:border-[var(--acc)] bg-transparent">
                   {TIME_OPTIONS.map((t) => (<option key={t} value={t}>{fmt12(t)}</option>))}
                 </select>
               </div>
@@ -1738,7 +1738,7 @@ export default function OnboardingPage() {
             <div>
               <Label>What time do you go to bed?</Label>
               <select value={sleepTime} onChange={(e) => setSleepTime(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 font-semibold text-sm text-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all bg-white">
+                className="w-full px-4 py-3 rounded-xl border-2 border-[var(--line-2)] font-semibold text-sm text-[var(--foreground)] outline-none transition focus:border-[var(--acc)] bg-transparent">
                 {TIME_OPTIONS.map((t) => (<option key={t} value={t}>{fmt12(t)}</option>))}
               </select>
             </div>
@@ -1750,7 +1750,7 @@ export default function OnboardingPage() {
                     className={`w-12 h-12 rounded-full border-2 font-bold text-lg transition-all ${
                       workoutDays === d
                         ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
-                        : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                        : 'border-[var(--line-2)] text-[var(--fg-3)] hover:border-[var(--fg-3)]'
                     }`}>
                     {d}
                   </button>
@@ -1765,7 +1765,7 @@ export default function OnboardingPage() {
                     className={`w-12 h-12 rounded-full border-2 font-bold text-lg transition-all ${
                       mealsPerDay === m
                         ? 'border-[var(--acc)] bg-[var(--ink-3)] text-[var(--acc-text)]'
-                        : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                        : 'border-[var(--line-2)] text-[var(--fg-3)] hover:border-[var(--fg-3)]'
                     }`}>
                     {m}
                   </button>
@@ -1774,26 +1774,26 @@ export default function OnboardingPage() {
             </div>
             <div>
               <Label>When do you usually eat?</Label>
-              <p className="text-sm text-gray-500 mb-3">We&apos;ll build your meal plan around these times</p>
+              <p className="text-sm text-[var(--fg-3)] mb-3">We&apos;ll build your meal plan around these times</p>
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <p className="text-xs font-semibold text-gray-500 mb-1">Breakfast</p>
+                  <p className="text-xs font-semibold text-[var(--fg-3)] mb-1">Breakfast</p>
                   <select value={breakfastTime} onChange={(e) => setBreakfastTime(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-xl border-2 border-gray-200 font-semibold text-sm text-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all bg-white">
+                    className="w-full px-3 py-2.5 rounded-xl border-2 border-[var(--line-2)] font-semibold text-sm text-[var(--foreground)] outline-none transition focus:border-[var(--acc)] bg-transparent">
                     {TIME_OPTIONS.map((t) => (<option key={t} value={t}>{fmt12(t)}</option>))}
                   </select>
                 </div>
                 <div>
-                  <p className="text-xs font-semibold text-gray-500 mb-1">Lunch</p>
+                  <p className="text-xs font-semibold text-[var(--fg-3)] mb-1">Lunch</p>
                   <select value={lunchTime} onChange={(e) => setLunchTime(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-xl border-2 border-gray-200 font-semibold text-sm text-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all bg-white">
+                    className="w-full px-3 py-2.5 rounded-xl border-2 border-[var(--line-2)] font-semibold text-sm text-[var(--foreground)] outline-none transition focus:border-[var(--acc)] bg-transparent">
                     {TIME_OPTIONS.map((t) => (<option key={t} value={t}>{fmt12(t)}</option>))}
                   </select>
                 </div>
                 <div>
-                  <p className="text-xs font-semibold text-gray-500 mb-1">Dinner</p>
+                  <p className="text-xs font-semibold text-[var(--fg-3)] mb-1">Dinner</p>
                   <select value={dinnerTime} onChange={(e) => setDinnerTime(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-xl border-2 border-gray-200 font-semibold text-sm text-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all bg-white">
+                    className="w-full px-3 py-2.5 rounded-xl border-2 border-[var(--line-2)] font-semibold text-sm text-[var(--foreground)] outline-none transition focus:border-[var(--acc)] bg-transparent">
                     {TIME_OPTIONS.map((t) => (<option key={t} value={t}>{fmt12(t)}</option>))}
                   </select>
                 </div>
