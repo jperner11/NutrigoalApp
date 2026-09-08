@@ -191,12 +191,12 @@ export default function ResetPasswordPage() {
           </div>
 
           {!sessionChecked ? (
-            <div className="rounded-[24px] border border-[var(--line)] bg-white/80 p-6 text-[var(--muted)]">
+            <div className="rounded-[24px] border border-[var(--line)] bg-[var(--panel-strong)]/80 p-6 text-[var(--muted)]">
               Checking your reset link...
             </div>
           ) : !sessionReady ? (
             requestSent ? (
-              <div className="rounded-[24px] border border-[var(--line)] bg-white/80 p-6 text-sm leading-6 text-[var(--muted)]">
+              <div className="rounded-[24px] border border-[var(--line)] bg-[var(--panel-strong)]/80 p-6 text-sm leading-6 text-[var(--muted)]">
                 <p className="font-semibold text-[var(--foreground)]">Check your inbox</p>
                 <p className="mt-2">
                   If an account exists for <span className="font-semibold">{requestEmail.trim()}</span>, we&apos;ve
