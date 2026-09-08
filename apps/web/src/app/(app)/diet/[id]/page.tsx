@@ -226,10 +226,16 @@ export default function DietPlanDetailPage() {
     setActivating(true)
     const supabase = createClient()
 
-    await supabase
+    const { error: deactivateError } = await supabase
       .from('diet_plans')
       .update({ is_active: false })
       .eq('user_id', profile.id)
+
+    if (deactivateError) {
+      toast.error('Failed to update diet plans')
+      setActivating(false)
+      return
+    }
 
     const { error } = await supabase
       .from('diet_plans')
