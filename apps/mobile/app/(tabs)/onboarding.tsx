@@ -880,7 +880,7 @@ export default function OnboardingScreen() {
             })()}
 
             <View style={st.aiNote}>
-              <Ionicons name="sparkles" size={18} color="#16a34a" />
+              <Ionicons name="sparkles" size={18} color={colors.success} />
               <Text style={st.aiNoteText}>
                 After setup, AI will use all of this to generate a personalized meal plan and training program — timed around your schedule, avoiding your injuries and food dislikes.
               </Text>
@@ -905,7 +905,7 @@ export default function OnboardingScreen() {
           disabled={!canContinue() || loading}
         >
           {loading ? (
-            <ActivityIndicator color="#fff" />
+            <ActivityIndicator color={colors.onAccent} />
           ) : (
             <Text style={st.nextText}>{step === STEPS.length - 1 ? 'Get Started' : 'Continue'}</Text>
           )}
@@ -952,12 +952,12 @@ const makeStyles = (c: BrandColors) => StyleSheet.create({
     fontSize: 28,
     lineHeight: 32,
     fontWeight: '800',
-    color: '#ffffff',
+    color: c.foreground,
     letterSpacing: -1,
   },
   heroSubtitle: {
     marginTop: 8,
-    color: 'rgba(255,255,255,0.72)',
+    color: c.textMuted,
     fontSize: 14,
     lineHeight: 20,
   },
@@ -1035,7 +1035,7 @@ const makeStyles = (c: BrandColors) => StyleSheet.create({
   backBtn: { flex: 1, borderWidth: 1, borderColor: c.lineStrong, borderRadius: 16, paddingVertical: 16, alignItems: 'center', backgroundColor: c.panelMuted },
   backText: { fontSize: 16, fontWeight: '600', color: c.textMuted },
   nextBtn: { flex: 2, backgroundColor: c.brand500, borderRadius: 16, paddingVertical: 16, alignItems: 'center' },
-  nextText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  nextText: { color: c.onAccent, fontSize: 16, fontWeight: '700' },
   btnDisabled: { opacity: 0.5 },
 })
 
