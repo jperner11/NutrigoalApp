@@ -26,7 +26,7 @@ export default function MatchedCoachCard({ match }: { match: MatchedCoachResult 
               className="h-14 w-14 rounded-full object-cover"
             />
           ) : (
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[var(--brand-500)] to-[var(--brand-800)] text-lg font-bold text-white">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[var(--brand-500)] to-[var(--brand-800)] text-lg font-bold text-[#0a0a0a]">
               {initial}
             </div>
           )}

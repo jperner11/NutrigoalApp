@@ -41,7 +41,7 @@ export function ChoiceCard({
           : 'border-[var(--line)] bg-[var(--surface-strong)] hover:border-[rgba(205,242,78,0.28)] hover:bg-[rgba(205,242,78,0.08)]'
       }`}
     >
-      {icon ? <div className={`mb-4 inline-flex rounded-2xl p-3 ${selected ? 'bg-[var(--brand-500)] text-white' : 'bg-[var(--brand-100)] text-[var(--brand-400)]'}`}>{icon}</div> : null}
+      {icon ? <div className={`mb-4 inline-flex rounded-2xl p-3 ${selected ? 'bg-[var(--brand-500)] text-[#0a0a0a]' : 'bg-[var(--brand-100)] text-[var(--brand-400)]'}`}>{icon}</div> : null}
       <div className="text-lg font-semibold text-[var(--foreground)]">{title}</div>
       {description ? <div className="mt-2 text-sm leading-6 text-[var(--muted)]">{description}</div> : null}
     </button>
