@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     const [{ data: profile }, { data: activePlan }, { data: lastCheckIn }] = await Promise.all([
       supabase.from('user_profiles').select('*').eq('id', userId).single(),
       // Get active training plan
-      supabase.from('training_plans').select('*').eq('user_id', userId).eq('is_active', true).single(),
+      supabase.from('training_plans').select('*').eq('user_id', userId).eq('is_active', true).maybeSingle(),
       // Determine period: since last check-in or 14 days
       supabase
         .from('training_check_ins')
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
         .eq('user_id', userId)
         .order('check_in_date', { ascending: false })
         .limit(1)
-        .single(),
+        .maybeSingle(),
     ])
 
     if (!profile) {

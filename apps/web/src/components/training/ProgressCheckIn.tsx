@@ -48,7 +48,7 @@ export default function ProgressCheckIn({ userId, onPlanRegenerate }: ProgressCh
         .eq('user_id', userId)
         .order('check_in_date', { ascending: false })
         .limit(1)
-        .single()
+        .maybeSingle()
 
       if (lastCheckIn) {
         setLastCheckInDate(lastCheckIn.check_in_date)
