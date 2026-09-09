@@ -24,45 +24,49 @@ export async function GET(request: Request) {
     return NextResponse.json({ message: error?.message ?? 'Failed to load schedules' }, { status: 500 })
   }
 
-  const results = await Promise.all(
-    schedules.map(async (schedule) => {
-      if (shouldSkip(schedule, now)) return false
+  const eligible = schedules
+    .filter((schedule) => !shouldSkip(schedule, now))
+    .map((schedule) => ({
+      schedule,
+      template: schedule.template as { id: string; name: string; questions: unknown[] } | null,
+    }))
+    .filter((entry): entry is typeof entry & { template: NonNullable<typeof entry.template> } => entry.template !== null)
 
-      const template = schedule.template as { id: string; name: string; questions: unknown[] } | null
-      if (!template) return false
+  if (eligible.length === 0) {
+    return NextResponse.json({ created: 0, checked: schedules.length })
+  }
 
-      const { error: insertError } = await supabase.from('feedback_requests').insert({
-        nutritionist_id: schedule.trainer_id,
-        client_id: schedule.client_id,
-        title: template.name,
-        questions: template.questions,
-        template_id: template.id,
-        schedule_id: schedule.id,
-        status: 'pending',
-      })
-
-      if (insertError) {
-        Sentry.captureException(insertError, { tags: { kind: 'cron', route: 'check-ins', scheduleId: schedule.id } })
-        return false
-      }
-
-      const { error: updateError } = await supabase
-        .from('feedback_schedules')
-        .update({ last_triggered_at: now.toISOString() })
-        .eq('id', schedule.id)
-
-      if (updateError) {
-        Sentry.captureException(updateError, { tags: { kind: 'cron', route: 'check-ins', scheduleId: schedule.id } })
-        return false
-      }
-
-      return true
-    }),
+  const { error: insertError } = await supabase.from('feedback_requests').insert(
+    eligible.map(({ schedule, template }) => ({
+      nutritionist_id: schedule.trainer_id,
+      client_id: schedule.client_id,
+      title: template.name,
+      questions: template.questions,
+      template_id: template.id,
+      schedule_id: schedule.id,
+      status: 'pending',
+    })),
   )
 
-  const created = results.filter(Boolean).length
+  if (insertError) {
+    Sentry.captureException(insertError, { tags: { kind: 'cron', route: 'check-ins' } })
+    return NextResponse.json({ message: insertError.message }, { status: 500 })
+  }
 
-  return NextResponse.json({ created, checked: schedules.length })
+  const { error: updateError } = await supabase
+    .from('feedback_schedules')
+    .update({ last_triggered_at: now.toISOString() })
+    .in(
+      'id',
+      eligible.map(({ schedule }) => schedule.id),
+    )
+
+  if (updateError) {
+    Sentry.captureException(updateError, { tags: { kind: 'cron', route: 'check-ins' } })
+    return NextResponse.json({ message: updateError.message }, { status: 500 })
+  }
+
+  return NextResponse.json({ created: eligible.length, checked: schedules.length })
 }
 
 function shouldSkip(
