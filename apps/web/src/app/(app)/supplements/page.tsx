@@ -377,7 +377,7 @@ export default function SupplementsPage() {
                     style={{
                       borderColor: isTaken ? 'var(--ok)' : 'var(--line-2)',
                       background: isTaken ? 'var(--ok)' : 'transparent',
-                      color: isTaken ? '#131012' : 'var(--fg-3)',
+                      color: isTaken ? '#0a0a0a' : 'var(--fg-3)',
                     }}
                   >
                     {isTaken && <Check className="h-4 w-4" aria-hidden="true" />}
