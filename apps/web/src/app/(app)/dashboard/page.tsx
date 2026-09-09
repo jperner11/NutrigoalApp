@@ -24,7 +24,7 @@ import Link from 'next/link'
 import { toast } from 'react-hot-toast'
 import MealPlanTracker from '@/components/dashboard/MealPlanTracker'
 import { canAccess } from '@/lib/tierUtils'
-import { getLocalDateString } from '@/lib/date'
+import { getLocalDateString, getMondayIndexedDay } from '@/lib/date'
 import { reportClientError } from '@/lib/apiClient'
 import StreaksWidget from '@/components/dashboard/StreaksWidget'
 import TodayTrainingPreview from '@/components/dashboard/TodayTrainingPreview'
@@ -148,7 +148,7 @@ export default function DashboardPage() {
 
         // Weekly progress stats
         const weekStart = new Date()
-        weekStart.setDate(weekStart.getDate() - weekStart.getDay()) // Sunday
+        weekStart.setDate(weekStart.getDate() - getMondayIndexedDay(weekStart)) // Monday
         const weekStartStr = getLocalDateString(weekStart)
 
         // Avg daily calorie goal % over past 7 days
