@@ -5,7 +5,7 @@ import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
 import {
   CheckCircle, Clock, Camera, Loader2, Send, Plus, Trash2,
-  ChevronDown, ChevronRight, Pencil, Copy, ToggleLeft, ToggleRight,
+  ChevronUp, ChevronDown, ChevronRight, Pencil, Copy, ToggleLeft, ToggleRight,
 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { isTrainerRole } from '@treno/shared'
@@ -397,10 +397,14 @@ function TemplateForm({ template, trainerId, onSaved, onCancel }: {
             <div className="flex flex-col gap-1 mt-1">
               <button onClick={() => moveQuestion(idx, -1)} disabled={idx === 0}
                 aria-label="Move question up"
-                className="text-[var(--muted-soft)] hover:text-[var(--muted)] disabled:opacity-30 text-xs">▲</button>
+                className="text-[var(--muted-soft)] hover:text-[var(--muted)] disabled:opacity-30">
+                <ChevronUp className="h-4 w-4" />
+              </button>
               <button onClick={() => moveQuestion(idx, 1)} disabled={idx === questions.length - 1}
                 aria-label="Move question down"
-                className="text-[var(--muted-soft)] hover:text-[var(--muted)] disabled:opacity-30 text-xs">▼</button>
+                className="text-[var(--muted-soft)] hover:text-[var(--muted)] disabled:opacity-30">
+                <ChevronDown className="h-4 w-4" />
+              </button>
             </div>
             <div className="flex-1">
               <select value={q.type} onChange={e => updateQuestion(q.id, 'type', e.target.value)}
