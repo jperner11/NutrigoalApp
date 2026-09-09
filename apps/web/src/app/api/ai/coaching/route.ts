@@ -60,7 +60,7 @@ export async function POST(request: Request) {
         .not('body_fat_pct', 'is', null)
         .order('date', { ascending: false })
         .limit(1)
-        .single()
+        .maybeSingle()
 
       if (latestWeight?.body_fat_pct) {
         additionalInputs.latestBodyFatPct = latestWeight.body_fat_pct
