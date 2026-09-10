@@ -712,7 +712,7 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-6">
             <StepHeader
-              icon={<Globe className="h-12 w-12 text-sky-500" />}
+              icon={<Globe className="h-12 w-12 text-[var(--acc-text)]" />}
               title="Set up your public profile"
               subtitle="This is what potential clients see in the coach directory. You can update it anytime from Settings."
             />
@@ -946,7 +946,7 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-6">
             <StepHeader
-              icon={<MessageSquare className="h-12 w-12 text-indigo-500" />}
+              icon={<MessageSquare className="h-12 w-12 text-[var(--acc-text)]" />}
               title="What happens after intake?"
               subtitle="Choose the default next step once a client accepts your invite and finishes their questionnaire."
             />
@@ -1292,21 +1292,21 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-6">
             <StepHeader
-              icon={<Utensils className="h-12 w-12 text-orange-500" />}
+              icon={<Utensils className="h-12 w-12 text-[var(--acc-text)]" />}
               title="Your Food Preferences"
               subtitle="Tell us what you genuinely enjoy eating so the plan feels like it was built by a real nutritionist, not a template."
             />
             <div>
               <Label>Top 5 favourite meals or dishes (any cuisine)</Label>
-              <p className="text-sm text-gray-500 mb-2">Think meals, not just ingredients &mdash; e.g. &quot;chicken stir-fry&quot;, &quot;pasta carbonara&quot;, &quot;salmon with rice&quot;</p>
+              <p className="text-sm text-[var(--fg-3)] mb-2">Think meals, not just ingredients &mdash; e.g. &quot;chicken stir-fry&quot;, &quot;pasta carbonara&quot;, &quot;salmon with rice&quot;</p>
               <textarea value={favouriteFoods} onChange={(e) => setFavouriteFoods(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
+                className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)] resize-none"
                 rows={3} placeholder="e.g. chicken stir-fry, spaghetti bolognese, salmon with rice, tacos, Greek salad" />
             </div>
             <div>
               <Label>Foods you absolutely hate and would never eat</Label>
               <textarea value={foodDislikes} onChange={(e) => setFoodDislikes(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
+                className="w-full px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)] resize-none"
                 rows={2} placeholder="e.g. tofu, liver, sardines, coconut" />
               <div className="flex flex-wrap gap-1.5 mt-2">
                 {COMMON_FOOD_DISLIKES.map(f => (
@@ -1316,7 +1316,7 @@ export default function OnboardingPage() {
                       if (items.some(i => i.toLowerCase() === f.toLowerCase())) return prev
                       return prev ? `${prev}, ${f}` : f
                     })}
-                    className="text-xs px-2.5 py-1 bg-gray-100 text-gray-600 rounded-full hover:bg-red-100 hover:text-red-700 transition-colors">
+                    className="text-xs px-2.5 py-1 bg-[var(--line)] text-[var(--fg-2)] rounded-full hover:bg-[var(--danger-bg)] hover:text-[var(--danger-text)] transition-colors">
                     + {f}
                   </button>
                 ))}
@@ -1330,7 +1330,7 @@ export default function OnboardingPage() {
                 onToggle={(val) => toggleArray(dietaryRestrictions, setDietaryRestrictions, val)}
               />
               <input type="text" value={allergies} onChange={(e) => setAllergies(e.target.value)}
-                className="w-full mt-3 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full mt-3 px-4 py-3 border border-[var(--line-2)] rounded-xl outline-none transition focus:border-[var(--acc)]"
                 placeholder="Any specific allergies? e.g. peanuts, shellfish, gluten" />
             </div>
             <div className="grid md:grid-cols-2 gap-4">
@@ -1356,12 +1356,12 @@ export default function OnboardingPage() {
             <div>
               <Label>How adventurous are you with food? (1 = stick to what I know, 10 = try anything)</Label>
               <div className="flex items-center gap-4 mt-2">
-                <span className="text-sm text-gray-500">1</span>
+                <span className="text-sm text-[var(--fg-3)]">1</span>
                 <input type="range" min={1} max={10} value={foodAdventurousness}
                   onChange={(e) => setFoodAdventurousness(parseInt(e.target.value))}
-                  className="flex-1 accent-purple-600" />
-                <span className="text-sm text-gray-500">10</span>
-                <span className="text-lg font-bold text-purple-600 w-8 text-center">{foodAdventurousness}</span>
+                  className="flex-1 accent-[var(--acc)]" />
+                <span className="text-sm text-[var(--fg-3)]">10</span>
+                <span className="text-lg font-bold text-[var(--acc-text)] w-8 text-center">{foodAdventurousness}</span>
               </div>
             </div>
           </div>
