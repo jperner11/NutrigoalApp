@@ -157,9 +157,12 @@ function CreatePlan({ user, profile, onDone, onCancel }: any) {
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    supabase.from('exercises').select('*').then(({ data, error }) => {
+    Promise.resolve(supabase.from('exercises').select('*')).then(({ data, error }) => {
       if (data) setAllExercises(data as Exercise[])
       else if (error) Alert.alert('Error', 'Could not load exercises')
+    }).catch((err) => {
+      Sentry.captureException(err, { tags: { kind: 'training-exercises-load', screen: 'training-plan-builder' } })
+      Alert.alert('Error', 'Could not load exercises')
     })
   }, [])
 

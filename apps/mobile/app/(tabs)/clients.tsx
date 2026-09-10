@@ -896,10 +896,10 @@ function CreateClientTrainingPlan({ client, user, onDone, onCancel }: {
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    supabase.from('exercises').select('*').then(({ data, error }) => {
+    Promise.resolve(supabase.from('exercises').select('*')).then(({ data, error }) => {
       if (data) setAllExercises(data as Exercise[])
       else if (error) Alert.alert('Error', 'Could not load exercises')
-    })
+    }).catch(() => Alert.alert('Error', 'Could not load exercises'))
   }, [])
 
   const filteredExercises = allExercises.filter(e => {
