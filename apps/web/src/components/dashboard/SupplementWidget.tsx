@@ -55,32 +55,37 @@ export default function SupplementWidget({ userId }: SupplementWidgetProps) {
     const supabase = createClient()
     const isLogged = todayLogs.some(l => l.supplement_id === sup.id)
 
-    if (isLogged) {
-      const { error } = await supabase
-        .from('supplement_logs')
-        .delete()
-        .eq('user_id', userId)
-        .eq('supplement_id', sup.id)
-        .eq('date', today)
+    try {
+      if (isLogged) {
+        const { error } = await supabase
+          .from('supplement_logs')
+          .delete()
+          .eq('user_id', userId)
+          .eq('supplement_id', sup.id)
+          .eq('date', today)
 
-      if (error) {
-        toast.error('Failed to unlog')
-        return
-      }
-      setTodayLogs(prev => prev.filter(l => l.supplement_id !== sup.id))
-    } else {
-      const { data, error } = await supabase
-        .from('supplement_logs')
-        .insert({ user_id: userId, supplement_id: sup.id, date: today })
-        .select()
-        .single()
+        if (error) {
+          toast.error('Failed to unlog')
+          return
+        }
+        setTodayLogs(prev => prev.filter(l => l.supplement_id !== sup.id))
+      } else {
+        const { data, error } = await supabase
+          .from('supplement_logs')
+          .insert({ user_id: userId, supplement_id: sup.id, date: today })
+          .select()
+          .single()
 
-      if (error) {
-        toast.error('Failed to log')
-        return
+        if (error) {
+          toast.error('Failed to log')
+          return
+        }
+        setTodayLogs(prev => [...prev, data])
+        toast.success(`${sup.name} taken!`)
       }
-      setTodayLogs(prev => [...prev, data])
-      toast.success(`${sup.name} taken!`)
+    } catch (err) {
+      reportClientError(err, { feature: 'dashboard', action: 'supplement-widget-toggle' })
+      toast.error('Something went wrong. Please try again.')
     }
   }
 
