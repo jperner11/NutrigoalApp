@@ -558,7 +558,7 @@ export default function ProgressPage() {
             {[...logs].reverse().map((log, i, arr) => (
               <div
                 key={log.id}
-                className="row justify-between px-6 py-3.5"
+                className="row justify-between gap-3 px-6 py-3.5"
                 style={{
                   borderBottom: i < arr.length - 1 ? '1px solid var(--line)' : 'none',
                   fontSize: 13,
@@ -616,7 +616,7 @@ export default function ProgressPage() {
                   </>
                 ) : (
                   <>
-                    <div className="row gap-4">
+                    <div className="row min-w-0 flex-1 gap-4">
                       <span
                         className="mono shrink-0"
                         style={{
@@ -628,24 +628,24 @@ export default function ProgressPage() {
                       >
                         {formatFullDate(log.date).toUpperCase()}
                       </span>
-                      <span className="serif" style={{ fontSize: 16, color: 'var(--fg)' }}>
+                      <span className="serif shrink-0" style={{ fontSize: 16, color: 'var(--fg)' }}>
                         {log.weight_kg}kg
                       </span>
                       {log.body_fat_pct && (
-                        <span className="chip" style={{ color: 'var(--acc)' }}>
+                        <span className="chip shrink-0" style={{ color: 'var(--acc)' }}>
                           {log.body_fat_pct}% BF
                         </span>
                       )}
                       {log.notes && (
                         <span
-                          className="truncate"
+                          className="min-w-0 flex-1 truncate"
                           style={{ fontSize: 12, color: 'var(--fg-3)' }}
                         >
                           {log.notes}
                         </span>
                       )}
                     </div>
-                    <div className="row gap-1">
+                    <div className="row shrink-0 gap-1">
                       <button
                         onClick={() => {
                           setEditingId(log.id)
