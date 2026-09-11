@@ -482,11 +482,16 @@ function ClientCheckInsPage({ profile }: { profile: UserProfile }) {
   async function loadCheckIns() {
     const supabase = createClient()
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('feedback_requests')
         .select('*')
         .eq('client_id', profile.id)
         .order('created_at', { ascending: false })
+      if (error) {
+        toast.error('Failed to load check-ins')
+        reportClientError(error, { feature: 'check-ins', action: 'client-load-check-ins' })
+        return
+      }
       if (data) setRequests(data as FeedbackRequest[])
     } catch (err) {
       reportClientError(err, { feature: 'check-ins', action: 'client-load-check-ins' })
