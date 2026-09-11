@@ -638,6 +638,9 @@ export default function SettingsPage() {
       }
       setVerificationStatus('pending')
       toast.success('Verification request submitted. We’ll review it shortly.')
+    } catch (err) {
+      reportClientError(err, { feature: 'settings', action: 'request-coach-verification' })
+      toast.error('Failed to submit verification request.')
     } finally {
       setSavingVerification(false)
     }
