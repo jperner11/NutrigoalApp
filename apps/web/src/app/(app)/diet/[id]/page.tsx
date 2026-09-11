@@ -157,17 +157,21 @@ export default function DietPlanDetailPage() {
 
     async function loadSelection() {
       const supabase = createClient()
-      const { data } = await supabase
-        .from('user_tier_selections')
-        .select('selected_id')
-        .eq('user_id', profile!.id)
-        .eq('selection_type', 'meal')
-        .single()
+      try {
+        const { data } = await supabase
+          .from('user_tier_selections')
+          .select('selected_id')
+          .eq('user_id', profile!.id)
+          .eq('selection_type', 'meal')
+          .single()
 
-      if (data) {
-        setSelectedMealId(data.selected_id)
-      } else if (meals.length > 0) {
-        setShowMealPicker(true)
+        if (data) {
+          setSelectedMealId(data.selected_id)
+        } else if (meals.length > 0) {
+          setShowMealPicker(true)
+        }
+      } catch (err) {
+        reportClientError(err, { feature: 'diet', action: 'diet-plan-tier-selection-load' })
       }
     }
 
