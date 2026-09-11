@@ -9,6 +9,7 @@ import type { WeeklyReport } from '@/lib/reports'
 import { isTrainerRole } from '@treno/shared'
 import { toast } from 'react-hot-toast'
 import { getLocalDateString } from '@/lib/date'
+import { AppHeroPanel } from '@/components/ui/AppDesign'
 
 function getWeekRange(offset: number): { start: string; end: string; label: string } {
   const now = new Date()
@@ -120,10 +121,12 @@ export default function ReportsPage() {
 
     return (
       <div className="max-w-4xl mx-auto space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold text-[var(--foreground)]">Beta Reports</h1>
-          <p className="text-[var(--muted)] mt-1">A quick operational view of onboarding and activation during the beta.</p>
-        </div>
+        <AppHeroPanel
+          eyebrow="Beta reports"
+          title="Beta,"
+          accent="reported."
+          subtitle="A quick operational view of onboarding and activation during the beta."
+        />
 
         {loading ? (
           <div className="text-[var(--muted-soft)] text-center py-12">Loading beta metrics...</div>
@@ -171,12 +174,12 @@ export default function ReportsPage() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-[var(--foreground)]">Reports</h1>
-          <p className="text-[var(--muted)] mt-1">Weekly summary of your progress.</p>
-        </div>
-      </div>
+      <AppHeroPanel
+        eyebrow="N° 08 · Reports"
+        title="Progress,"
+        accent="summarized."
+        subtitle="Weekly summary of your progress."
+      />
 
       {/* Week Selector */}
       <div className="flex items-center justify-between card p-3 mb-6">
