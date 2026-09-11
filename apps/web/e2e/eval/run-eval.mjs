@@ -410,8 +410,11 @@ function buildJudgePrompt(persona, mealPlan, trainingPlan, rubric) {
     try {
       const parsed = JSON.parse(mealPlan.replace(/^```json?\n?/, '').replace(/\n?```$/, ''))
       const meals = parsed.meals ?? []
-      const totalCal = meals.reduce((s, m) => s + (m.ingredients ?? []).reduce((ms, i) => ms + (i.calories ?? 0), 0), 0)
-      const totalProt = meals.reduce((s, m) => s + (m.ingredients ?? []).reduce((ms, i) => ms + (i.protein ?? 0), 0), 0)
+      const sumField = (field) => meals.reduce((s, m) => s + (m.ingredients ?? []).reduce((ms, i) => ms + (i[field] ?? 0), 0), 0)
+      const totalCal = sumField('calories')
+      const totalProt = sumField('protein')
+      const totalCarbs = sumField('carbs')
+      const totalFat = sumField('fat')
       // Grounded scan shared with the production route — exception-aware, so
       // "coconut milk" (vegan) or "gluten-free oats" never read as violations.
       const scanViolations = findAllergenViolations(meals, persona.meal.allergies ?? [], persona.meal.dietaryRestrictions ?? [])
@@ -419,7 +422,7 @@ function buildJudgePrompt(persona, mealPlan, trainingPlan, rubric) {
         ? '  Programmatic allergen + restriction scan: CLEAN. Do NOT report a safety violation unless you can name a specific offending ingredient from the list below. Plant milks (coconut/oat/soy/pea) are vegan and dairy-free; oats explicitly labelled gluten-free are acceptable for celiac.'
         : scanViolations.map(v => `  ⚠️ ${v.term} found in ${v.where}: "${v.text}" (meal: ${v.meal})`).join('\n')
       const allIngredients = meals.flatMap(m => (m.ingredients ?? []).map(i => i.name)).join(', ')
-      return `Meal plan totals: ~${Math.round(totalCal)} kcal, ~${Math.round(totalProt)}g protein (targets: ${persona.meal.calories} kcal, ${persona.meal.protein}g protein)\nSafety scan:\n${scanReport}\nAll ingredients: ${allIngredients}\nMeal titles: ${meals.map(m => m.title).join(' | ')}\nSupplements: ${JSON.stringify(parsed.supplements ?? [])}`
+      return `Meal plan totals: ~${Math.round(totalCal)} kcal, ~${Math.round(totalProt)}g protein, ~${Math.round(totalCarbs)}g carbs, ~${Math.round(totalFat)}g fat (targets: ${persona.meal.calories} kcal, ${persona.meal.protein}g protein, ${persona.meal.carbs}g carbs, ${persona.meal.fat}g fat)\nSafety scan:\n${scanReport}\nAll ingredients: ${allIngredients}\nMeal titles: ${meals.map(m => m.title).join(' | ')}\nSupplements: ${JSON.stringify(parsed.supplements ?? [])}`
     } catch {
       return `[PARSE ERROR — raw content: ${mealPlan.slice(0, 300)}]`
     }
@@ -465,6 +468,8 @@ Medical conditions: ${JSON.stringify(persona.meal.medicalConditions)}
 Injuries: ${JSON.stringify(persona.training.injuries)}
 Calorie target: ${persona.meal.calories} kcal
 Protein target: ${persona.meal.protein}g
+Carb target: ${persona.meal.carbs}g
+Fat target: ${persona.meal.fat}g
 
 MEAL PLAN ANALYSIS:
 ${mealSummary}
