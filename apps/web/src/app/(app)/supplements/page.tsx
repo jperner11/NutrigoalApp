@@ -337,10 +337,7 @@ export default function SupplementsPage() {
       {loading ? (
         <ListCard eyebrow="LOADING" title="Pulling your supplement stack.">
           <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--ink-2)]">
-            <div
-              className="h-full w-1/3 animate-pulse rounded-full"
-              style={{ width: `${progress}%` }}
-            />
+            <div className="h-full w-1/3 animate-pulse rounded-full bg-[var(--acc)]" />
           </div>
         </ListCard>
       ) : supplements.length === 0 ? (
