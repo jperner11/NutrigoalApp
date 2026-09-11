@@ -416,7 +416,7 @@ function TemplateForm({ template, trainerId, onSaved, onCancel }: {
               </select>
               <input type="text" value={q.question} onChange={e => updateQuestion(q.id, 'question', e.target.value)}
                 aria-label={`Question ${idx + 1} text`}
-                className="w-full px-3 py-2 text-sm border border-[var(--line-strong)] rounded-lg"
+                className="w-full px-3 py-2 text-sm bg-[var(--background-elevated)] border border-[var(--line-strong)] rounded-lg"
                 placeholder="Type your question..." />
             </div>
             {questions.length > 1 && (
