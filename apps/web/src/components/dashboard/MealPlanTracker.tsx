@@ -130,7 +130,7 @@ export default function MealPlanTracker({ userId, userRole = 'free', onMacrosUpd
           .select('selected_id')
           .eq('user_id', userId)
           .eq('selection_type', 'meal')
-          .single()
+          .maybeSingle()
 
         if (selection) setSelectedMealId(selection.selected_id)
       }

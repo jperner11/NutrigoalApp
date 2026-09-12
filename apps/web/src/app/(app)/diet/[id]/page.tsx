@@ -163,7 +163,7 @@ export default function DietPlanDetailPage() {
           .select('selected_id')
           .eq('user_id', profile!.id)
           .eq('selection_type', 'meal')
-          .single()
+          .maybeSingle()
 
         if (data) {
           setSelectedMealId(data.selected_id)
