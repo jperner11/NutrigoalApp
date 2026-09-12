@@ -144,7 +144,7 @@ export default function TrainingPlanDetailPage() {
         .select('selected_id')
         .eq('user_id', profile!.id)
         .eq('selection_type', 'training_day')
-        .single()
+        .maybeSingle()
 
       if (data) {
         setSelectedDayId(data.selected_id)
