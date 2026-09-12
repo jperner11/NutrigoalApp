@@ -86,12 +86,13 @@ export default function ReportsPage() {
     try {
       if (isTrainerRole(profile!.role)) {
         const supabase = createClient()
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from('beta_events')
           .select('event_name, created_at, metadata')
           .eq('user_id', profile!.id)
           .order('created_at', { ascending: false })
           .limit(100)
+        if (error) throw error
         setTrainerEvents((data as Array<{ event_name: string; created_at: string; metadata: Record<string, unknown> }>) ?? [])
         return
       }
