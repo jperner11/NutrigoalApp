@@ -273,8 +273,9 @@ export default function CoachQuestionsPage() {
           </div>
 
           <div>
-            <label className="app-mono-label mb-1 block">Label</label>
+            <label htmlFor="question-label" className="app-mono-label mb-1 block">Label</label>
             <input
+              id="question-label"
               type="text"
               value={draft.label}
               onChange={(e) => setDraft({ ...draft, label: e.target.value })}
@@ -284,8 +285,9 @@ export default function CoachQuestionsPage() {
           </div>
 
           <div>
-            <label className="app-mono-label mb-1 block">Help text (optional)</label>
+            <label htmlFor="question-help-text" className="app-mono-label mb-1 block">Help text (optional)</label>
             <input
+              id="question-help-text"
               type="text"
               value={draft.help_text}
               onChange={(e) => setDraft({ ...draft, help_text: e.target.value })}
@@ -295,8 +297,9 @@ export default function CoachQuestionsPage() {
           </div>
 
           <div>
-            <label className="app-mono-label mb-1 block">Type</label>
+            <label htmlFor="question-type" className="app-mono-label mb-1 block">Type</label>
             <select
+              id="question-type"
               value={draft.type}
               onChange={(e) => setDraft({ ...draft, type: e.target.value as DraftQuestion['type'] })}
               className="input-field px-3 py-2 text-sm"
@@ -323,6 +326,7 @@ export default function CoachQuestionsPage() {
                       }}
                       className="input-field px-3 py-2 text-sm flex-1"
                       placeholder={`Option ${idx + 1}`}
+                      aria-label={`Option ${idx + 1}`}
                     />
                     <button
                       onClick={() => setDraft({ ...draft, options: draft.options.filter((_, i) => i !== idx) })}
