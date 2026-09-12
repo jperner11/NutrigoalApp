@@ -165,7 +165,7 @@ export function ChatThread({
   }
 
   return (
-    <div className="mx-auto flex h-[calc(100vh-80px)] max-w-[920px] flex-col">
+    <div className="mx-auto flex h-[calc(100dvh-80px)] max-w-[920px] flex-col">
       <AppPageHeader
         eyebrow={role === 'coach' ? 'Client messages' : 'Managed client'}
         title="Messages"
