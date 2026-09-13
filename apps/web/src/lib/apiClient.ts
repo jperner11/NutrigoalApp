@@ -14,7 +14,7 @@ export class ApiError extends Error {
   }
 }
 
-export type ApiContext = {
+type ApiContext = {
   feature?: string
   action?: string
   extra?: Record<string, unknown>
