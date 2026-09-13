@@ -404,7 +404,7 @@ export default function SupplementsPage() {
                   <button
                     onClick={() => handleDelete(sup)}
                     aria-label={`Remove ${sup.name}`}
-                    className="btn btn-ghost ml-2 flex-shrink-0 p-2 text-[var(--fg-3)] hover:text-[var(--brand-400)]"
+                    className="btn btn-ghost ml-2 flex-shrink-0 p-2 text-[var(--fg-3)] hover:text-[var(--danger-text)]"
                   >
                     <Trash2 className="h-4 w-4" aria-hidden="true" />
                   </button>
