@@ -114,23 +114,29 @@ export default function ClientFeedbackPage() {
     if (validQs.length === 0) { toast.error('Add at least one question'); return }
 
     setSaving(true)
-    const supabase = createClient()
-    const { error } = await supabase.from('feedback_requests').insert({
-      nutritionist_id: profile!.id,
-      client_id: id,
-      title: title.trim(),
-      questions: validQs,
-      template_id: selectedTemplateId || null,
-    })
-    setSaving(false)
-    if (error) { toast.error(error.message); return }
+    try {
+      const supabase = createClient()
+      const { error } = await supabase.from('feedback_requests').insert({
+        nutritionist_id: profile!.id,
+        client_id: id,
+        title: title.trim(),
+        questions: validQs,
+        template_id: selectedTemplateId || null,
+      })
+      if (error) { toast.error(error.message); return }
 
-    toast.success('Check-in sent!')
-    setShowCreate(false)
-    setTitle('')
-    setSelectedTemplateId('')
-    setQuestions([{ id: '1', question: '', type: 'text' }])
-    await loadAll()
+      toast.success('Check-in sent!')
+      setShowCreate(false)
+      setTitle('')
+      setSelectedTemplateId('')
+      setQuestions([{ id: '1', question: '', type: 'text' }])
+      await loadAll()
+    } catch (err) {
+      reportClientError(err, { feature: 'clients/[id]/feedback', action: 'send-check-in' })
+      toast.error('Failed to send check-in')
+    } finally {
+      setSaving(false)
+    }
   }
 
   if (loading) return <div className="text-[var(--fg-3)]">Loading...</div>
@@ -276,52 +282,68 @@ function ScheduleCard({ schedule, templates, trainerId, clientId, onRefresh }: {
   async function handleSave() {
     if (!templateId) { toast.error('Select a template'); return }
     setSaving(true)
-    const supabase = createClient()
+    try {
+      const supabase = createClient()
 
-    if (schedule) {
-      const { error } = await supabase.from('feedback_schedules').update({
-        template_id: templateId,
-        day_of_week: dayOfWeek,
-        recurrence,
-        is_active: true,
-      }).eq('id', schedule.id)
-      if (error) { toast.error(error.message); setSaving(false); return }
-      toast.success('Schedule updated')
-    } else {
-      const { error } = await supabase.from('feedback_schedules').insert({
-        trainer_id: trainerId,
-        client_id: clientId,
-        template_id: templateId,
-        day_of_week: dayOfWeek,
-        recurrence,
-      })
-      if (error) { toast.error(error.message); setSaving(false); return }
-      toast.success('Schedule created')
+      if (schedule) {
+        const { error } = await supabase.from('feedback_schedules').update({
+          template_id: templateId,
+          day_of_week: dayOfWeek,
+          recurrence,
+          is_active: true,
+        }).eq('id', schedule.id)
+        if (error) { toast.error(error.message); return }
+        toast.success('Schedule updated')
+      } else {
+        const { error } = await supabase.from('feedback_schedules').insert({
+          trainer_id: trainerId,
+          client_id: clientId,
+          template_id: templateId,
+          day_of_week: dayOfWeek,
+          recurrence,
+        })
+        if (error) { toast.error(error.message); return }
+        toast.success('Schedule created')
+      }
+      setEditing(false)
+      onRefresh()
+    } catch (err) {
+      reportClientError(err, { feature: 'clients/[id]/feedback', action: 'save-schedule' })
+      toast.error('Failed to save schedule')
+    } finally {
+      setSaving(false)
     }
-    setSaving(false)
-    setEditing(false)
-    onRefresh()
   }
 
   async function toggleActive() {
     if (!schedule) return
-    const supabase = createClient()
-    const { error } = await supabase.from('feedback_schedules').update({
-      is_active: !schedule.is_active,
-    }).eq('id', schedule.id)
-    if (error) { toast.error(error.message); return }
-    toast.success(schedule.is_active ? 'Schedule paused' : 'Schedule resumed')
-    onRefresh()
+    try {
+      const supabase = createClient()
+      const { error } = await supabase.from('feedback_schedules').update({
+        is_active: !schedule.is_active,
+      }).eq('id', schedule.id)
+      if (error) { toast.error(error.message); return }
+      toast.success(schedule.is_active ? 'Schedule paused' : 'Schedule resumed')
+      onRefresh()
+    } catch (err) {
+      reportClientError(err, { feature: 'clients/[id]/feedback', action: 'toggle-schedule-active' })
+      toast.error('Failed to update schedule')
+    }
   }
 
   async function handleDelete() {
     if (!schedule) return
     if (!confirm('Remove recurring schedule?')) return
-    const supabase = createClient()
-    const { error } = await supabase.from('feedback_schedules').delete().eq('id', schedule.id)
-    if (error) { toast.error(error.message); return }
-    toast.success('Schedule removed')
-    onRefresh()
+    try {
+      const supabase = createClient()
+      const { error } = await supabase.from('feedback_schedules').delete().eq('id', schedule.id)
+      if (error) { toast.error(error.message); return }
+      toast.success('Schedule removed')
+      onRefresh()
+    } catch (err) {
+      reportClientError(err, { feature: 'clients/[id]/feedback', action: 'delete-schedule' })
+      toast.error('Failed to remove schedule')
+    }
   }
 
   if (templates.length === 0) return null
