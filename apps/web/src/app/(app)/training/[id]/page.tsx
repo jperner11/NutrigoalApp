@@ -160,17 +160,23 @@ export default function TrainingPlanDetailPage() {
     if (!profile) return
     const supabase = createClient()
 
-    await supabase
-      .from('user_tier_selections')
-      .upsert({
-        user_id: profile.id,
-        selection_type: 'training_day' as const,
-        selected_id: dayId,
-      }, { onConflict: 'user_id,selection_type' })
+    try {
+      const { error } = await supabase
+        .from('user_tier_selections')
+        .upsert({
+          user_id: profile.id,
+          selection_type: 'training_day' as const,
+          selected_id: dayId,
+        }, { onConflict: 'user_id,selection_type' })
 
-    setSelectedDayId(dayId)
-    setShowDayPicker(false)
-    toast.success('Training day unlocked!')
+      if (error) throw error
+
+      setSelectedDayId(dayId)
+      setShowDayPicker(false)
+      toast.success('Training day unlocked!')
+    } catch {
+      toast.error('Failed to save your training day selection')
+    }
   }
 
   function toggleDay(dayId: string) {
