@@ -77,23 +77,27 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Client email is required.' }, { status: 400 })
     }
 
-    const { count: activeClientCount } = await admin
-      .from('nutritionist_clients')
-      .select('id', { count: 'exact', head: true })
-      .eq('nutritionist_id', user.id)
-      .eq('status', 'active')
-
-    const { data: packageRow } = await admin
-      .from('nutritionist_packages')
-      .select('max_clients')
-      .eq('nutritionist_id', user.id)
-      .maybeSingle()
-
-    const { count: pendingInviteCount } = await admin
-      .from('personal_trainer_invites')
-      .select('id', { count: 'exact', head: true })
-      .eq('personal_trainer_id', user.id)
-      .eq('status', 'pending')
+    const [
+      { count: activeClientCount },
+      { data: packageRow },
+      { count: pendingInviteCount },
+    ] = await Promise.all([
+      admin
+        .from('nutritionist_clients')
+        .select('id', { count: 'exact', head: true })
+        .eq('nutritionist_id', user.id)
+        .eq('status', 'active'),
+      admin
+        .from('nutritionist_packages')
+        .select('max_clients')
+        .eq('nutritionist_id', user.id)
+        .maybeSingle(),
+      admin
+        .from('personal_trainer_invites')
+        .select('id', { count: 'exact', head: true })
+        .eq('personal_trainer_id', user.id)
+        .eq('status', 'pending'),
+    ])
 
     const maxClients = packageRow?.max_clients ?? 15
     const totalCount = (activeClientCount ?? 0) + (pendingInviteCount ?? 0)
