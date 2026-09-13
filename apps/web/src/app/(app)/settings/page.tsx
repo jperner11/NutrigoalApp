@@ -1300,8 +1300,9 @@ export default function SettingsPage() {
 
                     <div className="mt-4 space-y-4">
                       <div>
-                        <label className={labelClass} style={labelStyle}>Question label</label>
+                        <label htmlFor={`trainer-question-label-${question.localKey}`} className={labelClass} style={labelStyle}>Question label</label>
                         <input
+                          id={`trainer-question-label-${question.localKey}`}
                           type="text"
                           value={question.label}
                           onChange={(e) => updateTrainerQuestion(question.localKey, { label: e.target.value })}
@@ -1311,8 +1312,9 @@ export default function SettingsPage() {
                         />
                       </div>
                       <div>
-                        <label className={labelClass} style={labelStyle}>Help text</label>
+                        <label htmlFor={`trainer-question-help-${question.localKey}`} className={labelClass} style={labelStyle}>Help text</label>
                         <input
+                          id={`trainer-question-help-${question.localKey}`}
                           type="text"
                           value={question.help_text ?? ''}
                           onChange={(e) => updateTrainerQuestion(question.localKey, { help_text: e.target.value })}
@@ -1323,8 +1325,9 @@ export default function SettingsPage() {
                       </div>
                       <div className="grid gap-4 md:grid-cols-[1fr_auto]">
                         <div>
-                          <label className={labelClass} style={labelStyle}>Answer type</label>
+                          <label htmlFor={`trainer-question-type-${question.localKey}`} className={labelClass} style={labelStyle}>Answer type</label>
                           <select
+                            id={`trainer-question-type-${question.localKey}`}
                             value={question.type}
                             onChange={(e) => updateTrainerQuestion(question.localKey, { type: e.target.value as CustomIntakeQuestionType, options: e.target.value === 'single_select' || e.target.value === 'multi_select' ? question.options : [] })}
                             className={selectClass}
@@ -1345,8 +1348,9 @@ export default function SettingsPage() {
                       </div>
                       {(question.type === 'single_select' || question.type === 'multi_select') && (
                         <div>
-                          <label className={labelClass} style={labelStyle}>Options</label>
+                          <label htmlFor={`trainer-question-options-${question.localKey}`} className={labelClass} style={labelStyle}>Options</label>
                           <input
+                            id={`trainer-question-options-${question.localKey}`}
                             type="text"
                             value={question.options.join(', ')}
                             onChange={(e) => updateTrainerQuestion(question.localKey, {
@@ -1428,8 +1432,9 @@ export default function SettingsPage() {
 
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
-                    <label className={labelClass} style={labelStyle}>Profile slug</label>
+                    <label htmlFor="settings-marketplace-slug" className={labelClass} style={labelStyle}>Profile slug</label>
                     <input
+                      id="settings-marketplace-slug"
                       type="text"
                       value={marketplaceProfile.slug}
                       disabled
@@ -1438,8 +1443,9 @@ export default function SettingsPage() {
                     <p className="mt-1 text-xs" style={{ color: 'var(--fg-3)' }}>Generated from your name. We can make this editable later if needed.</p>
                   </div>
                   <div>
-                    <label className={labelClass} style={labelStyle}>Location</label>
+                    <label htmlFor="settings-marketplace-location" className={labelClass} style={labelStyle}>Location</label>
                     <input
+                      id="settings-marketplace-location"
                       type="text"
                       value={marketplaceProfile.location_label ?? ''}
                       onChange={(e) => setMarketplaceField('location_label', e.target.value)}
@@ -1450,8 +1456,9 @@ export default function SettingsPage() {
                 </div>
 
                 <div>
-                  <label className={labelClass} style={labelStyle}>Headline</label>
+                  <label htmlFor="settings-marketplace-headline" className={labelClass} style={labelStyle}>Headline</label>
                   <input
+                    id="settings-marketplace-headline"
                     type="text"
                     value={marketplaceProfile.headline ?? ''}
                     onChange={(e) => setMarketplaceField('headline', e.target.value)}
@@ -1461,8 +1468,9 @@ export default function SettingsPage() {
                 </div>
 
                 <div>
-                  <label className={labelClass} style={labelStyle}>Short bio</label>
+                  <label htmlFor="settings-marketplace-bio" className={labelClass} style={labelStyle}>Short bio</label>
                   <textarea
+                    id="settings-marketplace-bio"
                     value={marketplaceProfile.bio ?? ''}
                     onChange={(e) => setMarketplaceField('bio', e.target.value)}
                     className={`${inputClass} min-h-[140px]`}
@@ -1471,8 +1479,9 @@ export default function SettingsPage() {
                 </div>
 
                 <div>
-                  <label className={labelClass} style={labelStyle}>Consultation link</label>
+                  <label htmlFor="settings-marketplace-consultation-url" className={labelClass} style={labelStyle}>Consultation link</label>
                   <input
+                    id="settings-marketplace-consultation-url"
                     type="url"
                     value={marketplaceProfile.consultation_url ?? ''}
                     onChange={(e) => setMarketplaceField('consultation_url', e.target.value)}
@@ -1484,8 +1493,9 @@ export default function SettingsPage() {
 
                 <div className="grid gap-4 md:grid-cols-3">
                   <div>
-                    <label className={labelClass} style={labelStyle}>Price from</label>
+                    <label htmlFor="settings-marketplace-price-from" className={labelClass} style={labelStyle}>Price from</label>
                     <input
+                      id="settings-marketplace-price-from"
                       type="number"
                       min={0}
                       value={marketplaceProfile.price_from ?? ''}
@@ -1495,8 +1505,9 @@ export default function SettingsPage() {
                     />
                   </div>
                   <div>
-                    <label className={labelClass} style={labelStyle}>Price to</label>
+                    <label htmlFor="settings-marketplace-price-to" className={labelClass} style={labelStyle}>Price to</label>
                     <input
+                      id="settings-marketplace-price-to"
                       type="number"
                       min={0}
                       value={marketplaceProfile.price_to ?? ''}
@@ -1506,8 +1517,9 @@ export default function SettingsPage() {
                     />
                   </div>
                   <div>
-                    <label className={labelClass} style={labelStyle}>Currency</label>
+                    <label htmlFor="settings-marketplace-currency" className={labelClass} style={labelStyle}>Currency</label>
                     <select
+                      id="settings-marketplace-currency"
                       value={marketplaceProfile.currency}
                       onChange={(e) => setMarketplaceField('currency', e.target.value)}
                       className={selectClass}
@@ -1661,8 +1673,9 @@ export default function SettingsPage() {
 
                           <div className="mt-4 grid gap-4 md:grid-cols-2">
                             <div>
-                              <label className={labelClass} style={labelStyle}>Offer title</label>
+                              <label htmlFor={`coach-offer-title-${offer.localKey}`} className={labelClass} style={labelStyle}>Offer title</label>
                               <input
+                                id={`coach-offer-title-${offer.localKey}`}
                                 type="text"
                                 value={offer.title}
                                 onChange={(e) => updateCoachOffer(offer.localKey, { title: e.target.value })}
@@ -1672,8 +1685,9 @@ export default function SettingsPage() {
                               />
                             </div>
                             <div>
-                              <label className={labelClass} style={labelStyle}>CTA label</label>
+                              <label htmlFor={`coach-offer-cta-${offer.localKey}`} className={labelClass} style={labelStyle}>CTA label</label>
                               <input
+                                id={`coach-offer-cta-${offer.localKey}`}
                                 type="text"
                                 value={offer.cta_label}
                                 onChange={(e) => updateCoachOffer(offer.localKey, { cta_label: e.target.value })}
@@ -1683,8 +1697,9 @@ export default function SettingsPage() {
                               />
                             </div>
                             <div>
-                              <label className={labelClass} style={labelStyle}>Price</label>
+                              <label htmlFor={`coach-offer-price-${offer.localKey}`} className={labelClass} style={labelStyle}>Price</label>
                               <input
+                                id={`coach-offer-price-${offer.localKey}`}
                                 type="number"
                                 min={1}
                                 value={offer.price}
@@ -1694,8 +1709,9 @@ export default function SettingsPage() {
                               />
                             </div>
                             <div>
-                              <label className={labelClass} style={labelStyle}>Billing period</label>
+                              <label htmlFor={`coach-offer-period-${offer.localKey}`} className={labelClass} style={labelStyle}>Billing period</label>
                               <select
+                                id={`coach-offer-period-${offer.localKey}`}
                                 value={offer.billing_period}
                                 onChange={(e) => updateCoachOffer(offer.localKey, { billing_period: e.target.value as CoachOfferBillingPeriod })}
                                 className={selectClass}
@@ -1709,8 +1725,9 @@ export default function SettingsPage() {
                           </div>
 
                           <div className="mt-4">
-                            <label className={labelClass} style={labelStyle}>Offer description</label>
+                            <label htmlFor={`coach-offer-description-${offer.localKey}`} className={labelClass} style={labelStyle}>Offer description</label>
                             <textarea
+                              id={`coach-offer-description-${offer.localKey}`}
                               value={offer.description ?? ''}
                               onChange={(e) => updateCoachOffer(offer.localKey, { description: e.target.value })}
                               className={`${inputClass} min-h-[110px]`}
