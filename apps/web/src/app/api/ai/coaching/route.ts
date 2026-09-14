@@ -41,11 +41,16 @@ export async function POST(request: Request) {
     // Session-scoped client: RLS limits reads/writes to the user's own rows
     const supabase = await createClient()
 
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from('user_profiles')
       .select('*')
       .eq('id', userId)
       .single()
+
+    if (profileError) {
+      Sentry.captureException(profileError, { tags: { kind: 'api-route', route: 'ai/coaching' } })
+      return NextResponse.json({ message: 'Internal server error' }, { status: 500 })
+    }
 
     if (!profile) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 })
