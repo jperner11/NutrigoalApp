@@ -27,10 +27,7 @@ export default function MarketingThreeLanes() {
               background: i === 0 ? 'var(--ink-2)' : 'transparent',
             }}
           >
-            <div
-              className="grid items-center gap-8"
-              style={{ gridTemplateColumns: '160px 1.2fr 1fr auto' }}
-            >
+            <div className="grid items-start gap-4 lg:grid-cols-[160px_1.2fr_1fr_auto] lg:items-center lg:gap-8">
               <div
                 className="mono"
                 style={{ fontSize: 11, color: 'var(--acc)', letterSpacing: '0.18em' }}
