@@ -43,11 +43,11 @@ export async function generateWeeklyReport(
   const supabase = createClient()
 
   const [
-    { data: mealLogs },
-    { data: workoutLogs },
-    { data: cardioSessions },
-    { data: weightLogs },
-    { data: waterLogs },
+    { data: mealLogs, error: mealLogsError },
+    { data: workoutLogs, error: workoutLogsError },
+    { data: cardioSessions, error: cardioSessionsError },
+    { data: weightLogs, error: weightLogsError },
+    { data: waterLogs, error: waterLogsError },
   ] = await Promise.all([
     // Meal logs
     supabase
@@ -87,6 +87,10 @@ export async function generateWeeklyReport(
       .gte('date', startDate)
       .lte('date', endDate),
   ])
+
+  const queryError =
+    mealLogsError || workoutLogsError || cardioSessionsError || weightLogsError || waterLogsError
+  if (queryError) throw queryError
 
   const mealDays = new Set(mealLogs?.map(l => l.date) ?? [])
   const totalCal = mealLogs?.reduce((s, l) => s + (l.total_calories || 0), 0) ?? 0
