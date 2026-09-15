@@ -95,7 +95,13 @@ export async function checkPlanGenerationAllowed(
     query = query.gte('created_at', cutoff.toISOString())
   }
 
-  const { count } = await query
+  const { count, error } = await query
+  if (error) {
+    return NextResponse.json(
+      { message: 'Unable to verify plan generation eligibility. Please try again.' },
+      { status: 500 },
+    )
+  }
   if ((count ?? 0) > 0) {
     return NextResponse.json(
       {
