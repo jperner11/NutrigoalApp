@@ -49,6 +49,10 @@ function CoachCheckInsPage({ profile }: { profile: UserProfile }) {
         supabase.from('feedback_templates').select('*').eq('trainer_id', profile.id).order('created_at', { ascending: false }),
         supabase.from('feedback_requests').select('*, client:client_id(id, full_name, email)').eq('nutritionist_id', profile.id).order('created_at', { ascending: false }).limit(50),
       ])
+      if (tRes.error || rRes.error) {
+        reportClientError(tRes.error ?? rRes.error, { feature: 'check-ins', action: 'coach-load-all' })
+        toast.error('Failed to load check-ins')
+      }
       if (tRes.data) setTemplates(tRes.data as FeedbackTemplate[])
       if (rRes.data) {
         // feedback_requests has two FKs to user_profiles (nutritionist_id, client_id), so
@@ -58,6 +62,7 @@ function CoachCheckInsPage({ profile }: { profile: UserProfile }) {
       }
     } catch (err) {
       reportClientError(err, { feature: 'check-ins', action: 'coach-load-all' })
+      toast.error('Failed to load check-ins')
     } finally {
       setLoading(false)
     }
