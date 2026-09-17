@@ -14,7 +14,11 @@ test('client sees a well-formed empty state on /reports with no logged data', as
 
   await page.goto('/reports', { waitUntil: 'networkidle' })
 
-  await expect(page.getByRole('heading', { name: 'Reports' })).toBeVisible()
+  // The page header was migrated to the shared AppHeroPanel design (#707),
+  // matching every other app page: the real <h1> is now editorial copy
+  // ("Progress, summarized.") and "Reports" only appears in the eyebrow line
+  // above it. Assert on the eyebrow instead of a literal "Reports" heading.
+  await expect(page.getByText('N° 08 · Reports')).toBeVisible()
 
   // Adherence bars render (not stuck on "Loading report...") with their labels.
   await expect(page.getByText('Calorie Target')).toBeVisible()

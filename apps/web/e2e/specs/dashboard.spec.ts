@@ -19,9 +19,15 @@ test('client sees dashboard hero actions and today KPIs', async ({
   // Free tier only: upgrade CTA.
   await expect(page.getByRole('link', { name: /upgrade/i })).toBeVisible()
 
-  // Today's KPI row renders its zero-state without crashing.
+  // Today's KPI row renders its zero-state without crashing. "Water" and
+  // "Goal" need exact matches: a substring/case-insensitive `getByText()`
+  // also matches other, unrelated page text ("Log water" quick action,
+  // sidebar "Water" nav link, "Set up your metrics and goals..." onboarding
+  // banner copy) — a Playwright strict-mode violation, not a rendering bug.
+  // StatTile renders its label pre-uppercased (`label.toUpperCase()`), so
+  // each tile's actual text is e.g. "WATER"/"GOAL".
   await expect(page.getByText('Calories')).toBeVisible()
-  await expect(page.getByText('Water')).toBeVisible()
+  await expect(page.getByText('WATER', { exact: true })).toBeVisible()
   await expect(page.getByText('Workouts today')).toBeVisible()
-  await expect(page.getByText('Goal')).toBeVisible()
+  await expect(page.getByText('GOAL', { exact: true })).toBeVisible()
 })
