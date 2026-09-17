@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import * as Sentry from '@sentry/nextjs'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
 import { getLocalDateString } from '@/lib/date'
@@ -136,7 +137,12 @@ export default function PhotosPage() {
     const urlParts = photo.photo_url.split('/progress-photos/')
     const storagePath = urlParts[1]
     if (storagePath) {
-      await supabase.storage.from('progress-photos').remove([storagePath])
+      const { error: storageError } = await supabase.storage.from('progress-photos').remove([storagePath])
+      if (storageError) {
+        Sentry.captureException(storageError, {
+          tags: { kind: 'page', page: 'progress/photos', op: 'deleteStorageFile' },
+        })
+      }
     }
     const { error } = await supabase.from('progress_photos').delete().eq('id', photo.id)
     if (error) {
