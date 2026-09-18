@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createAdminClient } from '@/lib/supabase/admin'
 import * as Sentry from '@sentry/nextjs'
 
 export async function GET(request: Request) {
@@ -31,7 +31,7 @@ async function getLocalNutrition(id: string, amount: number, unit: string) {
     return NextResponse.json({ message: 'Database not configured' }, { status: 503 })
   }
 
-  const supabase = createClient(supabaseUrl, serviceRoleKey)
+  const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('foods')
     .select('*')
@@ -159,7 +159,7 @@ async function cacheFood(
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
   if (!supabaseUrl || !serviceRoleKey) return
 
-  const supabase = createClient(supabaseUrl, serviceRoleKey)
+  const supabase = createAdminClient()
 
   const macros = per100g ?? {
     calories: Math.round(offNutriments?.['energy-kcal_100g'] ?? 0),
