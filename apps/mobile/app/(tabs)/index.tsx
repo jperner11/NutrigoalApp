@@ -126,11 +126,15 @@ function ClientHome({ userId }: { userId: string | null }) {
 
   const addWater = async (amount: number) => {
     if (!userId) return
-    await supabase.from('water_logs').insert({
+    const { error } = await supabase.from('water_logs').insert({
       user_id: userId,
       date: today,
       amount_ml: amount,
     })
+    if (error) {
+      Sentry.captureException(error, { tags: { kind: 'water-add', screen: 'client-home' } })
+      return
+    }
     setWaterTotal((prev) => prev + amount)
   }
 
@@ -226,7 +230,15 @@ function ClientHome({ userId }: { userId: string | null }) {
           </View>
           <View style={styles.waterButtons}>
             {WATER_QUICK_ADD.map((opt) => (
-              <TouchableOpacity key={opt.amount} style={styles.waterBtn} onPress={() => addWater(opt.amount)}>
+              <TouchableOpacity
+                key={opt.amount}
+                style={styles.waterBtn}
+                onPress={() =>
+                  addWater(opt.amount).catch((err) =>
+                    Sentry.captureException(err, { tags: { kind: 'water-add', screen: 'client-home' } })
+                  )
+                }
+              >
                 <Text style={styles.waterBtnText}>+{opt.label}</Text>
               </TouchableOpacity>
             ))}
