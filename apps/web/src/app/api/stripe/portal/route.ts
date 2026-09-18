@@ -10,12 +10,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Not authenticated' }, { status: 401 })
   }
 
-  const { data: subscription } = await supabase
+  const { data: subscription, error: subscriptionError } = await supabase
     .from('subscriptions')
     .select('stripe_customer_id')
     .eq('user_id', user.id)
     .not('stripe_customer_id', 'is', null)
-    .single()
+    .maybeSingle()
+
+  if (subscriptionError) {
+    return NextResponse.json({ message: 'Failed to look up subscription' }, { status: 500 })
+  }
 
   if (!subscription?.stripe_customer_id) {
     return NextResponse.json({ message: 'No active subscription found' }, { status: 404 })
