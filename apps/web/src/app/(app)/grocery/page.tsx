@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { ShoppingCart, Check, ChevronDown, ChevronUp } from 'lucide-react'
 import { aggregateIngredients, groupByCategory, CATEGORY_ORDER } from '@/lib/grocery'
 import type { GroceryItem } from '@/lib/grocery'
+import { AppHeroPanel, EmptyStateCard, ListCard } from '@/components/ui/AppDesign'
 
 interface MealFoods {
   _meta?: unknown
@@ -111,16 +112,26 @@ export default function GroceryPage() {
     })
   }
 
-  if (loading) return <div className="text-[var(--muted)]">Loading...</div>
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-[900px]">
+        <ListCard eyebrow="Loading" title="Building your grocery list.">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--line)]">
+            <div className="h-full w-1/3 animate-pulse rounded-full bg-[var(--acc)]" />
+          </div>
+        </ListCard>
+      </div>
+    )
+  }
 
   if (groceryItems.length === 0) {
     return (
-      <div className="max-w-2xl mx-auto text-center py-16">
-        <ShoppingCart className="h-12 w-12 text-[var(--muted-soft)] mx-auto mb-4" />
-        <h2 className="text-xl font-bold text-[var(--foreground)] mb-2">No Grocery List</h2>
-        <p className="text-[var(--muted)]">
-          You need an active meal plan to generate a grocery list. Create or activate a diet plan first.
-        </p>
+      <div className="mx-auto max-w-[900px]">
+        <EmptyStateCard
+          icon={<ShoppingCart className="h-7 w-7" />}
+          title="No grocery list yet."
+          body="You need an active meal plan to generate a grocery list. Create or activate a diet plan first."
+        />
       </div>
     )
   }
@@ -135,36 +146,39 @@ export default function GroceryPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-[var(--foreground)]">Grocery List</h1>
-        <p className="text-[var(--muted)] mt-1">
-          Weekly shopping list from <span className="font-medium">{planName}</span>
-        </p>
-      </div>
+    <div className="mx-auto max-w-[900px]">
+      <AppHeroPanel
+        eyebrow="N° 07 · Grocery"
+        title="Grocery,"
+        accent="listed."
+        subtitle={<>Weekly shopping list from <span className="font-medium">{planName}</span>.</>}
+        meta={
+          <div className="app-card-topline min-w-[160px]">
+            <span>CHECKED</span>
+            <span style={{ color: 'var(--acc)' }}>{checkedCount}/{totalItems}</span>
+          </div>
+        }
+      />
 
       {/* Progress */}
-      <div className="card p-4 mb-6">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-[var(--muted)]">
+      <ListCard className="mb-6" eyebrow="PROGRESS">
+        <div className="mb-3 flex items-center justify-between">
+          <span className="text-sm font-medium text-[var(--fg-3)]">
             {checkedCount} of {totalItems} items checked
           </span>
           {checkedCount > 0 && (
             <button
               onClick={() => setCheckedItems(new Set())}
-              className="text-xs text-[var(--acc-text)] hover:underline font-medium"
+              className="text-xs font-medium text-[var(--acc-text)] hover:underline"
             >
               Clear all
             </button>
           )}
         </div>
-        <div className="w-full h-2 bg-[var(--line)] rounded-full overflow-hidden">
-          <div
-            className="h-full bg-[var(--acc)] rounded-full transition-all duration-300"
-            style={{ width: `${totalItems > 0 ? (checkedCount / totalItems) * 100 : 0}%` }}
-          />
+        <div className="app-progress-track">
+          <div style={{ width: `${totalItems > 0 ? (checkedCount / totalItems) * 100 : 0}%` }} />
         </div>
-      </div>
+      </ListCard>
 
       {/* Grocery Sections */}
       <div className="space-y-4">
