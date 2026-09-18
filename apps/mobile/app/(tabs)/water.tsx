@@ -65,7 +65,11 @@ export default function WaterScreen() {
 
   const addWater = async (amount: number) => {
     if (!user) return
-    await supabase.from('water_logs').insert({ user_id: user.id, date: today, amount_ml: amount })
+    const { error } = await supabase.from('water_logs').insert({ user_id: user.id, date: today, amount_ml: amount })
+    if (error) {
+      Sentry.captureException(error, { tags: { kind: 'water-add', screen: 'water' } })
+      return
+    }
     await fetchLogs()
   }
 
@@ -92,7 +96,15 @@ export default function WaterScreen() {
 
         <View style={styles.quickRow}>
           {WATER_QUICK_ADD.map((opt) => (
-            <TouchableOpacity key={opt.amount} style={styles.quickBtn} onPress={() => addWater(opt.amount)}>
+            <TouchableOpacity
+              key={opt.amount}
+              style={styles.quickBtn}
+              onPress={() =>
+                addWater(opt.amount).catch((err) =>
+                  Sentry.captureException(err, { tags: { kind: 'water-add', screen: 'water' } })
+                )
+              }
+            >
               <Text style={styles.quickBtnText}>+{opt.label}</Text>
             </TouchableOpacity>
           ))}
