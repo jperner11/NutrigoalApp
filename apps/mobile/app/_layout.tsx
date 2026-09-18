@@ -37,17 +37,17 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
     SplashScreen.hideAsync()
 
     const inAuthGroup = segments[0] === '(auth)'
+    const inOnboarding = (segments as string[])[0] === '(tabs)' && (segments as string[])[1] === 'onboarding'
+    const needsOnboarding = !!(profile && requiresOnboardingQuestionnaire(profile.role) && !profile.onboarding_completed)
 
     if (!session && !inAuthGroup) {
       router.replace('/(auth)/login')
-    } else if (session && inAuthGroup) {
-      if (profile && requiresOnboardingQuestionnaire(profile.role) && !profile.onboarding_completed) {
-        router.replace('/(tabs)/onboarding')
-      } else {
-        router.replace('/(tabs)')
-      }
+    } else if (session && needsOnboarding && !inOnboarding) {
+      router.replace('/(tabs)/onboarding')
+    } else if (session && inAuthGroup && !needsOnboarding) {
+      router.replace('/(tabs)')
     }
-  }, [session, loading, segments])
+  }, [session, loading, segments, profile])
 
   if (loading) return null
 
