@@ -23,7 +23,19 @@ export async function routeSupabaseThroughNode(page: Page): Promise<void> {
       method: req.method(),
       headers,
       body: req.postDataBuffer() ?? undefined,
+      redirect: 'manual', // a 3xx (e.g. /auth/v1/verify -> our app) must reach the
+      // browser as a real redirect so it navigates there itself — auto-following
+      // here would fulfill the ORIGINAL supabase.co request with the destination
+      // page's body, leaving the browser stuck on the supabase.co origin (breaking
+      // every relative /_next/static asset request that follows).
     })
+    if (resp.status >= 300 && resp.status < 400) {
+      await route.fulfill({
+        status: resp.status,
+        headers: { location: resp.headers.get('location') ?? '' },
+      })
+      return
+    }
     const body = Buffer.from(await resp.arrayBuffer())
     const respHeaders: Record<string, string> = {}
     resp.headers.forEach((v, k) => {
