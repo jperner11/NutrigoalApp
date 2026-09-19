@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { rateLimit, getClientIp } from '@/lib/rateLimit'
 
@@ -112,7 +113,8 @@ async function searchSpoonacular(query: string, limit: number): Promise<FoodResu
       source: 'spoonacular' as const,
       external_id: String(item.id),
     }))
-  } catch {
+  } catch (error) {
+    Sentry.captureException(error, { tags: { kind: 'api-route', route: 'food/search', provider: 'spoonacular' } })
     return []
   }
 }
@@ -141,7 +143,8 @@ async function searchOpenFoodFacts(query: string, limit: number): Promise<FoodRe
         default_unit: 'g',
         brand: p.brands ?? null,
       }))
-  } catch {
+  } catch (error) {
+    Sentry.captureException(error, { tags: { kind: 'api-route', route: 'food/search', provider: 'openfoodfacts' } })
     return []
   }
 }
