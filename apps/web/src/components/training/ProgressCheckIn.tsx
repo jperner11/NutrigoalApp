@@ -130,7 +130,7 @@ export default function ProgressCheckIn({ userId, onPlanRegenerate }: ProgressCh
           <ArrowRight className="h-4 w-4 text-[var(--brand-400)] transition-transform group-hover:translate-x-0.5" />
         </button>
         {checkInError && (
-          <p className="px-1 text-xs text-[var(--danger)]">{checkInError}</p>
+          <p className="px-1 text-xs text-[var(--danger-text)]">{checkInError}</p>
         )}
       </div>
     )
