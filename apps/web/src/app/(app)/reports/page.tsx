@@ -59,7 +59,14 @@ function AdherenceBar({ label, percentage }: { label: string; percentage: number
         <span className="text-sm font-medium text-[var(--muted)]">{label}</span>
         <span className="text-sm font-bold text-[var(--foreground)]">{percentage}%</span>
       </div>
-      <div className="w-full h-2.5 bg-[var(--line)] rounded-full overflow-hidden">
+      <div
+        className="w-full h-2.5 bg-[var(--line)] rounded-full overflow-hidden"
+        role="progressbar"
+        aria-label={label}
+        aria-valuenow={Math.min(100, percentage)}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
         <div
           className="h-full rounded-full transition-all duration-500"
           style={{ width: `${Math.min(100, percentage)}%`, background: 'var(--acc)' }}
