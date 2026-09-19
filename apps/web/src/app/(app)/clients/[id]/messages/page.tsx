@@ -63,12 +63,15 @@ export default function ClientMessagesPage() {
 
       if (error) {
         // Race: another tab created it first — re-fetch.
-        const { data: retry } = await supabase
+        const { data: retry, error: retryError } = await supabase
           .from('conversations')
           .select('id')
           .eq('nutritionist_id', profile!.id)
           .eq('client_id', id)
           .maybeSingle()
+        if (retryError) {
+          Sentry.captureException(retryError, { tags: { kind: 'page', page: 'clients/[id]/messages', op: 'resolveConversation.retry' } })
+        }
         return retry?.id ?? null
       }
       return created?.id ?? null
