@@ -1908,7 +1908,7 @@ export default function SettingsPage() {
 
             {/* Delete Account */}
             <div className="card-2 p-5">
-              <h3 className="serif mb-2 flex items-center gap-2" style={{ fontSize: 20, color: 'var(--warn-text)' }}>
+              <h3 className="serif mb-2 flex items-center gap-2" style={{ fontSize: 20, color: 'var(--danger-text)' }}>
                 <AlertTriangle className="h-5 w-5" />
                 Danger Zone
               </h3>
@@ -1920,14 +1920,14 @@ export default function SettingsPage() {
                   type="button"
                   onClick={() => setShowDeleteConfirm(true)}
                   className="btn btn-ghost"
-                  style={{ color: 'var(--warn-text)' }}
+                  style={{ color: 'var(--danger-text)' }}
                 >
                   <Trash2 className="h-4 w-4" />
                   <span>Delete Account</span>
                 </button>
               ) : (
                 <div className="card-2 space-y-3 p-4">
-                  <p className="text-sm font-medium" style={{ color: 'var(--warn-text)' }}>
+                  <p className="text-sm font-medium" style={{ color: 'var(--danger-text)' }}>
                     Type <span className="mono rounded px-1" style={{ background: 'var(--ink-3)' }}>DELETE</span> to confirm:
                   </p>
                   <input
