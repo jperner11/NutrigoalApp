@@ -1,5 +1,6 @@
 import type { UserRole } from '@/lib/supabase/types'
 import { createClient } from '@/lib/supabase/client'
+import { reportSupabaseError } from '@/lib/supabaseReport'
 
 export type GatedFeature =
   | 'supplements'
@@ -73,19 +74,24 @@ export async function checkRegenEligibility(
   const cutoff = new Date()
   cutoff.setDate(cutoff.getDate() - cooldown)
 
-  const { count } = await supabase
+  const { count, error: countError } = await supabase
     .from('ai_usage')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', userId)
     .in('type', ['meal_suggestion', 'workout_suggestion'])
     .gte('created_at', cutoff.toISOString())
 
+  if (countError) {
+    reportSupabaseError(countError, { feature: 'generate-plans', action: 'checkRegenEligibility', table: 'ai_usage' })
+    return { canRegenerate: false, daysRemaining: cooldown }
+  }
+
   if ((count ?? 0) === 0) {
     return { canRegenerate: true, daysRemaining: 0 }
   }
 
   // Find when the oldest usage in the window expires
-  const { data: oldest } = await supabase
+  const { data: oldest, error: oldestError } = await supabase
     .from('ai_usage')
     .select('created_at')
     .eq('user_id', userId)
@@ -93,6 +99,11 @@ export async function checkRegenEligibility(
     .gte('created_at', cutoff.toISOString())
     .order('created_at', { ascending: true })
     .limit(1)
+
+  if (oldestError) {
+    reportSupabaseError(oldestError, { feature: 'generate-plans', action: 'checkRegenEligibility', table: 'ai_usage' })
+    return { canRegenerate: false, daysRemaining: cooldown }
+  }
 
   if (oldest && oldest.length > 0) {
     const usageDate = new Date(oldest[0].created_at)
