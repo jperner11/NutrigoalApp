@@ -94,7 +94,12 @@ export default function TrainingScreen() {
           <Text style={s.title}>Training</Text>
         </View>
         {!managedClient && (
-          <TouchableOpacity style={s.addBtn} onPress={() => setScreen('create')}>
+          <TouchableOpacity
+            style={s.addBtn}
+            onPress={() => setScreen('create')}
+            accessibilityRole="button"
+            accessibilityLabel="Create training plan"
+          >
             <Ionicons name="add" size={24} color="#fff" />
           </TouchableOpacity>
         )}
@@ -234,7 +239,15 @@ function CreatePlan({ user, profile, onDone, onCancel }: any) {
           <View key={di} style={s.dayCard}>
             <View style={s.dayHeader}>
               <TextInput style={s.dayNameInput} value={day.name} onChangeText={(t) => { const u = [...days]; u[di].name = t; setDays(u) }} />
-              {days.length > 1 && <TouchableOpacity onPress={() => removeDay(di)}><Ionicons name="trash-outline" size={20} color={colors.error} /></TouchableOpacity>}
+              {days.length > 1 && (
+                <TouchableOpacity
+                  onPress={() => removeDay(di)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Remove ${day.name}`}
+                >
+                  <Ionicons name="trash-outline" size={20} color={colors.error} />
+                </TouchableOpacity>
+              )}
             </View>
             {day.exercises.map((ex, ei) => (
               <View key={ei} style={s.exerciseRow}>
@@ -242,7 +255,13 @@ function CreatePlan({ user, profile, onDone, onCancel }: any) {
                   <Text style={s.exerciseName}>{ex.exercise.name}</Text>
                   <Text style={s.exerciseMeta}>{ex.sets} sets × {ex.reps} · {ex.rest_seconds}s rest</Text>
                 </View>
-                <TouchableOpacity onPress={() => removeExercise(di, ei)}><Ionicons name="close-circle" size={22} color={colors.textSubtle} /></TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => removeExercise(di, ei)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Remove ${ex.exercise.name}`}
+                >
+                  <Ionicons name="close-circle" size={22} color={colors.textSubtle} />
+                </TouchableOpacity>
               </View>
             ))}
             <TouchableOpacity style={s.addExBtn} onPress={() => { setPickerDayIdx(di); setShowPicker(true); setSearch(''); setFilterBody('') }}>
@@ -343,9 +362,13 @@ function PlanDetail({ planId, user, onBack, onStartSession }: any) {
   return (
     <SafeAreaView style={s.container}>
       <View style={s.modalHeader}>
-        <TouchableOpacity onPress={onBack}><Ionicons name="arrow-back" size={24} color={colors.foreground} /></TouchableOpacity>
+        <TouchableOpacity onPress={onBack} accessibilityRole="button" accessibilityLabel="Go back">
+          <Ionicons name="arrow-back" size={24} color={colors.foreground} />
+        </TouchableOpacity>
         <Text style={s.modalTitle}>{plan.name}</Text>
-        <TouchableOpacity onPress={handleDelete}><Ionicons name="trash-outline" size={22} color={colors.error} /></TouchableOpacity>
+        <TouchableOpacity onPress={handleDelete} accessibilityRole="button" accessibilityLabel="Delete plan">
+          <Ionicons name="trash-outline" size={22} color={colors.error} />
+        </TouchableOpacity>
       </View>
       <ScrollView contentContainerStyle={s.content}>
         {days.map((day) => (
@@ -545,7 +568,11 @@ function WorkoutSession({ dayId, user, profile, onDone }: any) {
   return (
     <SafeAreaView style={s.container}>
       <View style={s.modalHeader}>
-        <TouchableOpacity onPress={() => Alert.alert('Quit?', 'Your progress will be lost', [{ text: 'Stay' }, { text: 'Quit', style: 'destructive', onPress: onDone }])}>
+        <TouchableOpacity
+          onPress={() => Alert.alert('Quit?', 'Your progress will be lost', [{ text: 'Stay' }, { text: 'Quit', style: 'destructive', onPress: onDone }])}
+          accessibilityRole="button"
+          accessibilityLabel="Quit workout"
+        >
           <Ionicons name="close" size={24} color={colors.foreground} />
         </TouchableOpacity>
         <Text style={s.modalTitle}>{currentIdx + 1} / {exercises.length}</Text>
@@ -625,7 +652,13 @@ function WorkoutSession({ dayId, user, profile, onDone }: any) {
               placeholder={currentEx.reps.split('-').pop() || '12'}
               placeholderTextColor={colors.textSubtle}
             />
-            <TouchableOpacity style={[s.checkBtn, set.completed && s.checkBtnDone]} onPress={() => toggleComplete(si)}>
+            <TouchableOpacity
+              style={[s.checkBtn, set.completed && s.checkBtnDone]}
+              onPress={() => toggleComplete(si)}
+              accessibilityRole="button"
+              accessibilityLabel={set.completed ? `Set ${si + 1} completed` : `Mark set ${si + 1} complete`}
+              accessibilityState={{ selected: set.completed }}
+            >
               <Ionicons name={set.completed ? 'checkmark-circle' : 'ellipse-outline'} size={28} color={set.completed ? colors.brand500 : colors.textSubtle} />
             </TouchableOpacity>
           </View>
