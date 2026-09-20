@@ -273,14 +273,14 @@ export default function AcceptInvitePage() {
               )}
 
               {currentUser && !currentUser.emailMatches && invite.status === 'pending' && (
-                <div className="mt-8 rounded-[24px] border border-red-200 bg-red-50/90 p-6 text-sm leading-6 text-red-700">
+                <div className="mt-8 rounded-[24px] border border-[var(--danger)] bg-[var(--danger-bg)] p-6 text-sm leading-6 text-[var(--danger-text)]">
                   You&apos;re signed in as <strong>{currentUser.email}</strong>, but this invite is for <strong>{invite.invited_email}</strong>.
                   Sign out and use the invited email to accept.
                 </div>
               )}
 
               {currentUser?.alreadyAssignedToOtherTrainer && invite.status === 'pending' && (
-                <div className="mt-8 rounded-[24px] border border-amber-200 bg-amber-50/90 p-6 text-sm leading-6 text-amber-700">
+                <div className="mt-8 rounded-[24px] border border-[var(--warn)] bg-[var(--warn-bg)] p-6 text-sm leading-6 text-[var(--warn-text)]">
                   This account already has an active trainer. Disconnect from your current trainer before accepting a new invite.
                 </div>
               )}
