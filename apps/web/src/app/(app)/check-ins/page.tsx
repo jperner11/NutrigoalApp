@@ -494,6 +494,7 @@ function ClientCheckInsPage({ profile }: { profile: UserProfile }) {
       }
       if (data) setRequests(data as FeedbackRequest[])
     } catch (err) {
+      toast.error('Failed to load check-ins')
       reportClientError(err, { feature: 'check-ins', action: 'client-load-check-ins' })
     } finally {
       setLoading(false)
