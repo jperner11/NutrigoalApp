@@ -224,7 +224,9 @@ export default function NewClientDietPlanPage() {
     setSaving(true)
     const supabase = createClient()
 
-    await supabase.from('diet_plans').update({ is_active: false }).eq('user_id', id).eq('is_active', true)
+    const { error: deactivateError } = await supabase.from('diet_plans').update({ is_active: false }).eq('user_id', id).eq('is_active', true)
+
+    if (deactivateError) { toast.error('Failed to update diet plans'); setSaving(false); return }
 
     const { data: plan, error } = await supabase.from('diet_plans').insert({
       user_id: id, created_by: profile!.id, name: planName,

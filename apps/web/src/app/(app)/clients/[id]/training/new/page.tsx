@@ -132,7 +132,9 @@ export default function NewClientTrainingPlanPage() {
     const supabase = createClient()
 
     try {
-      await supabase.from('training_plans').update({ is_active: false }).eq('user_id', id).eq('is_active', true)
+      const { error: deactivateError } = await supabase.from('training_plans').update({ is_active: false }).eq('user_id', id).eq('is_active', true)
+
+      if (deactivateError) { toast.error('Failed to update training plans'); setSaving(false); return }
 
       const { data: plan, error } = await supabase.from('training_plans').insert({
         user_id: id, created_by: profile!.id, name: planName,
