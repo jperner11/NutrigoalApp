@@ -133,7 +133,7 @@ export default function LeadsPage() {
         meta={
           <div className="app-card-topline min-w-[160px]">
             <span>PENDING</span>
-            <span style={{ color: 'var(--acc)' }}>{pendingLeads.length}</span>
+            <span style={{ color: 'var(--acc-text)' }}>{pendingLeads.length}</span>
           </div>
         }
       />
