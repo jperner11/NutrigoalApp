@@ -173,8 +173,8 @@ export default function ClientFeedbackPage() {
 
           {templates.length > 0 && (
             <div className="mb-4">
-              <label className="block text-sm font-medium text-[var(--fg-2)] mb-1">Load from template</label>
-              <select value={selectedTemplateId} onChange={e => loadFromTemplate(e.target.value)}
+              <label htmlFor="feedback-load-template" className="block text-sm font-medium text-[var(--fg-2)] mb-1">Load from template</label>
+              <select id="feedback-load-template" value={selectedTemplateId} onChange={e => loadFromTemplate(e.target.value)}
                 className="w-full px-4 py-2.5 border border-[var(--line-strong)] rounded-lg text-sm focus:ring-2 focus:ring-[var(--acc)] focus:border-transparent">
                 <option value="">— Build from scratch —</option>
                 {templates.map(t => (
@@ -185,8 +185,8 @@ export default function ClientFeedbackPage() {
           )}
 
           <div className="mb-4">
-            <label className="block text-sm font-medium text-[var(--fg-2)] mb-1">Title</label>
-            <input type="text" value={title} onChange={e => setTitle(e.target.value)}
+            <label htmlFor="feedback-title" className="block text-sm font-medium text-[var(--fg-2)] mb-1">Title</label>
+            <input id="feedback-title" type="text" value={title} onChange={e => setTitle(e.target.value)}
               className="w-full px-4 py-3 border border-[var(--line-strong)] rounded-lg focus:ring-2 focus:ring-[var(--acc)] focus:border-transparent"
               placeholder="e.g. Weekly Check-in" />
           </div>
@@ -386,8 +386,8 @@ function ScheduleCard({ schedule, templates, trainerId, clientId, onRefresh }: {
       ) : editing ? (
         <div className="space-y-3 mt-3">
           <div>
-            <label className="block text-xs font-medium text-[var(--fg-2)] mb-1">Template</label>
-            <select value={templateId} onChange={e => setTemplateId(e.target.value)}
+            <label htmlFor="feedback-schedule-template" className="block text-xs font-medium text-[var(--fg-2)] mb-1">Template</label>
+            <select id="feedback-schedule-template" value={templateId} onChange={e => setTemplateId(e.target.value)}
               className="w-full px-3 py-2 text-sm border border-[var(--line-strong)] rounded-lg focus:ring-2 focus:ring-[var(--acc)] focus:border-transparent">
               <option value="">Select template...</option>
               {templates.map(t => (
@@ -397,15 +397,15 @@ function ScheduleCard({ schedule, templates, trainerId, clientId, onRefresh }: {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-[var(--fg-2)] mb-1">Day</label>
-              <select value={dayOfWeek} onChange={e => setDayOfWeek(Number(e.target.value))}
+              <label htmlFor="feedback-schedule-day" className="block text-xs font-medium text-[var(--fg-2)] mb-1">Day</label>
+              <select id="feedback-schedule-day" value={dayOfWeek} onChange={e => setDayOfWeek(Number(e.target.value))}
                 className="w-full px-3 py-2 text-sm border border-[var(--line-strong)] rounded-lg focus:ring-2 focus:ring-[var(--acc)] focus:border-transparent">
                 {DAYS.map((d, i) => <option key={i} value={i}>{d}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-[var(--fg-2)] mb-1">Frequency</label>
-              <select value={recurrence} onChange={e => setRecurrence(e.target.value as CheckInRecurrence)}
+              <label htmlFor="feedback-schedule-recurrence" className="block text-xs font-medium text-[var(--fg-2)] mb-1">Frequency</label>
+              <select id="feedback-schedule-recurrence" value={recurrence} onChange={e => setRecurrence(e.target.value as CheckInRecurrence)}
                 className="w-full px-3 py-2 text-sm border border-[var(--line-strong)] rounded-lg focus:ring-2 focus:ring-[var(--acc)] focus:border-transparent">
                 {RECURRENCE_OPTIONS.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
               </select>
