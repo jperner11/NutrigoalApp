@@ -99,23 +99,34 @@ export default function DashboardPage() {
 
     async function loadTodayStats() {
       try {
-        // Load meal, water, workout and cardio logs for today (independent queries)
+        // Weekly progress stats
+        const weekStart = new Date()
+        weekStart.setDate(weekStart.getDate() - getMondayIndexedDay(weekStart)) // Monday
+        const weekStartStr = getLocalDateString(weekStart)
+
+        // Avg daily calorie goal % over past 7 days
+        const sevenDaysAgo = getLocalDateString(new Date(Date.now() - 7 * 86400000))
+
+        // Meal/water logs for the past 7 days already cover "today" (a subset of that range),
+        // so today's totals are derived from the same query instead of a separate one.
         const [
-          { data: mealLogs },
-          { data: waterLogs },
+          { data: weekMealLogs },
+          { data: weekWaterLogs },
           { count: workoutCount },
           { data: cardioSessions },
+          { count: weekWorkoutCount },
+          { data: recentWeights },
         ] = await Promise.all([
           supabase
             .from('meal_logs')
-            .select('total_calories, total_protein, total_carbs, total_fat')
+            .select('date, total_calories, total_protein, total_carbs, total_fat')
             .eq('user_id', profile!.id)
-            .eq('date', today),
+            .gte('date', sevenDaysAgo),
           supabase
             .from('water_logs')
-            .select('amount_ml')
+            .select('date, amount_ml')
             .eq('user_id', profile!.id)
-            .eq('date', today),
+            .gte('date', sevenDaysAgo),
           supabase
             .from('workout_logs')
             .select('*', { count: 'exact', head: true })
@@ -127,13 +138,27 @@ export default function DashboardPage() {
             .eq('user_id', profile!.id)
             .eq('date', today)
             .eq('is_completed', true),
+          supabase
+            .from('workout_logs')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', profile!.id)
+            .gte('date', weekStartStr),
+          supabase
+            .from('weight_logs')
+            .select('weight_kg, date')
+            .eq('user_id', profile!.id)
+            .order('date', { ascending: false })
+            .limit(2),
         ])
 
-        const caloriesConsumed = mealLogs?.reduce((sum, log) => sum + log.total_calories, 0) ?? 0
-        const proteinConsumed = mealLogs?.reduce((sum, log) => sum + (log.total_protein ?? 0), 0) ?? 0
-        const carbsConsumed = mealLogs?.reduce((sum, log) => sum + (log.total_carbs ?? 0), 0) ?? 0
-        const fatConsumed = mealLogs?.reduce((sum, log) => sum + (log.total_fat ?? 0), 0) ?? 0
-        const waterConsumed = waterLogs?.reduce((sum, log) => sum + log.amount_ml, 0) ?? 0
+        const mealLogsToday = weekMealLogs?.filter(log => log.date === today) ?? []
+        const waterLogsToday = weekWaterLogs?.filter(log => log.date === today) ?? []
+
+        const caloriesConsumed = mealLogsToday.reduce((sum, log) => sum + log.total_calories, 0)
+        const proteinConsumed = mealLogsToday.reduce((sum, log) => sum + (log.total_protein ?? 0), 0)
+        const carbsConsumed = mealLogsToday.reduce((sum, log) => sum + (log.total_carbs ?? 0), 0)
+        const fatConsumed = mealLogsToday.reduce((sum, log) => sum + (log.total_fat ?? 0), 0)
+        const waterConsumed = waterLogsToday.reduce((sum, log) => sum + log.amount_ml, 0)
         const cardioMinutes = cardioSessions?.reduce((sum, s) => sum + s.duration_minutes, 0) ?? 0
 
         setTodayStats({
@@ -145,44 +170,6 @@ export default function DashboardPage() {
           workoutsCompleted: workoutCount ?? 0,
           cardioMinutes,
         })
-
-        // Weekly progress stats
-        const weekStart = new Date()
-        weekStart.setDate(weekStart.getDate() - getMondayIndexedDay(weekStart)) // Monday
-        const weekStartStr = getLocalDateString(weekStart)
-
-        // Avg daily calorie goal % over past 7 days
-        const sevenDaysAgo = getLocalDateString(new Date(Date.now() - 7 * 86400000))
-
-        // Weekly stats and latest weight data are all independent of each other
-        const [
-          { data: weekMealLogs },
-          { count: weekWorkoutCount },
-          { data: weekWaterLogs },
-          { data: recentWeights },
-        ] = await Promise.all([
-          supabase
-            .from('meal_logs')
-            .select('date, total_calories')
-            .eq('user_id', profile!.id)
-            .gte('date', sevenDaysAgo),
-          supabase
-            .from('workout_logs')
-            .select('*', { count: 'exact', head: true })
-            .eq('user_id', profile!.id)
-            .gte('date', weekStartStr),
-          supabase
-            .from('water_logs')
-            .select('date, amount_ml')
-            .eq('user_id', profile!.id)
-            .gte('date', sevenDaysAgo),
-          supabase
-            .from('weight_logs')
-            .select('weight_kg, date')
-            .eq('user_id', profile!.id)
-            .order('date', { ascending: false })
-            .limit(2),
-        ])
 
         let avgGoalPct: number | null = null
         if (weekMealLogs && weekMealLogs.length > 0 && profile!.daily_calories) {
