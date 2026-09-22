@@ -480,8 +480,8 @@ export default function TrainingPlanDetailPage() {
       {/* Free User Day Picker Modal */}
       {showDayPicker && isFreeUser && (
         <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 p-4">
-          <div className="bg-[var(--panel-strong)] rounded-2xl w-full max-w-md shadow-2xl">
-            <div className="px-6 py-5 border-b border-[var(--line)]">
+          <div className="bg-[var(--panel-strong)] rounded-2xl w-full max-w-md max-h-[80vh] overflow-y-auto shadow-2xl">
+            <div className="sticky top-0 bg-[var(--panel-strong)] px-6 py-5 border-b border-[var(--line)]">
               <h3 className="text-lg font-bold text-[var(--foreground)]">Choose a training day to unlock</h3>
               <p className="text-sm text-[var(--muted-soft)] mt-1">
                 Free plan includes 1 training day. Pick the one you&apos;d like to see.
