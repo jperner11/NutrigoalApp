@@ -5,7 +5,7 @@ import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
 import { calculateCardioCalories } from '@/lib/cardio'
 import { getLocalDateString } from '@/lib/date'
-import { HeartPulse, Lock } from 'lucide-react'
+import { HeartPulse, Lock, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { isFeatureLocked } from '@/lib/tierUtils'
 import { toast } from 'react-hot-toast'
@@ -330,20 +330,32 @@ export default function CardioPage() {
                 >
                   ACTIVITY
                 </label>
-                <select
-                  id="cardio-activity"
-                  value={formData.cardio_type_id}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, cardio_type_id: e.target.value }))
-                  }
-                  style={inputStyle}
-                >
-                  {cardioTypes.map((type) => (
-                    <option key={type.id} value={type.id}>
-                      {type.name}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select
+                    id="cardio-activity"
+                    value={formData.cardio_type_id}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, cardio_type_id: e.target.value }))
+                    }
+                    style={{
+                      ...inputStyle,
+                      paddingRight: 32,
+                      appearance: 'none',
+                      WebkitAppearance: 'none',
+                      MozAppearance: 'none',
+                    }}
+                  >
+                    {cardioTypes.map((type) => (
+                      <option key={type.id} value={type.id}>
+                        {type.name}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown
+                    className="pointer-events-none absolute right-3 top-3 h-4 w-4"
+                    style={{ color: 'var(--fg-3)' }}
+                  />
+                </div>
               </div>
 
               <div>
