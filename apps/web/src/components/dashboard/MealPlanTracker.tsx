@@ -85,22 +85,23 @@ export default function MealPlanTracker({ userId, userRole = 'free', onMacrosUpd
       const plan = plans[0]
       setActivePlan(plan)
 
-      // Get meals for this plan (matching today's day_of_week or null = every day)
-      const { data: planMeals } = await supabase
-        .from('diet_plan_meals')
-        .select('*')
-        .eq('diet_plan_id', plan.id)
-        .or(`day_of_week.eq.${dayOfWeek},day_of_week.is.null`)
+      // Get meals for this plan (matching today's day_of_week or null = every day),
+      // and today's meal logs — independent queries, so run them concurrently.
+      const [{ data: planMeals }, { data: logs }] = await Promise.all([
+        supabase
+          .from('diet_plan_meals')
+          .select('*')
+          .eq('diet_plan_id', plan.id)
+          .or(`day_of_week.eq.${dayOfWeek},day_of_week.is.null`),
+        supabase
+          .from('meal_logs')
+          .select('diet_plan_meal_id, total_calories, total_protein, total_carbs, total_fat')
+          .eq('user_id', userId)
+          .eq('date', today)
+          .not('diet_plan_meal_id', 'is', null),
+      ])
 
       setMeals(planMeals ?? [])
-
-      // Get today's meal logs that reference this plan's meals
-      const { data: logs } = await supabase
-        .from('meal_logs')
-        .select('diet_plan_meal_id, total_calories, total_protein, total_carbs, total_fat')
-        .eq('user_id', userId)
-        .eq('date', today)
-        .not('diet_plan_meal_id', 'is', null)
 
       const loggedIds = new Set<string>()
       let totalCal = 0, totalPro = 0, totalCarbs = 0, totalFat = 0
