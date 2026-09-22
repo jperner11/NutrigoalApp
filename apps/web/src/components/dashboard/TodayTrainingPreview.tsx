@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Dumbbell, Play, CheckCircle2 } from 'lucide-react'
 import Link from 'next/link'
+import { toast } from 'react-hot-toast'
 import { reportClientError } from '@/lib/apiClient'
 import { getMondayIndexedDay, getLocalDateString } from '@/lib/date'
 
@@ -118,6 +119,7 @@ export default function TodayTrainingPreview({ userId }: TodayTrainingPreviewPro
         })
       } catch (err) {
         reportClientError(err, { feature: 'dashboard', action: 'today-training-preview-load' })
+        toast.error('Failed to load today\'s training. Please refresh the page.')
         setNoPlan(true)
       } finally {
         setLoading(false)
