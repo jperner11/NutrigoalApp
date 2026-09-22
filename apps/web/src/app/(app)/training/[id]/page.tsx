@@ -55,11 +55,21 @@ export default function TrainingPlanDetailPage() {
     const supabase = createClient()
 
     try {
-      const { data: planData, error: planError } = await supabase
-        .from('training_plans')
-        .select('*')
-        .eq('id', params.id)
-        .single()
+      const [
+        { data: planData, error: planError },
+        { data: daysData, error: daysError },
+      ] = await Promise.all([
+        supabase
+          .from('training_plans')
+          .select('*')
+          .eq('id', params.id)
+          .single(),
+        supabase
+          .from('training_plan_days')
+          .select('*')
+          .eq('training_plan_id', params.id)
+          .order('day_number'),
+      ])
 
       if (planError || !planData) {
         toast.error('Training plan not found')
@@ -68,12 +78,6 @@ export default function TrainingPlanDetailPage() {
       }
 
       setPlan(planData)
-
-      const { data: daysData, error: daysError } = await supabase
-        .from('training_plan_days')
-        .select('*')
-        .eq('training_plan_id', params.id)
-        .order('day_number')
 
       if (daysError) throw daysError
 

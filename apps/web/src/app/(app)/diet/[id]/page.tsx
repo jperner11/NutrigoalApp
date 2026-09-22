@@ -117,11 +117,17 @@ export default function DietPlanDetailPage() {
     const supabase = createClient()
 
     try {
-      const { data: planData, error: planError } = await supabase
-        .from('diet_plans')
-        .select('*')
-        .eq('id', params.id)
-        .single()
+      const [{ data: planData, error: planError }, { data: mealsData }] = await Promise.all([
+        supabase
+          .from('diet_plans')
+          .select('*')
+          .eq('id', params.id)
+          .single(),
+        supabase
+          .from('diet_plan_meals')
+          .select('*')
+          .eq('diet_plan_id', params.id),
+      ])
 
       if (planError || !planData) {
         toast.error('Diet plan not found')
@@ -130,12 +136,6 @@ export default function DietPlanDetailPage() {
       }
 
       setPlan(planData)
-
-      const { data: mealsData } = await supabase
-        .from('diet_plan_meals')
-        .select('*')
-        .eq('diet_plan_id', params.id)
-
       setMeals(mealsData ?? [])
       setExpandedMeals(new Set((mealsData ?? []).map(m => m.id)))
     } catch (err) {
