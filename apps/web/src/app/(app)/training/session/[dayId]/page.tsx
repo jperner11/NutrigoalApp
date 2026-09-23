@@ -111,24 +111,23 @@ export default function WorkoutSessionPage() {
       const supabase = createClient()
 
       try {
-        // Fetch day info
-        const { data: dayData, error: dayError } = await supabase
-          .from('training_plan_days')
-          .select('*')
-          .eq('id', dayId)
-          .single()
+        // Fetch day info and exercises for this day concurrently (independent queries)
+        const [
+          { data: dayData, error: dayError },
+          { data: planExercises, error: exercisesError },
+        ] = await Promise.all([
+          supabase.from('training_plan_days').select('*').eq('id', dayId).single(),
+          supabase
+            .from('training_plan_exercises')
+            .select('*, exercises(*)')
+            .eq('plan_day_id', dayId)
+            .order('order_index'),
+        ])
 
         if (dayError) throw dayError
         if (dayData) {
           setDayName(dayData.name)
         }
-
-        // Fetch exercises for this day
-        const { data: planExercises, error: exercisesError } = await supabase
-          .from('training_plan_exercises')
-          .select('*, exercises(*)')
-          .eq('plan_day_id', dayId)
-          .order('order_index')
 
         if (exercisesError) throw exercisesError
         if (!planExercises || planExercises.length === 0) {
