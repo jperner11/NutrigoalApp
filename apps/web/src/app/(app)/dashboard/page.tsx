@@ -261,17 +261,18 @@ export default function DashboardPage() {
   if (isTrainerRole(profile.role)) {
     if (!profile.onboarding_completed) {
       return (
-        <div className="panel-strong p-8">
-          <h1 className="font-display text-3xl font-bold text-[var(--foreground)]">Complete your coach setup</h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--muted)]">
-            Tell us how you coach, who you work with, and what information you need from clients before programming.
-          </p>
-          <Link
-            href="/onboarding"
-            className="btn-primary mt-6 inline-flex items-center space-x-2 rounded-2xl px-5 py-3 text-sm font-semibold"
-          >
-            <span>Finish coach setup</span>
-          </Link>
+        <div className="-m-4 p-4 sm:-m-6 sm:p-6 lg:-m-8 lg:p-8">
+          <AppHeroPanel
+            eyebrow="Coach setup"
+            title="Complete your"
+            accent="coach setup."
+            subtitle="Tell us how you coach, who you work with, and what information you need from clients before programming."
+            actions={
+              <Link href="/onboarding" className="btn btn-accent">
+                <span>Finish coach setup</span>
+              </Link>
+            }
+          />
         </div>
       )
     }
