@@ -36,13 +36,20 @@ import { AppHeroPanel, AppSectionHeader, EmptyStateCard, ListCard } from '@/comp
 
 type TimeRange = '7D' | '1M' | '3M' | '6M' | 'ALL'
 
+function subtractMonths(date: Date, months: number): Date {
+  const target = new Date(date.getFullYear(), date.getMonth() - months, 1)
+  const daysInTargetMonth = new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate()
+  target.setDate(Math.min(date.getDate(), daysInTargetMonth))
+  return target
+}
+
 function getDateThreshold(range: TimeRange): Date | null {
   const now = new Date()
   switch (range) {
     case '7D': return new Date(now.getTime() - 7 * 86400000)
-    case '1M': return new Date(now.getFullYear(), now.getMonth() - 1, now.getDate())
-    case '3M': return new Date(now.getFullYear(), now.getMonth() - 3, now.getDate())
-    case '6M': return new Date(now.getFullYear(), now.getMonth() - 6, now.getDate())
+    case '1M': return subtractMonths(now, 1)
+    case '3M': return subtractMonths(now, 3)
+    case '6M': return subtractMonths(now, 6)
     case 'ALL': return null
   }
 }
