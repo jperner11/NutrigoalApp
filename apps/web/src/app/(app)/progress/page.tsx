@@ -221,12 +221,17 @@ export default function ProgressPage() {
     else if (diff < -0.3) trend = 'down'
   }
 
+  // Gaining weight is the intended outcome for bulking users, so don't flag it as a warning.
+  const gainIsGood = profile?.goal === 'bulking'
+  const directionTone = (dir: 'up' | 'down'): 'warn' | 'ok' =>
+    (dir === 'up') === gainIsGood ? 'ok' : 'warn'
+
   const trendIcon =
     trend === 'up' ? <TrendingUp className="h-3 w-3" />
     : trend === 'down' ? <TrendingDown className="h-3 w-3" />
     : <Minus className="h-3 w-3" />
   const trendTone: 'warn' | 'ok' | 'muted' =
-    trend === 'up' ? 'warn' : trend === 'down' ? 'ok' : 'muted'
+    trend === 'stable' ? 'muted' : directionTone(trend)
   const trendLabel = trend === 'up' ? 'Going up' : trend === 'down' ? 'Going down' : 'Stable'
 
   // Chart Y-axis domain
@@ -430,13 +435,13 @@ export default function ProgressPage() {
               <Minus className="h-3.5 w-3.5" />
             )
           }
-          iconTone={change > 0 ? 'warn' : change < 0 ? 'ok' : 'muted'}
+          iconTone={change === 0 ? 'muted' : directionTone(change > 0 ? 'up' : 'down')}
           label="Change"
           value={`${change > 0 ? '+' : ''}${change.toFixed(1)}kg`}
           change={
             change > 0 ? 'Above start' : change < 0 ? 'Below start' : 'No change'
           }
-          changeTone={change > 0 ? 'warn' : change < 0 ? 'ok' : 'muted'}
+          changeTone={change === 0 ? 'muted' : directionTone(change > 0 ? 'up' : 'down')}
         />
         <StatTile
           variant="card"
