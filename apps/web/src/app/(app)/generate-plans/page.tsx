@@ -734,7 +734,7 @@ interface SavedSupplementRecommendation {
             )}
 
             {savedSupplements && (
-              <Link href="/supplements" className="flex items-center gap-4 px-5 py-4 rounded-xl border border-[rgba(196,121,28,0.34)] bg-[rgba(196,121,28,0.14)] hover:border-[var(--warn)] transition-colors group">
+              <Link href="/supplements" className="flex items-center gap-4 px-5 py-4 rounded-xl border border-[var(--warn)] bg-[var(--warn-bg)] hover:border-[var(--warn)] transition-colors group">
                 <Pill className="h-5 w-5 text-[var(--warn-text)] flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-[var(--warn-text)]">Supplement Recommendations</p>
