@@ -116,7 +116,7 @@ export default function LoginScreen() {
     opacity: 0.6,
   },
   buttonText: {
-    color: '#fff',
+    color: c.onAccent,
     fontSize: 16,
     fontWeight: '700',
   },
@@ -204,7 +204,7 @@ export default function LoginScreen() {
               disabled={loading}
             >
               {loading ? (
-                <ActivityIndicator color="#fff" />
+                <ActivityIndicator color={colors.onAccent} />
               ) : (
                 <Text style={styles.buttonText}>Sign In</Text>
               )}
