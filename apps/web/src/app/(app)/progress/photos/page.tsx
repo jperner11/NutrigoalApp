@@ -233,12 +233,14 @@ export default function PhotosPage() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label
+                htmlFor="progress-photo-date"
                 className="mono mb-2 block"
                 style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
               >
                 DATE
               </label>
               <input
+                id="progress-photo-date"
                 type="date"
                 value={formDate}
                 onChange={(e) => setFormDate(e.target.value)}
@@ -252,13 +254,15 @@ export default function PhotosPage() {
               >
                 POSE
               </label>
-              <div className="row gap-2">
+              <div className="row gap-2" role="group" aria-label="Pose">
                 {POSES.map((pose) => {
                   const active = formPose === pose.value
                   return (
                     <button
                       key={pose.value}
+                      type="button"
                       onClick={() => setFormPose(pose.value)}
+                      aria-pressed={active}
                       className="flex-1 transition"
                       style={{
                         padding: '10px 12px',
@@ -348,12 +352,14 @@ export default function PhotosPage() {
 
           <div className="mt-4">
             <label
+              htmlFor="progress-photo-notes"
               className="mono mb-2 block"
               style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
             >
               NOTES
             </label>
             <input
+              id="progress-photo-notes"
               type="text"
               value={formNotes}
               onChange={(e) => setFormNotes(e.target.value)}
