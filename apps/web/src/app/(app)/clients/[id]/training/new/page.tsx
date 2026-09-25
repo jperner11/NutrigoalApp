@@ -274,6 +274,7 @@ export default function NewClientTrainingPlanPage() {
                 <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
                   className="input-field flex-1 px-3 py-2 text-sm" placeholder="Search exercises..." />
                 <select value={filterBodyPart} onChange={e => setFilterBodyPart(e.target.value)}
+                  aria-label="Filter exercises by body part"
                   className="input-field px-3 py-2 text-sm">
                   <option value="">All muscles</option>
                   {BODY_PARTS.map(bp => <option key={bp.value} value={bp.value}>{bp.label}</option>)}
