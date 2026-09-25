@@ -112,7 +112,7 @@ export default function InviteClientPage() {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-lg font-medium hover:shadow-lg transition-all disabled:opacity-50"
+          className="btn btn-accent w-full justify-center disabled:opacity-50"
         >
           {isLoading ? 'Sending...' : 'Send Invitation'}
         </button>
@@ -133,14 +133,14 @@ export default function InviteClientPage() {
             />
             <button
               onClick={handleCopyLink}
-              className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors"
+              className="btn btn-accent px-4 py-2 text-sm"
             >
               Copy
             </button>
           </div>
           <Link
             href="/clients"
-            className="inline-block mt-4 text-sm text-purple-600 hover:text-purple-700"
+            className="inline-block mt-4 text-sm text-[var(--acc-text)] hover:opacity-80"
           >
             ← Back to Clients
           </Link>
