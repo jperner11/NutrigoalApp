@@ -284,7 +284,7 @@ export default function AIGenerateScreen() {
 
             {!meals && !loading && (
               <TouchableOpacity style={st.generateBtn} onPress={generateMealPlan}>
-                <Ionicons name="sparkles" size={20} color="#fff" />
+                <Ionicons name="sparkles" size={20} color={colors.onAccent} />
                 <Text style={st.generateBtnText}>Generate Meal Plan</Text>
               </TouchableOpacity>
             )}
@@ -343,9 +343,9 @@ export default function AIGenerateScreen() {
                     <Text style={st.regenText}>Regenerate</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={[st.saveBtn, saving && { opacity: 0.6 }]} onPress={saveMealPlan} disabled={saving}>
-                    {saving ? <ActivityIndicator color="#fff" /> : (
+                    {saving ? <ActivityIndicator color={colors.onAccent} /> : (
                       <>
-                        <Ionicons name="checkmark" size={18} color="#fff" />
+                        <Ionicons name="checkmark" size={18} color={colors.onAccent} />
                         <Text style={st.saveBtnText}>Save Plan</Text>
                       </>
                     )}
@@ -370,7 +370,7 @@ export default function AIGenerateScreen() {
 
             {!trainingPlan && !loading && (
               <TouchableOpacity style={st.generateBtn} onPress={generateTrainingPlan}>
-                <Ionicons name="sparkles" size={20} color="#fff" />
+                <Ionicons name="sparkles" size={20} color={colors.onAccent} />
                 <Text style={st.generateBtnText}>Generate Training Plan</Text>
               </TouchableOpacity>
             )}
@@ -414,9 +414,9 @@ export default function AIGenerateScreen() {
                     <Text style={st.regenText}>Regenerate</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={[st.saveBtn, saving && { opacity: 0.6 }]} onPress={saveTrainingPlan} disabled={saving}>
-                    {saving ? <ActivityIndicator color="#fff" /> : (
+                    {saving ? <ActivityIndicator color={colors.onAccent} /> : (
                       <>
-                        <Ionicons name="checkmark" size={18} color="#fff" />
+                        <Ionicons name="checkmark" size={18} color={colors.onAccent} />
                         <Text style={st.saveBtnText}>Save Plan</Text>
                       </>
                     )}
@@ -457,7 +457,7 @@ const makeStyles = (c: BrandColors) => StyleSheet.create({
   infoTitle: { fontSize: 15, fontWeight: '700', color: c.foregroundSoft },
   infoDesc: { fontSize: 13, color: c.foregroundSoft, marginTop: 2, lineHeight: 18 },
   generateBtn: { flexDirection: 'row', backgroundColor: c.brand500, borderRadius: 18, paddingVertical: 16, alignItems: 'center', justifyContent: 'center', gap: 8 },
-  generateBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  generateBtnText: { color: c.onAccent, fontSize: 16, fontWeight: '700' },
   loadingBox: { alignItems: 'center', paddingVertical: 40, gap: 16 },
   loadingText: { fontSize: 15, color: c.textMuted, fontWeight: '500' },
   // Meal plan styles
@@ -484,7 +484,7 @@ const makeStyles = (c: BrandColors) => StyleSheet.create({
   regenBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, borderWidth: 1, borderColor: c.accentLine, borderRadius: 16, backgroundColor: c.panelMuted, paddingVertical: 14 },
   regenText: { fontSize: 15, fontWeight: '600', color: c.brand500 },
   saveBtn: { flex: 2, flexDirection: 'row', backgroundColor: c.brand500, borderRadius: 16, paddingVertical: 14, alignItems: 'center', justifyContent: 'center', gap: 6 },
-  saveBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
+  saveBtnText: { color: c.onAccent, fontSize: 15, fontWeight: '700' },
   // Training plan styles
   planHeader: { marginBottom: 16 },
   planName: { fontSize: 20, fontWeight: '800', color: c.foreground },
