@@ -117,20 +117,26 @@ export default function CoachQuestionsPage() {
       : '/api/personal-trainer/custom-intake/questions'
     const method = draft.id ? 'PATCH' : 'POST'
 
-    const res = await fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    })
-    const json = await res.json()
-    setSaving(false)
-    if (!res.ok) {
-      toast.error(json.error || 'Failed to save')
-      return
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      const json = await res.json()
+      if (!res.ok) {
+        toast.error(json.error || 'Failed to save')
+        return
+      }
+      toast.success(draft.id ? 'Question updated' : 'Question added')
+      setDraft(null)
+      await fetchQuestions()
+    } catch (err) {
+      reportClientError(err, { feature: 'coach-questions', action: 'save-question' })
+      toast.error('Failed to save')
+    } finally {
+      setSaving(false)
     }
-    toast.success(draft.id ? 'Question updated' : 'Question added')
-    setDraft(null)
-    await fetchQuestions()
   }
 
   async function deleteQuestion(id: string) {
