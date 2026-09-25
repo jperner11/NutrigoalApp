@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import type { UserProfile } from '@/lib/supabase/types'
 import type { User } from '@supabase/supabase-js'
 import { toast } from 'react-hot-toast'
+import { reportClientError } from '@/lib/apiClient'
 
 // Distinguishes a deliberate sign-out from an expired session so the
 // auth-change listener doesn't show a misleading "session expired" toast.
@@ -44,7 +45,10 @@ export function useUser() {
       setLoading(false)
     }
 
-    getUser()
+    getUser().catch((err) => {
+      reportClientError(err, { feature: 'auth', action: 'get-user' })
+      setLoading(false)
+    })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED' && !session) {
