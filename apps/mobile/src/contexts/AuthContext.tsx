@@ -28,12 +28,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   const fetchProfile = async (userId: string) => {
-    const { data } = await supabase
-      .from('user_profiles')
-      .select('*')
-      .eq('id', userId)
-      .single()
-    setProfile(data as UserProfile | null)
+    try {
+      const { data } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', userId)
+        .single()
+      setProfile(data as UserProfile | null)
+    } catch (err) {
+      Sentry.captureException(err, { tags: { kind: 'auth-init', op: 'fetchProfile' } })
+    }
   }
 
   const refreshProfile = async () => {
