@@ -11,6 +11,7 @@ import {
   Pencil, Loader2, Check, X,
 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
+import { reportClientError } from '@/lib/apiClient'
 import type { UserProfile, DietPlan, TrainingPlan } from '@/lib/supabase/types'
 import { isTrainerRole } from '@treno/shared'
 import { AppHeroPanel, AppSectionHeader, EmptyStateCard, MetricCard } from '@/components/ui/AppDesign'
@@ -97,8 +98,11 @@ export default function ClientDetailPage() {
           pendingFeedbackCount: feedbackRes.count ?? 0,
           unreadMessageCount,
         })
-      } catch {
-        if (!cancelled) toast.error('Failed to load client data')
+      } catch (err) {
+        if (!cancelled) {
+          reportClientError(err, { feature: 'clients/[id]', action: 'load-client-detail' })
+          toast.error('Failed to load client data')
+        }
       } finally {
         if (!cancelled) setLoading(false)
       }
