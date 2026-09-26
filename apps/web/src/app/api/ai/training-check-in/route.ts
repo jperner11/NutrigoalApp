@@ -24,32 +24,31 @@ export async function POST(request: Request) {
     // Session-scoped client: RLS limits reads/writes to the user's own rows
     const supabase = await createClient()
 
-    const { data: profile } = await supabase
-      .from('user_profiles')
-      .select('*')
-      .eq('id', userId)
-      .single()
+    // These three queries are independent (each only needs userId), so run them concurrently.
+    const [{ data: profile }, { data: activePlan }, { data: lastCheckIn }] = await Promise.all([
+      supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', userId)
+        .single(),
+      supabase
+        .from('training_plans')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('is_active', true)
+        .single(),
+      supabase
+        .from('training_check_ins')
+        .select('check_in_date')
+        .eq('user_id', userId)
+        .order('check_in_date', { ascending: false })
+        .limit(1)
+        .single(),
+    ])
 
     if (!profile) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 })
     }
-
-    // Get active training plan
-    const { data: activePlan } = await supabase
-      .from('training_plans')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('is_active', true)
-      .single()
-
-    // Determine period: since last check-in or 14 days
-    const { data: lastCheckIn } = await supabase
-      .from('training_check_ins')
-      .select('check_in_date')
-      .eq('user_id', userId)
-      .order('check_in_date', { ascending: false })
-      .limit(1)
-      .single()
 
     const now = new Date()
     const periodEnd = now.toISOString().split('T')[0]
