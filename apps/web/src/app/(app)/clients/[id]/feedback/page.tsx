@@ -197,6 +197,7 @@ export default function ClientFeedbackPage() {
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <select value={q.type} onChange={e => setQuestions(prev => prev.map(qq => qq.id === q.id ? { ...qq, type: e.target.value as FeedbackQuestionType } : qq))}
+                    aria-label="Question type"
                     className="text-xs font-medium text-[var(--acc-text)] px-2 py-0.5 bg-[var(--acc-soft)] rounded border-0">
                     {QUESTION_TYPES.map(qt => <option key={qt.value} value={qt.value}>{qt.label}</option>)}
                   </select>
