@@ -156,10 +156,10 @@ export default function ClientDetailPage() {
               <AnamnesisRow icon={<ThumbsDown className="h-4 w-4 text-[var(--fg-3)]" />} label="Dislikes" value={client.food_dislikes.join(', ')} />
             )}
             {client.training_experience && (
-              <AnamnesisRow icon={<Activity className="h-4 w-4 text-[var(--brand-400)]" />} label="Experience" value={client.training_experience} />
+              <AnamnesisRow icon={<Activity className="h-4 w-4 text-[var(--acc-text)]" />} label="Experience" value={client.training_experience} />
             )}
             {client.equipment_access && (
-              <AnamnesisRow icon={<Weight className="h-4 w-4 text-[var(--brand-400)]" />} label="Equipment" value={client.equipment_access.replace(/_/g, ' ')} />
+              <AnamnesisRow icon={<Weight className="h-4 w-4 text-[var(--acc-text)]" />} label="Equipment" value={client.equipment_access.replace(/_/g, ' ')} />
             )}
           </div>
         )}
@@ -170,9 +170,9 @@ export default function ClientDetailPage() {
             {client.desired_outcome && <AnamnesisRow icon={<Target className="h-4 w-4 text-[var(--acc)]" />} label="Desired outcome" value={client.desired_outcome} />}
             {client.past_dieting_challenges && <AnamnesisRow icon={<AlertTriangle className="h-4 w-4 text-[var(--warn)]" />} label="Past challenges" value={client.past_dieting_challenges} />}
             {client.weekly_derailers && <AnamnesisRow icon={<ClipboardList className="h-4 w-4 text-[var(--acc)]" />} label="Derailers" value={client.weekly_derailers} />}
-            {client.equipment_access && <AnamnesisRow icon={<Weight className="h-4 w-4 text-[var(--brand-400)]" />} label="Equipment" value={client.equipment_access.replace(/_/g, ' ')} />}
-            {client.workout_days_per_week && <AnamnesisRow icon={<Dumbbell className="h-4 w-4 text-[var(--brand-400)]" />} label="Training availability" value={`${client.workout_days_per_week} days / week`} />}
-            {client.max_session_minutes && <AnamnesisRow icon={<Activity className="h-4 w-4 text-[var(--brand-400)]" />} label="Session length" value={`${client.max_session_minutes} min`} />}
+            {client.equipment_access && <AnamnesisRow icon={<Weight className="h-4 w-4 text-[var(--acc-text)]" />} label="Equipment" value={client.equipment_access.replace(/_/g, ' ')} />}
+            {client.workout_days_per_week && <AnamnesisRow icon={<Dumbbell className="h-4 w-4 text-[var(--acc-text)]" />} label="Training availability" value={`${client.workout_days_per_week} days / week`} />}
+            {client.max_session_minutes && <AnamnesisRow icon={<Activity className="h-4 w-4 text-[var(--acc-text)]" />} label="Session length" value={`${client.max_session_minutes} min`} />}
             {client.plan_preference && <AnamnesisRow icon={<ClipboardList className="h-4 w-4 text-[var(--acc)]" />} label="Plan style" value={client.plan_preference.replace(/_/g, ' ')} />}
             {client.sleep_quality && <AnamnesisRow icon={<Stethoscope className="h-4 w-4 text-[var(--fg-3)]" />} label="Recovery context" value={`${client.sleep_quality}${client.stress_level ? ` · stress ${client.stress_level}` : ''}`} />}
           </div>
@@ -213,12 +213,12 @@ export default function ClientDetailPage() {
       <div className="grid grid-cols-2 gap-4 mb-6">
         <Link href={`/clients/${id}/messages`}
           className="card flex items-center justify-center space-x-2 p-4 transition hover:border-[var(--line-strong)]">
-          <MessageSquare className="h-5 w-5 text-[var(--brand-400)]" />
+          <MessageSquare className="h-5 w-5 text-[var(--acc-text)]" />
           <span className="font-medium text-[var(--fg)]">Messages</span>
         </Link>
         <Link href={`/clients/${id}/feedback`}
           className="card flex items-center justify-center space-x-2 p-4 transition hover:border-[var(--line-strong)]">
-          <ClipboardList className="h-5 w-5 text-[var(--brand-400)]" />
+          <ClipboardList className="h-5 w-5 text-[var(--acc-text)]" />
           <span className="font-medium text-[var(--fg)]">Check-ins</span>
         </Link>
       </div>
@@ -284,7 +284,7 @@ export default function ClientDetailPage() {
             {trainingPlans.map(plan => (
               <div key={plan.id} className="card p-4 flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <Dumbbell className="h-5 w-5 text-[var(--brand-400)]" />
+                  <Dumbbell className="h-5 w-5 text-[var(--acc-text)]" />
                   <div>
                     <p className="font-semibold text-[var(--fg)]">{plan.name}</p>
                     <p className="text-xs text-[var(--fg-3)]">{plan.days_per_week}x/week{plan.description ? ` · ${plan.description}` : ''}</p>
@@ -344,7 +344,7 @@ function EditableMacros({ client, onUpdated }: { client: UserProfile; onUpdated:
         <div className="flex items-center justify-between mb-2">
           <span className="app-mono-label">Macro targets</span>
           <button onClick={() => setEditing(true)}
-            className="flex items-center gap-1 text-xs font-medium text-[var(--brand-400)] hover:text-[var(--brand-500)]">
+            className="flex items-center gap-1 text-xs font-medium text-[var(--acc-text)] hover:underline">
             <Pencil className="h-3 w-3" />
             Edit
           </button>
