@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react'
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, RefreshControl } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
+import * as Sentry from '@sentry/react-native'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
+import { getLocalDateString } from '../../src/lib/date'
 import { WATER_QUICK_ADD } from '@treno/shared'
 import { useBrandColors, useThemedStyles, brandShadow } from '../../src/theme/brand'
 
@@ -31,7 +33,7 @@ export default function WaterScreen() {
   const { user, profile } = useAuth()
   const [logs, setLogs] = useState<{ id: string; amount_ml: number; logged_at: string }[]>([])
   const [refreshing, setRefreshing] = useState(false)
-  const today = new Date().toISOString().split('T')[0]
+  const today = getLocalDateString()
 
   const fetchLogs = async () => {
     if (!user) return
@@ -44,13 +46,30 @@ export default function WaterScreen() {
     if (data) setLogs(data)
   }
 
-  useEffect(() => { fetchLogs() }, [user])
+  useEffect(() => {
+    fetchLogs().catch((err) => {
+      Sentry.captureException(err, { tags: { kind: 'water-load', screen: 'water' } })
+    })
+  }, [user])
 
-  const onRefresh = async () => { setRefreshing(true); await fetchLogs(); setRefreshing(false) }
+  const onRefresh = async () => {
+    setRefreshing(true)
+    try {
+      await fetchLogs()
+    } catch (err) {
+      Sentry.captureException(err, { tags: { kind: 'water-refresh', screen: 'water' } })
+    } finally {
+      setRefreshing(false)
+    }
+  }
 
   const addWater = async (amount: number) => {
     if (!user) return
-    await supabase.from('water_logs').insert({ user_id: user.id, date: today, amount_ml: amount })
+    const { error } = await supabase.from('water_logs').insert({ user_id: user.id, date: today, amount_ml: amount })
+    if (error) {
+      Sentry.captureException(error, { tags: { kind: 'water-add', screen: 'water' } })
+      return
+    }
     await fetchLogs()
   }
 
@@ -77,7 +96,15 @@ export default function WaterScreen() {
 
         <View style={styles.quickRow}>
           {WATER_QUICK_ADD.map((opt) => (
-            <TouchableOpacity key={opt.amount} style={styles.quickBtn} onPress={() => addWater(opt.amount)}>
+            <TouchableOpacity
+              key={opt.amount}
+              style={styles.quickBtn}
+              onPress={() =>
+                addWater(opt.amount).catch((err) =>
+                  Sentry.captureException(err, { tags: { kind: 'water-add', screen: 'water' } })
+                )
+              }
+            >
               <Text style={styles.quickBtnText}>+{opt.label}</Text>
             </TouchableOpacity>
           ))}

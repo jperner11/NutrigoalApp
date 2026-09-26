@@ -272,6 +272,43 @@ export async function seedTrainingDay(
   return { planDayId: planDay.id }
 }
 
+/**
+ * Seed an active one-day diet plan with a single meal/ingredient for a client, so
+ * a grocery-list spec can jump straight to /grocery without driving the "New Diet
+ * Plan" builder UI (mirrors seedTrainingDay's approach for /training). Cascades
+ * away when the client's auth user is deleted.
+ */
+export async function seedActiveDietPlan(
+  clientId: string,
+  planName = 'E2E Diet Plan',
+): Promise<{ planId: string }> {
+  const supabase = admin()
+
+  const { data: plan, error: planError } = await supabase
+    .from('diet_plans')
+    .insert({ user_id: clientId, created_by: clientId, name: planName, is_active: true })
+    .select()
+    .single()
+  if (planError || !plan) {
+    throw new Error(`Failed to seed diet plan: ${planError?.message ?? 'unknown error'}`)
+  }
+
+  const { error: mealError } = await supabase.from('diet_plan_meals').insert({
+    diet_plan_id: plan.id,
+    day_of_week: 0,
+    meal_type: 'breakfast',
+    meal_name: 'E2E Breakfast',
+    foods: { items: [{ name: 'Chicken Breast', amount: 200, unit: 'g' }] },
+    total_calories: 330,
+    total_protein: 62,
+    total_carbs: 0,
+    total_fat: 7,
+  })
+  if (mealError) throw new Error(`Failed to seed diet plan meal: ${mealError.message}`)
+
+  return { planId: plan.id }
+}
+
 // Deletes every synthetic user this layer ever created (matched by the TEST_PREFIX
 // in their email). Safe to run before or after a test run to keep the test DB clean.
 export async function cleanupAllTestUsers(): Promise<number> {

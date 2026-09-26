@@ -30,8 +30,10 @@ test('F16 (e2e): Pro client tracks a supplement', async ({ client, page }) => {
 
   await page.getByRole('button', { name: /^add supplement$/i }).click()
 
-  // The new supplement appears in the stack list.
-  await expect(page.getByText('Vitamin D3')).toBeVisible({ timeout: 15_000 })
+  // The new supplement appears in the stack list. Scoped to the list heading
+  // (not a plain text match) because the "Vitamin D3 added" success toast
+  // contains the same substring and can still be on screen here.
+  await expect(page.getByRole('heading', { name: 'Vitamin D3' })).toBeVisible({ timeout: 15_000 })
   await expect(page.getByText('2000 IU')).toBeVisible()
 
   // Mark it taken today — the toggle button flips to pressed and the

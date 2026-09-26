@@ -5,8 +5,10 @@ import {
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
+import * as Sentry from '@sentry/react-native'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
+import { getLocalDateString } from '../../src/lib/date'
 import {
   BODY_PARTS, EQUIPMENT_TYPES, DEFAULT_REST_SECONDS, DEFAULT_SETS, DEFAULT_REPS,
   calculateSuggestion, parseRepRange,
@@ -64,8 +66,21 @@ export default function TrainingScreen() {
     if (data) setPlans(data as TrainingPlan[])
   }
 
-  useEffect(() => { fetchPlans() }, [user])
-  const onRefresh = async () => { setRefreshing(true); await fetchPlans(); setRefreshing(false) }
+  useEffect(() => {
+    fetchPlans().catch((err) => {
+      Sentry.captureException(err, { tags: { kind: 'training-load', screen: 'training-list' } })
+    })
+  }, [user])
+  const onRefresh = async () => {
+    setRefreshing(true)
+    try {
+      await fetchPlans()
+    } catch (err) {
+      Sentry.captureException(err, { tags: { kind: 'training-refresh', screen: 'training-list' } })
+    } finally {
+      setRefreshing(false)
+    }
+  }
 
   if (screen === 'create' && !managedClient) return <CreatePlan user={user} profile={profile} onDone={() => { setScreen('list'); fetchPlans() }} onCancel={() => setScreen('list')} />
   if (screen === 'detail' && selectedPlanId) return <PlanDetail planId={selectedPlanId} user={user} onBack={() => { setScreen('list'); fetchPlans() }} onStartSession={(dayId: string) => { setSessionDayId(dayId); setScreen('session') }} />
@@ -79,7 +94,12 @@ export default function TrainingScreen() {
           <Text style={s.title}>Training</Text>
         </View>
         {!managedClient && (
-          <TouchableOpacity style={s.addBtn} onPress={() => setScreen('create')}>
+          <TouchableOpacity
+            style={s.addBtn}
+            onPress={() => setScreen('create')}
+            accessibilityRole="button"
+            accessibilityLabel="Create training plan"
+          >
             <Ionicons name="add" size={24} color="#fff" />
           </TouchableOpacity>
         )}
@@ -142,7 +162,13 @@ function CreatePlan({ user, profile, onDone, onCancel }: any) {
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    supabase.from('exercises').select('*').then(({ data }) => { if (data) setAllExercises(data as Exercise[]) })
+    Promise.resolve(supabase.from('exercises').select('*')).then(({ data, error }) => {
+      if (data) setAllExercises(data as Exercise[])
+      else if (error) Alert.alert('Error', 'Could not load exercises')
+    }).catch((err) => {
+      Sentry.captureException(err, { tags: { kind: 'training-exercises-load', screen: 'training-plan-builder' } })
+      Alert.alert('Error', 'Could not load exercises')
+    })
   }, [])
 
   const filteredExercises = allExercises.filter(e => {
@@ -213,7 +239,15 @@ function CreatePlan({ user, profile, onDone, onCancel }: any) {
           <View key={di} style={s.dayCard}>
             <View style={s.dayHeader}>
               <TextInput style={s.dayNameInput} value={day.name} onChangeText={(t) => { const u = [...days]; u[di].name = t; setDays(u) }} />
-              {days.length > 1 && <TouchableOpacity onPress={() => removeDay(di)}><Ionicons name="trash-outline" size={20} color={colors.error} /></TouchableOpacity>}
+              {days.length > 1 && (
+                <TouchableOpacity
+                  onPress={() => removeDay(di)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Remove ${day.name}`}
+                >
+                  <Ionicons name="trash-outline" size={20} color={colors.error} />
+                </TouchableOpacity>
+              )}
             </View>
             {day.exercises.map((ex, ei) => (
               <View key={ei} style={s.exerciseRow}>
@@ -221,7 +255,13 @@ function CreatePlan({ user, profile, onDone, onCancel }: any) {
                   <Text style={s.exerciseName}>{ex.exercise.name}</Text>
                   <Text style={s.exerciseMeta}>{ex.sets} sets × {ex.reps} · {ex.rest_seconds}s rest</Text>
                 </View>
-                <TouchableOpacity onPress={() => removeExercise(di, ei)}><Ionicons name="close-circle" size={22} color={colors.textSubtle} /></TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => removeExercise(di, ei)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Remove ${ex.exercise.name}`}
+                >
+                  <Ionicons name="close-circle" size={22} color={colors.textSubtle} />
+                </TouchableOpacity>
               </View>
             ))}
             <TouchableOpacity style={s.addExBtn} onPress={() => { setPickerDayIdx(di); setShowPicker(true); setSearch(''); setFilterBody('') }}>
@@ -322,9 +362,13 @@ function PlanDetail({ planId, user, onBack, onStartSession }: any) {
   return (
     <SafeAreaView style={s.container}>
       <View style={s.modalHeader}>
-        <TouchableOpacity onPress={onBack}><Ionicons name="arrow-back" size={24} color={colors.foreground} /></TouchableOpacity>
+        <TouchableOpacity onPress={onBack} accessibilityRole="button" accessibilityLabel="Go back">
+          <Ionicons name="arrow-back" size={24} color={colors.foreground} />
+        </TouchableOpacity>
         <Text style={s.modalTitle}>{plan.name}</Text>
-        <TouchableOpacity onPress={handleDelete}><Ionicons name="trash-outline" size={22} color={colors.error} /></TouchableOpacity>
+        <TouchableOpacity onPress={handleDelete} accessibilityRole="button" accessibilityLabel="Delete plan">
+          <Ionicons name="trash-outline" size={22} color={colors.error} />
+        </TouchableOpacity>
       </View>
       <ScrollView contentContainerStyle={s.content}>
         {days.map((day) => (
@@ -510,7 +554,7 @@ function WorkoutSession({ dayId, user, profile, onDone }: any) {
     await supabase.from('workout_logs').insert({
       user_id: user.id,
       plan_day_id: dayId,
-      date: new Date().toISOString().split('T')[0],
+      date: getLocalDateString(),
       duration_minutes: durationMin,
       exercises: exerciseLogs,
     })
@@ -524,7 +568,11 @@ function WorkoutSession({ dayId, user, profile, onDone }: any) {
   return (
     <SafeAreaView style={s.container}>
       <View style={s.modalHeader}>
-        <TouchableOpacity onPress={() => Alert.alert('Quit?', 'Your progress will be lost', [{ text: 'Stay' }, { text: 'Quit', style: 'destructive', onPress: onDone }])}>
+        <TouchableOpacity
+          onPress={() => Alert.alert('Quit?', 'Your progress will be lost', [{ text: 'Stay' }, { text: 'Quit', style: 'destructive', onPress: onDone }])}
+          accessibilityRole="button"
+          accessibilityLabel="Quit workout"
+        >
           <Ionicons name="close" size={24} color={colors.foreground} />
         </TouchableOpacity>
         <Text style={s.modalTitle}>{currentIdx + 1} / {exercises.length}</Text>
@@ -593,7 +641,7 @@ function WorkoutSession({ dayId, user, profile, onDone }: any) {
               keyboardType="numeric"
               editable={!set.completed}
               placeholder={set.suggestedWeight ? `${set.suggestedWeight}` : '0'}
-              placeholderTextColor="#c4b5fd"
+              placeholderTextColor={colors.textSubtle}
             />
             <TextInput
               style={[s.setInput]}
@@ -602,9 +650,15 @@ function WorkoutSession({ dayId, user, profile, onDone }: any) {
               keyboardType="numeric"
               editable={!set.completed}
               placeholder={currentEx.reps.split('-').pop() || '12'}
-              placeholderTextColor="#c4b5fd"
+              placeholderTextColor={colors.textSubtle}
             />
-            <TouchableOpacity style={[s.checkBtn, set.completed && s.checkBtnDone]} onPress={() => toggleComplete(si)}>
+            <TouchableOpacity
+              style={[s.checkBtn, set.completed && s.checkBtnDone]}
+              onPress={() => toggleComplete(si)}
+              accessibilityRole="button"
+              accessibilityLabel={set.completed ? `Set ${si + 1} completed` : `Mark set ${si + 1} complete`}
+              accessibilityState={{ selected: set.completed }}
+            >
               <Ionicons name={set.completed ? 'checkmark-circle' : 'ellipse-outline'} size={28} color={set.completed ? colors.brand500 : colors.textSubtle} />
             </TouchableOpacity>
           </View>
@@ -715,7 +769,7 @@ const makeStyles = (c: BrandColors) => StyleSheet.create({
   sessionExMeta: { fontSize: 14, color: c.textMuted, textAlign: 'center', marginTop: 4, marginBottom: 16 },
   suggestionCard: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: c.brand100, borderRadius: 14, borderWidth: 1, borderColor: c.accentLine, padding: 12, marginBottom: 16 },
   suggestionText: { fontSize: 13, color: c.foregroundSoft, flex: 1 },
-  overloadBanner: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: c.warningBg, borderRadius: 14, borderWidth: 1, borderColor: '#f3d27a', padding: 12, marginBottom: 14 },
+  overloadBanner: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: c.warningBg, borderRadius: 14, borderWidth: 1, borderColor: c.warning, padding: 12, marginBottom: 14 },
   overloadBannerText: { fontSize: 13, color: c.foregroundSoft, fontWeight: '600', flex: 1 },
   lastSessionCard: { backgroundColor: c.panel, borderRadius: 14, borderWidth: 1, borderColor: c.line, padding: 12, marginBottom: 12 },
   lastSessionLabel: { fontSize: 12, fontWeight: '700', color: c.textMuted, textTransform: 'uppercase', letterSpacing: 0.4 },

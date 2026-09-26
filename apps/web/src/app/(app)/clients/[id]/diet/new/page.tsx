@@ -224,7 +224,9 @@ export default function NewClientDietPlanPage() {
     setSaving(true)
     const supabase = createClient()
 
-    await supabase.from('diet_plans').update({ is_active: false }).eq('user_id', id).eq('is_active', true)
+    const { error: deactivateError } = await supabase.from('diet_plans').update({ is_active: false }).eq('user_id', id).eq('is_active', true)
+
+    if (deactivateError) { toast.error('Failed to update diet plans'); setSaving(false); return }
 
     const { data: plan, error } = await supabase.from('diet_plans').insert({
       user_id: id, created_by: profile!.id, name: planName,
@@ -241,7 +243,13 @@ export default function NewClientDietPlanPage() {
       total_carbs: m.foods.reduce((s, f) => s + f.carbs, 0),
       total_fat: m.foods.reduce((s, f) => s + f.fat, 0),
     }))
-    await supabase.from('diet_plan_meals').insert(mealRows)
+    const { error: mealsError } = await supabase.from('diet_plan_meals').insert(mealRows)
+
+    if (mealsError) {
+      toast.error('Failed to save meals')
+      setSaving(false)
+      return
+    }
 
     toast.success(`Diet plan created for ${client?.full_name}`)
     router.push(`/clients/${id}`)
@@ -278,7 +286,7 @@ export default function NewClientDietPlanPage() {
           placeholder="e.g. Cutting Plan - Week 1" />
       </ListCard>
 
-      <div className="grid grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-2 gap-3 mb-6 lg:grid-cols-4">
         <MetricCard label="Calories" value={totalCals} footer={client.daily_calories ? `${Math.round((totalCals / client.daily_calories) * 100)}% of ${client.daily_calories}` : undefined} tone="accent" />
         <MetricCard label="Protein" value={totalProtein} unit="g" footer={client.daily_protein ? `${Math.round((totalProtein / client.daily_protein) * 100)}% of ${client.daily_protein}g` : undefined} tone="success" />
         <MetricCard label="Carbs" value={totalCarbs} unit="g" footer={client.daily_carbs ? `${Math.round((totalCarbs / client.daily_carbs) * 100)}% of ${client.daily_carbs}g` : undefined} tone="warn" />
@@ -372,7 +380,7 @@ export default function NewClientDietPlanPage() {
                 <div className="space-y-3 rounded-lg border border-[var(--line)] bg-[var(--ink-2)] p-4">
                   <input type="text" value={customFood.name} onChange={e => setCustomFood(p => ({ ...p, name: e.target.value }))}
                     className="input-field w-full px-3 py-2 text-sm" placeholder="Food name" />
-                  <div className="grid grid-cols-4 gap-2">
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                     <div>
                       <label className="app-mono-label mb-1 block">Cal/100g</label>
                       <input type="number" value={customFood.calories_per_100g} onChange={e => setCustomFood(p => ({ ...p, calories_per_100g: e.target.value }))}

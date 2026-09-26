@@ -135,7 +135,7 @@ export function restrictionTerms(dietaryRestrictions = []) {
     for (const fam of RESTRICTION_FAMILIES) {
       if (fam.keys.some((k) => d.includes(k))) {
         const terms = fam.label === 'gluten-free'
-          ? ALLERGEN_FAMILIES.find((f) => f.label === 'gluten').terms
+          ? ALLERGEN_FAMILIES.find((f) => f.label === 'gluten')?.terms ?? []
           : fam.terms
         for (const t of terms) out.add(t)
       }

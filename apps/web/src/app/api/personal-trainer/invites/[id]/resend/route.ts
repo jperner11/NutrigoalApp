@@ -62,13 +62,22 @@ export async function POST(
       invite.client_first_name,
     )
 
-    await admin
+    const { error: updateError } = await admin
       .from('personal_trainer_invites')
       .update({
         delivery_method: 'invite',
         last_sent_at: new Date().toISOString(),
+        expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
       })
       .eq('id', invite.id)
+
+    if (updateError) {
+      Sentry.captureException(updateError, { tags: { kind: 'api-route', route: 'personal-trainer/invites/resend' } })
+      return NextResponse.json(
+        { error: 'Invite email sent, but failed to extend its expiry. Please try resending again.' },
+        { status: 500 }
+      )
+    }
   } catch (error) {
     Sentry.captureException(error, { tags: { kind: 'api-route', route: 'personal-trainer/invites/resend' } })
     const message = error instanceof Error ? error.message : 'Failed to resend invite.'

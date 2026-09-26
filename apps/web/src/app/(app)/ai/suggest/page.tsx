@@ -112,7 +112,7 @@ export default function AISuggestPage() {
           {!canUse ? (
             <>
               <Lock className="h-4 w-4" />
-              <span>No suggestions remaining</span>
+              <span>{isClient ? 'Managed by your trainer' : 'Upgrade to unlock suggestions'}</span>
             </>
           ) : isLoading ? (
             <>

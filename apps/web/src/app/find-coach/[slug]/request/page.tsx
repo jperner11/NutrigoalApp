@@ -199,6 +199,7 @@ export default function RequestCoachingPage() {
               <select
                 value={value}
                 onChange={(e) => setter(e.target.value)}
+                aria-label={label}
                 className="w-full"
                 style={{
                   padding: '10px 12px',
@@ -225,6 +226,7 @@ export default function RequestCoachingPage() {
         <textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
+          aria-label={`Message to ${coachFirstName}`}
           placeholder={`Hey ${coachFirstName} — short context about your training, goals, and what you want from coaching.`}
           style={{
             width: '100%',

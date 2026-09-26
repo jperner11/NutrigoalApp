@@ -263,7 +263,7 @@ export default function CoachDirectory() {
                   <span
                     className="chip"
                     style={{
-                      color: c.accepting_new_clients ? 'var(--ok)' : 'var(--fg-4)',
+                      color: c.accepting_new_clients ? 'var(--ok-text)' : 'var(--fg-4)',
                     }}
                   >
                     ● {c.accepting_new_clients ? 'Accepting' : 'Waitlist'}

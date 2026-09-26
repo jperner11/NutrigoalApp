@@ -280,15 +280,15 @@ export default function CoachWizard({ initialGoal = null }: { initialGoal?: stri
       description={activeStep.description}
       aside={
         <div>
-          <div className="inline-flex rounded-full bg-white/12 p-4 text-sky-50">
+          <div className="inline-flex rounded-full bg-white/12 p-4 text-white">
             <Icon className="h-7 w-7" />
           </div>
-          <div className="mt-6 text-sm font-semibold uppercase tracking-[0.16em] text-sky-100/70">
+          <div className="mt-6 text-sm font-semibold uppercase tracking-[0.16em] text-white/70">
             Your match brief
           </div>
           <div className="mt-4 space-y-3">
             {asideHighlights.map((item) => (
-              <div key={item} className="rounded-[20px] border border-white/10 bg-white/8 px-4 py-3 text-sm leading-6 text-sky-50/88">
+              <div key={item} className="rounded-[20px] border border-white/10 bg-white/8 px-4 py-3 text-sm leading-6 text-white/88">
                 {item}
               </div>
             ))}
@@ -303,7 +303,7 @@ export default function CoachWizard({ initialGoal = null }: { initialGoal?: stri
               setPhase('questions')
               setStatusMessage(null)
             }}
-            className="mt-6 text-sm font-semibold text-sky-100/88 underline-offset-4 hover:underline"
+            className="mt-6 text-sm font-semibold text-white/88 underline-offset-4 hover:underline"
           >
             Reset answers
           </button>

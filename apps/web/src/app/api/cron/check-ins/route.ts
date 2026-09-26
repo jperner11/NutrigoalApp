@@ -24,15 +24,20 @@ export async function GET(request: Request) {
     return NextResponse.json({ message: error?.message ?? 'Failed to load schedules' }, { status: 500 })
   }
 
-  let created = 0
+  const eligible = schedules
+    .filter((schedule) => !shouldSkip(schedule, now))
+    .map((schedule) => ({
+      schedule,
+      template: schedule.template as { id: string; name: string; questions: unknown[] } | null,
+    }))
+    .filter((entry): entry is typeof entry & { template: NonNullable<typeof entry.template> } => entry.template !== null)
 
-  for (const schedule of schedules) {
-    if (shouldSkip(schedule, now)) continue
+  if (eligible.length === 0) {
+    return NextResponse.json({ created: 0, checked: schedules.length })
+  }
 
-    const template = schedule.template as { id: string; name: string; questions: unknown[] } | null
-    if (!template) continue
-
-    const { error: insertError } = await supabase.from('feedback_requests').insert({
+  const { error: insertError } = await supabase.from('feedback_requests').insert(
+    eligible.map(({ schedule, template }) => ({
       nutritionist_id: schedule.trainer_id,
       client_id: schedule.client_id,
       title: template.name,
@@ -40,26 +45,28 @@ export async function GET(request: Request) {
       template_id: template.id,
       schedule_id: schedule.id,
       status: 'pending',
-    })
+    })),
+  )
 
-    if (insertError) {
-      Sentry.captureException(insertError, { tags: { kind: 'cron', route: 'check-ins', scheduleId: schedule.id } })
-      continue
-    }
-
-    const { error: updateError } = await supabase
-      .from('feedback_schedules')
-      .update({ last_triggered_at: now.toISOString() })
-      .eq('id', schedule.id)
-
-    if (updateError) {
-      Sentry.captureException(updateError, { tags: { kind: 'cron', route: 'check-ins', scheduleId: schedule.id } })
-      continue
-    }
-    created++
+  if (insertError) {
+    Sentry.captureException(insertError, { tags: { kind: 'cron', route: 'check-ins' } })
+    return NextResponse.json({ message: insertError.message }, { status: 500 })
   }
 
-  return NextResponse.json({ created, checked: schedules.length })
+  const { error: updateError } = await supabase
+    .from('feedback_schedules')
+    .update({ last_triggered_at: now.toISOString() })
+    .in(
+      'id',
+      eligible.map(({ schedule }) => schedule.id),
+    )
+
+  if (updateError) {
+    Sentry.captureException(updateError, { tags: { kind: 'cron', route: 'check-ins' } })
+    return NextResponse.json({ message: updateError.message }, { status: 500 })
+  }
+
+  return NextResponse.json({ created: eligible.length, checked: schedules.length })
 }
 
 function shouldSkip(

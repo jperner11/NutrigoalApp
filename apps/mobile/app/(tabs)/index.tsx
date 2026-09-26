@@ -10,8 +10,10 @@ import {
 import { useRouter } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import * as Sentry from '@sentry/react-native'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
+import { getLocalDateString } from '../../src/lib/date'
 import { WATER_QUICK_ADD, isManagedClientRole, isTrainerRole } from '@treno/shared'
 import { BrandLogo } from '../../src/components/BrandLogo'
 import { useBrandColors, useThemedStyles, brandShadow, type BrandColors } from '../../src/theme/brand'
@@ -60,7 +62,7 @@ function ClientHome({ userId }: { userId: string | null }) {
   const [hasDietPlan, setHasDietPlan] = useState(false)
   const [hasTrainingPlan, setHasTrainingPlan] = useState(false)
 
-  const today = useMemo(() => new Date().toISOString().split('T')[0], [])
+  const today = useMemo(() => getLocalDateString(), [])
   const managedClient = isManagedClientRole(profile?.role)
 
   const fetchDashboardData = async () => {
@@ -106,22 +108,33 @@ function ClientHome({ userId }: { userId: string | null }) {
   }
 
   useEffect(() => {
-    fetchDashboardData()
+    fetchDashboardData().catch((err) => {
+      Sentry.captureException(err, { tags: { kind: 'dashboard-load', screen: 'client-home' } })
+    })
   }, [userId, profile?.role])
 
   const onRefresh = async () => {
     setRefreshing(true)
-    await fetchDashboardData()
-    setRefreshing(false)
+    try {
+      await fetchDashboardData()
+    } catch (err) {
+      Sentry.captureException(err, { tags: { kind: 'dashboard-refresh', screen: 'client-home' } })
+    } finally {
+      setRefreshing(false)
+    }
   }
 
   const addWater = async (amount: number) => {
     if (!userId) return
-    await supabase.from('water_logs').insert({
+    const { error } = await supabase.from('water_logs').insert({
       user_id: userId,
       date: today,
       amount_ml: amount,
     })
+    if (error) {
+      Sentry.captureException(error, { tags: { kind: 'water-add', screen: 'client-home' } })
+      return
+    }
     setWaterTotal((prev) => prev + amount)
   }
 
@@ -217,7 +230,15 @@ function ClientHome({ userId }: { userId: string | null }) {
           </View>
           <View style={styles.waterButtons}>
             {WATER_QUICK_ADD.map((opt) => (
-              <TouchableOpacity key={opt.amount} style={styles.waterBtn} onPress={() => addWater(opt.amount)}>
+              <TouchableOpacity
+                key={opt.amount}
+                style={styles.waterBtn}
+                onPress={() =>
+                  addWater(opt.amount).catch((err) =>
+                    Sentry.captureException(err, { tags: { kind: 'water-add', screen: 'client-home' } })
+                  )
+                }
+              >
                 <Text style={styles.waterBtnText}>+{opt.label}</Text>
               </TouchableOpacity>
             ))}
@@ -310,13 +331,20 @@ function TrainerHome() {
   }
 
   useEffect(() => {
-    fetchTrainerData()
+    fetchTrainerData().catch((err) => {
+      Sentry.captureException(err, { tags: { kind: 'dashboard-load', screen: 'trainer-home' } })
+    })
   }, [user?.id])
 
   const onRefresh = async () => {
     setRefreshing(true)
-    await fetchTrainerData()
-    setRefreshing(false)
+    try {
+      await fetchTrainerData()
+    } catch (err) {
+      Sentry.captureException(err, { tags: { kind: 'dashboard-refresh', screen: 'trainer-home' } })
+    } finally {
+      setRefreshing(false)
+    }
   }
 
   return (

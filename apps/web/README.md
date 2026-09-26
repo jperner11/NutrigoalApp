@@ -20,9 +20,10 @@ A modern web application for tracking nutrition, hydration, workouts, and cardio
 - **Monitor progress** — view client meal logs, water intake, and workout history
 
 ### Pricing Tiers
-- **Free** — basic tracking, 1 AI suggestion (lifetime)
-- **Pro ($14.99/mo)** — full planning, 5 AI suggestions/month, analytics
-- **Nutritionist ($49.99/mo)** — everything in Pro + 10 clients, 20 AI suggestions/month
+- **Free ($0)** — plan previews, water intake tracking, weight logging, and coach discovery
+- **Pro ($4.99/mo)** — full meal & training plans, cardio/supplement tracking, AI suggestions, weekly plan regeneration
+- **Unlimited ($9.99/mo)** — everything in Pro plus unlimited plan regeneration and priority AI generation
+- **Coach Pro ($24.99/mo)** — up to 15 clients, plan delivery, client messaging, custom intake questions, and a public coach profile
 
 ## Tech Stack
 
@@ -43,8 +44,8 @@ A modern web application for tracking nutrition, hydration, workouts, and cardio
 ### Setup
 
 ```bash
-git clone https://github.com/jperner11/TrenoApp.git
-cd TrenoApp
+git clone https://github.com/jperner11/NutrigoalApp.git
+cd NutrigoalApp
 npm install
 ```
 
@@ -65,10 +66,8 @@ STRIPE_SECRET_KEY=your_stripe_secret
 
 ### Database
 
-Run the migrations in your Supabase SQL Editor in order:
-
-1. `supabase/migrations/001_initial_schema.sql` — core tables, RLS policies, seed data
-2. `supabase/migrations/002_add_meal_log_plan_reference.sql` — links meal logs to diet plan meals
+Run every file in `supabase/migrations/` against your Supabase project, in
+filename (numeric prefix) order, via the Supabase SQL Editor or CLI.
 
 ### Run
 

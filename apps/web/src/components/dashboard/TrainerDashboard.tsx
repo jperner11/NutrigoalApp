@@ -13,6 +13,7 @@ import {
   UserPlus,
   Users,
 } from 'lucide-react'
+import { toast } from 'react-hot-toast'
 import AppPageHeader from '@/components/ui/AppPageHeader'
 import { reportClientError } from '@/lib/apiClient'
 
@@ -210,6 +211,7 @@ export default function TrainerDashboard({ trainerId, trainerName }: TrainerDash
         })
       } catch (err) {
         reportClientError(err, { feature: 'dashboard', action: 'trainer-dashboard-load' })
+        toast.error('Failed to load dashboard. Please refresh the page.')
       } finally {
         setLoading(false)
       }
@@ -295,7 +297,7 @@ export default function TrainerDashboard({ trainerId, trainerName }: TrainerDash
               <h2 className="font-display text-2xl font-bold text-[var(--foreground)]">Roster snapshot</h2>
               <p className="text-sm text-[var(--muted)]">The clients who need the next action from you.</p>
             </div>
-            <Link href="/clients" className="text-sm font-semibold text-[var(--brand-500)] hover:text-[var(--brand-900)]">
+            <Link href="/clients" className="text-sm font-semibold text-[var(--acc-text)] hover:underline">
               View all
             </Link>
           </div>
@@ -323,7 +325,7 @@ export default function TrainerDashboard({ trainerId, trainerName }: TrainerDash
                         {intakePending ? 'Intake pending' : needsPlans ? 'Needs plan assignment' : 'Plans in place'}
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 text-sm font-semibold text-[var(--brand-500)]">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-[var(--acc-text)]">
                       {intakePending || needsPlans ? <AlertCircle className="h-4 w-4" /> : <Sparkles className="h-4 w-4" />}
                       <ArrowRight className="h-4 w-4" />
                     </div>
@@ -337,7 +339,7 @@ export default function TrainerDashboard({ trainerId, trainerName }: TrainerDash
         <div className="space-y-6">
           <div className="panel-strong p-6">
             <div className="mb-4 flex items-center gap-2">
-              <CalendarClock className="h-5 w-5 text-[var(--brand-500)]" />
+              <CalendarClock className="h-5 w-5 text-[var(--acc-text)]" />
               <h2 className="font-display text-2xl font-bold text-[var(--foreground)]">Today&apos;s tasks</h2>
             </div>
             <div className="space-y-3 text-sm text-[var(--muted)]">
@@ -351,7 +353,7 @@ export default function TrainerDashboard({ trainerId, trainerName }: TrainerDash
 
           <div className="panel-strong p-6">
             <div className="mb-4 flex items-center gap-2">
-              <MessageSquare className="h-5 w-5 text-[var(--brand-500)]" />
+              <MessageSquare className="h-5 w-5 text-[var(--acc-text)]" />
               <h2 className="font-display text-2xl font-bold text-[var(--foreground)]">Recent activity</h2>
             </div>
             {state.recentActivity.length === 0 ? (
@@ -371,7 +373,7 @@ export default function TrainerDashboard({ trainerId, trainerName }: TrainerDash
 
           <div className="panel-strong p-6">
             <div className="mb-4 flex items-center gap-2">
-              <Mail className="h-5 w-5 text-[var(--brand-500)]" />
+              <Mail className="h-5 w-5 text-[var(--acc-text)]" />
               <h2 className="font-display text-2xl font-bold text-[var(--foreground)]">Invites in motion</h2>
             </div>
             {state.pendingInvites.length === 0 ? (
@@ -399,7 +401,7 @@ function TaskRow({ label, value }: { label: string; value: number }) {
   return (
     <div className="flex items-center justify-between rounded-[18px] border border-[var(--line)] bg-[var(--surface-strong)] px-4 py-3">
       <span>{label}</span>
-      <span className="rounded-full bg-[var(--brand-100)] px-3 py-1 text-xs font-semibold text-[var(--brand-400)]">
+      <span className="rounded-full bg-[var(--brand-100)] px-3 py-1 text-xs font-semibold text-[var(--acc-text)]">
         {value}
       </span>
     </div>

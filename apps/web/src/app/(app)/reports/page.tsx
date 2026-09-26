@@ -7,6 +7,9 @@ import { BarChart3, Utensils, Dumbbell, Droplets, TrendingUp, TrendingDown, Minu
 import { generateWeeklyReport } from '@/lib/reports'
 import type { WeeklyReport } from '@/lib/reports'
 import { isTrainerRole } from '@treno/shared'
+import { toast } from 'react-hot-toast'
+import { getLocalDateString } from '@/lib/date'
+import { AppHeroPanel } from '@/components/ui/AppDesign'
 
 function getWeekRange(offset: number): { start: string; end: string; label: string } {
   const now = new Date()
@@ -17,14 +20,13 @@ function getWeekRange(offset: number): { start: string; end: string; label: stri
   const sunday = new Date(monday)
   sunday.setDate(monday.getDate() + 6)
 
-  const fmt = (d: Date) => d.toISOString().split('T')[0]
   const label = offset === 0
     ? 'This Week'
     : offset === -1
     ? 'Last Week'
     : `${monday.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${sunday.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
 
-  return { start: fmt(monday), end: fmt(sunday), label }
+  return { start: getLocalDateString(monday), end: getLocalDateString(sunday), label }
 }
 
 function StatCard({ label, value, subtitle, icon: Icon }: {
@@ -38,7 +40,7 @@ function StatCard({ label, value, subtitle, icon: Icon }: {
       <div className="flex items-center gap-3 mb-2">
         <div
           className="w-9 h-9 rounded-lg flex items-center justify-center"
-          style={{ background: 'var(--ink-3)', color: 'var(--acc)' }}
+          style={{ background: 'var(--ink-3)', color: 'var(--acc-text)' }}
         >
           <Icon className="h-4.5 w-4.5" />
         </div>
@@ -57,7 +59,14 @@ function AdherenceBar({ label, percentage }: { label: string; percentage: number
         <span className="text-sm font-medium text-[var(--muted)]">{label}</span>
         <span className="text-sm font-bold text-[var(--foreground)]">{percentage}%</span>
       </div>
-      <div className="w-full h-2.5 bg-[var(--line)] rounded-full overflow-hidden">
+      <div
+        className="w-full h-2.5 bg-[var(--line)] rounded-full overflow-hidden"
+        role="progressbar"
+        aria-label={label}
+        aria-valuenow={Math.min(100, percentage)}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
         <div
           className="h-full rounded-full transition-all duration-500"
           style={{ width: `${Math.min(100, percentage)}%`, background: 'var(--acc)' }}
@@ -82,27 +91,32 @@ export default function ReportsPage() {
 
   async function loadReport() {
     setLoading(true)
-    if (isTrainerRole(profile!.role)) {
-      const supabase = createClient()
-      const { data } = await supabase
-        .from('beta_events')
-        .select('event_name, created_at, metadata')
-        .eq('user_id', profile!.id)
-        .order('created_at', { ascending: false })
-        .limit(100)
-      setTrainerEvents((data as Array<{ event_name: string; created_at: string; metadata: Record<string, unknown> }>) ?? [])
-      setLoading(false)
-      return
-    }
+    try {
+      if (isTrainerRole(profile!.role)) {
+        const supabase = createClient()
+        const { data, error } = await supabase
+          .from('beta_events')
+          .select('event_name, created_at, metadata')
+          .eq('user_id', profile!.id)
+          .order('created_at', { ascending: false })
+          .limit(100)
+        if (error) throw error
+        setTrainerEvents((data as Array<{ event_name: string; created_at: string; metadata: Record<string, unknown> }>) ?? [])
+        return
+      }
 
-    const { start, end } = getWeekRange(weekOffset)
-    const data = await generateWeeklyReport(profile!.id, start, end, {
-      calories: profile!.daily_calories,
-      protein: profile!.daily_protein,
-      waterMl: profile!.daily_water_ml,
-    })
-    setReport(data)
-    setLoading(false)
+      const { start, end } = getWeekRange(weekOffset)
+      const data = await generateWeeklyReport(profile!.id, start, end, {
+        calories: profile!.daily_calories,
+        protein: profile!.daily_protein,
+        waterMl: profile!.daily_water_ml,
+      })
+      setReport(data)
+    } catch {
+      toast.error('Failed to load report')
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (!profile) return null
@@ -115,10 +129,12 @@ export default function ReportsPage() {
 
     return (
       <div className="max-w-4xl mx-auto space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold text-[var(--foreground)]">Beta Reports</h1>
-          <p className="text-[var(--muted)] mt-1">A quick operational view of onboarding and activation during the beta.</p>
-        </div>
+        <AppHeroPanel
+          eyebrow="Beta reports"
+          title="Beta,"
+          accent="reported."
+          subtitle="A quick operational view of onboarding and activation during the beta."
+        />
 
         {loading ? (
           <div className="text-[var(--muted-soft)] text-center py-12">Loading beta metrics...</div>
@@ -166,12 +182,12 @@ export default function ReportsPage() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-[var(--foreground)]">Reports</h1>
-          <p className="text-[var(--muted)] mt-1">Weekly summary of your progress.</p>
-        </div>
-      </div>
+      <AppHeroPanel
+        eyebrow="N° 08 · Reports"
+        title="Progress,"
+        accent="summarized."
+        subtitle="Weekly summary of your progress."
+      />
 
       {/* Week Selector */}
       <div className="flex items-center justify-between card p-3 mb-6">

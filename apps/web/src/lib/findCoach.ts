@@ -230,16 +230,19 @@ export function buildWizardGoalSummary(answers: CoachWizardAnswers) {
 
 export function saveWizardAnswers(answers: CoachWizardAnswers) {
   if (typeof window === 'undefined') return
-  window.localStorage.setItem(COACH_WIZARD_STORAGE_KEY, JSON.stringify(answers))
+  try {
+    window.localStorage.setItem(COACH_WIZARD_STORAGE_KEY, JSON.stringify(answers))
+  } catch {
+    // Best-effort persistence only (e.g. Safari private browsing throws on write).
+  }
 }
 
 export function loadWizardAnswers(): CoachWizardAnswers | null {
   if (typeof window === 'undefined') return null
 
-  const raw = window.localStorage.getItem(COACH_WIZARD_STORAGE_KEY)
-  if (!raw) return null
-
   try {
+    const raw = window.localStorage.getItem(COACH_WIZARD_STORAGE_KEY)
+    if (!raw) return null
     return normalizeCoachWizardAnswers(JSON.parse(raw) as Partial<CoachWizardAnswers>)
   } catch {
     return null
@@ -248,21 +251,28 @@ export function loadWizardAnswers(): CoachWizardAnswers | null {
 
 export function clearWizardAnswers() {
   if (typeof window === 'undefined') return
-  window.localStorage.removeItem(COACH_WIZARD_STORAGE_KEY)
+  try {
+    window.localStorage.removeItem(COACH_WIZARD_STORAGE_KEY)
+  } catch {
+    // Best-effort cleanup only.
+  }
 }
 
 export function saveLeadWizardPreferences(answers: CoachWizardAnswers) {
   if (typeof window === 'undefined') return
-  window.localStorage.setItem(COACH_WIZARD_LEAD_STORAGE_KEY, JSON.stringify(answers))
+  try {
+    window.localStorage.setItem(COACH_WIZARD_LEAD_STORAGE_KEY, JSON.stringify(answers))
+  } catch {
+    // Best-effort persistence only (e.g. Safari private browsing throws on write).
+  }
 }
 
 export function loadLeadWizardPreferences(): CoachWizardAnswers | null {
   if (typeof window === 'undefined') return null
 
-  const raw = window.localStorage.getItem(COACH_WIZARD_LEAD_STORAGE_KEY)
-  if (!raw) return null
-
   try {
+    const raw = window.localStorage.getItem(COACH_WIZARD_LEAD_STORAGE_KEY)
+    if (!raw) return null
     return normalizeCoachWizardAnswers(JSON.parse(raw) as Partial<CoachWizardAnswers>)
   } catch {
     return null
@@ -271,5 +281,9 @@ export function loadLeadWizardPreferences(): CoachWizardAnswers | null {
 
 export function clearLeadWizardPreferences() {
   if (typeof window === 'undefined') return
-  window.localStorage.removeItem(COACH_WIZARD_LEAD_STORAGE_KEY)
+  try {
+    window.localStorage.removeItem(COACH_WIZARD_LEAD_STORAGE_KEY)
+  } catch {
+    // Best-effort cleanup only.
+  }
 }

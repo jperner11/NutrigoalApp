@@ -86,7 +86,7 @@ export default function CoachResults({ answers, matches }: CoachResultsProps) {
       {needsWaitlist ? (
         <section className="rounded-[30px] border border-[var(--line)] bg-[var(--surface-strong)] p-6 sm:p-8">
           <div className="max-w-3xl">
-            <div className="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--brand-700)]">Waitlist</div>
+            <div className="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--acc-text)]">Waitlist</div>
             <h3 className="mt-3 font-display text-3xl font-bold text-[var(--foreground)]">
               We’re growing the coach network around briefs like yours
             </h3>

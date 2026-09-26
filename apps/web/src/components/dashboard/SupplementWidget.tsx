@@ -7,6 +7,7 @@ import { toast } from 'react-hot-toast'
 import Link from 'next/link'
 import type { UserSupplement, SupplementLog } from '@/lib/supabase/types'
 import { reportClientError } from '@/lib/apiClient'
+import { getLocalDateString } from '@/lib/date'
 
 interface SupplementWidgetProps {
   userId: string
@@ -17,7 +18,7 @@ export default function SupplementWidget({ userId }: SupplementWidgetProps) {
   const [todayLogs, setTodayLogs] = useState<SupplementLog[]>([])
   const [loading, setLoading] = useState(true)
 
-  const today = new Date().toISOString().split('T')[0]
+  const today = getLocalDateString()
 
   useEffect(() => {
     async function load() {
@@ -54,32 +55,37 @@ export default function SupplementWidget({ userId }: SupplementWidgetProps) {
     const supabase = createClient()
     const isLogged = todayLogs.some(l => l.supplement_id === sup.id)
 
-    if (isLogged) {
-      const { error } = await supabase
-        .from('supplement_logs')
-        .delete()
-        .eq('user_id', userId)
-        .eq('supplement_id', sup.id)
-        .eq('date', today)
+    try {
+      if (isLogged) {
+        const { error } = await supabase
+          .from('supplement_logs')
+          .delete()
+          .eq('user_id', userId)
+          .eq('supplement_id', sup.id)
+          .eq('date', today)
 
-      if (error) {
-        toast.error('Failed to unlog')
-        return
-      }
-      setTodayLogs(prev => prev.filter(l => l.supplement_id !== sup.id))
-    } else {
-      const { data, error } = await supabase
-        .from('supplement_logs')
-        .insert({ user_id: userId, supplement_id: sup.id, date: today })
-        .select()
-        .single()
+        if (error) {
+          toast.error('Failed to unlog')
+          return
+        }
+        setTodayLogs(prev => prev.filter(l => l.supplement_id !== sup.id))
+      } else {
+        const { data, error } = await supabase
+          .from('supplement_logs')
+          .insert({ user_id: userId, supplement_id: sup.id, date: today })
+          .select()
+          .single()
 
-      if (error) {
-        toast.error('Failed to log')
-        return
+        if (error) {
+          toast.error('Failed to log')
+          return
+        }
+        setTodayLogs(prev => [...prev, data])
+        toast.success(`${sup.name} taken!`)
       }
-      setTodayLogs(prev => [...prev, data])
-      toast.success(`${sup.name} taken!`)
+    } catch (err) {
+      reportClientError(err, { feature: 'dashboard', action: 'supplement-widget-toggle' })
+      toast.error('Something went wrong. Please try again.')
     }
   }
 
@@ -156,6 +162,8 @@ export default function SupplementWidget({ userId }: SupplementWidgetProps) {
             <button
               key={sup.id}
               onClick={() => toggleLog(sup)}
+              aria-label={isTaken ? `Mark ${sup.name} as not taken today` : `Mark ${sup.name} as taken today`}
+              aria-pressed={isTaken}
               className="row w-full gap-2 rounded-lg px-2 py-1.5 text-left transition"
               style={{
                 background: isTaken ? 'var(--ink-3)' : 'transparent',
@@ -169,7 +177,7 @@ export default function SupplementWidget({ userId }: SupplementWidgetProps) {
                     ? '2px solid var(--acc)'
                     : '2px solid var(--line-2)',
                   background: isTaken ? 'var(--acc)' : 'transparent',
-                  color: '#131012',
+                  color: isTaken ? '#0a0a0a' : 'var(--fg-3)',
                 }}
               >
                 {isTaken && <Check className="h-3 w-3" />}

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
+import { getLocalDateString } from '@/lib/date'
 import { toast } from 'react-hot-toast'
 import {
   Pill,
@@ -43,29 +44,34 @@ export default function SupplementsPage() {
     notes: '',
   })
 
-  const today = new Date().toISOString().split('T')[0]
+  const today = getLocalDateString()
 
   const load = useCallback(async () => {
     if (!profile) return
     const supabase = createClient()
 
-    const [supRes, logRes] = await Promise.all([
-      supabase
-        .from('user_supplements')
-        .select('*')
-        .eq('user_id', profile.id)
-        .eq('is_active', true)
-        .order('created_at'),
-      supabase
-        .from('supplement_logs')
-        .select('*')
-        .eq('user_id', profile.id)
-        .eq('date', today),
-    ])
+    try {
+      const [supRes, logRes] = await Promise.all([
+        supabase
+          .from('user_supplements')
+          .select('*')
+          .eq('user_id', profile.id)
+          .eq('is_active', true)
+          .order('created_at'),
+        supabase
+          .from('supplement_logs')
+          .select('*')
+          .eq('user_id', profile.id)
+          .eq('date', today),
+      ])
 
-    setSupplements(supRes.data ?? [])
-    setTodayLogs(logRes.data ?? [])
-    setLoading(false)
+      setSupplements(supRes.data ?? [])
+      setTodayLogs(logRes.data ?? [])
+    } catch {
+      toast.error('Failed to load supplements')
+    } finally {
+      setLoading(false)
+    }
   }, [profile, today])
 
   useEffect(() => { load() }, [load])
@@ -204,7 +210,7 @@ export default function SupplementsPage() {
         meta={
           <div className="app-card-topline min-w-[160px]">
             <span>TODAY</span>
-            <span style={{ color: 'var(--acc)' }}>{takenCount}/{totalActive}</span>
+            <span style={{ color: 'var(--acc-text)' }}>{takenCount}/{totalActive}</span>
           </div>
         }
       />
@@ -217,7 +223,7 @@ export default function SupplementsPage() {
               <Pill className="h-5 w-5 text-[var(--ok)]" />
               <h3 className="text-sm font-semibold text-[var(--fg)]">Daily stack</h3>
             </div>
-            <span className="app-status-pill text-xs" style={{ color: 'var(--ok)' }}>
+            <span className="app-status-pill text-xs" style={{ color: 'var(--ok-text)' }}>
               {takenCount}/{totalActive}
             </span>
           </div>
@@ -330,11 +336,8 @@ export default function SupplementsPage() {
       {/* Supplement List */}
       {loading ? (
         <ListCard eyebrow="LOADING" title="Pulling your supplement stack.">
-          <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--ink-2)]">
-            <div
-              className="h-full w-1/3 animate-pulse rounded-full"
-              style={{ width: `${progress}%` }}
-            />
+          <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--line)]">
+            <div className="h-full w-1/3 animate-pulse rounded-full bg-[var(--acc)]" />
           </div>
         </ListCard>
       ) : supplements.length === 0 ? (
@@ -360,8 +363,7 @@ export default function SupplementsPage() {
             return (
               <div
                 key={sup.id}
-                className="card-flat overflow-hidden transition hover:border-[var(--line-strong)]"
-                style={isTaken ? { borderColor: 'rgba(26, 163, 122, 0.42)', background: 'rgba(26, 163, 122, 0.08)' } : undefined}
+                className={`card-flat overflow-hidden transition ${isTaken ? 'border-[var(--ok)] bg-[var(--success-bg)]' : 'hover:border-[var(--line-strong)]'}`}
               >
                 <div className="flex items-center p-4">
                   <button
@@ -372,7 +374,7 @@ export default function SupplementsPage() {
                     style={{
                       borderColor: isTaken ? 'var(--ok)' : 'var(--line-2)',
                       background: isTaken ? 'var(--ok)' : 'transparent',
-                      color: isTaken ? '#131012' : 'var(--fg-3)',
+                      color: isTaken ? '#0a0a0a' : 'var(--fg-3)',
                     }}
                   >
                     {isTaken && <Check className="h-4 w-4" aria-hidden="true" />}
@@ -402,7 +404,7 @@ export default function SupplementsPage() {
                   <button
                     onClick={() => handleDelete(sup)}
                     aria-label={`Remove ${sup.name}`}
-                    className="btn btn-ghost ml-2 flex-shrink-0 p-2 text-[var(--fg-3)] hover:text-[var(--brand-400)]"
+                    className="btn btn-ghost ml-2 flex-shrink-0 p-2 text-[var(--fg-3)] hover:text-[var(--danger-text)]"
                   >
                     <Trash2 className="h-4 w-4" aria-hidden="true" />
                   </button>

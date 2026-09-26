@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
+import { getLocalDateString } from '../../src/lib/date'
 import {
   MEAL_TYPES, COMMON_SUPPLEMENTS, SUPPLEMENT_FREQUENCIES, SUPPLEMENT_TIMES,
 } from '@treno/shared'
@@ -54,7 +55,7 @@ export default function DietScreen() {
   const [todayLogs, setTodayLogs] = useState<string[]>([]) // supplement_ids taken today
   const [refreshing, setRefreshing] = useState(false)
 
-  const today = new Date().toISOString().split('T')[0]
+  const today = getLocalDateString()
 
   const fetchPlans = async () => {
     if (!user) return
@@ -179,7 +180,7 @@ function DietPlanDetail({ planId, user, onBack }: { planId: string; user: { id: 
   const [expandedMeal, setExpandedMeal] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
-  const today = new Date().toISOString().split('T')[0]
+  const today = getLocalDateString()
   const dayOfWeek = (new Date().getDay() + 6) % 7
 
   const loadPlan = async () => {
@@ -756,7 +757,7 @@ function LogMeal({ user, onDone, onCancel }: any) {
   const handleSave = async () => {
     if (foods.length === 0) { Alert.alert('Error', 'Add at least one food'); return }
     setSaving(true)
-    const today = new Date().toISOString().split('T')[0]
+    const today = getLocalDateString()
     await supabase.from('meal_logs').insert({
       user_id: user.id, date: today, meal_type: mealType, foods,
       total_calories: foods.reduce((s, f) => s + f.calories, 0),
@@ -955,15 +956,15 @@ const makeStyles = (c: BrandColors) => StyleSheet.create({
   coachTitle: { fontSize: 17, fontWeight: '800', color: c.foregroundSoft, marginBottom: 8 },
   coachSection: { fontSize: 14, fontWeight: '700', color: c.foregroundSoft, marginTop: 14, marginBottom: 6 },
   coachBody: { fontSize: 13, lineHeight: 21, color: c.textMuted },
-  coachWarning: { fontSize: 13, lineHeight: 20, color: '#9a6700', backgroundColor: '#fff7ed', borderWidth: 1, borderColor: '#fed7aa', borderRadius: 12, padding: 12, marginTop: 8 },
+  coachWarning: { fontSize: 13, lineHeight: 20, color: c.foregroundSoft, backgroundColor: c.warningBg, borderWidth: 1, borderColor: c.warning, borderRadius: 12, padding: 12, marginTop: 8 },
   ruleItem: { fontSize: 13, lineHeight: 21, color: c.textMuted, marginTop: 6 },
-  supplementInsightCard: { marginTop: 8, borderWidth: 1, borderColor: '#fde68a', backgroundColor: '#fffbeb', borderRadius: 14, padding: 12 },
+  supplementInsightCard: { marginTop: 8, borderWidth: 1, borderColor: c.warning, backgroundColor: c.warningBg, borderRadius: 14, padding: 12 },
   supplementInsightName: { fontSize: 14, fontWeight: '700', color: c.foregroundSoft },
-  supplementInsightMeta: { fontSize: 12, fontWeight: '600', color: '#b45309', marginTop: 2 },
+  supplementInsightMeta: { fontSize: 12, fontWeight: '600', color: c.warning, marginTop: 2 },
   supplementInsightBody: { fontSize: 13, lineHeight: 20, color: c.textMuted, marginTop: 8 },
   supplementInsightBudget: { fontSize: 12, color: c.textSubtle, marginTop: 8 },
   mealTrackCard: { backgroundColor: c.panel, borderRadius: 18, borderWidth: 1, borderColor: c.line, padding: 16, marginBottom: 12, ...brandShadow },
-  mealTrackCardDone: { borderColor: 'rgba(31, 157, 115, 0.24)', backgroundColor: '#f4fcf8' },
+  mealTrackCardDone: { borderColor: 'rgba(31, 157, 115, 0.24)', backgroundColor: c.successBg },
   mealTrackHeader: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   mealTrackName: { fontSize: 16, fontWeight: '700', color: c.foregroundSoft },
   mealTrackMeta: { fontSize: 12, color: c.textMuted, marginTop: 4 },

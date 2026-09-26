@@ -145,7 +145,7 @@ export default function SignupScreen() {
     opacity: 0.6,
   },
   buttonText: {
-    color: '#fff',
+    color: c.onAccent,
     fontSize: 16,
     fontWeight: '700',
   },
@@ -261,9 +261,9 @@ export default function SignupScreen() {
           <View style={styles.header}>
             <BrandLogo />
             <View style={styles.eyebrow}>
-              <Text style={styles.eyebrowText}>New patient intake</Text>
+              <Text style={styles.eyebrowText}>New member setup</Text>
             </View>
-            <Text style={styles.title}>Create your account and start the clinic setup.</Text>
+            <Text style={styles.title}>Create your account and set up your plan.</Text>
             <Text style={styles.subtitle}>
               We&apos;ll use your profile to shape nutrition targets, training guidance, and coach discovery around the right path for you.
             </Text>
@@ -336,7 +336,7 @@ export default function SignupScreen() {
               disabled={loading}
             >
               {loading ? (
-                <ActivityIndicator color="#fff" />
+                <ActivityIndicator color={colors.onAccent} />
               ) : (
                 <Text style={styles.buttonText}>Create Account</Text>
               )}

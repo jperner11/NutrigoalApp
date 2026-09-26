@@ -32,8 +32,13 @@ export default function ClientMessagesPage() {
       .eq('id', id)
       .single()
       .then(
-        ({ data }) => {
-          if (!cancelled && data) setClient(data as UserProfile)
+        ({ data, error }) => {
+          if (cancelled) return
+          if (data) {
+            setClient(data as UserProfile)
+          } else if (error) {
+            Sentry.captureException(error, { tags: { kind: 'page', page: 'clients/[id]/messages', op: 'loadClient' } })
+          }
         },
         (err) => {
           Sentry.captureException(err, { tags: { kind: 'page', page: 'clients/[id]/messages', op: 'loadClient' } })
@@ -58,12 +63,15 @@ export default function ClientMessagesPage() {
 
       if (error) {
         // Race: another tab created it first — re-fetch.
-        const { data: retry } = await supabase
+        const { data: retry, error: retryError } = await supabase
           .from('conversations')
           .select('id')
           .eq('nutritionist_id', profile!.id)
           .eq('client_id', id)
           .maybeSingle()
+        if (retryError) {
+          Sentry.captureException(retryError, { tags: { kind: 'page', page: 'clients/[id]/messages', op: 'resolveConversation.retry' } })
+        }
         return retry?.id ?? null
       }
       return created?.id ?? null

@@ -21,7 +21,12 @@ function wrapBuilder<T extends object>(builder: T, table: string | undefined): T
             (value: unknown) => {
               if (value && typeof value === 'object' && 'error' in value) {
                 const err = (value as { error: unknown }).error
-                if (err && typeof err === 'object' && 'message' in err) {
+                if (
+                  err &&
+                  typeof err === 'object' &&
+                  'message' in err &&
+                  (err as { code?: string }).code !== 'PGRST116'
+                ) {
                   reportSupabaseError(err as { message: string }, { table })
                 }
               }

@@ -83,7 +83,7 @@ export default function InviteClientPage() {
             type="text"
             value={clientFirstName}
             onChange={(e) => setClientFirstName(e.target.value)}
-            className="w-full px-4 py-3 border border-[var(--line-strong)] rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="w-full px-4 py-3 border border-[var(--line-strong)] rounded-lg focus:ring-2 focus:ring-[var(--acc)] focus:border-transparent"
             placeholder="Optional"
           />
         </div>
@@ -98,21 +98,21 @@ export default function InviteClientPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-[var(--line-strong)] rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-[var(--line-strong)] rounded-lg focus:ring-2 focus:ring-[var(--acc)] focus:border-transparent"
               placeholder="client@example.com"
               required
             />
           </div>
         </div>
 
-        <div className="mb-6 rounded-2xl border border-sky-100 bg-sky-50 px-4 py-3 text-sm leading-6 text-slate-700">
+        <div className="mb-6 rounded-2xl border border-[var(--line)] bg-[var(--panel-strong)] px-4 py-3 text-sm leading-6 text-[var(--muted)]">
           We&apos;ll send a secure invite link. Existing members receive a join request and new clients will be asked to create their account before accepting.
         </div>
 
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-lg font-medium hover:shadow-lg transition-all disabled:opacity-50"
+          className="btn btn-accent w-full justify-center py-3 disabled:opacity-50"
         >
           {isLoading ? 'Sending...' : 'Send Invitation'}
         </button>
@@ -133,14 +133,14 @@ export default function InviteClientPage() {
             />
             <button
               onClick={handleCopyLink}
-              className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors"
+              className="btn btn-accent"
             >
               Copy
             </button>
           </div>
           <Link
             href="/clients"
-            className="inline-block mt-4 text-sm text-purple-600 hover:text-purple-700"
+            className="inline-block mt-4 text-sm text-[var(--muted-soft)] hover:text-[var(--muted)]"
           >
             ← Back to Clients
           </Link>

@@ -1,9 +1,12 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import dynamic from 'next/dynamic'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
+import { getLocalDateString } from '@/lib/date'
 import { toast } from 'react-hot-toast'
+import { reportClientError } from '@/lib/apiClient'
 import Link from 'next/link'
 import {
   TrendingUp,
@@ -18,29 +21,32 @@ import {
   Hourglass,
   Hash,
 } from 'lucide-react'
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  ReferenceLine,
-} from 'recharts'
 import type { WeightLog } from '@/lib/supabase/types'
 import StatTile from '@/components/ui/StatTile'
 import { AppHeroPanel, AppSectionHeader, EmptyStateCard, ListCard } from '@/components/ui/AppDesign'
 
+// recharts is only needed on this page, so keep it out of the initial bundle.
+const WeightTrendChart = dynamic(() => import('./WeightTrendChart'), {
+  ssr: false,
+  loading: () => <div style={{ height: 320 }} />,
+})
+
 type TimeRange = '7D' | '1M' | '3M' | '6M' | 'ALL'
+
+function subtractMonths(date: Date, months: number): Date {
+  const target = new Date(date.getFullYear(), date.getMonth() - months, 1)
+  const daysInTargetMonth = new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate()
+  target.setDate(Math.min(date.getDate(), daysInTargetMonth))
+  return target
+}
 
 function getDateThreshold(range: TimeRange): Date | null {
   const now = new Date()
   switch (range) {
     case '7D': return new Date(now.getTime() - 7 * 86400000)
-    case '1M': return new Date(now.getFullYear(), now.getMonth() - 1, now.getDate())
-    case '3M': return new Date(now.getFullYear(), now.getMonth() - 3, now.getDate())
-    case '6M': return new Date(now.getFullYear(), now.getMonth() - 6, now.getDate())
+    case '1M': return subtractMonths(now, 1)
+    case '3M': return subtractMonths(now, 3)
+    case '6M': return subtractMonths(now, 6)
     case 'ALL': return null
   }
 }
@@ -80,7 +86,7 @@ export default function ProgressPage() {
   const [formWeight, setFormWeight] = useState('')
   const [formBodyFat, setFormBodyFat] = useState('')
   const [formNotes, setFormNotes] = useState('')
-  const [formDate, setFormDate] = useState(new Date().toISOString().split('T')[0])
+  const [formDate, setFormDate] = useState(getLocalDateString())
   const [saving, setSaving] = useState(false)
 
   // Edit state
@@ -91,18 +97,21 @@ export default function ProgressPage() {
   const loadLogs = useCallback(async () => {
     if (!profile) return
     const supabase = createClient()
-    const { data, error } = await supabase
-      .from('weight_logs')
-      .select('*')
-      .eq('user_id', profile.id)
-      .order('date', { ascending: true })
 
-    if (error) {
+    try {
+      const { data, error } = await supabase
+        .from('weight_logs')
+        .select('*')
+        .eq('user_id', profile.id)
+        .order('date', { ascending: true })
+
+      if (error) throw error
+      setLogs(data ?? [])
+    } catch {
       toast.error('Failed to load weight logs')
-      return
+    } finally {
+      setLoading(false)
     }
-    setLogs(data ?? [])
-    setLoading(false)
   }, [profile])
 
   useEffect(() => { loadLogs() }, [loadLogs])
@@ -112,58 +121,80 @@ export default function ProgressPage() {
     setSaving(true)
     const supabase = createClient()
 
-    const { error } = await supabase.from('weight_logs').upsert({
-      user_id: profile.id,
-      date: formDate,
-      weight_kg: parseFloat(formWeight),
-      body_fat_pct: formBodyFat ? parseFloat(formBodyFat) : null,
-      notes: formNotes || null,
-    }, { onConflict: 'user_id,date' })
+    try {
+      const { error } = await supabase.from('weight_logs').upsert({
+        user_id: profile.id,
+        date: formDate,
+        weight_kg: parseFloat(formWeight),
+        body_fat_pct: formBodyFat ? parseFloat(formBodyFat) : null,
+        notes: formNotes || null,
+      }, { onConflict: 'user_id,date' })
 
-    if (error) {
+      if (error) {
+        toast.error('Failed to save weight log')
+        return
+      }
+
+      const { error: profileError } = await supabase
+        .from('user_profiles')
+        .update({ weight_kg: parseFloat(formWeight) })
+        .eq('id', profile.id)
+
+      if (profileError) {
+        reportClientError(profileError, { feature: 'progress', action: 'sync-profile-weight' })
+      }
+
+      toast.success('Weight logged.')
+      setShowForm(false)
+      setFormWeight('')
+      setFormBodyFat('')
+      setFormNotes('')
+      loadLogs()
+    } catch (err) {
+      reportClientError(err, { feature: 'progress', action: 'save-weight-log' })
       toast.error('Failed to save weight log')
+    } finally {
       setSaving(false)
-      return
     }
-
-    await supabase.from('user_profiles').update({ weight_kg: parseFloat(formWeight) }).eq('id', profile.id)
-
-    toast.success('Weight logged.')
-    setShowForm(false)
-    setFormWeight('')
-    setFormBodyFat('')
-    setFormNotes('')
-    setSaving(false)
-    loadLogs()
   }
 
   async function handleDelete(id: string) {
     if (!window.confirm('Delete this weight entry? This action cannot be undone.')) return
     const supabase = createClient()
-    const { error } = await supabase.from('weight_logs').delete().eq('id', id)
-    if (error) {
+    try {
+      const { error } = await supabase.from('weight_logs').delete().eq('id', id)
+      if (error) {
+        toast.error('Failed to delete entry')
+        return
+      }
+      toast.success('Entry deleted')
+      loadLogs()
+    } catch (err) {
+      reportClientError(err, { feature: 'progress', action: 'delete-weight-log' })
       toast.error('Failed to delete entry')
-      return
     }
-    toast.success('Entry deleted')
-    loadLogs()
   }
 
   async function handleEditSave(log: WeightLog) {
     if (!editWeight) return
     const supabase = createClient()
-    const { error } = await supabase.from('weight_logs').update({
-      weight_kg: parseFloat(editWeight),
-      body_fat_pct: editBodyFat ? parseFloat(editBodyFat) : null,
-    }).eq('id', log.id)
+    try {
+      const { error } = await supabase.from('weight_logs').update({
+        weight_kg: parseFloat(editWeight),
+        body_fat_pct: editBodyFat ? parseFloat(editBodyFat) : null,
+      }).eq('id', log.id)
 
-    if (error) {
+      if (error) {
+        toast.error('Failed to update')
+        return
+      }
+      setEditingId(null)
+      toast.success('Updated')
+      loadLogs()
+    } catch (err) {
+      reportClientError(err, { feature: 'progress', action: 'update-weight-log' })
       toast.error('Failed to update')
-      return
     }
-    setEditingId(null)
-    toast.success('Updated')
-    loadLogs()
   }
 
   // Filter logs by range
@@ -194,12 +225,17 @@ export default function ProgressPage() {
     else if (diff < -0.3) trend = 'down'
   }
 
+  // Gaining weight is the intended outcome for bulking users, so don't flag it as a warning.
+  const gainIsGood = profile?.goal === 'bulking'
+  const directionTone = (dir: 'up' | 'down'): 'warn' | 'ok' =>
+    (dir === 'up') === gainIsGood ? 'ok' : 'warn'
+
   const trendIcon =
     trend === 'up' ? <TrendingUp className="h-3 w-3" />
     : trend === 'down' ? <TrendingDown className="h-3 w-3" />
     : <Minus className="h-3 w-3" />
   const trendTone: 'warn' | 'ok' | 'muted' =
-    trend === 'up' ? 'warn' : trend === 'down' ? 'ok' : 'muted'
+    trend === 'stable' ? 'muted' : directionTone(trend)
   const trendLabel = trend === 'up' ? 'Going up' : trend === 'down' ? 'Going down' : 'Stable'
 
   // Chart Y-axis domain
@@ -403,13 +439,13 @@ export default function ProgressPage() {
               <Minus className="h-3.5 w-3.5" />
             )
           }
-          iconTone={change > 0 ? 'warn' : change < 0 ? 'ok' : 'muted'}
+          iconTone={change === 0 ? 'muted' : directionTone(change > 0 ? 'up' : 'down')}
           label="Change"
           value={`${change > 0 ? '+' : ''}${change.toFixed(1)}kg`}
           change={
             change > 0 ? 'Above start' : change < 0 ? 'Below start' : 'No change'
           }
-          changeTone={change > 0 ? 'warn' : change < 0 ? 'ok' : 'muted'}
+          changeTone={change === 0 ? 'muted' : directionTone(change > 0 ? 'up' : 'down')}
         />
         <StatTile
           variant="card"
@@ -451,52 +487,13 @@ export default function ProgressPage() {
             accent="line."
             className="app-section-compact"
           />
-          <ResponsiveContainer width="100%" height={320}>
-            <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-              <defs>
-                <linearGradient id="weightGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="var(--acc)" stopOpacity={0.32} />
-                  <stop offset="95%" stopColor="var(--acc)" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--line)" />
-              <XAxis dataKey="label" tick={{ fontSize: 11, fill: 'var(--fg-4)' }} stroke="var(--line-strong)" />
-              <YAxis domain={[yMin, yMax]} tick={{ fontSize: 11, fill: 'var(--fg-4)' }} unit="kg" stroke="var(--line-strong)" />
-              <Tooltip
-                contentStyle={{
-                  borderRadius: '12px',
-                  border: '1px solid var(--line-strong)',
-                  background: 'var(--panel-strong)',
-                  color: 'var(--fg)',
-                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.28)',
-                  fontSize: 12,
-                }}
-                formatter={(value) => [`${value}kg`, 'Weight']}
-                labelFormatter={(_, payload) => {
-                  if (payload?.[0]?.payload?.date) return formatFullDate(payload[0].payload.date)
-                  return ''
-                }}
-              />
-              {targetWeight && (
-                <ReferenceLine
-                  y={targetWeight}
-                  stroke="var(--acc)"
-                  strokeDasharray="6 4"
-                  strokeOpacity={0.55}
-                  label={{ value: `Target: ${targetWeight}kg`, position: 'right', fill: 'var(--acc-text)', fontSize: 11 }}
-                />
-              )}
-              <Area
-                type="monotone"
-                dataKey="weight"
-                stroke="var(--acc)"
-                strokeWidth={2.5}
-                fill="url(#weightGradient)"
-                dot={{ r: 4, fill: 'var(--acc)', stroke: 'var(--panel-strong)', strokeWidth: 2 }}
-                activeDot={{ r: 6, fill: 'var(--fg)', stroke: 'var(--panel-strong)', strokeWidth: 2 }}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
+          <WeightTrendChart
+            chartData={chartData}
+            yMin={yMin}
+            yMax={yMax}
+            targetWeight={targetWeight}
+            formatTooltipLabel={formatFullDate}
+          />
         </div>
       ) : chartData.length === 1 ? (
         <EmptyStateCard
@@ -531,7 +528,7 @@ export default function ProgressPage() {
             {[...logs].reverse().map((log, i, arr) => (
               <div
                 key={log.id}
-                className="row justify-between px-6 py-3.5"
+                className="row justify-between gap-3 px-6 py-3.5"
                 style={{
                   borderBottom: i < arr.length - 1 ? '1px solid var(--line)' : 'none',
                   fontSize: 13,
@@ -573,6 +570,7 @@ export default function ProgressPage() {
                         onClick={() => handleEditSave(log)}
                         className="btn btn-ghost"
                         style={{ padding: 6, color: 'var(--ok)' }}
+                        aria-label="Save"
                       >
                         <Check className="h-4 w-4" />
                       </button>
@@ -580,6 +578,7 @@ export default function ProgressPage() {
                         onClick={() => setEditingId(null)}
                         className="btn btn-ghost"
                         style={{ padding: 6 }}
+                        aria-label="Cancel"
                       >
                         <X className="h-4 w-4" />
                       </button>
@@ -587,7 +586,7 @@ export default function ProgressPage() {
                   </>
                 ) : (
                   <>
-                    <div className="row gap-4">
+                    <div className="row min-w-0 flex-1 gap-4">
                       <span
                         className="mono shrink-0"
                         style={{
@@ -599,24 +598,24 @@ export default function ProgressPage() {
                       >
                         {formatFullDate(log.date).toUpperCase()}
                       </span>
-                      <span className="serif" style={{ fontSize: 16, color: 'var(--fg)' }}>
+                      <span className="serif shrink-0" style={{ fontSize: 16, color: 'var(--fg)' }}>
                         {log.weight_kg}kg
                       </span>
                       {log.body_fat_pct && (
-                        <span className="chip" style={{ color: 'var(--acc)' }}>
+                        <span className="chip shrink-0" style={{ color: 'var(--acc)' }}>
                           {log.body_fat_pct}% BF
                         </span>
                       )}
                       {log.notes && (
                         <span
-                          className="truncate"
+                          className="min-w-0 flex-1 truncate"
                           style={{ fontSize: 12, color: 'var(--fg-3)' }}
                         >
                           {log.notes}
                         </span>
                       )}
                     </div>
-                    <div className="row gap-1">
+                    <div className="row shrink-0 gap-1">
                       <button
                         onClick={() => {
                           setEditingId(log.id)
@@ -625,6 +624,7 @@ export default function ProgressPage() {
                         }}
                         className="btn btn-ghost"
                         style={{ padding: 6 }}
+                        aria-label="Edit entry"
                       >
                         <Pencil className="h-3.5 w-3.5" />
                       </button>
@@ -632,6 +632,7 @@ export default function ProgressPage() {
                         onClick={() => handleDelete(log.id)}
                         className="btn btn-ghost"
                         style={{ padding: 6, color: 'var(--warn)' }}
+                        aria-label="Delete entry"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>

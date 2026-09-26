@@ -8,6 +8,7 @@ import Link from 'next/link'
 import AppPageHeader from '@/components/ui/AppPageHeader'
 import Portrait from '@/components/ui/Portrait'
 import { isManagedClientRole } from '@treno/shared'
+import { reportClientError } from '@/lib/apiClient'
 
 interface TrainerInfo {
   id: string
@@ -46,16 +47,21 @@ export default function MyNutritionistPage() {
     const supabase = createClient()
 
     async function load() {
-      const [{ data: trainerData }, { count: dietCount }, { count: trainingCount }] = await Promise.all([
-        supabase.from('user_profiles').select('id, full_name, email').eq('id', trainerId).single(),
-        supabase.from('diet_plans').select('*', { count: 'exact', head: true }).eq('user_id', currentProfileId).eq('is_active', true),
-        supabase.from('training_plans').select('*', { count: 'exact', head: true }).eq('user_id', currentProfileId).eq('is_active', true),
-      ])
+      try {
+        const [{ data: trainerData }, { count: dietCount }, { count: trainingCount }] = await Promise.all([
+          supabase.from('user_profiles').select('id, full_name, email').eq('id', trainerId).single(),
+          supabase.from('diet_plans').select('*', { count: 'exact', head: true }).eq('user_id', currentProfileId).eq('is_active', true),
+          supabase.from('training_plans').select('*', { count: 'exact', head: true }).eq('user_id', currentProfileId).eq('is_active', true),
+        ])
 
-      setTrainer(trainerData ?? null)
-      setHasDietPlan((dietCount ?? 0) > 0)
-      setHasTrainingPlan((trainingCount ?? 0) > 0)
-      setLoading(false)
+        setTrainer(trainerData ?? null)
+        setHasDietPlan((dietCount ?? 0) > 0)
+        setHasTrainingPlan((trainingCount ?? 0) > 0)
+      } catch (err) {
+        reportClientError(err, { feature: 'my-nutritionist', action: 'load-trainer-info' })
+      } finally {
+        setLoading(false)
+      }
     }
 
     load()

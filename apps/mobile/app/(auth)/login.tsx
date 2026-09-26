@@ -116,7 +116,7 @@ export default function LoginScreen() {
     opacity: 0.6,
   },
   buttonText: {
-    color: '#fff',
+    color: c.onAccent,
     fontSize: 16,
     fontWeight: '700',
   },
@@ -172,7 +172,7 @@ export default function LoginScreen() {
             </View>
             <Text style={styles.title}>Built for focused nutrition and training plans.</Text>
             <Text style={styles.subtitle}>
-              Pick up your programme, track today, and keep the clinic view with you on mobile.
+              Pick up your programme, track today, and keep your plan with you on mobile.
             </Text>
           </View>
 
@@ -204,7 +204,7 @@ export default function LoginScreen() {
               disabled={loading}
             >
               {loading ? (
-                <ActivityIndicator color="#fff" />
+                <ActivityIndicator color={colors.onAccent} />
               ) : (
                 <Text style={styles.buttonText}>Sign In</Text>
               )}

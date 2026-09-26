@@ -504,6 +504,7 @@ export default function NewTrainingPlanPage() {
                     <select
                       value={filterBodyPart}
                       onChange={(e) => setFilterBodyPart(e.target.value)}
+                      aria-label="Filter exercises by body part"
                       className="input-field flex-1 py-2 text-sm"
                     >
                       <option value="">All body parts</option>
@@ -516,6 +517,7 @@ export default function NewTrainingPlanPage() {
                     <select
                       value={filterEquipment}
                       onChange={(e) => setFilterEquipment(e.target.value)}
+                      aria-label="Filter exercises by equipment"
                       className="input-field flex-1 py-2 text-sm"
                     >
                       <option value="">All equipment</option>
@@ -581,6 +583,7 @@ export default function NewTrainingPlanPage() {
                         onChange={(e) =>
                           setCustomExercise((prev) => ({ ...prev, body_part: e.target.value }))
                         }
+                        aria-label="Custom exercise body part"
                         className="input-field flex-1"
                       >
                         <option value="">Body part...</option>
@@ -595,6 +598,7 @@ export default function NewTrainingPlanPage() {
                         onChange={(e) =>
                           setCustomExercise((prev) => ({ ...prev, equipment: e.target.value }))
                         }
+                        aria-label="Custom exercise equipment"
                         className="input-field flex-1"
                       >
                         <option value="">Equipment...</option>

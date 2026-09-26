@@ -5,8 +5,10 @@ import {
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
+import * as Sentry from '@sentry/react-native'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
+import { getLocalDateString } from '../../src/lib/date'
 import { calculateCardioCalories } from '@treno/shared'
 import type { CardioSession, CardioType } from '@treno/shared'
 import { useBrandColors, useThemedStyles, brandShadow } from '../../src/theme/brand'
@@ -61,7 +63,7 @@ export default function CardioScreen() {
   const [selectedTypeId, setSelectedTypeId] = useState('')
   const [duration, setDuration] = useState('30')
   const [bpm, setBpm] = useState('')
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0])
+  const [date, setDate] = useState(getLocalDateString())
 
   const fetchData = async () => {
     if (!user) return
@@ -73,12 +75,25 @@ export default function CardioScreen() {
       setCardioTypes(typesRes.data as CardioType[])
       if (!selectedTypeId && typesRes.data.length > 0) setSelectedTypeId(typesRes.data[0].id)
     }
-    if (sessionsRes.data) setSessions(sessionsRes.data as any)
+    if (sessionsRes.data) setSessions(sessionsRes.data as (CardioSession & { cardio_types?: CardioType })[])
   }
 
-  useEffect(() => { fetchData() }, [user])
+  useEffect(() => {
+    fetchData().catch((err) => {
+      Sentry.captureException(err, { tags: { kind: 'cardio-load', screen: 'cardio' } })
+    })
+  }, [user])
 
-  const onRefresh = async () => { setRefreshing(true); await fetchData(); setRefreshing(false) }
+  const onRefresh = async () => {
+    setRefreshing(true)
+    try {
+      await fetchData()
+    } catch (err) {
+      Sentry.captureException(err, { tags: { kind: 'cardio-refresh', screen: 'cardio' } })
+    } finally {
+      setRefreshing(false)
+    }
+  }
 
   const handleSave = async () => {
     if (!user || !profile) return
@@ -147,7 +162,7 @@ export default function CardioScreen() {
                   <Ionicons name="heart" size={20} color={colors.accent} />
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.cardTitle}>{(s as any).cardio_types?.name || 'Cardio'}</Text>
+                  <Text style={styles.cardTitle}>{s.cardio_types?.name || 'Cardio'}</Text>
                   <Text style={styles.cardDate}>{new Date(s.date).toLocaleDateString()}</Text>
                 </View>
                 <View style={{ alignItems: 'flex-end' }}>

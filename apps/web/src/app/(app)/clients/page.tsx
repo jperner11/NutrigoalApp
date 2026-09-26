@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'react-hot-toast'
 import { isTrainerRole } from '@treno/shared'
 import { AppHeroPanel, AppSectionHeader, EmptyStateCard, MetricCard } from '@/components/ui/AppDesign'
-import { apiFetch, ApiError } from '@/lib/apiClient'
+import { apiFetch, ApiError, reportClientError } from '@/lib/apiClient'
 import { getAppOrigin, getShareableInviteUrl } from '@/lib/personalTrainerInvites'
 
 interface ActiveClientRow {
@@ -25,6 +25,19 @@ interface ActiveClientRow {
     email: string
     onboarding_completed: boolean
   } | null
+}
+
+interface ActiveClientRowQuery {
+  id: string
+  status: string
+  invited_email: string | null
+  created_at: string
+  client: Array<{
+    id: string
+    full_name: string | null
+    email: string
+    onboarding_completed: boolean
+  }> | null
 }
 
 interface PendingInviteRow {
@@ -58,46 +71,61 @@ export default function ClientsPage() {
     const supabase = createClient()
 
     async function loadClients() {
-      const [{ data: clientRows }, { data: inviteRows }] = await Promise.all([
-        supabase
-          .from('nutritionist_clients')
-          .select('id, status, invited_email, created_at, client:client_id(id, full_name, email, onboarding_completed)')
-          .eq('nutritionist_id', trainerId)
-          .eq('status', 'active')
-          .order('created_at', { ascending: false }),
-        supabase
-          .from('personal_trainer_invites')
-          .select('id, invited_email, client_first_name, status, expires_at, last_sent_at, created_at, invite_token')
-          .eq('personal_trainer_id', trainerId)
-          .in('status', ['pending', 'expired'])
-          .order('created_at', { ascending: false }),
-      ])
-
-      const activeRows = (clientRows as unknown as ActiveClientRow[]) ?? []
-      const clientIds = activeRows.map((row) => row.client?.id).filter(Boolean) as string[]
-
-      let activeDietSet = new Set<string>()
-      let activeTrainingSet = new Set<string>()
-
-      if (clientIds.length > 0) {
-        const [{ data: dietRows }, { data: trainingRows }] = await Promise.all([
-          supabase.from('diet_plans').select('user_id').in('user_id', clientIds).eq('is_active', true),
-          supabase.from('training_plans').select('user_id').in('user_id', clientIds).eq('is_active', true),
+      try {
+        const [{ data: clientRows, error: clientsError }, { data: inviteRows, error: invitesError }] = await Promise.all([
+          supabase
+            .from('nutritionist_clients')
+            .select('id, status, invited_email, created_at, client:client_id(id, full_name, email, onboarding_completed)')
+            .eq('nutritionist_id', trainerId)
+            .eq('status', 'active')
+            .order('created_at', { ascending: false }),
+          supabase
+            .from('personal_trainer_invites')
+            .select('id, invited_email, client_first_name, status, expires_at, last_sent_at, created_at, invite_token')
+            .eq('personal_trainer_id', trainerId)
+            .in('status', ['pending', 'expired'])
+            .order('created_at', { ascending: false }),
         ])
 
-        activeDietSet = new Set((dietRows ?? []).map((row) => row.user_id))
-        activeTrainingSet = new Set((trainingRows ?? []).map((row) => row.user_id))
-      }
+        if (clientsError) throw clientsError
+        if (invitesError) throw invitesError
 
-      setActiveClients(
-        activeRows.map((row) => ({
+        const activeRows: ActiveClientRow[] = ((clientRows as ActiveClientRowQuery[] | null) ?? []).map((row) => ({
           ...row,
-          hasDietPlan: row.client?.id ? activeDietSet.has(row.client.id) : false,
-          hasTrainingPlan: row.client?.id ? activeTrainingSet.has(row.client.id) : false,
+          client: row.client?.[0] ?? null,
         }))
-      )
-      setPendingInvites((inviteRows as PendingInviteRow[]) ?? [])
-      setLoading(false)
+        const clientIds = activeRows.map((row) => row.client?.id).filter(Boolean) as string[]
+
+        let activeDietSet = new Set<string>()
+        let activeTrainingSet = new Set<string>()
+
+        if (clientIds.length > 0) {
+          const [{ data: dietRows, error: dietError }, { data: trainingRows, error: trainingError }] = await Promise.all([
+            supabase.from('diet_plans').select('user_id').in('user_id', clientIds).eq('is_active', true),
+            supabase.from('training_plans').select('user_id').in('user_id', clientIds).eq('is_active', true),
+          ])
+
+          if (dietError) throw dietError
+          if (trainingError) throw trainingError
+
+          activeDietSet = new Set((dietRows ?? []).map((row) => row.user_id))
+          activeTrainingSet = new Set((trainingRows ?? []).map((row) => row.user_id))
+        }
+
+        setActiveClients(
+          activeRows.map((row) => ({
+            ...row,
+            hasDietPlan: row.client?.id ? activeDietSet.has(row.client.id) : false,
+            hasTrainingPlan: row.client?.id ? activeTrainingSet.has(row.client.id) : false,
+          }))
+        )
+        setPendingInvites((inviteRows as PendingInviteRow[]) ?? [])
+      } catch (err) {
+        reportClientError(err, { feature: 'clients', action: 'load-clients' })
+        toast.error('Failed to load clients')
+      } finally {
+        setLoading(false)
+      }
     }
 
     loadClients()
@@ -240,7 +268,7 @@ export default function ClientsPage() {
                     </p>
                   </div>
                 </div>
-                <span className="app-status-pill text-xs" style={{ color: 'var(--warn)' }}>
+                <span className="app-status-pill text-xs" style={{ color: 'var(--warn-text)' }}>
                   Needs plan
                 </span>
               </Link>
@@ -314,10 +342,10 @@ export default function ClientsPage() {
                       {row.client?.email ?? row.invited_email}
                     </p>
                     <div className="mt-2 flex flex-wrap gap-2">
-                      <span className="app-status-pill text-xs" style={{ color: row.hasDietPlan ? 'var(--ok)' : 'var(--warn)' }}>
+                      <span className="app-status-pill text-xs" style={{ color: row.hasDietPlan ? 'var(--ok-text)' : 'var(--warn-text)' }}>
                         {row.hasDietPlan ? 'Diet assigned' : 'Diet needed'}
                       </span>
-                      <span className="app-status-pill text-xs" style={{ color: row.hasTrainingPlan ? 'var(--ok)' : 'var(--warn)' }}>
+                      <span className="app-status-pill text-xs" style={{ color: row.hasTrainingPlan ? 'var(--ok-text)' : 'var(--warn-text)' }}>
                         {row.hasTrainingPlan ? 'Training assigned' : 'Training needed'}
                       </span>
                     </div>
@@ -367,7 +395,7 @@ export default function ClientsPage() {
                         <div className="mt-2 flex flex-wrap gap-3 text-xs text-[var(--fg-4)]">
                           <span>Sent {new Date(invite.last_sent_at).toLocaleDateString('en-GB')}</span>
                           <span>Expires {new Date(invite.expires_at).toLocaleDateString('en-GB')}</span>
-                          <span className={expired ? 'font-semibold text-[var(--warn)]' : ''}>{expired ? 'Needs attention' : 'Awaiting client acceptance'}</span>
+                          <span className={expired ? 'font-semibold text-[var(--warn-text)]' : ''}>{expired ? 'Needs attention' : 'Awaiting client acceptance'}</span>
                         </div>
                       </div>
                     </div>

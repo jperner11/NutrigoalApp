@@ -22,7 +22,7 @@ npm run lint:web     # ESLint on the web app
 
 Turbo is installed but the root `package.json` scripts delegate directly via `npm run ... -w apps/web`. `turbo.json` defines `build`/`dev`/`lint` tasks if you want to run across all workspaces (e.g. `npx turbo run build`).
 
-No test framework is configured in any workspace.
+`apps/web` has Playwright e2e specs in `apps/web/e2e/` (run via `npm run e2e:test -w apps/web`). No other workspace has a test framework configured.
 
 ## Working with `packages/shared`
 
@@ -33,7 +33,3 @@ cd packages/shared && npm run build
 ```
 
 The compiled output lives in `packages/shared/dist/` and is what the apps actually import.
-
-## Legacy directory
-
-An older standalone copy of the app exists at `~/TrenoApp/` (outside this repo). **Do not use it** — always work inside `~/Desktop/Treno/`.

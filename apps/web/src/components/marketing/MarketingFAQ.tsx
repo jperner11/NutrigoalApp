@@ -41,7 +41,7 @@ export default function MarketingFAQ() {
                 </div>
                 <span
                   className="mono ml-6 shrink-0"
-                  style={{ color: 'var(--acc)', fontSize: 18 }}
+                  style={{ color: 'var(--acc-text)', fontSize: 18 }}
                   aria-hidden="true"
                 >
                   {open === i ? '−' : '+'}

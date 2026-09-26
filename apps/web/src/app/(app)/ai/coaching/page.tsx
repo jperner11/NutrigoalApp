@@ -64,7 +64,7 @@ export default function AICoachingHub() {
           </div>
           <div
             className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl"
-            style={{ background: 'var(--ink-3)', color: 'var(--acc)' }}
+            style={{ background: 'var(--ink-3)', color: 'var(--acc-text)' }}
           >
             <Brain className="h-7 w-7" />
           </div>
@@ -85,11 +85,11 @@ export default function AICoachingHub() {
                   <div className="row justify-between gap-4">
                     <div
                       className="flex h-11 w-11 items-center justify-center rounded-xl"
-                      style={{ background: 'var(--ink-3)', color: 'var(--acc)' }}
+                      style={{ background: 'var(--ink-3)', color: 'var(--acc-text)' }}
                     >
                       <Icon className="h-5 w-5" />
                     </div>
-                    <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" style={{ color: 'var(--acc)' }} />
+                    <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" style={{ color: 'var(--acc-text)' }} />
                   </div>
                   <div
                     className="mono mt-5"
@@ -106,7 +106,7 @@ export default function AICoachingHub() {
                 </div>
                 <div
                   className="mono"
-                  style={{ fontSize: 10, color: 'var(--acc)', letterSpacing: '0.1em' }}
+                  style={{ fontSize: 10, color: 'var(--acc-text)', letterSpacing: '0.1em' }}
                 >
                   OPEN TOOL →
                 </div>

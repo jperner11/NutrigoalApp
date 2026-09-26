@@ -89,9 +89,9 @@ export function TrainerCustomQuestionsEditor({ value, onChange }: Props) {
   return (
     <div className="space-y-4">
       {value.length === 0 && (
-        <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-6 text-center">
-          <p className="text-sm text-gray-600 font-medium">No custom questions yet.</p>
-          <p className="text-xs text-gray-500 mt-1">
+        <div className="rounded-2xl border border-dashed border-[var(--line-strong)] bg-[var(--panel-strong)] p-6 text-center">
+          <p className="text-sm text-[var(--fg-2)] font-medium">No custom questions yet.</p>
+          <p className="text-xs text-[var(--fg-3)] mt-1">
             Add your own or start from a suggested template below.
           </p>
         </div>
@@ -100,15 +100,15 @@ export function TrainerCustomQuestionsEditor({ value, onChange }: Props) {
       {value.map((q, i) => {
         const needsOptions = q.type === 'single_select' || q.type === 'multi_select'
         return (
-          <div key={q.localId} className="rounded-2xl border border-gray-200 bg-white p-5 space-y-3">
+          <div key={q.localId} className="rounded-2xl border border-[var(--line)] bg-[var(--panel-strong)] p-5 space-y-3">
             <div className="flex items-start justify-between gap-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
+              <span className="text-xs font-bold uppercase tracking-wider text-[var(--fg-4)]">
                 Question {i + 1}
               </span>
               <button
                 type="button"
                 onClick={() => remove(q.localId)}
-                className="text-gray-400 hover:text-red-600 transition-colors"
+                className="text-[var(--fg-4)] hover:text-[var(--danger-text)] transition-colors"
                 aria-label="Remove question"
               >
                 <Trash2 className="h-4 w-4" />
@@ -116,30 +116,30 @@ export function TrainerCustomQuestionsEditor({ value, onChange }: Props) {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-600 mb-1">Question</label>
+              <label className="block text-xs font-semibold text-[var(--fg-2)] mb-1">Question</label>
               <input
                 type="text"
                 value={q.label}
                 onChange={(e) => update(q.localId, { label: e.target.value })}
                 placeholder="e.g. What motivates you most right now?"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-[var(--line)] bg-[var(--background-elevated)] text-[var(--foreground)] rounded-lg text-sm focus:ring-2 focus:ring-[var(--focus)] focus:border-transparent"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-600 mb-1">Help text (optional)</label>
+              <label className="block text-xs font-semibold text-[var(--fg-2)] mb-1">Help text (optional)</label>
               <input
                 type="text"
                 value={q.help_text}
                 onChange={(e) => update(q.localId, { help_text: e.target.value })}
                 placeholder="Context for your client"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-[var(--line)] bg-[var(--background-elevated)] text-[var(--foreground)] rounded-lg text-sm focus:ring-2 focus:ring-[var(--focus)] focus:border-transparent"
               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1">Answer type</label>
+                <label className="block text-xs font-semibold text-[var(--fg-2)] mb-1">Answer type</label>
                 <select
                   value={q.type}
                   onChange={(e) => {
@@ -152,7 +152,7 @@ export function TrainerCustomQuestionsEditor({ value, onChange }: Props) {
                           : [],
                     })
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-[var(--line)] bg-[var(--background-elevated)] text-[var(--foreground)] rounded-lg text-sm focus:ring-2 focus:ring-[var(--focus)] focus:border-transparent"
                 >
                   {QUESTION_TYPE_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>
@@ -162,12 +162,12 @@ export function TrainerCustomQuestionsEditor({ value, onChange }: Props) {
                 </select>
               </div>
               <div className="flex items-end">
-                <label className="flex items-center gap-2 text-sm text-gray-700 select-none">
+                <label className="flex items-center gap-2 text-sm text-[var(--fg-2)] select-none">
                   <input
                     type="checkbox"
                     checked={q.required}
                     onChange={(e) => update(q.localId, { required: e.target.checked })}
-                    className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                    className="h-4 w-4 rounded border-[var(--line-strong)] focus:ring-[var(--focus)]"
                   />
                   Required
                 </label>
@@ -176,7 +176,7 @@ export function TrainerCustomQuestionsEditor({ value, onChange }: Props) {
 
             {needsOptions && (
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1">
+                <label className="block text-xs font-semibold text-[var(--fg-2)] mb-1">
                   Options (one per line)
                 </label>
                 <textarea
@@ -188,7 +188,7 @@ export function TrainerCustomQuestionsEditor({ value, onChange }: Props) {
                     })
                   }
                   placeholder={'Option A\nOption B\nOption C'}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                  className="w-full px-3 py-2 border border-[var(--line)] bg-[var(--background-elevated)] text-[var(--foreground)] rounded-lg text-sm focus:ring-2 focus:ring-[var(--focus)] focus:border-transparent resize-none"
                 />
               </div>
             )}
@@ -199,14 +199,14 @@ export function TrainerCustomQuestionsEditor({ value, onChange }: Props) {
       <button
         type="button"
         onClick={() => add()}
-        className="w-full flex items-center justify-center gap-2 rounded-xl border-2 border-dashed border-purple-300 bg-purple-50/50 text-purple-700 py-3 text-sm font-semibold hover:bg-purple-50 transition-all"
+        className="w-full flex items-center justify-center gap-2 rounded-xl border-2 border-dashed border-[var(--line-strong)] py-3 text-sm font-semibold text-[var(--fg-2)] transition-colors hover:border-[var(--brand-400)] hover:text-[var(--brand-400)]"
       >
         <Plus className="h-4 w-4" />
         Add a question
       </button>
 
       <div>
-        <p className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">
+        <p className="text-xs font-bold uppercase tracking-wider text-[var(--fg-3)] mb-2">
           Suggested templates
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -215,7 +215,7 @@ export function TrainerCustomQuestionsEditor({ value, onChange }: Props) {
               key={tpl.label}
               type="button"
               onClick={() => add(tpl)}
-              className="text-left rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs text-gray-700 hover:border-purple-300 hover:bg-purple-50/50 transition-all"
+              className="text-left rounded-xl border border-[var(--line)] bg-[var(--panel-strong)] px-3 py-2 text-xs text-[var(--fg-2)] hover:border-[var(--brand-400)] hover:bg-[var(--ink-3)] transition-all"
             >
               + {tpl.label}
             </button>

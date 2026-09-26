@@ -216,7 +216,7 @@ export default function DiscoverPage() {
         >
           <div
             className="mono mb-1.5"
-            style={{ fontSize: 10, color: 'var(--acc)', letterSpacing: '0.14em' }}
+            style={{ fontSize: 10, color: 'var(--acc-text)', letterSpacing: '0.14em' }}
           >
             ✦ HEADS UP
           </div>
@@ -315,7 +315,7 @@ export default function DiscoverPage() {
                           {coachName}
                         </div>
                         {coach.coach?.coach_verification_status === 'verified' && (
-                          <BadgeCheck width={16} height={16} style={{ color: 'var(--acc)' }} />
+                          <BadgeCheck width={16} height={16} style={{ color: 'var(--acc-text)' }} />
                         )}
                       </div>
                       <div
@@ -326,7 +326,7 @@ export default function DiscoverPage() {
                       </div>
                       {coach.rating_count > 0 && coach.rating_avg != null && (
                         <div className="row mt-1.5 items-center" style={{ gap: 5 }}>
-                          <Star width={13} height={13} style={{ color: 'var(--acc)', fill: 'var(--acc)' }} />
+                          <Star width={13} height={13} style={{ color: 'var(--acc-text)', fill: 'var(--acc-text)' }} />
                           <span style={{ fontSize: 13, fontWeight: 600 }}>
                             {coach.rating_avg.toFixed(1)}
                           </span>
@@ -340,7 +340,7 @@ export default function DiscoverPage() {
                   <span
                     className="chip shrink-0"
                     style={{
-                      color: accepting ? 'var(--ok)' : 'var(--warn)',
+                      color: accepting ? 'var(--ok-text)' : 'var(--warn-text)',
                     }}
                   >
                     ● {accepting ? 'Accepting' : 'Waitlist'}
@@ -449,7 +449,7 @@ export default function DiscoverPage() {
                           </div>
                           <div
                             className="serif shrink-0"
-                            style={{ fontSize: 14, color: 'var(--acc)' }}
+                            style={{ fontSize: 14, color: 'var(--acc-text)' }}
                           >
                             {formatOfferPrice(offer.price, coach.currency, offer.billing_period)}
                           </div>
@@ -490,7 +490,7 @@ export default function DiscoverPage() {
                         borderRadius: 12,
                       }}
                     >
-                      <UserCheck className="h-3.5 w-3.5" style={{ color: 'var(--acc)' }} />
+                      <UserCheck className="h-3.5 w-3.5" style={{ color: 'var(--acc-text)' }} />
                       {(coach.coach?.coach_services ?? []).slice(0, 2).join(' · ')}
                     </span>
                   )}
@@ -528,7 +528,7 @@ export default function DiscoverPage() {
               <div>
                 <div
                   className="mono"
-                  style={{ fontSize: 11, color: 'var(--acc)', letterSpacing: '0.14em' }}
+                  style={{ fontSize: 11, color: 'var(--acc-text)', letterSpacing: '0.14em' }}
                 >
                   ✦ REQUEST COACHING
                 </div>

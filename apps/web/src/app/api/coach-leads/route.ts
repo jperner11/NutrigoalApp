@@ -62,7 +62,15 @@ export async function GET() {
     return NextResponse.json({ error: 'Failed to load leads.' }, { status: 500 })
   }
 
-  return NextResponse.json({ leads: data ?? [] })
+  // coach_leads has two FKs to user_profiles (coach_id, user_id), so PostgREST
+  // returns the embedded user:user_id(...) relation as an array, not a single
+  // object — unwrap it the same way clients/page.tsx and check-ins/page.tsx do.
+  const leads = (data ?? []).map((lead) => ({
+    ...lead,
+    user: Array.isArray(lead.user) ? (lead.user[0] ?? null) : lead.user,
+  }))
+
+  return NextResponse.json({ leads })
 }
 
 export async function POST(request: Request) {

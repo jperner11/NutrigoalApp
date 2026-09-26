@@ -52,5 +52,4 @@ export default function WeekDayTabs({ selectedDay, onSelectDay, daySummaries }: 
   )
 }
 
-export { DAY_LABELS }
 export type { DaySummary }

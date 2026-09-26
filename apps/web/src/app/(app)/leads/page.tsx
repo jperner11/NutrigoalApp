@@ -9,6 +9,7 @@ import { useUser } from '@/hooks/useUser'
 import { COACH_LEAD_STAGES, formatLeadStage } from '@/lib/coachMarketplace'
 import { isTrainerRole } from '@treno/shared'
 import { apiFetch, ApiError } from '@/lib/apiClient'
+import { AppHeroPanel, AppSectionHeader, EmptyStateCard, ListCard, MetricCard, StatusPill } from '@/components/ui/AppDesign'
 
 interface LeadRecord {
   id: string
@@ -111,52 +112,57 @@ export default function LeadsPage() {
   }
 
   if (loading) {
-    return <div className="text-[var(--muted-soft)]">Loading leads...</div>
+    return (
+      <div className="mx-auto max-w-[1100px]">
+        <ListCard eyebrow="Loading" title="Pulling your marketplace leads.">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--line)]">
+            <div className="h-full w-1/3 animate-pulse rounded-full bg-[var(--acc)]" />
+          </div>
+        </ListCard>
+      </div>
+    )
   }
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-[var(--foreground)]">Marketplace Leads</h1>
-          <p className="mt-1 text-[var(--muted)]">
-            Review incoming coaching requests and convert the right fits into managed clients.
-          </p>
-        </div>
-        <div className="rounded-2xl border border-[var(--line)] bg-[var(--panel-strong)] px-4 py-3 text-sm text-[var(--muted)]">
-          {pendingLeads.length} pending
-        </div>
-      </div>
+    <div className="mx-auto max-w-[1100px] space-y-8">
+      <AppHeroPanel
+        eyebrow="N° 13 · Marketplace"
+        title="Leads,"
+        accent="worth chasing."
+        subtitle="Review incoming coaching requests and convert the right fits into managed clients."
+        meta={
+          <div className="app-card-topline min-w-[160px]">
+            <span>PENDING</span>
+            <span style={{ color: 'var(--acc-text)' }}>{pendingLeads.length}</span>
+          </div>
+        }
+      />
 
       <div className="grid gap-4 md:grid-cols-3">
-        {[
-          ['Pending', pendingLeads.length],
-          ['Accepted', leads.filter((lead) => lead.status === 'accepted').length],
-          ['Declined', leads.filter((lead) => lead.status === 'declined').length],
-        ].map(([label, value]) => (
-          <div key={label} className="glass-card rounded-[28px] p-6">
-            <div className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--muted-soft)]">{label}</div>
-            <div className="mt-3 text-4xl font-bold text-[var(--foreground)]">{value}</div>
-          </div>
-        ))}
+        <MetricCard label="Pending" value={pendingLeads.length} footer="Waiting for your response." tone="muted" />
+        <MetricCard label="Accepted" value={leads.filter((lead) => lead.status === 'accepted').length} footer="Added to your client roster." tone="success" />
+        <MetricCard label="Declined" value={leads.filter((lead) => lead.status === 'declined').length} footer="Marketplace requests you passed on." tone="danger" />
       </div>
 
       <section className="space-y-4">
-        <div>
-          <h2 className="text-xl font-bold text-[var(--foreground)]">Pending requests</h2>
-          <p className="text-sm text-[var(--muted)]">These people are waiting for your response.</p>
-        </div>
+        <AppSectionHeader
+          index="01"
+          eyebrow="pending requests"
+          title="Waiting on"
+          accent="you."
+          summary="These people are waiting for your response."
+        />
 
         {pendingLeads.length === 0 ? (
-          <div className="rounded-[28px] border border-dashed border-[var(--line)] bg-[var(--panel-strong)] px-6 py-14 text-center">
-            <Inbox className="mx-auto h-10 w-10 text-[var(--muted-soft)]" />
-            <h3 className="mt-4 text-lg font-semibold text-[var(--foreground)]">No pending leads right now.</h3>
-            <p className="mt-2 text-sm text-[var(--muted-soft)]">Once your marketplace profile is live, incoming requests will appear here.</p>
-          </div>
+          <EmptyStateCard
+            icon={<Inbox className="h-7 w-7" />}
+            title="No pending leads right now."
+            body="Once your marketplace profile is live, incoming requests will appear here."
+          />
         ) : (
           <div className="space-y-4">
             {pendingLeads.map((lead) => (
-              <div key={lead.id} className="rounded-[30px] border border-[var(--line)] bg-[var(--panel-strong)] p-6 shadow-[0_16px_38px_rgba(15,23,42,0.05)]">
+              <div key={lead.id} className="card p-6">
                 <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
                   <div className="space-y-4">
                     <div>
@@ -222,7 +228,7 @@ export default function LeadsPage() {
                       type="button"
                       onClick={() => handleLead(lead.id, 'accept')}
                       disabled={workingId === lead.id}
-                      className="inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--ok)] px-4 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
+                      className="inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--ok)] px-4 py-2.5 text-sm font-semibold text-[#0a0a0a] hover:opacity-90 disabled:opacity-50"
                     >
                       {workingId === lead.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserCheck className="h-4 w-4" />}
                       Accept lead
@@ -246,28 +252,27 @@ export default function LeadsPage() {
 
       {handledLeads.length > 0 && (
         <section className="space-y-4">
-          <div>
-            <h2 className="text-xl font-bold text-[var(--foreground)]">Handled requests</h2>
-            <p className="text-sm text-[var(--muted)]">Recent accepted and declined marketplace requests.</p>
-          </div>
+          <AppSectionHeader
+            index="02"
+            eyebrow="handled requests"
+            title="Recently"
+            accent="closed."
+            summary="Accepted and declined marketplace requests."
+          />
 
           <div className="space-y-3">
             {handledLeads.map((lead) => (
-              <div key={lead.id} className="rounded-2xl border border-[var(--line)] bg-[var(--panel-strong)] p-5">
+              <div key={lead.id} className="card-2 p-5">
                 <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                   <div>
                     <div className="font-semibold text-[var(--foreground)]">{lead.user?.full_name || lead.user?.email || 'Lead'}</div>
                     <div className="mt-1 text-sm text-[var(--muted)]">{lead.goal_summary}</div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className={`rounded-full px-3 py-1 text-xs font-semibold ${lead.status === 'accepted' ? 'bg-[var(--success-bg)] text-[var(--ok-text)]' : 'bg-[var(--line)] text-[var(--muted)]'}`}>
-                      {lead.status}
-                    </span>
-                    <span className="rounded-full bg-[var(--acc-soft)] px-3 py-1 text-xs font-semibold text-[var(--acc-text)]">
-                      {formatLeadStage(lead.stage)}
-                    </span>
+                    <StatusPill tone={lead.status === 'accepted' ? 'success' : 'muted'}>{lead.status}</StatusPill>
+                    <StatusPill tone="accent">{formatLeadStage(lead.stage)}</StatusPill>
                     {lead.status === 'accepted' && (
-                      <Link href={`/clients/${lead.user_id}`} className="text-sm font-semibold text-[var(--acc)] hover:opacity-80">
+                      <Link href={`/clients/${lead.user_id}`} className="text-sm font-semibold text-[var(--acc-text)] hover:opacity-80">
                         Open client
                       </Link>
                     )}

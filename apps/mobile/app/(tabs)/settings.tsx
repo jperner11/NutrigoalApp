@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Linking, TextInput, ActivityIndicator, Alert } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
+import * as Sentry from '@sentry/react-native'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { PRICING } from '@treno/shared'
 import { BrandLogo } from '../../src/components/BrandLogo'
@@ -51,7 +52,10 @@ export default function SettingsScreen() {
       setLoadingSupportHistory(false)
     }
 
-    loadSupportHistory()
+    loadSupportHistory().catch((err) => {
+      Sentry.captureException(err, { tags: { kind: 'settings-support-history', screen: 'settings' } })
+      setLoadingSupportHistory(false)
+    })
   }, [profile])
 
   const openSupportEmail = () => {

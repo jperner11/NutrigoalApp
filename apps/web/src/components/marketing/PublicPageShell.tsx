@@ -17,13 +17,13 @@ export default function PublicPageShell({ eyebrow, title, intro, children }: Pub
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <BrandLogo href="/" />
           <div className="flex items-center gap-3">
-            <Link href="/faq" className="hidden rounded-full px-4 py-2 text-sm font-semibold text-[var(--muted)] transition hover:text-[var(--foreground)] sm:inline-flex">
+            <Link href="/faq" className="hidden rounded-full px-4 py-2 text-sm font-semibold text-white/60 transition hover:text-white sm:inline-flex">
               FAQ
             </Link>
-            <Link href="/support" className="hidden rounded-full px-4 py-2 text-sm font-semibold text-[var(--muted)] transition hover:text-[var(--foreground)] sm:inline-flex">
+            <Link href="/support" className="hidden rounded-full px-4 py-2 text-sm font-semibold text-white/60 transition hover:text-white sm:inline-flex">
               Support
             </Link>
-            <Link href="/login" className="rounded-full px-4 py-2 text-sm font-semibold text-[var(--muted)] transition hover:text-[var(--foreground)]">
+            <Link href="/login" className="rounded-full px-4 py-2 text-sm font-semibold text-white/60 transition hover:text-white">
               Sign in
             </Link>
           </div>

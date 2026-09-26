@@ -88,7 +88,7 @@ async function getOffNutrition(id: string, amount: number, unit: string) {
       fat: Math.round((n.fat_100g ?? 0) * scale * 10) / 10,
     }
 
-    cacheFood(data.product.product_name, barcode, 'openfoodfacts', n)
+    await cacheFood(data.product.product_name, barcode, 'openfoodfacts', n)
 
     return NextResponse.json(result)
   } catch {
@@ -124,7 +124,7 @@ async function getSpoonacularNutrition(id: string, amount: number, unit: string)
     const carbs = Math.round(findNutrient('Carbohydrates') * 10) / 10
     const fat = Math.round(findNutrient('Fat') * 10) / 10
 
-    cacheFood(data.name, spoonId, 'spoonacular', null, {
+    await cacheFood(data.name, spoonId, 'spoonacular', null, {
       calories: amount > 0 ? Math.round((calories / amount) * 100) : 0,
       protein: amount > 0 ? Math.round(((protein / amount) * 100) * 10) / 10 : 0,
       carbs: amount > 0 ? Math.round(((carbs / amount) * 100) * 10) / 10 : 0,
@@ -148,7 +148,7 @@ async function getSpoonacularNutrition(id: string, amount: number, unit: string)
   }
 }
 
-function cacheFood(
+async function cacheFood(
   name: string,
   externalId: string,
   source: string,
@@ -168,8 +168,8 @@ function cacheFood(
     fat: Math.round((offNutriments?.fat_100g ?? 0) * 10) / 10,
   }
 
-  Promise.resolve(
-    supabase.from('foods').upsert(
+  try {
+    const { error } = await supabase.from('foods').upsert(
       {
         name,
         source,
@@ -181,14 +181,11 @@ function cacheFood(
         is_verified: false,
       },
       { onConflict: 'source,external_id', ignoreDuplicates: true },
-    ),
-  )
-    .then(({ error }) => {
-      if (error) {
-        Sentry.captureException(error, { tags: { kind: 'api-route', route: 'food/nutrition', op: 'cacheFood' } })
-      }
-    })
-    .catch((err) => {
-      Sentry.captureException(err, { tags: { kind: 'api-route', route: 'food/nutrition', op: 'cacheFood' } })
-    })
+    )
+    if (error) {
+      Sentry.captureException(error, { tags: { kind: 'api-route', route: 'food/nutrition', op: 'cacheFood' } })
+    }
+  } catch (err) {
+    Sentry.captureException(err, { tags: { kind: 'api-route', route: 'food/nutrition', op: 'cacheFood' } })
+  }
 }

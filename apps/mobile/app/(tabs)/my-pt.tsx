@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
+import type { User } from '@supabase/supabase-js'
 import type { Message, FeedbackRequest, FeedbackQuestion } from '@treno/shared'
 import { useBrandColors, useThemedStyles, brandShadow, type BrandColors } from '../../src/theme/brand'
 
@@ -89,7 +90,7 @@ export default function MyPTScreen() {
 
   useEffect(() => { loadData() }, [loadData])
 
-  if (screen === 'messages' && conversationId) {
+  if (screen === 'messages' && conversationId && user) {
     return <ChatScreen conversationId={conversationId} user={user} ptName={ptName || 'PT'}
       onBack={() => { setScreen('home'); loadData() }} />
   }
@@ -97,7 +98,7 @@ export default function MyPTScreen() {
     return <FeedbackListScreen requests={feedbackRequests} onBack={() => setScreen('home')}
       onSelect={(fb) => { setSelectedFeedback(fb); setScreen('feedback-respond') }} />
   }
-  if (screen === 'feedback-respond' && selectedFeedback) {
+  if (screen === 'feedback-respond' && selectedFeedback && user) {
     return <FeedbackRespondScreen feedback={selectedFeedback} user={user}
       onBack={() => { setScreen('feedback-list'); loadData() }} />
   }
@@ -147,7 +148,7 @@ export default function MyPTScreen() {
 
         {/* Action Cards */}
         <TouchableOpacity style={s.actionCard} onPress={() => setScreen('messages')}>
-          <View style={[s.actionIcon, { backgroundColor: '#eff6ff' }]}>
+          <View style={[s.actionIcon, { backgroundColor: colors.brand100 }]}>
             <Ionicons name="chatbubbles" size={24} color={colors.brand500} />
           </View>
           <View style={{ flex: 1 }}>
@@ -161,7 +162,7 @@ export default function MyPTScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity style={s.actionCard} onPress={() => setScreen('feedback-list')}>
-          <View style={[s.actionIcon, { backgroundColor: '#f5f3ff' }]}>
+          <View style={[s.actionIcon, { backgroundColor: colors.brand100 }]}>
             <Ionicons name="clipboard" size={24} color={colors.brand500} />
           </View>
           <View style={{ flex: 1 }}>
@@ -180,7 +181,7 @@ export default function MyPTScreen() {
 
 // ─── Chat Screen ─────────────────────────────────────────
 function ChatScreen({ conversationId, user, ptName, onBack }: {
-  conversationId: string; user: any; ptName: string; onBack: () => void
+  conversationId: string; user: User; ptName: string; onBack: () => void
 }) {
   const colors = useBrandColors()
   const s = useThemedStyles(makeStyles)
@@ -198,6 +199,7 @@ function ChatScreen({ conversationId, user, ptName, onBack }: {
     // Mark as read
     supabase.from('messages').update({ read_at: new Date().toISOString() })
       .eq('conversation_id', conversationId).neq('sender_id', user.id).is('read_at', null)
+      .then(() => {})
 
     // Realtime
     const channel = supabase
@@ -240,8 +242,8 @@ function ChatScreen({ conversationId, user, ptName, onBack }: {
           const isMe = item.sender_id === user?.id
           return (
             <View style={[s.msgBubble, isMe ? s.msgMe : s.msgThem]}>
-              <Text style={[s.msgText, isMe && { color: '#fff' }]}>{item.content}</Text>
-              <Text style={[s.msgTime, isMe && { color: 'rgba(255,255,255,0.7)' }]}>
+              <Text style={[s.msgText, isMe && { color: colors.onAccent }]}>{item.content}</Text>
+              <Text style={[s.msgTime, isMe && { color: 'rgba(10, 10, 10, 0.7)' }]}>
                 {new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </Text>
             </View>
@@ -253,7 +255,7 @@ function ChatScreen({ conversationId, user, ptName, onBack }: {
         <TextInput style={s.msgInput} value={text} onChangeText={setText}
           placeholder="Type a message..." placeholderTextColor={colors.textSubtle} multiline />
         <TouchableOpacity style={s.sendBtn} onPress={handleSend} disabled={sending || !text.trim()}>
-          <Ionicons name="send" size={20} color="#fff" />
+          <Ionicons name="send" size={20} color={colors.onAccent} />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -301,7 +303,7 @@ function FeedbackListScreen({ requests, onBack, onSelect }: {
 
 // ─── Feedback Respond ────────────────────────────────────
 function FeedbackRespondScreen({ feedback, user, onBack }: {
-  feedback: FeedbackRequest; user: any; onBack: () => void
+  feedback: FeedbackRequest; user: User; onBack: () => void
 }) {
   const colors = useBrandColors()
   const s = useThemedStyles(makeStyles)
@@ -388,7 +390,7 @@ function FeedbackRespondScreen({ feedback, user, onBack }: {
 
         {!isCompleted && (
           <TouchableOpacity style={[s.submitBtn, saving && { opacity: 0.6 }]} onPress={handleSubmit} disabled={saving}>
-            {saving ? <ActivityIndicator color="#fff" /> : <Text style={s.submitBtnText}>Submit Feedback</Text>}
+            {saving ? <ActivityIndicator color={colors.onAccent} /> : <Text style={s.submitBtnText}>Submit Feedback</Text>}
           </TouchableOpacity>
         )}
       </ScrollView>
@@ -421,7 +423,7 @@ const makeStyles = (c: BrandColors) => StyleSheet.create({
   actionTitle: { fontSize: 16, fontWeight: '700', color: c.foregroundSoft },
   actionSub: { fontSize: 13, color: c.textSubtle, marginTop: 2 },
   badge: { backgroundColor: c.brand500, borderRadius: 12, minWidth: 24, height: 24, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
-  badgeText: { color: '#fff', fontSize: 12, fontWeight: '700' },
+  badgeText: { color: c.onAccent, fontSize: 12, fontWeight: '700' },
   // Chat
   chatHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 },
   chatTitle: { fontSize: 18, fontWeight: '700', color: c.foreground },
@@ -452,13 +454,13 @@ const makeStyles = (c: BrandColors) => StyleSheet.create({
   ratingBtn: { width: 44, height: 44, borderRadius: 22, borderWidth: 1, borderColor: c.lineStrong, alignItems: 'center', justifyContent: 'center', backgroundColor: c.panelMuted },
   ratingBtnActive: { backgroundColor: c.brand500, borderColor: c.brand500 },
   ratingText: { fontSize: 18, fontWeight: '700', color: c.textSubtle },
-  ratingTextActive: { color: '#fff' },
+  ratingTextActive: { color: c.onAccent },
   yesNoRow: { flexDirection: 'row', gap: 12 },
   yesNoBtn: { flex: 1, paddingVertical: 14, borderRadius: 14, borderWidth: 1, borderColor: c.lineStrong, alignItems: 'center', backgroundColor: c.panelMuted },
   yesNoBtnActive: { backgroundColor: c.brand500, borderColor: c.brand500 },
   yesNoText: { fontSize: 16, fontWeight: '600', color: c.textSubtle },
-  yesNoTextActive: { color: '#fff' },
+  yesNoTextActive: { color: c.onAccent },
   submitBtn: { backgroundColor: c.brand500, borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginTop: 8 },
-  submitBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  submitBtnText: { color: c.onAccent, fontSize: 16, fontWeight: '700' },
 })
 

@@ -31,6 +31,7 @@
       "criteria": [
         "Meal plan: total calories within ±100 kcal of target (post-scaling tolerance slightly wider for eval)",
         "Meal plan: protein within ±10g of target",
+        "Meal plan: carbs within ±15g of target and fat within ±8g of target (same tolerances the generation prompt is instructed to hit)",
         "Training plan: correct number of training days returned",
         "Training plan: rep ranges and rest periods match the prescribed training style",
         "No obviously wrong macro data (e.g. chicken breast labelled as 0g protein)"

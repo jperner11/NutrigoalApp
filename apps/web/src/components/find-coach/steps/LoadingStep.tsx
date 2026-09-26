@@ -37,7 +37,7 @@ export default function LoadingStep({ answers }: { answers: CoachWizardAnswers }
       <div className="inline-flex rounded-full bg-[var(--brand-100)] p-5 text-[var(--brand-900)]">
         <Loader2 className="h-8 w-8 animate-spin" />
       </div>
-      <div className="mt-8 inline-flex items-center gap-2 rounded-full bg-[rgba(237,248,255,0.72)] px-4 py-2 text-sm font-semibold text-[var(--brand-700)]">
+      <div className="mt-8 inline-flex items-center gap-2 rounded-full bg-[rgba(237,248,255,0.72)] px-4 py-2 text-sm font-semibold text-[var(--acc-text)]">
         <Sparkles className="h-4 w-4" />
         Matching in progress
       </div>
