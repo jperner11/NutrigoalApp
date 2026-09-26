@@ -63,10 +63,13 @@ export default function MyNutritionistMessagesPage() {
       .eq('client_id', profile.id)
       .maybeSingle()
       .then(
-        ({ data }) => {
+        ({ data, error }) => {
           if (cancelled) return
           setConversationId(data?.id ?? null)
           setResolved(true)
+          if (error) {
+            Sentry.captureException(error, { tags: { kind: 'page', page: 'my-nutritionist/messages', op: 'loadConversation' } })
+          }
         },
         (err) => {
           if (!cancelled) setResolved(true)
