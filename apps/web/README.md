@@ -87,14 +87,15 @@ src/
 │   ├── api/                # API routes (food search, nutrition, AI, Stripe webhook)
 │   └── auth/               # Auth callback
 ├── components/
-│   ├── dashboard/          # MealPlanTracker
-│   └── ui/                 # Sidebar
+│   ├── billing/, brand/, coach/, dashboard/, diet/, find-coach/,
+│   │   marketing/, messages/, onboarding/, training/  # Feature-scoped components
+│   └── ui/                 # Shared UI primitives (Sidebar, StatTile, ProBadge, etc.)
 ├── hooks/                  # useUser hook
 └── lib/
     ├── supabase/           # Client, server, middleware, types
     ├── nutrition.ts        # BMR, TDEE, macro calculations
-    ├── constants.ts        # App constants
-    └── cardio.ts           # Cardio utilities
+    ├── cardio.ts           # Cardio utilities
+    └── ...                 # apiClient, billing, coachScoring, tierUtils, and other domain helpers
 ```
 
 ## Nutrition Science
