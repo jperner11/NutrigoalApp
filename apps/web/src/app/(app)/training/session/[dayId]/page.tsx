@@ -525,6 +525,7 @@ export default function WorkoutSessionPage() {
               <input
                 type="number"
                 inputMode="decimal"
+                aria-label={`Set ${set.set_number} weight in kilograms`}
                 value={set.weight_kg || ''}
                 onChange={e => updateSet(i, 'weight_kg', parseFloat(e.target.value) || 0)}
                 className={`w-full text-center text-sm font-medium border rounded-lg py-2.5 px-2 focus:outline-none focus:ring-2 focus:ring-[var(--acc)] focus:border-transparent transition-colors ${
@@ -544,6 +545,7 @@ export default function WorkoutSessionPage() {
               <input
                 type="number"
                 inputMode="numeric"
+                aria-label={`Set ${set.set_number} reps`}
                 value={set.reps || ''}
                 onChange={e => updateSet(i, 'reps', parseInt(e.target.value) || 0)}
                 className={`w-full text-center text-sm font-medium border rounded-lg py-2.5 px-2 focus:outline-none focus:ring-2 focus:ring-[var(--acc)] focus:border-transparent transition-colors ${
@@ -564,13 +566,15 @@ export default function WorkoutSessionPage() {
             <div className="flex justify-center">
               <button
                 onClick={() => toggleSetComplete(i)}
+                aria-label={set.completed ? `Mark set ${set.set_number} incomplete` : `Mark set ${set.set_number} complete`}
+                aria-pressed={set.completed}
                 className={`h-11 w-11 rounded-xl flex items-center justify-center transition-all active:scale-95 ${
                   set.completed
                     ? 'bg-[var(--ok)] text-white shadow-sm'
                     : 'bg-[var(--line)] text-[var(--muted-soft)] hover:bg-[var(--line-strong)]'
                 }`}
               >
-                <Check className="h-5 w-5" strokeWidth={set.completed ? 3 : 2} />
+                <Check className="h-5 w-5" strokeWidth={set.completed ? 3 : 2} aria-hidden="true" />
               </button>
             </div>
           </div>
