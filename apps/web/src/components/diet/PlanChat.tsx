@@ -167,7 +167,7 @@ export default function PlanChat({ planId, meals, targets, userProfile, dayOfWee
 
       {/* Chat panel */}
       {isOpen && (
-        <div className="card fixed bottom-6 right-6 w-[400px] max-h-[550px] flex flex-col z-50 overflow-hidden">
+        <div className="card fixed bottom-6 right-6 w-[400px] max-w-[calc(100vw-3rem)] max-h-[550px] flex flex-col z-50 overflow-hidden">
           {/* Header */}
           <div
             className="px-5 py-3.5 flex items-center justify-between flex-shrink-0"
