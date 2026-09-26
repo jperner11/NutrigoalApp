@@ -25,11 +25,13 @@ export default function WaterPage() {
     const supabase = createClient()
 
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('water_logs')
         .select('amount_ml')
         .eq('user_id', profile.id)
         .eq('date', today)
+
+      if (error) throw error
 
       setTodayTotal(data?.reduce((sum, log) => sum + log.amount_ml, 0) ?? 0)
     } catch {
