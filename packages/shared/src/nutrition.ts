@@ -82,7 +82,8 @@ export function calculateMacros(calories: number, goal: UserMetrics['goal'], wei
   }
 
   const protein = Math.round(weight * proteinPerKg)
-  const fat = Math.round((calories * fatPercent) / 9) // 9 calories per gram of fat
+  // Clamp: very low calorie targets can push this negative
+  const fat = Math.max(0, Math.round((calories * fatPercent) / 9)) // 9 calories per gram of fat
   const remainingCalories = calories - (protein * 4) - (fat * 9)
   // Clamp: very low calorie targets with high bodyweight can push this negative
   const carbs = Math.max(0, Math.round(remainingCalories / 4)) // 4 calories per gram of carbs
