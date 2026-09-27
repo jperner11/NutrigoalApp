@@ -172,15 +172,15 @@ export default function SettingsScreen() {
             textAlignVertical="top"
           />
           <TouchableOpacity style={[styles.supportBtn, submittingSupport && { opacity: 0.6 }]} onPress={submitSupportRequest} disabled={submittingSupport}>
-            {submittingSupport ? <ActivityIndicator color="#fff" /> : (
+            {submittingSupport ? <ActivityIndicator color={colors.onAccent} /> : (
               <>
-                <Ionicons name="send-outline" size={18} color="#fff" />
+                <Ionicons name="send-outline" size={18} color={colors.onAccent} />
                 <Text style={styles.supportBtnText}>Submit report</Text>
               </>
             )}
           </TouchableOpacity>
           <TouchableOpacity style={styles.supportBtn} onPress={openSupportEmail}>
-            <Ionicons name="mail-outline" size={18} color="#fff" />
+            <Ionicons name="mail-outline" size={18} color={colors.onAccent} />
             <Text style={styles.supportBtnText}>Email support</Text>
           </TouchableOpacity>
           <Text style={styles.supportEmail}>{SUPPORT_EMAIL}</Text>
@@ -262,7 +262,7 @@ const makeStyles = (c: BrandColors) => StyleSheet.create({
   statValue: { fontSize: 20, fontWeight: '800', color: c.brand500 },
   statLabel: { fontSize: 12, color: c.textMuted, marginTop: 2 },
   supportBtn: { marginTop: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: c.brand500, borderRadius: 14, paddingVertical: 14 },
-  supportBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
+  supportBtnText: { color: c.onAccent, fontSize: 15, fontWeight: '700' },
   supportEmail: { marginTop: 10, fontSize: 12, color: c.textSubtle, textAlign: 'center' },
   supportHistoryList: { marginTop: 14, gap: 10 },
   supportHistoryItem: { flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1, borderColor: c.line, borderRadius: 14, backgroundColor: c.panelMuted, padding: 12 },
