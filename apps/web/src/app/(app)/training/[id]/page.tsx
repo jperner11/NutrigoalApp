@@ -26,6 +26,7 @@ import type {
 } from '@/lib/supabase/types'
 import { isFeatureLocked } from '@/lib/tierUtils'
 import UpgradeModal from '@/components/ui/UpgradeModal'
+import { reportClientError } from '@/lib/apiClient'
 
 interface DayWithExercises extends TrainingPlanDay {
   exercises: (TrainingPlanExercise & { exercises: Exercise })[]
@@ -143,17 +144,23 @@ export default function TrainingPlanDetailPage() {
 
     async function loadSelection() {
       const supabase = createClient()
-      const { data } = await supabase
-        .from('user_tier_selections')
-        .select('selected_id')
-        .eq('user_id', profile!.id)
-        .eq('selection_type', 'training_day')
-        .maybeSingle()
+      try {
+        const { data, error } = await supabase
+          .from('user_tier_selections')
+          .select('selected_id')
+          .eq('user_id', profile!.id)
+          .eq('selection_type', 'training_day')
+          .maybeSingle()
 
-      if (data) {
-        setSelectedDayId(data.selected_id)
-      } else if (days.length > 0) {
-        setShowDayPicker(true)
+        if (error) throw error
+
+        if (data) {
+          setSelectedDayId(data.selected_id)
+        } else if (days.length > 0) {
+          setShowDayPicker(true)
+        }
+      } catch (err) {
+        reportClientError(err, { feature: 'training', action: 'training-plan-tier-selection-load' })
       }
     }
 
