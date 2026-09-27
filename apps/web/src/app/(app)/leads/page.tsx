@@ -269,7 +269,7 @@ export default function LeadsPage() {
                     <div className="mt-1 text-sm text-[var(--muted)]">{lead.goal_summary}</div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <StatusPill tone={lead.status === 'accepted' ? 'success' : 'muted'}>{lead.status}</StatusPill>
+                    <StatusPill tone={lead.status === 'accepted' ? 'success' : lead.status === 'declined' ? 'danger' : 'muted'}>{lead.status}</StatusPill>
                     <StatusPill tone="accent">{formatLeadStage(lead.stage)}</StatusPill>
                     {lead.status === 'accepted' && (
                       <Link href={`/clients/${lead.user_id}`} className="text-sm font-semibold text-[var(--acc-text)] hover:opacity-80">
