@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight, Eye, EyeOff, Lock, Mail } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 import { sanitizeNextPath } from '@/lib/authRedirect'
@@ -167,139 +167,190 @@ export default function ResetPasswordPage() {
     window.location.href = nextPath
   }
 
+  const inputStyle: React.CSSProperties = {
+    width: '100%',
+    padding: '14px 16px',
+    fontSize: 15,
+    background: 'var(--ink-2)',
+    border: '1px solid var(--line-2)',
+    borderRadius: 12,
+    color: 'var(--fg)',
+    outline: 'none',
+  }
+
+  const loginHref = `/login${nextPath !== '/dashboard' ? `?next=${encodeURIComponent(nextPath)}` : ''}`
+
   return (
-    <div className="auth-bg min-h-screen px-4 py-10 sm:px-6 lg:px-8">
-      <div className="mx-auto flex max-w-7xl items-center justify-between pb-8">
+    <div className="auth-bg min-h-screen overflow-x-hidden">
+      <div className="row mx-auto max-w-[1320px] justify-between px-8 py-5">
         <BrandLogo href="/" />
-        <Link href={`/login${nextPath !== '/dashboard' ? `?next=${encodeURIComponent(nextPath)}` : ''}`} className="btn-secondary rounded-full px-5 py-3 text-sm font-semibold">
+        <Link href={loginHref} className="btn btn-ghost">
           Sign in
         </Link>
       </div>
 
-      <div className="mx-auto max-w-3xl">
-        <section className="glass-card rounded-[32px] p-8 sm:p-10">
-          <div className="mb-8">
-            <div className="eyebrow mb-4">{sessionReady ? 'Password setup' : 'Password reset'}</div>
-            <h1 className="text-4xl font-bold text-[var(--foreground)]">
-              {sessionReady ? 'Set your password' : 'Reset your password'}
-            </h1>
-            <p className="mt-3 text-base leading-7 text-[var(--muted)]">
-              {sessionReady
-                ? "Finish setting up your account, then we'll send you straight back to the invite."
-                : "Enter the email you signed up with and we'll send you a link to set a new password."}
-            </p>
+      <section className="mx-auto max-w-[440px] px-8 pb-20 pt-10">
+        <div className="mb-8 flex justify-center">
+          <BrandLogo compact />
+        </div>
+
+        <div className="mb-4 flex justify-center">
+          <div className="eyebrow eyebrow-dot">{sessionReady ? 'Password setup' : 'Password reset'}</div>
+        </div>
+
+        <h1 className="h2 mb-4 text-center">
+          {sessionReady ? 'Set your' : 'Reset your'}
+          <br />
+          <span className="italic-serif" style={{ color: 'var(--fg-3)' }}>
+            password.
+          </span>
+        </h1>
+
+        <p
+          className="mb-8 text-center"
+          style={{ fontSize: 14, color: 'var(--fg-3)' }}
+        >
+          {sessionReady
+            ? "Finish setting up your account, then we'll send you straight back to the invite."
+            : "Enter the email you signed up with and we'll send you a link to set a new password."}
+        </p>
+
+        {!sessionChecked ? (
+          <div className="text-center" style={{ fontSize: 14, color: 'var(--fg-3)' }}>
+            Checking your reset link...
           </div>
-
-          {!sessionChecked ? (
-            <div className="rounded-[24px] border border-[var(--line)] bg-[var(--panel-strong)]/80 p-6 text-[var(--muted)]">
-              Checking your reset link...
+        ) : !sessionReady ? (
+          requestSent ? (
+            <div className="text-center" style={{ fontSize: 14, color: 'var(--fg-3)' }}>
+              <p style={{ color: 'var(--fg)', fontWeight: 600 }}>Check your inbox</p>
+              <p className="mt-2">
+                If an account exists for <span style={{ color: 'var(--fg)', fontWeight: 600 }}>{requestEmail.trim()}</span>, we&apos;ve
+                sent a password reset link. It may take a minute to arrive — check spam too.
+              </p>
+              <button
+                type="button"
+                onClick={() => setRequestSent(false)}
+                className="mt-4 underline underline-offset-4"
+                style={{ color: 'var(--fg)', fontWeight: 600 }}
+              >
+                Use a different email
+              </button>
             </div>
-          ) : !sessionReady ? (
-            requestSent ? (
-              <div className="rounded-[24px] border border-[var(--line)] bg-[var(--panel-strong)]/80 p-6 text-sm leading-6 text-[var(--muted)]">
-                <p className="font-semibold text-[var(--foreground)]">Check your inbox</p>
-                <p className="mt-2">
-                  If an account exists for <span className="font-semibold">{requestEmail.trim()}</span>, we&apos;ve
-                  sent a password reset link. It may take a minute to arrive — check spam too.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => setRequestSent(false)}
-                  className="mt-4 text-sm font-semibold text-[var(--foreground)] underline underline-offset-4"
-                >
-                  Use a different email
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={handleRequestReset} className="space-y-5">
-                <div>
-                  <label htmlFor="reset-email" className="mb-2 block text-sm font-semibold text-[var(--foreground)]">Email</label>
-                  <div className="relative">
-                    <Mail className="pointer-events-none absolute left-5 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-[var(--muted-soft)]" />
-                    <input
-                      id="reset-email"
-                      type="email"
-                      value={requestEmail}
-                      onChange={(e) => setRequestEmail(e.target.value)}
-                      className="input-field input-field-icon-left"
-                      placeholder="you@example.com"
-                      autoComplete="email"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isRequesting}
-                  className="btn-primary flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-4 text-base font-semibold disabled:opacity-50"
-                >
-                  {isRequesting ? (
-                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                  ) : (
-                    <>
-                      <span>Send reset link</span>
-                      <ArrowRight className="h-4 w-4" />
-                    </>
-                  )}
-                </button>
-              </form>
-            )
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleRequestReset} className="col gap-4">
               <div>
-                <label htmlFor="password" className="mb-2 block text-sm font-semibold text-[var(--foreground)]">New password</label>
-                <div className="relative">
-                  <Lock className="pointer-events-none absolute left-5 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-[var(--muted-soft)]" />
-                  <input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    value={formData.password}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, password: e.target.value }))}
-                    className="input-field input-field-icon-both"
-                    placeholder="Minimum 6 characters"
-                    required
-                  />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? 'Hide password' : 'Show password'} className="absolute inset-y-0 right-0 flex items-center pr-5 text-[var(--muted-soft)]">
-                    {showPassword ? <EyeOff className="h-5 w-5" aria-hidden="true" /> : <Eye className="h-5 w-5" aria-hidden="true" />}
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="confirmPassword" className="mb-2 block text-sm font-semibold text-[var(--foreground)]">Confirm password</label>
-                <div className="relative">
-                  <Lock className="pointer-events-none absolute left-5 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-[var(--muted-soft)]" />
-                  <input
-                    id="confirmPassword"
-                    type={showPassword ? 'text' : 'password'}
-                    value={formData.confirmPassword}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, confirmPassword: e.target.value }))}
-                    className="input-field input-field-icon-left"
-                    placeholder="Repeat your password"
-                    required
-                  />
-                </div>
+                <label
+                  htmlFor="reset-email"
+                  className="mono mb-2 block"
+                  style={{ fontSize: 11, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
+                >
+                  EMAIL
+                </label>
+                <input
+                  id="reset-email"
+                  type="email"
+                  value={requestEmail}
+                  onChange={(e) => setRequestEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  autoComplete="email"
+                  style={inputStyle}
+                  required
+                />
               </div>
 
               <button
                 type="submit"
-                disabled={isLoading}
-                className="btn-primary flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-4 text-base font-semibold disabled:opacity-50"
+                disabled={isRequesting}
+                className="btn btn-accent mt-2 w-full justify-center disabled:opacity-50"
+                style={{ padding: '14px 18px', fontSize: 15 }}
               >
-                {isLoading ? (
-                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                {isRequesting ? (
+                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
                 ) : (
-                  <>
-                    <span>Save password</span>
-                    <ArrowRight className="h-4 w-4" />
-                  </>
+                  <span>Send reset link →</span>
                 )}
               </button>
             </form>
-          )}
-        </section>
-      </div>
+          )
+        ) : (
+          <form onSubmit={handleSubmit} className="col gap-4">
+            <div>
+              <label
+                htmlFor="password"
+                className="mono mb-2 block"
+                style={{ fontSize: 11, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
+              >
+                NEW PASSWORD
+              </label>
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={formData.password}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, password: e.target.value }))}
+                  placeholder="Minimum 6 characters"
+                  style={{ ...inputStyle, paddingRight: 48 }}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  className="absolute inset-y-0 right-0 flex items-center pr-4"
+                  style={{ color: 'var(--fg-3)' }}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" aria-hidden="true" />
+                  ) : (
+                    <Eye className="h-5 w-5" aria-hidden="true" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="confirmPassword"
+                className="mono mb-2 block"
+                style={{ fontSize: 11, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
+              >
+                CONFIRM PASSWORD
+              </label>
+              <input
+                id="confirmPassword"
+                type={showPassword ? 'text' : 'password'}
+                value={formData.confirmPassword}
+                onChange={(e) => setFormData((prev) => ({ ...prev, confirmPassword: e.target.value }))}
+                placeholder="Repeat your password"
+                style={inputStyle}
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="btn btn-accent mt-2 w-full justify-center disabled:opacity-50"
+              style={{ padding: '14px 18px', fontSize: 15 }}
+            >
+              {isLoading ? (
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              ) : (
+                <span>Save password →</span>
+              )}
+            </button>
+          </form>
+        )}
+
+        <div
+          className="mt-6 text-center"
+          style={{ fontSize: 13, color: 'var(--fg-3)' }}
+        >
+          <Link href={loginHref} style={{ color: 'var(--fg)', fontWeight: 600 }}>
+            Back to sign in
+          </Link>
+        </div>
+      </section>
     </div>
   )
 }
