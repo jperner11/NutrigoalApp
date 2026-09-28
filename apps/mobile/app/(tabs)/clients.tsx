@@ -467,7 +467,7 @@ function MessagesScreen({ client, user, onBack }: { client: ClientWithProfile; u
           }
         )
         .subscribe()
-    }).catch(() => {})
+    }).catch(() => Alert.alert('Error', 'Could not load messages'))
 
     return () => {
       cancelled = true
