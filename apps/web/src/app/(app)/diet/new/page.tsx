@@ -507,7 +507,7 @@ export default function NewDietPlanPage() {
           <MetricCard label="Calories" value={Math.round(totalCalories)} footer={`/ ${targetCalories}`} tone={Math.abs(totalCalories - targetCalories) < targetCalories * 0.1 ? 'accent' : 'danger'} />
           <MetricCard label="Protein" value={Math.round(totalProtein)} unit="g" footer={`/ ${targetProtein}g`} tone={Math.abs(totalProtein - targetProtein) < targetProtein * 0.15 ? 'success' : 'danger'} />
           <MetricCard label="Carbs" value={Math.round(totalCarbs)} unit="g" footer={`/ ${targetCarbs}g`} tone={Math.abs(totalCarbs - targetCarbs) < targetCarbs * 0.15 ? 'warn' : 'danger'} />
-          <MetricCard label="Fat" value={Math.round(totalFat)} unit="g" footer={`/ ${targetFat}g`} tone={Math.abs(totalFat - targetFat) < targetFat * 0.15 ? 'danger' : 'muted'} />
+          <MetricCard label="Fat" value={Math.round(totalFat)} unit="g" footer={`/ ${targetFat}g`} tone={Math.abs(totalFat - targetFat) < targetFat * 0.15 ? 'success' : 'danger'} />
         </div>
       )}
 
