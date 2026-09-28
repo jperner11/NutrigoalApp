@@ -195,6 +195,7 @@ export default function AIGenerateScreen() {
         if (dayErr) throw dayErr
 
         // Find or create exercises
+        const exerciseRows = []
         for (let i = 0; i < day.exercises.length; i++) {
           const ex = day.exercises[i]
           // Try to find existing exercise
@@ -214,7 +215,7 @@ export default function AIGenerateScreen() {
             exerciseId = created.id
           }
 
-          await supabase.from('training_plan_exercises').insert({
+          exerciseRows.push({
             plan_day_id: dayData.id,
             exercise_id: exerciseId,
             order_index: i,
@@ -224,6 +225,9 @@ export default function AIGenerateScreen() {
             notes: ex.notes || null,
           })
         }
+
+        const { error: exercisesErr } = await supabase.from('training_plan_exercises').insert(exerciseRows)
+        if (exercisesErr) throw exercisesErr
       }
 
       // Deactivate other plans
