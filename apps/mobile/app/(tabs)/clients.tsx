@@ -947,18 +947,21 @@ function CreateClientTrainingPlan({ client, user, onDone, onCancel }: {
 
     if (error || !plan) { Alert.alert('Error', error?.message || 'Failed'); setSaving(false); return }
 
-    for (let i = 0; i < days.length; i++) {
-      const { data: day } = await supabase.from('training_plan_days').insert({
-        training_plan_id: plan.id, day_number: i + 1, name: days[i].name,
-      }).select().single()
-      if (!day) continue
+    // Insert days and their exercises in parallel (each day only depends on plan.id)
+    await Promise.all(
+      days.map(async (d, i) => {
+        const { data: day } = await supabase.from('training_plan_days').insert({
+          training_plan_id: plan.id, day_number: i + 1, name: d.name,
+        }).select().single()
+        if (!day) return
 
-      const exerciseRows = days[i].exercises.map((e, idx) => ({
-        plan_day_id: day.id, exercise_id: e.exercise.id, order_index: idx,
-        sets: e.sets, reps: e.reps, rest_seconds: e.rest_seconds,
-      }))
-      await supabase.from('training_plan_exercises').insert(exerciseRows)
-    }
+        const exerciseRows = d.exercises.map((e, idx) => ({
+          plan_day_id: day.id, exercise_id: e.exercise.id, order_index: idx,
+          sets: e.sets, reps: e.reps, rest_seconds: e.rest_seconds,
+        }))
+        await supabase.from('training_plan_exercises').insert(exerciseRows)
+      })
+    )
 
     setSaving(false)
     Alert.alert('Success', `Training plan created for ${clientName}`)
