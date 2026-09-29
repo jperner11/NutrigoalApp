@@ -122,7 +122,7 @@ export default function WaterPage() {
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <Droplets
                 className="mb-2 h-6 w-6"
-                style={{ color: 'var(--acc)' }}
+                style={{ color: 'var(--acc-text)' }}
               />
               <span className="serif" style={{ fontSize: 36, lineHeight: 1 }}>
                 {todayTotal}
