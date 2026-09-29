@@ -629,7 +629,7 @@ export default function DashboardPage() {
             <Link
               href="/clients"
               className="mono"
-              style={{ fontSize: 10, color: 'var(--acc)', letterSpacing: '0.1em' }}
+              style={{ fontSize: 10, color: 'var(--acc-text)', letterSpacing: '0.1em' }}
             >
               VIEW ALL →
             </Link>
@@ -687,7 +687,7 @@ export default function DashboardPage() {
             <Link
               href="/progress"
               className="mono"
-              style={{ fontSize: 10, color: 'var(--acc)', letterSpacing: '0.1em' }}
+              style={{ fontSize: 10, color: 'var(--acc-text)', letterSpacing: '0.1em' }}
             >
               VIEW ALL →
             </Link>
