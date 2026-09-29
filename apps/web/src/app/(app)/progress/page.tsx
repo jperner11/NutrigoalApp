@@ -296,12 +296,14 @@ export default function ProgressPage() {
           <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-4">
             <div>
               <label
+                htmlFor="weight-log-date"
                 className="mono mb-2 block"
                 style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
               >
                 DATE
               </label>
               <input
+                id="weight-log-date"
                 type="date"
                 value={formDate}
                 onChange={(e) => setFormDate(e.target.value)}
@@ -310,12 +312,14 @@ export default function ProgressPage() {
             </div>
             <div>
               <label
+                htmlFor="weight-log-weight"
                 className="mono mb-2 block"
                 style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
               >
                 WEIGHT (KG) *
               </label>
               <input
+                id="weight-log-weight"
                 type="number"
                 step="0.1"
                 value={formWeight}
@@ -326,12 +330,14 @@ export default function ProgressPage() {
             </div>
             <div>
               <label
+                htmlFor="weight-log-body-fat"
                 className="mono mb-2 block"
                 style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
               >
                 BODY FAT %
               </label>
               <input
+                id="weight-log-body-fat"
                 type="number"
                 step="0.1"
                 value={formBodyFat}
@@ -342,12 +348,14 @@ export default function ProgressPage() {
             </div>
             <div>
               <label
+                htmlFor="weight-log-notes"
                 className="mono mb-2 block"
                 style={{ fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.12em' }}
               >
                 NOTES
               </label>
               <input
+                id="weight-log-notes"
                 type="text"
                 value={formNotes}
                 onChange={(e) => setFormNotes(e.target.value)}
@@ -553,6 +561,7 @@ export default function ProgressPage() {
                         step="0.1"
                         value={editWeight}
                         onChange={(e) => setEditWeight(e.target.value)}
+                        aria-label="Weight (kg)"
                         style={{ ...inputStyle, width: 100, padding: '6px 10px' }}
                       />
                       <span style={{ fontSize: 11, color: 'var(--fg-4)' }}>kg</span>
@@ -562,6 +571,7 @@ export default function ProgressPage() {
                         value={editBodyFat}
                         onChange={(e) => setEditBodyFat(e.target.value)}
                         placeholder="BF%"
+                        aria-label="Body fat percentage"
                         style={{ ...inputStyle, width: 90, padding: '6px 10px' }}
                       />
                     </div>
