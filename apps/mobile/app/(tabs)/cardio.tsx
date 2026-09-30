@@ -137,7 +137,12 @@ export default function CardioScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Cardio</Text>
-        <TouchableOpacity style={styles.addBtn} onPress={() => setShowForm(true)}>
+        <TouchableOpacity
+          style={styles.addBtn}
+          onPress={() => setShowForm(true)}
+          accessibilityRole="button"
+          accessibilityLabel="Log cardio session"
+        >
           <Ionicons name="add" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
