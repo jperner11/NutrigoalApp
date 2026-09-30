@@ -90,18 +90,6 @@ export default function PlanChat({ planId, meals, targets, userProfile, dayOfWee
     const { createClient } = await import('@/lib/supabase/client')
     const supabase = createClient()
 
-    // Delete existing meals for this day only (or all if no day specified)
-    const deleteQuery = supabase.from('diet_plan_meals').delete().eq('diet_plan_id', planId)
-    const { error: deleteError } =
-      dayOfWeek !== null && dayOfWeek !== undefined
-        ? await deleteQuery.eq('day_of_week', dayOfWeek)
-        : await deleteQuery
-
-    if (deleteError) {
-      toast.error('Failed to save modified meals')
-      return
-    }
-
     const inserts = updatedMeals.map(meal => {
       const ingredients = (meal.ingredients as Record<string, unknown>[]) ?? []
       return {
@@ -135,9 +123,36 @@ export default function PlanChat({ planId, meals, targets, userProfile, dayOfWee
       }
     })
 
-    const { error } = await supabase.from('diet_plan_meals').insert(inserts)
-    if (error) {
+    // Insert the replacement meals before deleting the old ones, so a failed
+    // insert (network blip, transient DB error) never leaves the plan empty.
+    const { data: insertedRows, error: insertError } = await supabase
+      .from('diet_plan_meals')
+      .insert(inserts)
+      .select('id')
+
+    if (insertError) {
       toast.error('Failed to save modified meals')
+      return
+    }
+
+    const insertedIds = (insertedRows ?? []).map(row => row.id)
+    if (insertedIds.length === 0) return
+
+    // Remove the meals being replaced for this day (or all if no day specified),
+    // excluding the rows we just inserted.
+    const deleteQuery = supabase
+      .from('diet_plan_meals')
+      .delete()
+      .eq('diet_plan_id', planId)
+      .not('id', 'in', `(${insertedIds.join(',')})`)
+    const { error: deleteError } =
+      dayOfWeek !== null && dayOfWeek !== undefined
+        ? await deleteQuery.eq('day_of_week', dayOfWeek)
+        : await deleteQuery
+
+    if (deleteError) {
+      // Non-fatal: the new meals are already saved; only stale rows remain.
+      toast.error('Saved, but could not remove the previous meals. Please refresh.')
     }
   }
 
