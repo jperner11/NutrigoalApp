@@ -9,7 +9,7 @@ import type { WeeklyReport } from '@/lib/reports'
 import { isTrainerRole } from '@treno/shared'
 import { toast } from 'react-hot-toast'
 import { getLocalDateString } from '@/lib/date'
-import { AppHeroPanel } from '@/components/ui/AppDesign'
+import { AppHeroPanel, EmptyStateCard } from '@/components/ui/AppDesign'
 
 function getWeekRange(offset: number): { start: string; end: string; label: string } {
   const now = new Date()
@@ -309,7 +309,13 @@ export default function ReportsPage() {
             </div>
           </div>
         </div>
-      ) : null}
+      ) : (
+        <EmptyStateCard
+          icon={<BarChart3 className="h-7 w-7" />}
+          title="No report for this week."
+          body="We couldn't load your weekly summary. Try a different week, or check back once you've logged some activity."
+        />
+      )}
     </div>
   )
 }
