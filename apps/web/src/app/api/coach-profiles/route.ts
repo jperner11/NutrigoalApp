@@ -82,6 +82,7 @@ export async function GET() {
   return NextResponse.json({
     profiles: (data ?? []).map((profile) => ({
       ...profile,
+      coach: Array.isArray(profile.coach) ? profile.coach[0] ?? null : profile.coach,
       offers: offersByCoachId.get(profile.coach_id) ?? [],
     })),
   })
