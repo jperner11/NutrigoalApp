@@ -1826,19 +1826,19 @@ export default function OnboardingPage() {
                       <div className="text-xs text-[var(--muted-soft)] mt-1">kcal / day</div>
                     </div>
                     <div className="bg-[var(--panel-strong)]/80 rounded-xl p-4 text-center">
-                      <div className="text-2xl font-bold text-red-600">{targets.protein}g</div>
+                      <div className="text-2xl font-bold text-[var(--acc-text)]">{targets.protein}g</div>
                       <div className="text-xs text-[var(--muted-soft)] mt-1">Protein</div>
                     </div>
                     <div className="bg-[var(--panel-strong)]/80 rounded-xl p-4 text-center">
-                      <div className="text-2xl font-bold text-yellow-600">{targets.carbs}g</div>
+                      <div className="text-2xl font-bold text-[var(--acc-text)]">{targets.carbs}g</div>
                       <div className="text-xs text-[var(--muted-soft)] mt-1">Carbs</div>
                     </div>
                     <div className="bg-[var(--panel-strong)]/80 rounded-xl p-4 text-center">
-                      <div className="text-2xl font-bold text-green-600">{targets.fat}g</div>
+                      <div className="text-2xl font-bold text-[var(--acc-text)]">{targets.fat}g</div>
                       <div className="text-xs text-[var(--muted-soft)] mt-1">Fat</div>
                     </div>
                     <div className="bg-[var(--panel-strong)]/80 rounded-xl p-4 text-center">
-                      <div className="text-2xl font-bold text-blue-600">{(targets.water / 1000).toFixed(1)}L</div>
+                      <div className="text-2xl font-bold text-[var(--acc-text)]">{(targets.water / 1000).toFixed(1)}L</div>
                       <div className="text-xs text-[var(--muted-soft)] mt-1">Water</div>
                     </div>
                   </div>
