@@ -704,11 +704,12 @@ export default function DashboardPage() {
                   : undefined
               }
               changeTone={
-                weightData.trend === 'up'
-                  ? 'warn'
-                  : weightData.trend === 'down'
+                weightData.trend === 'stable'
+                  ? 'muted'
+                  // Gaining weight is the intended outcome for bulking users, so don't flag it as a warning.
+                  : (weightData.trend === 'up') === (profile.goal === 'bulking')
                     ? 'ok'
-                    : 'muted'
+                    : 'warn'
               }
             />
             <StatTile
