@@ -256,6 +256,7 @@ export function ChatThread({
             onChange={(e) => setText(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={conversationId ? 'Type a message...' : 'Waiting for conversation...'}
+            aria-label={peerName ? `Message ${peerName}` : 'Message'}
             rows={1}
             disabled={!conversationId}
             className="min-h-[48px] flex-1 resize-none rounded-xl border bg-[var(--ink-2)] px-4 py-3 text-sm text-[var(--fg)] outline-none transition focus:border-[var(--acc)] disabled:opacity-60"
