@@ -87,6 +87,8 @@ const TERM_EXCEPTIONS = {
   milk: /\b(coconut|oat|soy|soya|rice|pea|hemp|plant)([- ]based)?[- ]milk\b/i,
   butter: /\b(peanut|seed|sunflower|soy|cocoa|apple)[- ]?butter\b/i,
   cream: /\bcoconut[- ]cream\b/i,
+  yogurt: /\b(coconut|oat|soy|soya|pea|hemp|plant)([- ]based)?[- ]yog?hurt\b|dairy[- ]free/i,
+  yoghurt: /\b(coconut|oat|soy|soya|pea|hemp|plant)([- ]based)?[- ]yog?hurt\b|dairy[- ]free/i,
   oats: /gluten[- ]free/i,
   bread: /gluten[- ]free/i,
   pasta: /gluten[- ]free/i,
