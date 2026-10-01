@@ -264,12 +264,14 @@ export default function SettingsPage() {
       setLoadingSupportHistory(true)
       const supabase = createClient()
       try {
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from('support_requests')
           .select('id, category, subject, status, created_at')
           .eq('user_id', profile.id)
           .order('created_at', { ascending: false })
           .limit(5)
+
+        if (error) throw error
 
         setSupportHistory(data ?? [])
       } catch (err) {
@@ -288,12 +290,14 @@ export default function SettingsPage() {
       setLoadingTrainerQuestions(true)
       const supabase = createClient()
       try {
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from('personal_trainer_custom_intake_questions')
           .select('*')
           .eq('trainer_id', profile.id)
           .order('sort_order', { ascending: true })
           .order('created_at', { ascending: true })
+
+        if (error) throw error
 
         setTrainerQuestions(((data as PersonalTrainerCustomIntakeQuestion[] | null) ?? []).map((question) => ({
           ...question,
@@ -327,11 +331,13 @@ export default function SettingsPage() {
       setLoadingMarketplaceProfile(true)
       const supabase = createClient()
       try {
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from('coach_public_profiles')
           .select('*')
           .eq('coach_id', profile.id)
           .maybeSingle()
+
+        if (error) throw error
 
         const fallbackSlug = buildCoachProfileSlug(profile.full_name || profile.email || 'coach', profile.id)
         const row = data as CoachPublicProfile | null
@@ -372,12 +378,14 @@ export default function SettingsPage() {
       setLoadingCoachOffers(true)
       const supabase = createClient()
       try {
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from('coach_offers')
           .select('*')
           .eq('coach_id', profile.id)
           .order('sort_order', { ascending: true })
           .order('created_at', { ascending: true })
+
+        if (error) throw error
 
         setCoachOffers(((data as CoachOffer[] | null) ?? []).map((offer) => ({
           ...offer,
