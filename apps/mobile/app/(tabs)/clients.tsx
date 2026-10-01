@@ -478,11 +478,16 @@ function MessagesScreen({ client, user, onBack }: { client: ClientWithProfile; u
   const handleSend = async () => {
     if (!text.trim() || !conversationId || !user) return
     setSending(true)
-    await supabase.from('messages').insert({
+    const { error } = await supabase.from('messages').insert({
       conversation_id: conversationId,
       sender_id: user.id,
       content: text.trim(),
     })
+    if (error) {
+      setSending(false)
+      Alert.alert('Error', 'Could not send message. Please try again.')
+      return
+    }
     await supabase.from('conversations').update({ last_message_at: new Date().toISOString() }).eq('id', conversationId)
     setText('')
     setSending(false)
