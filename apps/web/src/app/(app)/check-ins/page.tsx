@@ -14,6 +14,7 @@ import type {
   FeedbackTemplate, FeedbackQuestionType, UserProfile,
 } from '@/lib/supabase/types'
 import { reportClientError } from '@/lib/apiClient'
+import { AppHeroPanel } from '@/components/ui/AppDesign'
 
 export default function CheckInsPage() {
   const { profile } = useUser()
@@ -67,10 +68,15 @@ function CoachCheckInsPage({ profile }: { profile: UserProfile }) {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold text-[var(--foreground)] mb-6">Check-ins</h1>
+      <AppHeroPanel
+        eyebrow="N° 09 · Check-ins"
+        title="Check-ins,"
+        accent="answered."
+        subtitle="Review what your clients have submitted, and keep your question templates sharp."
+      />
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-[var(--ink-2)] rounded-xl p-1 mb-6">
+      <div className="mt-8 flex gap-1 bg-[var(--ink-2)] rounded-xl p-1 mb-6">
         <button onClick={() => setTab('overview')}
           className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all ${tab === 'overview' ? 'bg-[var(--panel-strong)] text-[var(--foreground)] shadow-sm' : 'text-[var(--muted-soft)] hover:text-[var(--muted)]'}`}>
           Overview
@@ -588,8 +594,6 @@ function ClientCheckInsPage({ profile }: { profile: UserProfile }) {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold text-[var(--foreground)] mb-6">Check-ins</h1>
-
       {activeRequest ? (
         <ActiveCheckIn
           request={activeRequest}
@@ -603,67 +607,76 @@ function ClientCheckInsPage({ profile }: { profile: UserProfile }) {
         />
       ) : (
         <>
-          {pending.length > 0 && (
-            <div className="mb-8">
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-[var(--warn-text)] mb-3">
-                Waiting for your response ({pending.length})
-              </h2>
-              <div className="space-y-3">
-                {pending.map(req => (
-                  <button key={req.id} onClick={() => openCheckIn(req)}
-                    className="w-full text-left card p-5 hover:shadow-md transition-shadow">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-semibold text-[var(--foreground)]">{req.title}</h3>
-                        <p className="text-xs text-[var(--muted-soft)] mt-1">
-                          {req.questions.length} question{req.questions.length === 1 ? '' : 's'} · Sent {new Date(req.created_at).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <span className="flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-full bg-[var(--warn-bg)] text-[var(--warn-text)]">
-                        <Clock className="h-3 w-3" />
-                        Pending
-                      </span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+          <AppHeroPanel
+            eyebrow="N° 09 · Check-ins"
+            title="Check-ins,"
+            accent="from your coach."
+            subtitle="Respond to pending requests and look back at what you've already shared."
+          />
 
-          {pending.length === 0 && completed.length === 0 && (
-            <div className="card p-12 text-center">
-              <CheckCircle className="h-12 w-12 text-[var(--muted-soft)] mx-auto mb-3" />
-              <h3 className="font-semibold text-[var(--foreground)] mb-1">No check-ins yet</h3>
-              <p className="text-sm text-[var(--muted-soft)]">Your coach will send check-ins here for you to complete.</p>
-            </div>
-          )}
-
-          {completed.length > 0 && (
-            <div>
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-[var(--ok-text)] mb-3">
-                Completed ({completed.length})
-              </h2>
-              <div className="space-y-3">
-                {completed.map(req => (
-                  <button key={req.id} onClick={() => openCheckIn(req)}
-                    className="w-full text-left card p-5 hover:shadow-md transition-shadow">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-semibold text-[var(--foreground)]">{req.title}</h3>
-                        <p className="text-xs text-[var(--muted-soft)] mt-1">
-                          Responded {req.responded_at ? new Date(req.responded_at).toLocaleDateString() : ''}
-                        </p>
+          <div className="mt-8">
+            {pending.length > 0 && (
+              <div className="mb-8">
+                <h2 className="text-sm font-semibold uppercase tracking-wider text-[var(--warn-text)] mb-3">
+                  Waiting for your response ({pending.length})
+                </h2>
+                <div className="space-y-3">
+                  {pending.map(req => (
+                    <button key={req.id} onClick={() => openCheckIn(req)}
+                      className="w-full text-left card p-5 hover:shadow-md transition-shadow">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="font-semibold text-[var(--foreground)]">{req.title}</h3>
+                          <p className="text-xs text-[var(--muted-soft)] mt-1">
+                            {req.questions.length} question{req.questions.length === 1 ? '' : 's'} · Sent {new Date(req.created_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <span className="flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-full bg-[var(--warn-bg)] text-[var(--warn-text)]">
+                          <Clock className="h-3 w-3" />
+                          Pending
+                        </span>
                       </div>
-                      <span className="flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-full bg-[var(--success-bg)] text-[var(--ok-text)]">
-                        <CheckCircle className="h-3 w-3" />
-                        Done
-                      </span>
-                    </div>
-                  </button>
-                ))}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+
+            {pending.length === 0 && completed.length === 0 && (
+              <div className="card p-12 text-center">
+                <CheckCircle className="h-12 w-12 text-[var(--muted-soft)] mx-auto mb-3" />
+                <h3 className="font-semibold text-[var(--foreground)] mb-1">No check-ins yet</h3>
+                <p className="text-sm text-[var(--muted-soft)]">Your coach will send check-ins here for you to complete.</p>
+              </div>
+            )}
+
+            {completed.length > 0 && (
+              <div>
+                <h2 className="text-sm font-semibold uppercase tracking-wider text-[var(--ok-text)] mb-3">
+                  Completed ({completed.length})
+                </h2>
+                <div className="space-y-3">
+                  {completed.map(req => (
+                    <button key={req.id} onClick={() => openCheckIn(req)}
+                      className="w-full text-left card p-5 hover:shadow-md transition-shadow">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="font-semibold text-[var(--foreground)]">{req.title}</h3>
+                          <p className="text-xs text-[var(--muted-soft)] mt-1">
+                            Responded {req.responded_at ? new Date(req.responded_at).toLocaleDateString() : ''}
+                          </p>
+                        </div>
+                        <span className="flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-full bg-[var(--success-bg)] text-[var(--ok-text)]">
+                          <CheckCircle className="h-3 w-3" />
+                          Done
+                        </span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </>
       )}
     </div>
