@@ -28,16 +28,35 @@ function Stars({
   onChange?: (v: number) => void
   size?: number
 }) {
-  const interactive = typeof onChange === 'function'
+  // Read-only display (e.g. a posted review's rating): a single labelled group,
+  // not five disabled buttons each announcing "N stars" with no overall rating.
+  if (!onChange) {
+    return (
+      <div className="row" style={{ gap: 2 }} role="img" aria-label={`Rated ${value} out of 5 stars`}>
+        {[1, 2, 3, 4, 5].map((n) => (
+          <Star
+            key={n}
+            width={size}
+            height={size}
+            aria-hidden="true"
+            style={{
+              color: n <= value ? 'var(--acc)' : 'var(--fg-4)',
+              fill: n <= value ? 'var(--acc)' : 'none',
+            }}
+          />
+        ))}
+      </div>
+    )
+  }
+
   return (
     <div className="row" style={{ gap: 2 }}>
       {[1, 2, 3, 4, 5].map((n) => (
         <button
           key={n}
           type="button"
-          disabled={!interactive}
-          onClick={interactive ? () => onChange!(n) : undefined}
-          className={interactive ? 'cursor-pointer' : 'cursor-default'}
+          onClick={() => onChange(n)}
+          className="cursor-pointer"
           style={{ lineHeight: 0, padding: 0, background: 'none', border: 'none' }}
           aria-label={`${n} star${n > 1 ? 's' : ''}`}
         >
