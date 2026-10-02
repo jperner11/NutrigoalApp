@@ -18,7 +18,7 @@ export default function AIScreen() {
   input: { backgroundColor: c.panel, borderWidth: 1, borderColor: c.lineStrong, borderRadius: 18, padding: 16, fontSize: 16, color: c.foreground, minHeight: 96, textAlignVertical: 'top', marginBottom: 12 },
   button: { backgroundColor: c.brand500, borderRadius: 18, paddingVertical: 16, alignItems: 'center' },
   buttonDisabled: { opacity: 0.6 },
-  buttonText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  buttonText: { color: c.onAccent, fontSize: 16, fontWeight: '700' },
   responseCard: { backgroundColor: c.panel, borderRadius: 20, borderWidth: 1, borderColor: c.line, padding: 16, marginTop: 16, ...brandShadow },
   responseText: { fontSize: 15, color: c.foregroundSoft, lineHeight: 22 },
 }))
@@ -89,7 +89,7 @@ export default function AIScreen() {
           disabled={loading}
         >
           {loading ? (
-            <ActivityIndicator color="#fff" />
+            <ActivityIndicator color={colors.onAccent} />
           ) : (
             <Text style={styles.buttonText}>Get Suggestion</Text>
           )}
