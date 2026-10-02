@@ -11,8 +11,9 @@ small PR to `staging`.
 - **Bug fixes** — obvious defects, error handling gaps, unhandled promise rejections.
 - **Test coverage** — add/repair a deterministic Playwright spec or unit test for an
   untested critical path. (See `apps/web/e2e/`.)
-- **Dead code / hygiene** — remove unused deps, dead files (e.g. the known dead
-  `bed_time` question), stray `apps/web/package-lock.json`, unused exports.
+- **Dead code / hygiene** — remove unused deps, dead files, stray
+  `apps/web/package-lock.json`, unused exports. (Note: `bed_time`/`sleep_time` is
+  *not* dead — see `docs/onboarding-question-audit.md` — don't re-flag it.)
 - **Type safety** — remove `any`, tighten types, fix TS strictness gaps.
 - **Small perf wins** — obvious N+1 queries, unnecessary client components, missing
   `Suspense`/loading states, oversized bundles.
