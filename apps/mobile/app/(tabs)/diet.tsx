@@ -734,7 +734,7 @@ function LogMeal({ user, onDone, onCancel }: any) {
     try {
       const res = await fetch(`${API_URL}/api/food/search?query=${encodeURIComponent(searchQuery)}&number=10`)
       if (res.ok) { const data = await res.json(); setSearchResults(data.results || []) }
-    } catch {}
+    } catch { Alert.alert('Error', 'Could not search foods') }
     setSearching(false)
   }
 
@@ -750,7 +750,7 @@ function LogMeal({ user, onDone, onCancel }: any) {
           carbs: Math.round(data.carbs || 0), fat: Math.round(data.fat || 0),
         }])
       }
-    } catch {}
+    } catch { Alert.alert('Error', 'Could not load nutrition info') }
     setLoadingNutrition(null)
   }
 
