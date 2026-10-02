@@ -758,7 +758,7 @@ function LogMeal({ user, onDone, onCancel }: any) {
     if (foods.length === 0) { Alert.alert('Error', 'Add at least one food'); return }
     setSaving(true)
     const today = getLocalDateString()
-    await supabase.from('meal_logs').insert({
+    const { error } = await supabase.from('meal_logs').insert({
       user_id: user.id, date: today, meal_type: mealType, foods,
       total_calories: foods.reduce((s, f) => s + f.calories, 0),
       total_protein: foods.reduce((s, f) => s + f.protein, 0),
@@ -766,6 +766,7 @@ function LogMeal({ user, onDone, onCancel }: any) {
       total_fat: foods.reduce((s, f) => s + f.fat, 0),
     })
     setSaving(false)
+    if (error) { Alert.alert('Error', 'Could not save meal. Please try again.'); return }
     onDone()
   }
 
