@@ -223,12 +223,13 @@ export default function CoachingToolPage() {
             <div className="mb-6 space-y-4">
               {config.fields.map((field) => (
                 <div key={field.key}>
-                  <label className={labelClass} style={labelStyle}>
+                  <label htmlFor={`coaching-field-${field.key}`} className={labelClass} style={labelStyle}>
                     {field.label.toUpperCase()}
                     {field.required && <span style={{ color: 'var(--warn)' }}> *</span>}
                   </label>
                   {field.type === 'textarea' ? (
                     <textarea
+                      id={`coaching-field-${field.key}`}
                       value={inputs[field.key] ?? ''}
                       onChange={(e) => setInputs({ ...inputs, [field.key]: e.target.value })}
                       placeholder={field.placeholder}
@@ -238,6 +239,7 @@ export default function CoachingToolPage() {
                     />
                   ) : (
                     <input
+                      id={`coaching-field-${field.key}`}
                       type={field.type}
                       value={inputs[field.key] ?? ''}
                       onChange={(e) => setInputs({ ...inputs, [field.key]: e.target.value })}
