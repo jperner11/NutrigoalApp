@@ -35,6 +35,7 @@ export function ChoiceCard({
     <button
       type="button"
       onClick={onClick}
+      aria-pressed={selected}
       className={`rounded-[24px] border p-5 text-left transition ${
         selected
           ? 'border-[rgba(205,242,78,0.34)] bg-[var(--brand-100)] shadow-[0_14px_32px_rgba(205,242,78,0.16)]'
@@ -63,6 +64,7 @@ export function ChoiceListItem({
     <button
       type="button"
       onClick={onClick}
+      aria-pressed={selected}
       className={`flex w-full items-start justify-between gap-4 rounded-[22px] border px-5 py-4 text-left transition ${
         selected
           ? 'border-[rgba(205,242,78,0.34)] bg-[var(--brand-100)]'
@@ -95,6 +97,7 @@ export function ChoiceChip({
     <button
       type="button"
       onClick={onClick}
+      aria-pressed={selected}
       className={`rounded-full border px-4 py-2.5 text-sm font-semibold transition ${
         selected
           ? 'border-[rgba(205,242,78,0.34)] bg-[var(--brand-100)] text-[var(--brand-400)]'
