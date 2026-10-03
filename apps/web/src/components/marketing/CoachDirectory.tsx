@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import Portrait from '@/components/ui/Portrait'
+import { apiFetch } from '@/lib/apiClient'
 
 interface CoachProfile {
   coach_id: string
@@ -51,14 +52,15 @@ export default function CoachDirectory() {
 
   useEffect(() => {
     let cancelled = false
-    fetch('/api/coach-profiles')
-      .then((r) => r.json())
+    apiFetch<{ profiles?: CoachProfile[] } | CoachProfile[]>('/api/coach-profiles', {
+      context: { feature: 'find-coach-directory', action: 'load-coaches' },
+    })
       .then((data) => {
         if (cancelled) return
-        if (Array.isArray(data?.profiles)) {
-          setCoaches(data.profiles as CoachProfile[])
-        } else if (Array.isArray(data)) {
-          setCoaches(data as CoachProfile[])
+        if (Array.isArray(data)) {
+          setCoaches(data)
+        } else if (Array.isArray(data?.profiles)) {
+          setCoaches(data.profiles)
         } else {
           setError('Could not load coaches.')
         }
