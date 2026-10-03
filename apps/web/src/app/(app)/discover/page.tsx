@@ -515,11 +515,11 @@ export default function DiscoverPage() {
       {/* Request modal */}
       {selectedCoach && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center px-4"
+          className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto px-4 py-8"
           style={{ background: 'rgba(13, 27, 42, 0.55)', backdropFilter: 'blur(4px)' }}
         >
           <div
-            className="card w-full max-w-2xl p-6"
+            className="card my-auto max-h-[85vh] w-full max-w-2xl overflow-y-auto p-6"
             role="dialog"
             aria-modal="true"
             aria-labelledby="request-coach-modal-title"
