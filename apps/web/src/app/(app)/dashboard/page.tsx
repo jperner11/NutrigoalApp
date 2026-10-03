@@ -594,7 +594,7 @@ export default function DashboardPage() {
               className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
               style={{
                 background: 'var(--ink-3)',
-                color: 'var(--acc)',
+                color: 'var(--acc-text)',
               }}
             >
               <Icon className="h-4 w-4" />

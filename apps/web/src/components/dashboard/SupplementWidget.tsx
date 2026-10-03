@@ -133,7 +133,7 @@ export default function SupplementWidget({ userId }: SupplementWidgetProps) {
           className="mono"
           style={{
             fontSize: 10,
-            color: 'var(--acc)',
+            color: 'var(--acc-text)',
             letterSpacing: '0.1em',
           }}
         >
