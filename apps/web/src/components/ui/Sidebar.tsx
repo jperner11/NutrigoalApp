@@ -87,6 +87,18 @@ export default function Sidebar({ userRole, userName, onSignOut, collapsed, onCo
     setMobileOpen(false)
   }, [pathname])
 
+  // Close mobile menu on Escape
+  useEffect(() => {
+    if (!mobileOpen) return
+
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') setMobileOpen(false)
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [mobileOpen])
+
   const navItems = isTrainerRole(userRole) && !isManagedClientRole(userRole) ? trainerNavItems : clientNavItems
   const filteredItems = navItems.filter(item => item.roles.includes(userRole))
 
