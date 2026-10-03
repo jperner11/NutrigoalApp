@@ -456,7 +456,7 @@ function MessagesScreen({ client, user, onBack }: { client: ClientWithProfile; u
     getOrCreateConversation().then(id => {
       if (cancelled || !id) return
       setConversationId(id)
-      fetchMessages(id)
+      fetchMessages(id).catch(() => Alert.alert('Error', 'Could not load messages'))
 
       // Subscribe to new messages
       channel = supabase

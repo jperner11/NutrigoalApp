@@ -192,14 +192,18 @@ function ChatScreen({ conversationId, user, ptName, onBack }: {
 
   useEffect(() => {
     // Fetch messages
-    supabase.from('messages').select('*').eq('conversation_id', conversationId)
-      .order('created_at', { ascending: true })
-      .then(({ data }) => { if (data) setMessages(data as Message[]) })
+    Promise.resolve(
+      supabase.from('messages').select('*').eq('conversation_id', conversationId)
+        .order('created_at', { ascending: true })
+    ).then(({ data }) => { if (data) setMessages(data as Message[]) })
+      .catch(() => Alert.alert('Error', 'Could not load messages'))
 
     // Mark as read
-    supabase.from('messages').update({ read_at: new Date().toISOString() })
-      .eq('conversation_id', conversationId).neq('sender_id', user.id).is('read_at', null)
-      .then(() => {})
+    Promise.resolve(
+      supabase.from('messages').update({ read_at: new Date().toISOString() })
+        .eq('conversation_id', conversationId).neq('sender_id', user.id).is('read_at', null)
+    ).then(() => {})
+      .catch(() => {})
 
     // Realtime
     const channel = supabase
