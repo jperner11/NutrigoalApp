@@ -290,46 +290,52 @@ export default function NewTrainingPlanPage() {
         return
       }
 
-      // Insert days and their exercises
-      for (let i = 0; i < days.length; i++) {
-        const day = days[i]
+      // Each day's insert only depends on plan.id, not on prior days, so run
+      // them concurrently instead of serializing one round trip per day.
+      const dayResults = await Promise.all(
+        days.map(async (day, i) => {
+          const { data: planDay, error: dayError } = await supabase
+            .from('training_plan_days')
+            .insert({
+              training_plan_id: plan.id,
+              day_number: i + 1,
+              name: day.name,
+            })
+            .select()
+            .single()
 
-        const { data: planDay, error: dayError } = await supabase
-          .from('training_plan_days')
-          .insert({
-            training_plan_id: plan.id,
-            day_number: i + 1,
-            name: day.name,
-          })
-          .select()
-          .single()
+          if (dayError || !planDay) {
+            return { dayName: day.name, stage: 'day' as const }
+          }
 
-        if (dayError || !planDay) {
-          toast.error(`Failed to create day "${day.name}"`)
-          setSaving(false)
-          return
-        }
+          // Batch insert exercises for this day
+          const exerciseInserts = day.exercises.map((ex, idx) => ({
+            plan_day_id: planDay.id,
+            exercise_id: ex.exercise_id,
+            order_index: idx,
+            sets: ex.sets,
+            reps: ex.reps,
+            rest_seconds: ex.rest_seconds,
+            notes: ex.notes.trim() || null,
+          }))
 
-        // Batch insert exercises for this day
-        const exerciseInserts = day.exercises.map((ex, idx) => ({
-          plan_day_id: planDay.id,
-          exercise_id: ex.exercise_id,
-          order_index: idx,
-          sets: ex.sets,
-          reps: ex.reps,
-          rest_seconds: ex.rest_seconds,
-          notes: ex.notes.trim() || null,
-        }))
+          const { error: exError } = await supabase
+            .from('training_plan_exercises')
+            .insert(exerciseInserts)
 
-        const { error: exError } = await supabase
-          .from('training_plan_exercises')
-          .insert(exerciseInserts)
+          return exError ? { dayName: day.name, stage: 'exercises' as const } : null
+        })
+      )
 
-        if (exError) {
-          toast.error(`Failed to save exercises for "${day.name}"`)
-          setSaving(false)
-          return
-        }
+      const failedDay = dayResults.find((result) => result !== null)
+      if (failedDay) {
+        toast.error(
+          failedDay.stage === 'day'
+            ? `Failed to create day "${failedDay.dayName}"`
+            : `Failed to save exercises for "${failedDay.dayName}"`
+        )
+        setSaving(false)
+        return
       }
 
       toast.success('Training plan created!')
