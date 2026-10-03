@@ -97,8 +97,10 @@ export default function CoachResults({ answers, matches }: CoachResultsProps) {
 
           <form onSubmit={handleWaitlistSubmit} className="mt-6 flex flex-col gap-3 sm:flex-row">
             <div className="relative flex-1">
+              <label htmlFor="waitlist-email" className="sr-only">Email address</label>
               <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted-soft)]" />
               <input
+                id="waitlist-email"
                 type="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
