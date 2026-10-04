@@ -37,7 +37,14 @@ export default function ResetPasswordPage() {
       if (finished) return
       finished = true
 
-      const { data: { session } } = await supabase.auth.getSession()
+      let session = null
+      try {
+        session = (await supabase.auth.getSession()).data.session
+      } catch {
+        // Treat a rejected getSession() the same as a resolved call that finds
+        // no session — surfaces the same "link invalid/expired" messaging
+        // instead of leaving an unhandled rejection.
+      }
       if (!session && cameFromLink) {
         toast.error('This password reset link is invalid or has expired. Request a new one below.')
       }
