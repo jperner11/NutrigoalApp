@@ -7,9 +7,9 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { useAuth } from '../../src/contexts/AuthContext'
 import { supabase } from '../../src/lib/supabase'
-import { getLocalDateString } from '../../src/lib/date'
 import {
   MEAL_TYPES, COMMON_SUPPLEMENTS, SUPPLEMENT_FREQUENCIES, SUPPLEMENT_TIMES,
+  getLocalDateString, getMondayIndexedDay,
 } from '@treno/shared'
 import type {
   DietPlan, DietPlanMeal, FoodItem, MealType, UserSupplement, SupplementFrequency, SupplementTime,
@@ -181,7 +181,7 @@ function DietPlanDetail({ planId, user, onBack }: { planId: string; user: { id: 
   const [loading, setLoading] = useState(true)
 
   const today = getLocalDateString()
-  const dayOfWeek = (new Date().getDay() + 6) % 7
+  const dayOfWeek = getMondayIndexedDay()
 
   const loadPlan = async () => {
     if (!user) return
