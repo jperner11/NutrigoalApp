@@ -135,7 +135,7 @@ export default function MyNutritionistPage() {
 
       {/* Coach card */}
       <div className="card p-6">
-        <div className="grid gap-5" style={{ gridTemplateColumns: '120px 1fr' }}>
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-[120px_1fr]">
           <Portrait seed={1} label={initials} height={140} />
           <div className="min-w-0">
             <div className="serif" style={{ fontSize: 28, lineHeight: 1.15 }}>
