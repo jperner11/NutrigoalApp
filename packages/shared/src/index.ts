@@ -109,6 +109,9 @@ export {
 // Training
 export { parseRepRange, calculateSuggestion } from './training'
 
+// Date
+export { getLocalDateString, getMondayIndexedDay } from './date'
+
 // Cardio
 export { calculateCardioCalories } from './cardio'
 
