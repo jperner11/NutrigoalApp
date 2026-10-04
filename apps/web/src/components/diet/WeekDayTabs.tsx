@@ -26,7 +26,9 @@ export default function WeekDayTabs({ selectedDay, onSelectDay, daySummaries }: 
         return (
           <button
             key={i}
+            type="button"
             onClick={() => onSelectDay(i)}
+            aria-pressed={isActive}
             className="flex-1 min-w-[4rem] px-2 py-2.5 rounded-lg text-center transition-all"
             style={{
               background: isActive ? 'var(--background)' : 'transparent',
