@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   RefreshControl,
+  Alert,
 } from 'react-native'
 import { useRouter } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
@@ -133,6 +134,7 @@ function ClientHome({ userId }: { userId: string | null }) {
     })
     if (error) {
       Sentry.captureException(error, { tags: { kind: 'water-add', screen: 'client-home' } })
+      Alert.alert('Error', 'Could not log water intake. Please try again.')
       return
     }
     setWaterTotal((prev) => prev + amount)

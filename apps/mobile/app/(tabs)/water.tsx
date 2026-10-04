@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, RefreshControl } from 'react-native'
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, RefreshControl, Alert } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import * as Sentry from '@sentry/react-native'
@@ -68,6 +68,7 @@ export default function WaterScreen() {
     const { error } = await supabase.from('water_logs').insert({ user_id: user.id, date: today, amount_ml: amount })
     if (error) {
       Sentry.captureException(error, { tags: { kind: 'water-add', screen: 'water' } })
+      Alert.alert('Error', 'Could not log water intake. Please try again.')
       return
     }
     await fetchLogs()
