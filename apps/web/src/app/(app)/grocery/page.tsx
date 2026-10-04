@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { ShoppingCart, Check, ChevronDown, ChevronUp } from 'lucide-react'
 import { aggregateIngredients, groupByCategory, CATEGORY_ORDER } from '@/lib/grocery'
 import type { GroceryItem } from '@/lib/grocery'
+import { reportClientError } from '@/lib/apiClient'
 
 interface MealFoods {
   _meta?: unknown
@@ -29,68 +30,67 @@ export default function GroceryPage() {
   async function loadGroceryList() {
     const supabase = createClient()
 
-    // Get active diet plan
-    const { data: plans } = await supabase
-      .from('diet_plans')
-      .select('id, name')
-      .eq('user_id', profile!.id)
-      .eq('is_active', true)
-      .order('created_at', { ascending: false })
-      .limit(1)
+    try {
+      // Get active diet plan
+      const { data: plans } = await supabase
+        .from('diet_plans')
+        .select('id, name')
+        .eq('user_id', profile!.id)
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
+        .limit(1)
 
-    if (!plans || plans.length === 0) {
-      setLoading(false)
-      return
-    }
+      if (!plans || plans.length === 0) return
 
-    setPlanName(plans[0].name)
+      setPlanName(plans[0].name)
 
-    // Get all meals for this plan (all 7 days)
-    const { data: meals } = await supabase
-      .from('diet_plan_meals')
-      .select('foods, day_of_week')
-      .eq('diet_plan_id', plans[0].id)
+      // Get all meals for this plan (all 7 days)
+      const { data: meals } = await supabase
+        .from('diet_plan_meals')
+        .select('foods, day_of_week')
+        .eq('diet_plan_id', plans[0].id)
 
-    if (!meals || meals.length === 0) {
-      setLoading(false)
-      return
-    }
+      if (!meals || meals.length === 0) return
 
-    // Group ingredients by day
-    const ingredientsByDay: { name: string; amount: number; unit: string }[][] = []
+      // Group ingredients by day
+      const ingredientsByDay: { name: string; amount: number; unit: string }[][] = []
 
-    // Group meals by day_of_week
-    const dayMap = new Map<number, typeof meals>()
-    for (const meal of meals) {
-      const day = meal.day_of_week ?? 0
-      if (!dayMap.has(day)) dayMap.set(day, [])
-      dayMap.get(day)!.push(meal)
-    }
-
-    for (const [, dayMeals] of dayMap) {
-      const dayIngredients: { name: string; amount: number; unit: string }[] = []
-
-      for (const meal of dayMeals) {
-        const foods = meal.foods as MealFoods
-        const items = foods?.items ?? (Array.isArray(foods) ? foods : [])
-
-        for (const item of items as { name: string; amount: number; unit: string }[]) {
-          if (item.name) {
-            dayIngredients.push({
-              name: item.name,
-              amount: Number(item.amount) || 0,
-              unit: item.unit || 'g',
-            })
-          }
-        }
+      // Group meals by day_of_week
+      const dayMap = new Map<number, typeof meals>()
+      for (const meal of meals) {
+        const day = meal.day_of_week ?? 0
+        if (!dayMap.has(day)) dayMap.set(day, [])
+        dayMap.get(day)!.push(meal)
       }
 
-      ingredientsByDay.push(dayIngredients)
-    }
+      for (const [, dayMeals] of dayMap) {
+        const dayIngredients: { name: string; amount: number; unit: string }[] = []
 
-    const aggregated = aggregateIngredients(ingredientsByDay)
-    setGroceryItems(aggregated)
-    setLoading(false)
+        for (const meal of dayMeals) {
+          const foods = meal.foods as MealFoods
+          const items = foods?.items ?? (Array.isArray(foods) ? foods : [])
+
+          for (const item of items as { name: string; amount: number; unit: string }[]) {
+            if (item.name) {
+              dayIngredients.push({
+                name: item.name,
+                amount: Number(item.amount) || 0,
+                unit: item.unit || 'g',
+              })
+            }
+          }
+        }
+
+        ingredientsByDay.push(dayIngredients)
+      }
+
+      const aggregated = aggregateIngredients(ingredientsByDay)
+      setGroceryItems(aggregated)
+    } catch (err) {
+      reportClientError(err, { feature: 'grocery', action: 'load-grocery-list' })
+    } finally {
+      setLoading(false)
+    }
   }
 
   function toggleCheck(key: string) {
